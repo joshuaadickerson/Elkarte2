@@ -1730,9 +1730,9 @@ function loadEssentialFunctions()
 	if (!function_exists('ip2range'))
 		require_once(SOURCEDIR . '/Subs.php');
 
-	if (!function_exists('cache_put_data'))
+	if (!function_exists('Cache::instance()->put'))
 	{
-		function cache_put_data($val)
+		function Cache::instance()->put($val)
 		{
 
 		}

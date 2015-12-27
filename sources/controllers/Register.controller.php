@@ -70,7 +70,6 @@ class Register_Controller extends Action_Controller
 			'register2' => array($this, 'action_register2'),
 			'usernamecheck' => array($this, 'action_registerCheckUsername'),
 			'activate' => array($this, 'action_activate'),
-			'contact' => array($this, 'action_contact'),
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
 		);
@@ -104,7 +103,7 @@ class Register_Controller extends Action_Controller
 
 		// Confused and want to contact the admins instead
 		if (isset($this->_req->post->show_contact))
-			redirectexit('action=register;sa=contact');
+			redirectexit('action=about;sa=contact');
 
 		loadLanguage('Login');
 		loadTemplate('Register');
@@ -924,6 +923,101 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Show the verification code or let it hear.
+	 *
+	 * - Accessed by ?action=register;sa=verificationcode
+	 */
+	public function action_verificationcode()
+	{
+		global $context, $scripturl;
+	//	vid=register;rand=ef746ef2ee7ad37a35ce512cf9aa43d2;sound
+
+		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
+		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
+
+		// Somehow no code was generated or the session was lost.
+		if (empty($code))
+		{
+			header('Content-Type: image/gif');
+			die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
+		}
+		// Show a window that will play the verification code (play sound)
+		elseif (isset($this->_req->query->sound))
+		{
+			loadLanguage('Login');
+			loadTemplate('Register');
+
+			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
+			$context['sub_template'] = 'verification_sound';
+			Template_Layers::getInstance()->removeAll();
+
+			obExit();
+		}
+		// If we have GD, try the nice code. (new image)
+		elseif (empty($this->_req->query->format))
+		{
+			require_once(SUBSDIR . '/Graphics.subs.php');
+
+			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
+				header('HTTP/1.1 400 Bad Request');
+			// Otherwise just show a pre-defined letter.
+			elseif (isset($this->_req->query->letter))
+			{
+				$this->_req->query->letter = (int) $this->_req->query->letter;
+				if ($this->_req->query->letter > 0 && $this->_req->query->letter <= strlen($code) && !showLetterImage(strtolower($code{$this->_req->query->letter - 1})))
+				{
+					header('Content-Type: image/gif');
+					die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
+				}
+			}
+			// You must be up to no good.
+			else
+			{
+				header('Content-Type: image/gif');
+				die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
+			}
+		}
+		// Or direct link to the sound
+		elseif ($this->_req->query->format === '.wav')
+		{
+			require_once(SUBSDIR . '/Sound.subs.php');
+
+			if (!createWaveFile($code))
+				header('HTTP/1.1 400 Bad Request');
+		}
+
+		// Why die when we can exit to live another day...
+		exit();
+	}
+
+	/**
+	 * See if a username already exists.
+	 *
+	 * - Used by registration template via xml request
+	 */
+	public function action_registerCheckUsername()
+	{
+		global $context;
+
+		// This is XML!
+		loadTemplate('Xml');
+		$context['sub_template'] = 'check_username';
+		$context['checked_username'] = isset($this->_req->query->username) ? un_htmlspecialchars($this->_req->query->username) : '';
+		$context['valid_username'] = true;
+
+		// Clean it up like mother would.
+		$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
+
+		$errors = Error_Context::context('valid_username', 0);
+
+		require_once(SUBSDIR . '/Auth.subs.php');
+		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
+
+		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+
+	/**
 	 * This function will display the contact information for the forum, as well a form to fill in.
 	 *
 	 * - Accessed by action=register;sa=coppa
@@ -998,193 +1092,5 @@ class Register_Controller extends Action_Controller
 				'id' => $this->_req->query->member,
 			);
 		}
-	}
-
-	/**
-	 * Show the verification code or let it hear.
-	 *
-	 * - Accessed by ?action=register;sa=verificationcode
-	 */
-	public function action_verificationcode()
-	{
-		global $context, $scripturl;
-	//	vid=register;rand=ef746ef2ee7ad37a35ce512cf9aa43d2;sound
-
-		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
-		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
-
-		// Somehow no code was generated or the session was lost.
-		if (empty($code))
-		{
-			header('Content-Type: image/gif');
-			die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
-		}
-		// Show a window that will play the verification code (play sound)
-		elseif (isset($this->_req->query->sound))
-		{
-			loadLanguage('Login');
-			loadTemplate('Register');
-
-			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
-			$context['sub_template'] = 'verification_sound';
-			Template_Layers::getInstance()->removeAll();
-
-			obExit();
-		}
-		// If we have GD, try the nice code. (new image)
-		elseif (empty($this->_req->query->format))
-		{
-			require_once(SUBSDIR . '/Graphics.subs.php');
-
-			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
-				header('HTTP/1.1 400 Bad Request');
-			// Otherwise just show a pre-defined letter.
-			elseif (isset($this->_req->query->letter))
-			{
-				$this->_req->query->letter = (int) $this->_req->query->letter;
-				if ($this->_req->query->letter > 0 && $this->_req->query->letter <= strlen($code) && !showLetterImage(strtolower($code{$this->_req->query->letter - 1})))
-				{
-					header('Content-Type: image/gif');
-					die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
-				}
-			}
-			// You must be up to no good.
-			else
-			{
-				header('Content-Type: image/gif');
-				die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
-			}
-		}
-		// Or direct link to the sound
-		elseif ($this->_req->query->format === '.wav')
-		{
-			require_once(SUBSDIR . '/Sound.subs.php');
-
-			if (!createWaveFile($code))
-				header('HTTP/1.1 400 Bad Request');
-		}
-
-		// Why die when we can exit to live another day...
-		exit();
-	}
-
-	/**
-	 * Shows the contact form for the user to fill out
-	 *
-	 * - Functionality needs to be enabled in the ACP for this to be used
-	 */
-	public function action_contact()
-	{
-		global $context, $txt, $user_info, $modSettings;
-
-		// Users have no need to use this, just send a PM
-		// Disabled, you cannot enter.
-		if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
-			redirectexit();
-
-		loadLanguage('Login');
-		loadTemplate('Register');
-
-		// Submitted the contact form?
-		if (isset($this->_req->post->send))
-		{
-			checkSession('post');
-			validateToken('contact');
-
-			// Can't send a lot of these in a row, no sir!
-			spamProtection('contact');
-
-			// No errors, yet.
-			$context['errors'] = array();
-			loadLanguage('Errors');
-
-			// Could they get the right send topic verification code?
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			require_once(SUBSDIR . '/Members.subs.php');
-
-			// Form validation
-			$validator = new Data_Validator();
-			$validator->sanitation_rules(array(
-				'emailaddress' => 'trim',
-				'contactmessage' => 'trim'
-			));
-			$validator->validation_rules(array(
-				'emailaddress' => 'required|valid_email',
-				'contactmessage' => 'required'
-			));
-			$validator->text_replacements(array(
-				'emailaddress' => $txt['error_email'],
-				'contactmessage' => $txt['error_message']
-			));
-
-			// Any form errors
-			if (!$validator->validate($this->_req->post))
-				$context['errors'] = $validator->validation_errors();
-
-			// Get the clean data
-			$this->_req->post = new ArrayObject($validator->validation_data(), ArrayObject::ARRAY_AS_PROPS);
-
-			// Trigger the verify contact event for captcha checks
-			$this->_events->trigger('verify_contact', array());
-
-			// No errors, then send the PM to the admins
-			if (empty($context['errors']))
-			{
-				$admins = admins();
-				if (!empty($admins))
-				{
-					require_once(SUBSDIR . '/PersonalMessage.subs.php');
-					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $this->_req->post->contactmessage, false, array('id' => 0, 'name' => $this->_req->post->emailaddress, 'username' => $this->_req->post->emailaddress));
-				}
-
-				// Send the PM
-				redirectexit('action=register;sa=contact;done');
-			}
-			else
-			{
-				$context['emailaddress'] = $this->_req->post->emailaddress;
-				$context['contactmessage'] = $this->_req->post->contactmessage;
-			}
-		}
-
-		// Show the contact done form or the form itself
-		if (isset($this->_req->query->done))
-			$context['sub_template'] = 'contact_form_done';
-		else
-		{
-			$context['sub_template'] = 'contact_form';
-			$context['page_title'] = $txt['admin_contact_form'];
-
-			// Setup any contract form events, like validation
-			$this->_events->trigger('setup_contact', array());
-		}
-
-		createToken('contact');
-	}
-
-	/**
-	 * See if a username already exists.
-	 *
-	 * - Used by registration template via xml request
-	 */
-	public function action_registerCheckUsername()
-	{
-		global $context;
-
-		// This is XML!
-		loadTemplate('Xml');
-		$context['sub_template'] = 'check_username';
-		$context['checked_username'] = isset($this->_req->query->username) ? un_htmlspecialchars($this->_req->query->username) : '';
-		$context['valid_username'] = true;
-
-		// Clean it up like mother would.
-		$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
-
-		$errors = Error_Context::context('valid_username', 0);
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
-
-		$context['valid_username'] = !$errors->hasErrors();
 	}
 }

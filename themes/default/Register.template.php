@@ -788,7 +788,7 @@ function template_contact_form()
 
 	echo '
 		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
-		<form id="contact_form" class="content" action="', $scripturl, '?action=register;sa=contact" method="post" accept-charset="UTF-8">
+		<form id="contact_form" class="content" action="', $scripturl, '?action=about;sa=contact" method="post" accept-charset="UTF-8">
 			<div class="content">';
 
 	if (!empty($context['errors']))

@@ -55,7 +55,7 @@ class TestSubs extends PHPUnit_Framework_TestCase
 			'{recent_url}' => $scripturl . '?action=recent',
 			'{search_url}' => $scripturl . '?action=search',
 			'{who_url}' => $scripturl . '?action=who',
-			'{credits_url}' => $scripturl . '?action=who;sa=credits',
+			'{credits_url}' => $scripturl . '?action=about;sa=credits',
 			'{calendar_url}' => $scripturl . '?action=calendar',
 			'{memberlist_url}' => $scripturl . '?action=memberlist',
 			'{stats_url}' => $scripturl . '?action=stats',

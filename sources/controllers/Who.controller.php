@@ -244,27 +244,4 @@ class Who_Controller extends Action_Controller
 		// Any profile fields disabled?
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 	}
-
-	/**
-	 * It prepares credit and copyright information for the credits page or the admin page.
-	 *
-	 * - Accessed by ?action=who;sa=credits
-	 *
-	 * @uses Who language file
-	 * @uses template_credits() sub template in Who.template,
-	 */
-	public function action_credits()
-	{
-		global $context, $txt;
-
-		require_once(SUBSDIR . '/Who.subs.php');
-		loadLanguage('Who');
-
-		$context += prepareCreditsData();
-
-		loadTemplate('Who');
-		$context['sub_template'] = 'credits';
-		$context['robot_no_index'] = true;
-		$context['page_title'] = $txt['credits'];
-	}
 }

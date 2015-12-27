@@ -169,6 +169,9 @@ class About_Controller extends Action_Controller
     {
         global $context, $modSettings;
 
+        if (empty($modSettings['staff_page']))
+            redirectexit();
+
         require_once(SUBSDIR . '/About.subs.php');
         $context['sub_template'] = 'staff';
 

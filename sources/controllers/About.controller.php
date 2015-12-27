@@ -37,6 +37,7 @@ class About_Controller extends Action_Controller
             'credits' => array($this, 'action_credits'),
             'contact' => array($this, 'action_contact'),
             'coppa' => array($this, 'action_coppa'),
+            'staff' => array($this, 'action_staff'),
         );
 
         // Setup the action handler
@@ -45,6 +46,12 @@ class About_Controller extends Action_Controller
 
         // Call the action
         $action->dispatch($subAction);
+    }
+
+    public function pre_dispatch()
+    {
+        loadTemplate('About');
+        loadLanguage('About');
     }
 
     /**
@@ -59,9 +66,6 @@ class About_Controller extends Action_Controller
         // Disabled, you cannot enter.
         if (empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
             redirectexit();
-
-        loadLanguage('Login');
-        loadTemplate('Register');
 
         // Submitted the contact form?
         if (isset($this->_req->post->send))
@@ -153,13 +157,31 @@ class About_Controller extends Action_Controller
         global $context, $txt;
 
         require_once(SUBSDIR . '/About.subs.php');
-        loadLanguage('About');
 
         $context += prepareCreditsData();
 
-        loadTemplate('About');
         $context['sub_template'] = 'credits';
         $context['robot_no_index'] = true;
         $context['page_title'] = $txt['credits'];
+    }
+
+    public function action_staff()
+    {
+        global $context, $modSettings;
+
+        require_once(SUBSDIR . '/About.subs.php');
+        $context['sub_template'] = 'staff';
+
+        $staff_groups = empty($modSettings['staff_groups']) ? array(1, 2) : explode(',', $modSettings['staff_groups']);
+        call_integration_hook('integrate_staff_groups', array($staff_groups));
+
+        loadStaffList($staff_groups);
+
+        loadMemberData($context['staff_ids']);
+
+        foreach ($context['staff_ids'] as $member)
+        {
+            loadMemberContext($member);
+        }
     }
 }

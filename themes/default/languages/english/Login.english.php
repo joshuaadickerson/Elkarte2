@@ -139,10 +139,3 @@ $txt['authenticate_openid'] = 'OpenID';
 $txt['authenticate_openid_url'] = 'OpenID Authentication URL';
 $txt['otp_required'] = 'A Google Authenticator token is required in order to log in!';
 $txt['disable_otp'] = 'Disable two factor authentication.';
-
-// Contact form
-$txt['admin_contact_form'] = 'Contact the admins';
-$txt['contact_your_message'] = 'Your message';
-$txt['errors_contact_form'] = 'The following errors occurred while processing your contact request';
-$txt['contact_subject'] = 'A guest has sent you a message';
-$txt['contact_thankyou'] = 'Thank you for your message, someone will contact you as soon as possible.';

@@ -144,3 +144,32 @@ function prepareCreditsData()
     $credits['copyrights']['elkarte'] = '&copy; 2012 - 2014 ElkArte Forum contributors';
     return $credits;
 }
+
+function loadStaffList(array $groups)
+{
+    global $context;
+    require_once(SUBSDIR . '/Membergroups.subs.php');
+
+    $members = array();
+    $temp = getMembersByGroups($groups);
+
+    // Sort it
+    foreach ($groups as $group)
+    {
+        if (isset($temp[$group]))
+        {
+            $context['staff_list'][$group] = $temp[$group];
+        }
+    }
+
+    // Get the unique member ids from it
+    foreach($context['staff_list'] as $group)
+    {
+        foreach($group['members'] as $id => $member)
+        {
+            $members[$id] = $member;
+        }
+    }
+
+    $context['staff_ids'] = array_keys($members);
+}

@@ -533,13 +533,63 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 }
 
 /**
+ * Get the members that are in groups with basic group and member info
+ * Be careful, this may return a large number of members
+ *
+ * @param int[] $groups
+ * @return array
+ */
+function getMembersByGroups(array $groups)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_member, m.real_name,
+			mg.id_group, mg.group_name, mg.online_color, mg.description, mg.id_parent, mg.icons
+		FROM {db_prefix}membergroups mg
+		LEFT JOIN {db_prefix}members m ON(m.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, m.additional_groups))
+		WHERE mg.id_group IN({array_int:groups})',
+		array(
+			'groups' => $groups,
+		)
+	);
+
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$id = (int) $row['id_group'];
+		$mem_id = (int) $row['id_member'];
+
+		if (!isset($return[$id]))
+		{
+			$return[$id] = array(
+				'id' => $id,
+				'name' => $row['group_name'],
+				'color' => $row['online_color'],
+				'description' => $row['description'],
+				'icons' => $row['icons'],
+				'parent' => (int) $row['id_parent'],
+				'members' => array(),
+			);
+		}
+
+		$return[$id]['members'][$mem_id] = array(
+			'id' => $mem_id,
+			'name' => $row['real_name'],
+		);
+	}
+
+	return $return;
+}
+
+/**
  * Gets the members of a supplied membergroup.
  *
  * - Returns them as a link for display.
  *
  * @package Membergroups
  * @param int[] $members
- * @param int $membergroup
+ * @param int[] $membergroup
  * @param integer|null $limit = null
  * @return boolean
  */

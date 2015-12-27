@@ -835,9 +835,13 @@ class ManageMembergroups_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
+		global $txt;
+
 		// Only one thing here!
 		$config_vars = array(
 			array('permissions', 'manage_membergroups'),
+			array('check', 'staff_page'),
+			array('text', 'staff_groups'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

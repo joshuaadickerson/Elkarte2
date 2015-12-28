@@ -21,32 +21,6 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
- *
- * What it does:
- * - Uses Request to determine as best it can client IPs for the current request.
- * - Uses Request cleanRequest() to:
- *   - Clean the request variables (ENV, GET, POST, COOKIE, SERVER)
- *   - Makes sure the query string was parsed correctly.
- *   - Handles the URLs passed by the queryless URLs option.
- *   - Makes sure, regardless of php.ini, everything has slashes.
- * - Uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
- */
-function cleanRequest()
-{
-	require_once(SOURCEDIR . '/Request.php');
-
-	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = Request::instance();
-
-	// Make sure there are no problems with the request
-	$req->cleanRequest();
-
-	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
-	$req->parseRequest();
-}
-
-/**
  * Validates a IPv6 address. returns true if it is ipv6.
  *
  * @param string $ip ip address to be validated

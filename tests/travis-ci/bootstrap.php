@@ -67,7 +67,8 @@ $context['forum_name'] = $mbname;
 $context['forum_name_html_safe'] = $context['forum_name'];
 
 // Just like we are starting, almost
-cleanRequest();
+Request::instance()->cleanRequest()->parseRequest();
+
 loadDatabase();
 Hooks::init(database(), Debug::get());
 reloadSettings();

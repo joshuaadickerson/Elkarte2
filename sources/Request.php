@@ -273,6 +273,8 @@ class Request
 			$_GET['action'] = (string) $_GET['action'];
 
 		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
+
+		return $this;
 	}
 
 	/**
@@ -392,6 +394,8 @@ class Request
 			$_SERVER['REQUEST_URL'] = $match[1] . $_SERVER['REQUEST_URI'];
 		else
 			$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
+
+		return $this;
 	}
 
 	/**

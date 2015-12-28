@@ -119,7 +119,7 @@ if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
 
 // Clean the request.
-cleanRequest();
+Request::instance()->cleanRequest()->parseRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();

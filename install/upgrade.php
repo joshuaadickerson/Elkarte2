@@ -461,9 +461,7 @@ function loadEssentialData()
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
 	if (file_exists(SOURCEDIR . '/QueryString.php'))
 	{
-		require_once(SOURCEDIR . '/QueryString.php');
-
-		cleanRequest();
+		Request::instance()->cleanRequest()->parseRequest();
 	}
 
 	// Set a session life limit for the admin

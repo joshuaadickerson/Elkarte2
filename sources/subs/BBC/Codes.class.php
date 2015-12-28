@@ -856,7 +856,7 @@ class Codes
 			'O' => 'circle',
 		);
 
-		Hooks::get()->hook('item_codes', array(&$item_codes));
+		\Hooks::get()->hook('item_codes', array(&$item_codes));
 
 		return $item_codes;
 	}
@@ -967,7 +967,7 @@ class Codes
 		}
 
 		// @todo Interface/setting to add more?
-		Hooks::get()->hook('bbc_set_printing', array($this));
+		\Hooks::get()->hook('bbc_set_printing', array($this));
 
 		return $this;
 	}

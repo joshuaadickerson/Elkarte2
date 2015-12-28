@@ -119,7 +119,7 @@ class ParserWrapper
 		// First see if any hooks set a parser.
 		foreach ($parsers as $parser_type => &$parser)
 		{
-			Hooks::get()->hook('' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
+			\Hooks::get()->hook('' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
 
 			// If not, use the default one
 			if ($parser === false)

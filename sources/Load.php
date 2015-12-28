@@ -1392,9 +1392,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadJavascriptFile('sha256.js', array('defer' => true));
 	}
 
-	// This determines the server... not used in many places, except for login fixing.
-	detectServer();
-
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
 

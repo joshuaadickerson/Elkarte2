@@ -88,6 +88,8 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 
 			$modSettings['user_access_mentions'][$user_info['id']] = 0;
 			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));
+
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			scheduleTaskImmediate('user_access_mentions');
 		}
 

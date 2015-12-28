@@ -119,7 +119,10 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 
 			// If there are no more users, scheduleTaskImmediate can be stopped
 			if (empty($user_access_mentions))
+			{
+				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				removeScheduleTaskImmediate('user_access_mentions', false);
+			}
 
 			return true;
 		}
@@ -167,6 +170,8 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 
 			// Remember where we are
 			updateSettings(array('mentions_member_check' => $current_check + $limit));
+
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			while ($row = $db->fetch_assoc($request))
 			{

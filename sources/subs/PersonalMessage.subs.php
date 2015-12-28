@@ -547,7 +547,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$recipients = array($recipients);
 
 	// Integrated PMs
-	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
+	Hooks::get()->hook('personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// Get a list of usernames and convert them to IDs.
 	$usernames = array();
@@ -896,7 +896,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	// Integrated After PMs
-	call_integration_hook('integrate_personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
+	Hooks::get()->hook('personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
 
 	// Back to what we were on before!
 	loadLanguage('index+PersonalMessage');

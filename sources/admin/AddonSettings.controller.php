@@ -96,7 +96,7 @@ class AddonSettings_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_general_mod_settings');
+			Hooks::get()->hook('save_general_mod_settings');
 
 			Settings_Form::save_db($config_vars);
 
@@ -139,7 +139,7 @@ class AddonSettings_Controller extends Action_Controller
 		$config_vars = array();
 
 		// Add new settings with a nice hook.
-		call_integration_hook('integrate_general_mod_settings', array(&$config_vars));
+		Hooks::get()->hook('general_mod_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

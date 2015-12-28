@@ -152,7 +152,7 @@ class Display_Controller extends Action_Controller
 		);
 
 		// Allow addons to add additional details to the topic query
-		call_integration_hook('integrate_topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
+		Hooks::get()->hook('topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
@@ -284,7 +284,7 @@ class Display_Controller extends Action_Controller
 		$context['page_title'] = $topicinfo['subject'];
 
 		// Allow addons access to the topicinfo array
-		call_integration_hook('integrate_display_topic', array($topicinfo));
+		Hooks::get()->hook('display_topic', array($topicinfo));
 
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
@@ -394,7 +394,7 @@ class Display_Controller extends Action_Controller
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
+		Hooks::get()->hook('display_message_list', array(&$messages, &$posters));
 
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
@@ -440,7 +440,7 @@ class Display_Controller extends Action_Controller
 			);
 			$msg_selects = array();
 			$msg_tables = array();
-			call_integration_hook('integrate_message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
+			Hooks::get()->hook('message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
 
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
@@ -655,8 +655,8 @@ class Display_Controller extends Action_Controller
 		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
-		call_integration_hook('integrate_display_buttons');
-		call_integration_hook('integrate_mod_buttons');
+		Hooks::get()->hook('display_buttons');
+		Hooks::get()->hook('mod_buttons');
 	}
 
 	/**
@@ -872,7 +872,7 @@ class Display_Controller extends Action_Controller
 			);
 		}
 
-		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
+		Hooks::get()->hook('prepare_display_context', array(&$output, &$message));
 
 		$output['classes'] = implode(' ', $output['classes']);
 

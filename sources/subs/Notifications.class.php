@@ -66,7 +66,7 @@ class Notifications extends AbstractModel
 
 		$this->_protect_id = true;
 
-		call_integration_hook('integrate_notifications_methods', array($this));
+		Hooks::get()->hook('notifications_methods', array($this));
 	}
 
 	/**

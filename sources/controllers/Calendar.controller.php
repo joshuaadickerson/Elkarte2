@@ -168,7 +168,7 @@ class Calendar_Controller extends Action_Controller
 		);
 
 		// Allow mods to add additional buttons here
-		call_integration_hook('integrate_calendar_buttons');
+		Hooks::get()->hook('calendar_buttons');
 	}
 
 	/**

@@ -238,7 +238,7 @@ class Search_Controller extends Action_Controller
 		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
 			$context['minmax_preferences']['asearch'] = 1;
 
-		call_integration_hook('integrate_search');
+		Hooks::get()->hook('search');
 	}
 
 	/**
@@ -399,7 +399,7 @@ class Search_Controller extends Action_Controller
 			$context['minmax_preferences']['asearch'] = 1;
 
 		// *** A last error check
-		call_integration_hook('integrate_search_errors');
+		Hooks::get()->hook('search_errors');
 
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
@@ -475,7 +475,7 @@ class Search_Controller extends Action_Controller
 			$msg_list = array_keys($context['topics']);
 			$posters = $this->_search->loadPosters($msg_list, count($context['topics']));
 
-			call_integration_hook('integrate_search_message_list', array(&$msg_list, &$posters));
+			Hooks::get()->hook('search_message_list', array(&$msg_list, &$posters));
 
 			if (!empty($posters))
 				loadMemberData(array_unique($posters));
@@ -726,7 +726,7 @@ class Search_Controller extends Action_Controller
 			$context['can_markread'] = $context['user']['is_logged'];
 
 			$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'markread');
-			call_integration_hook('integrate_quick_mod_actions_search');
+			Hooks::get()->hook('quick_mod_actions_search');
 		}
 
 		foreach ($context['key_words'] as $query)
@@ -790,7 +790,7 @@ class Search_Controller extends Action_Controller
 			);
 		}
 
-		call_integration_hook('integrate_search_message_context', array($counter, &$output));
+		Hooks::get()->hook('search_message_context', array($counter, &$output));
 
 		return $output;
 	}
@@ -854,7 +854,7 @@ class Search_Controller extends Action_Controller
 			'search_weight_first_message' => 10,
 		);
 
-		call_integration_hook('integrate_search_weights', array(&$this->_weight_factors));
+		Hooks::get()->hook('search_weights', array(&$this->_weight_factors));
 
 		// Set the weight factors for each area (frequency, age, etc) as defined in the ACP
 		$this->_calculate_weights($this->_weight_factors, $modSettings);

@@ -29,7 +29,7 @@ class HtmlParser
 
 		$empty_tags = $this->empty_tags;
 		$closable_tags = $this->closable_tags;
-		call_integration_hook('integrate_html_parser_load', array(&$empty_tags, &$closable_tags));
+		Hooks::get()->hook('html_parser_load', array(&$empty_tags, &$closable_tags));
 		$this->empty_tags = $empty_tags;
 		$this->closable_tags = $closable_tags;
 	}

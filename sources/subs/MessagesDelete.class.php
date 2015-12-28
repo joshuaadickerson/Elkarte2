@@ -687,7 +687,7 @@ class MessagesDelete
 			}
 
 			// Allow mods to remove message related data of their own (likes, maybe?)
-			call_integration_hook('integrate_remove_message', array($message));
+			Hooks::get()->hook('remove_message', array($message));
 		}
 
 		// Update the pesky statistics.

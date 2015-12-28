@@ -352,7 +352,7 @@ class ManageRegistration_Controller extends Action_Controller
 			// Post needs to take into account line breaks.
 			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);
 
-			call_integration_hook('integrate_save_registration_settings');
+			Hooks::get()->hook('save_registration_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
@@ -417,7 +417,7 @@ class ManageRegistration_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_registration_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_registration_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

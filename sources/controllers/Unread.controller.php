@@ -482,7 +482,7 @@ class Unread_Controller extends Action_Controller
 
 		// Allow help desks and bug trackers and what not to add their own unread
 		// data (just add a template_layer to show custom stuff in the template!)
-		call_integration_hook('integrate_unread_list');
+		Hooks::get()->hook('unread_list');
 	}
 
 	/**
@@ -539,7 +539,7 @@ class Unread_Controller extends Action_Controller
 		 * loaded into $context.
 		 * Starting from 2.0 this should be changed to a local variable and passed to the hook
 		 */
-		call_integration_hook('integrate_recent_buttons', array(&$context['recent_buttons']));
+		Hooks::get()->hook('recent_buttons', array(&$context['recent_buttons']));
 
 		return $context['recent_buttons'];
 	}

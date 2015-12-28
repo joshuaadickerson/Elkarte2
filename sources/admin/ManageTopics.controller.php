@@ -83,7 +83,7 @@ class ManageTopics_Controller extends Action_Controller
 			checkSession();
 
 			// Notify addons and integrations of the settings change.
-			call_integration_hook('integrate_save_topic_settings');
+			Hooks::get()->hook('save_topic_settings');
 
 			// Save the result!
 			Settings_Form::save_db($config_vars, $this->_req->post);
@@ -146,7 +146,7 @@ class ManageTopics_Controller extends Action_Controller
 				array('check', 'enablePreviousNext'),
 		);
 
-		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_topic_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -87,7 +87,7 @@ class ManageAvatars_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_avatar_settings');
+			Hooks::get()->hook('save_avatar_settings');
 
 			// Disable if invalid values would result
 			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
@@ -189,7 +189,7 @@ class ManageAvatars_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_avatar_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_avatar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

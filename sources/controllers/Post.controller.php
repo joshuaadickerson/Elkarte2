@@ -1418,11 +1418,11 @@ class Post_Controller extends Action_Controller
 		$controller->pre_dispatch();
 
 		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
-		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
+		Hooks::get()->hook('action_' . $hook . '_before', array('action_index'));
 
 		$result = $controller->action_index();
 
-		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
+		Hooks::get()->hook('action_' . $hook . '_after', array('action_index'));
 
 		return $result;
 	}

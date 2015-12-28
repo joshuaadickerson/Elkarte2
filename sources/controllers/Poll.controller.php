@@ -177,7 +177,7 @@ class Poll_Controller extends Action_Controller
 		}
 
 		// Maybe let a social networking mod log this, or something?
-		call_integration_hook('integrate_poll_vote', array(&$row['id_poll'], &$pollOptions));
+		Hooks::get()->hook('poll_vote', array(&$row['id_poll'], &$pollOptions));
 
 		// Return to the post...
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -675,7 +675,7 @@ class Poll_Controller extends Action_Controller
 		if (isset($this->_req->post->resetVoteCount))
 			resetVotes($bcinfo['id_poll']);
 
-		call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
+		Hooks::get()->hook('poll_add_edit', array($bcinfo['id_poll'], $isEdit));
 
 		// Off we go.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -727,7 +727,7 @@ class Poll_Controller extends Action_Controller
 		associatedPoll($topic, 0);
 
 		// A mod might have logged this (social network?), so let them remove, it too
-		call_integration_hook('integrate_poll_remove', array($pollID));
+		Hooks::get()->hook('poll_remove', array($pollID));
 
 		// Take the moderator back to the topic.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);

@@ -261,7 +261,7 @@ class ManageMail_Controller extends Action_Controller
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
-			call_integration_hook('integrate_save_mail_settings');
+			Hooks::get()->hook('save_mail_settings');
 
 			// You can not send more per page load than you can per minute
 			if (!empty($this->_req->post->mail_batch_size))
@@ -361,7 +361,7 @@ class ManageMail_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_mail_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

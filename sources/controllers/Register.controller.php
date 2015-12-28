@@ -484,7 +484,7 @@ class Register_Controller extends Action_Controller
 		}
 		else
 		{
-			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
+			Hooks::get()->hook('activate', array($regOptions['username'], 1, 1));
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
 

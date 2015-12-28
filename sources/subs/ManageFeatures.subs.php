@@ -292,7 +292,7 @@ function updateAllSignatures($applied_sigs)
 			}
 
 			$sig = strtr($sig, array("\n" => '<br />'));
-			call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
+			Hooks::get()->hook('apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
 			if ($sig != $row['signature'])
 				$changes[$row['id_member']] = $sig;
 		}

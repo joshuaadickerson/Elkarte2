@@ -369,7 +369,7 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
 	if (!empty($options))
 		addPollOptions($id_poll, $options);
 
-	call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
+	Hooks::get()->hook('poll_add_edit', array($id_poll, false));
 
 	return $id_poll;
 }
@@ -410,7 +410,7 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
 		)
 	);
 
-	call_integration_hook('integrate_poll_add_edit', array($id_poll, true));
+	Hooks::get()->hook('poll_add_edit', array($id_poll, true));
 }
 
 /**

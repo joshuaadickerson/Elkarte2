@@ -210,7 +210,7 @@ function create_control_richedit($editorOptions)
 	);
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
-	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
+	Hooks::get()->hook('editor_plugins', array($editorOptions['id']));
 
 	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
@@ -246,7 +246,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
-		call_integration_hook('integrate_bbc_buttons', array(&$bbc_tags));
+		Hooks::get()->hook('bbc_buttons', array(&$bbc_tags));
 
 		// Show the wysiwyg format and toggle buttons?
 		$bbc_tags['row2'][] = array('removeformat', 'source');

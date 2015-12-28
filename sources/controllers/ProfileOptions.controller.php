@@ -130,7 +130,7 @@ class ProfileOptions_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			call_integration_hook('integrate_remove_buddy', array($this->_memID));
+			Hooks::get()->hook('remove_buddy', array($this->_memID));
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($buddiesArray as $key => $buddy)
@@ -165,7 +165,7 @@ class ProfileOptions_Controller extends Action_Controller
 					unset($new_buddies[$k]);
 			}
 
-			call_integration_hook('integrate_add_buddies', array($this->_memID, &$new_buddies));
+			Hooks::get()->hook('add_buddies', array($this->_memID, &$new_buddies));
 
 			if (!empty($new_buddies))
 			{
@@ -207,7 +207,7 @@ class ProfileOptions_Controller extends Action_Controller
 			$context['buddies'][$buddy] = $memberContext[$buddy];
 		}
 
-		call_integration_hook('integrate_view_buddies', array($this->_memID));
+		Hooks::get()->hook('view_buddies', array($this->_memID));
 	}
 
 	/**
@@ -502,7 +502,7 @@ class ProfileOptions_Controller extends Action_Controller
 				if (empty($post_errors))
 				{
 					// Integration?
-					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd1));
+					Hooks::get()->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd1));
 
 					// Go then.
 					require_once(SUBSDIR . '/Auth.subs.php');

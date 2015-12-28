@@ -390,7 +390,7 @@ function modifyBoard($board_id, &$boardOptions)
 		$boardUpdateParameters['num_posts'] = (int) $boardOptions['num_posts'];
 	}
 
-	call_integration_hook('integrate_modify_board', array($board_id, $boardOptions, &$boardUpdates, &$boardUpdateParameters));
+	Hooks::get()->hook('modify_board', array($board_id, $boardOptions, &$boardUpdates, &$boardUpdateParameters));
 
 	// Do the updates (if any).
 	if (!empty($boardUpdates))
@@ -598,7 +598,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 
 	getBoardTree();
 
-	call_integration_hook('integrate_delete_board', array($boards_to_remove, &$moveChildrenTo));
+	Hooks::get()->hook('delete_board', array($boards_to_remove, &$moveChildrenTo));
 
 	// If $moveChildrenTo is set to null, include the children in the removal.
 	if ($moveChildrenTo === null)
@@ -1930,7 +1930,7 @@ function incrementBoard($id_board, $values)
 		'unapproved_posts', 'unapproved_topics'
 	);
 
-	call_integration_hook('integrate_board_fields', array(&$knownInts));
+	Hooks::get()->hook('board_fields', array(&$knownInts));
 
 	$set = array();
 	$params = array('id_board' => $id_board);
@@ -1974,7 +1974,7 @@ function decrementBoard($id_board, $values)
 		'unapproved_posts', 'unapproved_topics'
 	);
 
-	call_integration_hook('integrate_board_fields', array(&$knownInts));
+	Hooks::get()->hook('board_fields', array(&$knownInts));
 
 	$set = array();
 	$params = array('id_board' => $id_board);

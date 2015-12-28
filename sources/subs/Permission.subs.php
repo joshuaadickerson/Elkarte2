@@ -28,7 +28,7 @@ function loadIllegalPermissions()
 	if (!allowedTo('manage_permissions'))
 		$context['illegal_permissions'][] = 'manage_permissions';
 
-	call_integration_hook('integrate_load_illegal_permissions');
+	Hooks::get()->hook('load_illegal_permissions');
 }
 
 /**
@@ -72,7 +72,7 @@ function loadIllegalGuestPermissions()
 		'like_posts',
 	);
 
-	call_integration_hook('integrate_load_illegal_guest_permissions');
+	Hooks::get()->hook('load_illegal_guest_permissions');
 }
 
 /**

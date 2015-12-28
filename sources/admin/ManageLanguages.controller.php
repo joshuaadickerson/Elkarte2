@@ -1036,7 +1036,7 @@ class ManageLanguages_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_language_settings');
+			Hooks::get()->hook('save_language_settings');
 
 			$this->_languageSettings->save();
 			redirectexit('action=admin;area=languages;sa=settings');
@@ -1101,7 +1101,7 @@ class ManageLanguages_Controller extends Action_Controller
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
 		);
 
-		call_integration_hook('integrate_modify_language_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_language_settings', array(&$config_vars));
 
 		// Get our languages. No cache.
 		$languages = getLanguages(false);

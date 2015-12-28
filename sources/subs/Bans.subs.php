@@ -1488,7 +1488,7 @@ function banLoadAdditionalIPs($member_id)
 	loadLanguage('Profile');
 
 	$search_list = array();
-	call_integration_hook('integrate_load_additional_ip_ban', array(&$search_list));
+	Hooks::get()->hook('load_additional_ip_ban', array(&$search_list));
 	$search_list += array('ips_in_messages' => 'banLoadAdditionalIPsMember', 'ips_in_errors' => 'banLoadAdditionalIPsError');
 
 	$return = array();

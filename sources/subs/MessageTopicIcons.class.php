@@ -105,7 +105,7 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		);
 
 		// Allow addons to add to the message icon array
-		call_integration_hook('integrate_messageindex_icons', array(&$stable_icons));
+		Hooks::get()->hook('messageindex_icons', array(&$stable_icons));
 
 		$this->data = array();
 		foreach ($stable_icons as $icon)

@@ -208,7 +208,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['search_defaults'] = array('name', 'email');
 
 		// Allow mods to add additional buttons here
-		call_integration_hook('integrate_memberlist_buttons');
+		Hooks::get()->hook('memberlist_buttons');
 
 		if (!allowedTo('send_email_to_members'))
 			unset($context['columns']['email_address']);

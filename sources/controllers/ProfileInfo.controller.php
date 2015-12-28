@@ -125,7 +125,7 @@ class ProfileInfo_Controller extends Action_Controller
 		);
 
 		// Let addons add or remove to the tabs array
-		call_integration_hook('integrate_profile_summary', array($this->_memID));
+		Hooks::get()->hook('profile_summary', array($this->_memID));
 
 		// Go forward with whats left
 		$summary_areas = '';
@@ -999,7 +999,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['posts_by_time'] = UserStatsPostingTime($this->_memID);
 
 		// Custom stats (just add a template_layer to add it to the template!)
-		call_integration_hook('integrate_profile_stats', array($this->_memID));
+		Hooks::get()->hook('profile_stats', array($this->_memID));
 	}
 
 	/**

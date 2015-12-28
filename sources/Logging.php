@@ -269,7 +269,7 @@ function logActions($logs)
 		'admin' => 3,
 	);
 
-	Hooks::get()->hook('integrate_log_types', array(&$log_types));
+	Hooks::get()->hook('log_types', array(&$log_types));
 
 	// No point in doing anything, if the log isn't even enabled.
 	if (empty($modSettings['modlog_enabled']))

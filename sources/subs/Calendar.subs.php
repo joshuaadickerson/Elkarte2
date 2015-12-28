@@ -833,7 +833,7 @@ function insertEvent(&$eventOptions)
 		$eventOptions['start_date'], $eventOptions['end_date'],
 	);
 
-	call_integration_hook('integrate_create_event', array(&$eventOptions, &$event_columns, &$event_parameters));
+	Hooks::get()->hook('create_event', array(&$eventOptions, &$event_columns, &$event_parameters));
 
 	// Insert the event!
 	$db->insert('',
@@ -888,7 +888,7 @@ function modifyEvent($event_id, &$eventOptions)
 		'id_topic' => 'id_topic = {int:id_topic}'
 	);
 
-	call_integration_hook('integrate_modify_event', array($event_id, &$eventOptions, &$event_columns));
+	Hooks::get()->hook('modify_event', array($event_id, &$eventOptions, &$event_columns));
 
 	$eventOptions['id_event'] = $event_id;
 
@@ -933,7 +933,7 @@ function removeEvent($event_id)
 		)
 	);
 
-	call_integration_hook('integrate_remove_event', array($event_id));
+	Hooks::get()->hook('remove_event', array($event_id));
 
 	updateSettings(array(
 		'calendar_updated' => time(),

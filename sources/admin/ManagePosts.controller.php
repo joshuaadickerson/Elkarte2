@@ -159,7 +159,7 @@ class ManagePosts_Controller extends Action_Controller
 				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
 			);
 
-			call_integration_hook('integrate_save_censors', array(&$updates));
+			Hooks::get()->hook('save_censors', array(&$updates));
 
 			updateSettings($updates);
 		}
@@ -191,7 +191,7 @@ class ManagePosts_Controller extends Action_Controller
 			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8') : '';
 		}
 
-		call_integration_hook('integrate_censors');
+		Hooks::get()->hook('censors');
 		createToken('admin-censor');
 
 		// Using ajax?
@@ -264,7 +264,7 @@ class ManagePosts_Controller extends Action_Controller
 			if (!empty($this->_req->post->preview_characters))
 				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
 
-			call_integration_hook('integrate_save_post_settings');
+			Hooks::get()->hook('save_post_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=postsettings;sa=posts');
@@ -323,7 +323,7 @@ class ManagePosts_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_post_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_post_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

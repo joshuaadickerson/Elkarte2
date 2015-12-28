@@ -60,7 +60,7 @@ class Suggest_Controller extends Action_Controller
 		);
 
 		// Allow integration a way to register their own type
-		call_integration_hook('integrate_autosuggest', array(&$searchTypes));
+		Hooks::get()->hook('autosuggest', array(&$searchTypes));
 
 		// Good old session check
 		checkSession('post');

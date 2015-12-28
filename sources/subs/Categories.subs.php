@@ -36,7 +36,7 @@ function modifyCategory($category_id, $catOptions)
 	$catParameters = array();
 
 	$cat_id = $category_id;
-	call_integration_hook('integrate_pre_modify_category', array($cat_id, &$catOptions));
+	Hooks::get()->hook('pre_modify_category', array($cat_id, &$catOptions));
 
 	// Wanna change the categories position?
 	if (isset($catOptions['move_after']))
@@ -99,7 +99,7 @@ function modifyCategory($category_id, $catOptions)
 	}
 
 	$cat_id = $category_id;
-	call_integration_hook('integrate_modify_category', array($cat_id, &$catUpdates, &$catParameters));
+	Hooks::get()->hook('modify_category', array($cat_id, &$catUpdates, &$catParameters));
 
 	// Do the updates (if any).
 	if (!empty($catUpdates))
@@ -151,7 +151,7 @@ function createCategory($catOptions)
 		$catOptions['cat_name'],
 	);
 
-	call_integration_hook('integrate_create_category', array(&$catOptions, &$cat_columns, &$cat_parameters));
+	Hooks::get()->hook('create_category', array(&$catOptions, &$cat_columns, &$cat_parameters));
 
 	// Add the category to the database.
 	$db->insert('',
@@ -194,7 +194,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	getBoardTree();
 
-	call_integration_hook('integrate_delete_category', array($categories, &$moveBoardsTo));
+	Hooks::get()->hook('delete_category', array($categories, &$moveBoardsTo));
 
 	// With no category set to move the boards to, delete them all.
 	if ($moveBoardsTo === null)

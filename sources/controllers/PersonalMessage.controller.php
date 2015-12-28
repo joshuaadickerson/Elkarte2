@@ -714,7 +714,7 @@ class PersonalMessage_Controller extends Action_Controller
 			);
 
 			// Allow mods to add additional buttons here
-			call_integration_hook('integrate_conversation_buttons');
+			Hooks::get()->hook('conversation_buttons');
 		}
 	}
 

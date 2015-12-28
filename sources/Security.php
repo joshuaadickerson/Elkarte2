@@ -42,7 +42,7 @@ function validateSession($type = 'admin')
 
 	// Validate what type of session check this is.
 	$types = array();
-	call_integration_hook('integrate_validateSession', array(&$types));
+	Hooks::get()->hook('validateSession', array(&$types));
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
@@ -90,7 +90,7 @@ function validateSession($type = 'admin')
 		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
 		{
 			// Allow integration to verify the password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
+			$good_password = in_array(true, Hooks::get()->hook('verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
 			$password = $_POST[$type . '_hash_pass'];
 			if ($good_password || validateLoginPassword($password, $user_info['passwd']))
@@ -106,7 +106,7 @@ function validateSession($type = 'admin')
 		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
 		{
 			// Give integrated systems a chance to verify this password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
+			$good_password = in_array(true, Hooks::get()->hook('verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
 
 			// Password correct?
 			$password = $_POST[$type . '_pass'];
@@ -503,7 +503,7 @@ function banPermissions()
 		);
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 
-		Hooks::get()->hook('integrate_post_ban_permissions', array(&$denied_permissions));
+		Hooks::get()->hook('post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
 	}
 	// Are they absolutely under moderation?
@@ -516,7 +516,7 @@ function banPermissions()
 			'post_reply_any' => 'post_unapproved_replies_any',
 			'post_attachment' => 'post_unapproved_attachments',
 		);
-		Hooks::get()->hook('integrate_warn_permissions', array(&$permission_change));
+		Hooks::get()->hook('warn_permissions', array(&$permission_change));
 		foreach ($permission_change as $old => $new)
 		{
 			if (!in_array($old, $user_info['permissions']))
@@ -1287,7 +1287,7 @@ function spamProtection($error_type, $fatal = true)
 		'reporttm' => $modSettings['spamWaitTime'] * 4,
 		'search' => !empty($modSettings['search_floodcontrol_time']) ? $modSettings['search_floodcontrol_time'] : 1,
 	);
-	Hooks::get()->hook('integrate_spam_protection', array(&$timeOverrides));
+	Hooks::get()->hook('spam_protection', array(&$timeOverrides));
 
 	// Moderators are free...
 	if (!allowedTo('moderate_board'))
@@ -1628,7 +1628,7 @@ function checkSecurityFiles()
 	$has_files = false;
 
 	$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-	Hooks::get()->hook('integrate_security_files', array(&$securityFiles));
+	Hooks::get()->hook('security_files', array(&$securityFiles));
 
 	foreach ($securityFiles as $securityFile)
 	{

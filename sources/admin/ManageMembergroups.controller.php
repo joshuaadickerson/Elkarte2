@@ -372,7 +372,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			addMembergroup($id_group, $this->_req->post->group_name, $minposts, $group_type);
 
-			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
+			Hooks::get()->hook('add_membergroup', array($id_group, $postCountBasedGroup));
 
 			// Update the post groups now, if this is a post group!
 			if (isset($this->_req->post->min_posts))
@@ -605,7 +605,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			);
 			updateMembergroupProperties($properties);
 
-			call_integration_hook('integrate_save_membergroup', array($current_group['id_group']));
+			Hooks::get()->hook('save_membergroup', array($current_group['id_group']));
 
 			// Time to update the boards this membergroup has access to.
 			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
@@ -759,7 +759,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Finally, get all the groups this could be inherited off.
 		$context['inheritable_groups'] = getInheritableGroups($row['id_group']);
 
-		call_integration_hook('integrate_view_membergroup');
+		Hooks::get()->hook('view_membergroup');
 
 		$context['sub_template'] = 'edit_group';
 		$context['page_title'] = $txt['membergroups_edit_group'];
@@ -799,7 +799,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
-			call_integration_hook('integrate_save_membergroup_settings');
+			Hooks::get()->hook('save_membergroup_settings');
 
 			// Yeppers, saving this...
 			Settings_Form::save_db($config_vars);
@@ -841,7 +841,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_membergroup_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_membergroup_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

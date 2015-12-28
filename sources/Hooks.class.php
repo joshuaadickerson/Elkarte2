@@ -100,10 +100,18 @@ class Hooks
 	{
 		global $modSettings;
 
+		$results = array();
+
+		// Support legacy hooks
+		if (strpos($hook, 'integrate_') !== 0 && !empty($modSettings[$hook]))
+		{
+			$hook = 'integrate_' . $hook;
+			$results = $this->hook($hook, $parameters);
+		}
+
 		if ($this->_debug !== null)
 			$this->_debug->add('hooks', $hook);
 
-		$results = array();
 		if (empty($modSettings[$hook]))
 			return $results;
 
@@ -215,6 +223,9 @@ class Hooks
 		global $modSettings;
 
 		$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
+
+		// Don't save legacy hooks
+		$hook = strpos($hook, 'integrate_') === 0 ? substr($hook, 10) : $hook;
 
 		// Is it going to be permanent?
 		if ($permanent)
@@ -458,40 +469,56 @@ class Hooks
 
 		$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
 
-		// Get the permanent functions.
-		$request = $this->_db->query('', '
-			SELECT value
-			FROM {db_prefix}settings
-			WHERE variable = {string:variable}',
-			array(
-				'variable' => $hook,
-			)
-		);
-		list ($current_functions) = $this->_db->fetch_row($request);
-		$this->_db->free_result($request);
-
-		// If we found entries for this hook
-		if (!empty($current_functions))
+		if (strpos($hook, 'integrate_') === 0)
 		{
-			$current_functions = explode(',', $current_functions);
-
-			if (in_array($integration_call, $current_functions))
-			{
-				updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
-				if (empty($modSettings[$hook]))
-					removeSettings($hook);
-			}
+			$legacy_hook = $hook;
+			$hook = substr($hook, 10);
+		}
+		else
+		{
+			$legacy_hook = 'integrate_' . $hook;
 		}
 
-		// Turn the function list into something usable.
-		$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+		// Get the permanent functions.
+		$request = $this->_db->query('', '
+			SELECT variable, value
+			FROM {db_prefix}settings
+			WHERE variable = {string:variable}
+				OR variable = {string:legacy_hook}',
+			array(
+				'variable' => $hook,
+				'legacy_hook' => $legacy_hook,
+			)
+		);
 
-		// You can only remove it if it's available.
-		if (!in_array($integration_call, $functions))
-			return;
+		// @todo this is a hacked way but how often is this really called?
+		while (list ($hook, $current_functions) = $this->_db->fetch_row($request))
+		{
+			// If we found entries for this hook
+			if (!empty($current_functions)) {
+				$current_functions = explode(',', $current_functions);
 
-		$functions = array_diff($functions, array($integration_call));
-		$modSettings[$hook] = implode(',', $functions);
+				if (in_array($integration_call, $current_functions))
+				{
+					updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
+
+					if (empty($modSettings[$hook]))
+						removeSettings($hook);
+				}
+			}
+
+			// Turn the function list into something usable.
+			$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+
+			// You can only remove it if it's available.
+			if (!in_array($integration_call, $functions))
+				continue;
+
+			$functions = array_diff($functions, array($integration_call));
+			$modSettings[$hook] = implode(',', $functions);
+		}
+
+		$this->_db->free_result($request);
 	}
 
 	/**

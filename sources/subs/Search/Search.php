@@ -924,7 +924,7 @@ class Search
 		);
 
 		// Allow integration to add additional sort columns
-		call_integration_hook('integrate_search_sort_columns', array(&$sort_columns));
+		Hooks::get()->hook('search_sort_columns', array(&$sort_columns));
 
 		if (empty($this->_search_params['sort']) && !empty($params['sort']))
 		{
@@ -946,13 +946,13 @@ class Search
 		$this->_recentMsg = $modSettings['maxMsgID'] - $this->_minMsg;
 
 		// *** Parse the search query
-		call_integration_hook('integrate_search_params', array(&$this->_search_params));
+		Hooks::get()->hook('search_params', array(&$this->_search_params));
 
 		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
 		// @todo Setting to add more here?
 		// @todo Maybe only blacklist if they are the only word, or "any" is used?
 		$this->_blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
-		call_integration_hook('integrate_search_blacklisted_words', array(&$this->_blacklisted_words));
+		Hooks::get()->hook('search_blacklisted_words', array(&$this->_blacklisted_words));
 
 		// What are we searching for?
 		if (empty($this->_search_params['search']))
@@ -1216,7 +1216,7 @@ class Search
 				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
 			));
 
-			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
+			Hooks::get()->hook('subject_only_search_query', array(&$subject_query, &$subject_query_params));
 
 			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
 
@@ -1394,7 +1394,7 @@ class Search
 				$main_query['parameters']['board_query'] = $this->_boardQuery;
 			}
 		}
-		call_integration_hook('integrate_main_search_query', array(&$main_query));
+		Hooks::get()->hook('main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
 		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
@@ -1682,7 +1682,7 @@ class Search
 				}
 			}
 
-			call_integration_hook('integrate_subject_search_query', array(&$subject_query));
+			Hooks::get()->hook('subject_search_query', array(&$subject_query));
 
 			// Nothing to search for?
 			if (empty($subject_query['where']))

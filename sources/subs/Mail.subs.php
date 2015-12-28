@@ -163,7 +163,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
-	if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
+	if (in_array(false, Hooks::get()->hook('outgoing_email', array(&$subject, &$message, &$headers)), true))
 		return false;
 
 	// Save the original message...

@@ -462,7 +462,7 @@ class ProfileHistory_Controller extends Action_Controller
 			);
 
 			// Let integration add whois servers easily
-			call_integration_hook('integrate_trackip');
+			Hooks::get()->hook('trackip');
 		}
 		$context['sub_template'] = 'trackIP';
 	}

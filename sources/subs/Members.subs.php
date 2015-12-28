@@ -438,7 +438,7 @@ function deleteMembers($users, $check_not_admin = false)
 	));
 
 	// Integration rocks!
-	call_integration_hook('integrate_delete_members', array($users));
+	Hooks::get()->hook('delete_members', array($users));
 
 	updateMemberStats();
 
@@ -534,7 +534,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// Perhaps someone else wants to check this user
-	call_integration_hook('integrate_register_check', array(&$regOptions, &$reg_errors));
+	Hooks::get()->hook('register_check', array(&$regOptions, &$reg_errors));
 
 	// If there's any errors left return them at once!
 	if ($reg_errors->hasErrors())
@@ -654,7 +654,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	);
 
 	// Call an optional function to validate the users' input.
-	call_integration_hook('integrate_register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
+	Hooks::get()->hook('register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
 
 	$column_names = array();
 	$values = array();
@@ -790,7 +790,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// If they are for sure registered, let other people to know about it
-	call_integration_hook('integrate_register_after', array($regOptions, $memberID));
+	Hooks::get()->hook('register_after', array($regOptions, $memberID));
 
 	return $memberID;
 }
@@ -1115,7 +1115,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	);
 
 	// Allow mods with their own post tables to re-attribute posts as well :)
-	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count));
+	Hooks::get()->hook('reattribute_posts', array($memID, $email, $membername, $post_count));
 }
 
 /**
@@ -1942,7 +1942,7 @@ function approveMembers($conditions)
 
 	// Let the integration know that they've been activated!
 	foreach ($members_id as $member_id)
-		call_integration_hook('integrate_activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+		Hooks::get()->hook('activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
 
 	return $conditions['is_activated'];
 }
@@ -2459,7 +2459,7 @@ function updateMemberData($members, $data)
 
 			if (!empty($member_names))
 				foreach ($vars_to_integrate as $var)
-					call_integration_hook('integrate_change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
+					Hooks::get()->hook('change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
 		}
 	}
 

@@ -182,7 +182,7 @@ class News_Controller extends Action_Controller
 		);
 
 		// Easy adding of sub actions
-		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
+		Hooks::get()->hook('xmlfeeds', array(&$subActions));
 
 		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
 
@@ -678,7 +678,7 @@ function fix_possible_url($val)
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;
 
-	call_integration_hook('integrate_fix_url', array(&$val));
+	Hooks::get()->hook('fix_url', array(&$val));
 
 	if (empty($modSettings['queryless_urls']) || (serverIs('cgi') && ini_get('cgi.fix_pathinfo') == 0 && @get_cfg_var('cgi.fix_pathinfo') == 0) || (!serverIs('apache') && !serverIs('lighttpd')))
 		return $val;

@@ -257,7 +257,7 @@ class Reminder_Controller extends Action_Controller
 		else
 			updateMemberData($this->_req->post->u, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
+		Hooks::get()->hook('reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		loadTemplate('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
@@ -332,7 +332,7 @@ class Reminder_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
+		Hooks::get()->hook('reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		// Tell them it went fine.
 		loadTemplate('Login');

@@ -748,7 +748,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	}
 
 	// Maybe integrations want to change where we are heading?
-	Hooks::get()->hook('integrate_redirect', array(&$setLocation, &$refresh));
+	Hooks::get()->hook('redirect', array(&$setLocation, &$refresh));
 
 	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
 	if ($refresh)
@@ -885,7 +885,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 	// Hand off the output to the portal, etc. we're integrated with.
-	Hooks::get()->hook('integrate_exit', array($do_footer));
+	Hooks::get()->hook('exit', array($do_footer));
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
@@ -1710,7 +1710,7 @@ function replaceBasicActionUrl($string)
 			$scripturl . '?action=memberlist',
 			$scripturl . '?action=stats',
 		);
-		Hooks::get()->hook('integrate_basic_url_replacement', array(&$find, &$replace));
+		Hooks::get()->hook('basic_url_replacement', array(&$find, &$replace));
 	}
 
 	return str_replace($find, $replace, $string);
@@ -1726,7 +1726,7 @@ function replaceBasicActionUrl($string)
  */
 function createList($listOptions)
 {
-	Hooks::get()->hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
+	Hooks::get()->hook('list_' . $listOptions['id'], array(&$listOptions));
 
 	$list = new Generic_List($listOptions);
 

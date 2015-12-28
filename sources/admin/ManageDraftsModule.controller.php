@@ -88,7 +88,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Integrate drafts in to the delete member chain
-	 * call_integration_hook('integrate_delete_members' ...)
+	 * Hooks::get()->hook('delete_members' ...)
 	 *
 	 * @param int[] $users
 	 */
@@ -108,7 +108,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Integrate draft permission in to the members and board permissions
-	 * call_integration_hook('integrate_load_permissions' ...
+	 * Hooks::get()->hook('load_permissions' ...
 	 *
 	 * @param array $permissionGroups
 	 * @param array $permissionList
@@ -259,7 +259,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_drafts_settings');
+			Hooks::get()->hook('save_drafts_settings');
 
 			// Protect them from themselves.
 			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
@@ -325,7 +325,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 				array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
 		);
 
-		call_integration_hook('integrate_modify_drafts_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_drafts_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

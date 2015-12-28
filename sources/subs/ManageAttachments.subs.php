@@ -106,7 +106,7 @@ function approveAttachments($attachments)
 		)
 	);
 
-	call_integration_hook('integrate_approve_attachments', array($attachments));
+	Hooks::get()->hook('approve_attachments', array($attachments));
 }
 
 /**
@@ -270,7 +270,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			)
 		);
 
-	call_integration_hook('integrate_remove_attachments', array($attach));
+	Hooks::get()->hook('remove_attachments', array($attach));
 
 	if ($return_affected_messages)
 		return array_unique($msgs);

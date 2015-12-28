@@ -384,7 +384,7 @@ class Settings_Form
 			}
 		}
 
-		call_integration_hook('integrate_prepare_db_settings', array(&$config_vars));
+		Hooks::get()->hook('prepare_db_settings', array(&$config_vars));
 		createToken('admin-dbsc');
 	}
 

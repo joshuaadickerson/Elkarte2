@@ -199,7 +199,7 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// Are we using any sort of integration to validate the login?
-		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
+		if (in_array('retry', Hooks::get()->hook('validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
 			$context['disable_login_hashing'] = true;
@@ -391,7 +391,7 @@ class Auth_Controller extends Action_Controller
 		if (!$user_info['is_guest'])
 		{
 			// Pass the logout information to integrations.
-			call_integration_hook('integrate_logout', array($user_settings['member_name']));
+			Hooks::get()->hook('logout', array($user_settings['member_name']));
 
 			// If you log out, you aren't online anymore :P.
 			require_once(SUBSDIR . '/Logging.subs.php');
@@ -400,7 +400,7 @@ class Auth_Controller extends Action_Controller
 
 		// Logout? Let's kill the admin/moderate/other sessions, too.
 		$types = array('admin', 'moderate');
-		call_integration_hook('integrate_validateSession', array(&$types));
+		Hooks::get()->hook('validateSession', array(&$types));
 		foreach ($types as $type)
 			unset($_SESSION[$type . '_time']);
 
@@ -645,7 +645,7 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// Allows mods to easily extend the $other_passwords array
-		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
+		Hooks::get()->hook('other_passwords', array(&$other_passwords));
 
 		return $other_passwords;
 	}
@@ -729,7 +729,7 @@ function doLogin()
 	require_once(SUBSDIR . '/Auth.subs.php');
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	Hooks::get()->hook('login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Get ready to set the cookie...
 	$user_info['id'] = $user_settings['id_member'];

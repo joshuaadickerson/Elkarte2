@@ -341,7 +341,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
-			call_integration_hook('integrate_save_calendar_settings');
+			Hooks::get()->hook('save_calendar_settings');
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Update the stats in case.
@@ -430,7 +430,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_calendar_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_calendar_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

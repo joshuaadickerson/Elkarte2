@@ -164,7 +164,7 @@ class ManageServer_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			call_integration_hook('integrate_save_general_settings');
+			Hooks::get()->hook('save_general_settings');
 
 			$this->_generalSettingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
@@ -217,7 +217,7 @@ class ManageServer_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			call_integration_hook('integrate_save_database_settings');
+			Hooks::get()->hook('save_database_settings');
 
 			$this->_databaseSettingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
@@ -259,7 +259,7 @@ class ManageServer_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			call_integration_hook('integrate_save_cookie_settings');
+			Hooks::get()->hook('save_cookie_settings');
 
 			// Its either local or global cookies
 			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
@@ -347,7 +347,7 @@ class ManageServer_Controller extends Action_Controller
 		// Saving again?
 		if (isset($this->_req->query->save))
 		{
-			call_integration_hook('integrate_save_cache_settings');
+			Hooks::get()->hook('save_cache_settings');
 
 			$this->_cacheSettingsForm->save();
 
@@ -403,7 +403,7 @@ class ManageServer_Controller extends Action_Controller
 		// Initialize it with our settings
 		$config_vars = $this->_balancingSettingsForm->settings();
 
-		call_integration_hook('integrate_loadavg_settings');
+		Hooks::get()->hook('loadavg_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
 		$context['settings_title'] = $txt['load_balancing_settings'];
@@ -424,7 +424,7 @@ class ManageServer_Controller extends Action_Controller
 					$this->_req->$key = '2.0';
 			}
 
-			call_integration_hook('integrate_save_loadavg_settings');
+			Hooks::get()->hook('save_loadavg_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
@@ -525,7 +525,7 @@ class ManageServer_Controller extends Action_Controller
 		);
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_general_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_general_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -567,7 +567,7 @@ class ManageServer_Controller extends Action_Controller
 		);
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_database_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_database_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -605,7 +605,7 @@ class ManageServer_Controller extends Action_Controller
 		);
 
 		// Notify the integration
-		call_integration_hook('integrate_modify_cookie_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_cookie_settings', array(&$config_vars));
 
 		// Set them vars for our settings form
 		return $config_vars;
@@ -663,7 +663,7 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		// Notify the integration that we're preparing to mess up with cache settings...
-		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_cache_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -728,7 +728,7 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		// Notify the integration that we're preparing to mess with balancing settings...
-		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_loadavg_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

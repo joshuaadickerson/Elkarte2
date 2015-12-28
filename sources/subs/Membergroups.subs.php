@@ -80,7 +80,7 @@ function deleteMembergroups($groups)
 	foreach ($groups_to_log as $key => $row)
 		logAction('delete_group', array('group' => $row['group_name']), 'admin');
 
-	call_integration_hook('integrate_delete_membergroups', array($groups));
+	Hooks::get()->hook('delete_membergroups', array($groups));
 
 	// Remove the membergroups themselves.
 	$db->query('', '
@@ -520,7 +520,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	else
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 
-	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
+	Hooks::get()->hook('add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
 	updatePostgroupStats($members);

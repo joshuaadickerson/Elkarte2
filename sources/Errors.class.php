@@ -158,7 +158,7 @@ class Errors
 		{
 			// This prevents us from infinite looping if the hook or call produces an error.
 			$tried_hook = true;
-			Hooks::get()->hook('integrate_error_types', array(&$other_error_types));
+			Hooks::get()->hook('error_types', array(&$other_error_types));
 			$known_error_types += $other_error_types;
 		}
 
@@ -345,7 +345,7 @@ class Errors
 		$this->_displayDebug();
 
 		// Let's give integrations a chance to output a bit differently
-		Hooks::get()->hook('integrate_output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
+		Hooks::get()->hook('output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
 
 		// Dying on these errors only causes MORE problems (blank pages!)
 		if ($err_file === 'Unknown')

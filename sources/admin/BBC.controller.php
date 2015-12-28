@@ -167,7 +167,7 @@ class ManageBBC_Controller extends Action_Controller
 			if (isset($this->_req->post->smiley_enable))
 				sortSmileyTable();
 
-			call_integration_hook('integrate_save_smiley_settings');
+			Hooks::get()->hook('save_smiley_settings');
 
 			// Save away
 			Settings_Form::save_db($config_vars, $this->_req->post);
@@ -226,7 +226,7 @@ class ManageBBC_Controller extends Action_Controller
 			array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
 		);
 
-		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_smiley_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

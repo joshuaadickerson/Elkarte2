@@ -912,7 +912,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_filter_settings');
+			Hooks::get()->hook('save_filter_settings');
 
 			// Editing an entry?
 			$editid = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
@@ -997,7 +997,7 @@ class ManageMaillist_Controller extends Action_Controller
 			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
 		);
 
-		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_maillist_filter_settings', array(&$config_vars));
 
 		return $this->_filtersSettings->settings($config_vars);
 	}
@@ -1301,7 +1301,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_parser_settings');
+			Hooks::get()->hook('save_parser_settings');
 
 			// Editing a parser?
 			$editid = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
@@ -1386,7 +1386,7 @@ class ManageMaillist_Controller extends Action_Controller
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
 		);
 
-		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_maillist_parser_settings', array(&$config_vars));
 
 		return $this->_parsersSettings->settings($config_vars);
 	}
@@ -1448,7 +1448,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_maillist_settings');
+			Hooks::get()->hook('save_maillist_settings');
 
 			$email_error = false;
 			$board_error = false;
@@ -1629,7 +1629,7 @@ class ManageMaillist_Controller extends Action_Controller
 				)
 			);
 
-		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_maillist_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

@@ -341,7 +341,7 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_routine_maintenance', array(&$context['routine_actions']));
+		Hooks::get()->hook('routine_maintenance', array(&$context['routine_actions']));
 	}
 
 	/**
@@ -415,7 +415,7 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_topics_maintenance', array(&$context['topics_actions']));
+		Hooks::get()->hook('topics_maintenance', array(&$context['topics_actions']));
 
 		if ($this->_req->getQuery('done', 'strval') === 'purgeold')
 			$context['maintenance_finished'] = array(

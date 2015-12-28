@@ -864,7 +864,7 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		);
 
-		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
+		Hooks::get()->hook('admin_search', array(&$language_files, &$include_files, &$settings_search));
 
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));

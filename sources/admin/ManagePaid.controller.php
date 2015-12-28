@@ -158,7 +158,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_subscription_settings');
+			Hooks::get()->hook('save_subscription_settings');
 
 			// Check that the entered email addresses are valid
 			if (!empty($this->_req->post->paid_email_to))
@@ -242,7 +242,7 @@ class ManagePaid_Controller extends Action_Controller
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
 
-		call_integration_hook('integrate_modify_subscription_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_subscription_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -438,7 +438,7 @@ class ManagePaid_Controller extends Action_Controller
 
 			deleteSubscription($context['sub_id']);
 
-			call_integration_hook('integrate_delete_subscription', array($context['sub_id']));
+			Hooks::get()->hook('delete_subscription', array($context['sub_id']));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
@@ -538,7 +538,7 @@ class ManagePaid_Controller extends Action_Controller
 				updateSubscription($update, $ignore_active);
 			}
 
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
+			Hooks::get()->hook('save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}

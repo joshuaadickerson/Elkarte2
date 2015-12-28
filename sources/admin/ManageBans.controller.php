@@ -87,7 +87,7 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Make the call to integrate-manage_bans
-		call_integration_hook('integrate_manage_bans', array(&$subActions));
+		Hooks::get()->hook('manage_bans', array(&$subActions));
 
 		// Prepare some items for the template
 		$context['page_title'] = $txt['ban_title'];

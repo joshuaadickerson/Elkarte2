@@ -552,7 +552,7 @@ function availableThemes($current_theme, $current_member)
 				// Fill settings up.
 				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
 
-				call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
+				Hooks::get()->hook('init_theme', array($id_theme, &$settings));
 
 				if (!empty($settings['theme_variants']))
 				{

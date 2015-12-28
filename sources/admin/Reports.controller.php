@@ -69,7 +69,7 @@ class Reports_Controller extends Action_Controller
 			'staff' => 'action_staff',
 		);
 
-		call_integration_hook('integrate_report_types');
+		Hooks::get()->hook('report_types');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -135,7 +135,7 @@ class Reports_Controller extends Action_Controller
 		);
 
 		// Allow mods to add additional buttons here
-		call_integration_hook('integrate_report_buttons');
+		Hooks::get()->hook('report_buttons');
 
 		// Now generate the data.
 		$this->{$context['report_types'][$context['report_type']]['function']}();

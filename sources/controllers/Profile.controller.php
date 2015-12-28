@@ -663,7 +663,7 @@ class Profile_Controller extends Action_Controller
 				saveProfileChanges($profile_vars, $this->_memID);
 			}
 
-			call_integration_hook('integrate_profile_save', array(&$profile_vars, &$post_errors, $this->_memID));
+			Hooks::get()->hook('profile_save', array(&$profile_vars, &$post_errors, $this->_memID));
 
 			// There was a problem, let them try to re-enter.
 			if (!empty($post_errors))
@@ -677,7 +677,7 @@ class Profile_Controller extends Action_Controller
 				// If we've changed the password, notify any integration that may be listening in.
 				if (isset($profile_vars['passwd']))
 				{
-					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd2));
+					Hooks::get()->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd2));
 				}
 
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -767,7 +767,7 @@ class Profile_Controller extends Action_Controller
 				$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
 
 				// Does the integration want to check passwords?
-				$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($cur_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
+				$good_password = in_array(true, Hooks::get()->hook('verify_password', array($cur_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
 
 				// Start up the password checker, we have work to do
 				require_once(SUBSDIR . '/Auth.subs.php');

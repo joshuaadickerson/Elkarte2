@@ -76,7 +76,7 @@ function setupProfileContext($fields, $hook = '')
 	global $profile_fields, $context, $cur_profile, $txt;
 
 	if (!empty($hook))
-		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+		Hooks::get()->hook('' . $hook . '_profile_fields', array(&$fields));
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -299,7 +299,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 	$db->free_result($request);
 
-	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
+	Hooks::get()->hook('load_custom_profile_fields', array($memID, $area));
 }
 
 /**
@@ -996,7 +996,7 @@ function loadProfileFields($force_reload = false)
 		),
 	);
 
-	call_integration_hook('integrate_load_profile_fields', array(&$profile_fields));
+	Hooks::get()->hook('load_profile_fields', array(&$profile_fields));
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
@@ -1233,7 +1233,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'ignore_boards',
 	);
 
-	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+	Hooks::get()->hook('save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
 
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
@@ -1586,7 +1586,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	}
 	$db->free_result($request);
 
-	call_integration_hook('integrate_save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
+	Hooks::get()->hook('save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
 
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))

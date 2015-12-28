@@ -150,7 +150,7 @@ class ManageMembers_Controller extends Action_Controller
 		);
 
 		// Call integrate_manage_members
-		call_integration_hook('integrate_manage_members', array(&$subActions));
+		Hooks::get()->hook('manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
 		if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
@@ -273,7 +273,7 @@ class ManageMembers_Controller extends Action_Controller
 				'++' => '>'
 			);
 
-			call_integration_hook('integrate_view_members_params', array(&$params));
+			Hooks::get()->hook('view_members_params', array(&$params));
 
 			$search_params = array();
 			if ($context['sub_action'] == 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))

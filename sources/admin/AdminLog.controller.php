@@ -104,7 +104,7 @@ class AdminLog_Controller extends Action_Controller
 		);
 
 		// Give integration a way to add items
-		call_integration_hook('integrate_manage_logs', array(&$log_functions));
+		Hooks::get()->hook('manage_logs', array(&$log_functions));
 		$sub_action = isset($this->_req->query->sa, $log_functions[$this->_req->query->sa]) && empty($log_functions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : 'errorlog';
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
@@ -159,7 +159,7 @@ class AdminLog_Controller extends Action_Controller
 
 		$config_vars = $this->_pruningSettings->settings();
 
-		call_integration_hook('integrate_prune_settings');
+		Hooks::get()->hook('prune_settings');
 
 		// Saving?
 		if (isset($this->_req->query->save))

@@ -74,7 +74,7 @@ class User_Notification
 	 */
 	protected function _addFaviconNumbers($number)
 	{
-		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
+		Hooks::get()->hook('adjust_favicon_number', array(&$number));
 
 		loadJavascriptFile('favico.js');
 

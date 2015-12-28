@@ -117,7 +117,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			checkSession();
 
 			// notify the interested addons or integrations
-			call_integration_hook('integrate_save_search_engine_settings');
+			Hooks::get()->hook('save_search_engine_settings');
 
 			// save the results!
 			Settings_Form::save_db($config_vars);
@@ -185,7 +185,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		);
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
-		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_search_engine_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

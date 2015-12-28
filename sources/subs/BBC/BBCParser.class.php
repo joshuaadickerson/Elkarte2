@@ -89,7 +89,7 @@ class BBCParser
 	 */
 	public function parse($message)
 	{
-		call_integration_hook('integrate_pre_bbc_parser', array(&$message, $this->bbc));
+		Hooks::get()->hook('pre_bbc_parser', array(&$message, $this->bbc));
 
 		$this->message = $message;
 
@@ -150,7 +150,7 @@ class BBCParser
 
 		// Allow addons access to what the parser created
 		$message = $this->message;
-		call_integration_hook('integrate_post_bbc_parser', array(&$message));
+		Hooks::get()->hook('post_bbc_parser', array(&$message));
 		$this->message = $message;
 
 		return $this->message;
@@ -415,7 +415,7 @@ class BBCParser
 	public function loadHtmlParser()
 	{
 		$parser = new HtmlParser;
-		call_integration_hook('integrate_bbc_load_html_parser', array(&$parser));
+		Hooks::get()->hook('bbc_load_html_parser', array(&$parser));
 		$this->html_parser = $parser;
 	}
 
@@ -1247,7 +1247,7 @@ class BBCParser
 		// Do not use $this->autolinker. For some reason it causes a recursive loop
 		$autolinker = null;
 		$html = null;
-		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
+		Hooks::get()->hook('recursive_bbc_parser', array(&$autolinker, &$html));
 
 		$parser = new \BBC\Parser($bbc, $autolinker, $html);
 		$data = $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);

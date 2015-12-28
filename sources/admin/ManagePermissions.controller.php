@@ -906,7 +906,7 @@ class ManagePermissions_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			checkSession('post');
-			call_integration_hook('integrate_save_permission_settings');
+			Hooks::get()->hook('save_permission_settings');
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Clear all deny permissions...if we want that.
@@ -959,7 +959,7 @@ class ManagePermissions_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_permission_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_permission_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1074,7 +1074,7 @@ class ManagePermissions_Controller extends Action_Controller
 			'attachment' => array('post_attachment', 'post_unapproved_attachments'),
 		);
 
-		call_integration_hook('integrate_post_moderation_mapping', array(&$mappings));
+		Hooks::get()->hook('post_moderation_mapping', array(&$mappings));
 
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');

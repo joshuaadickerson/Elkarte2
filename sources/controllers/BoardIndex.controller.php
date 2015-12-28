@@ -140,7 +140,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		);
 
 		// Allow mods to add additional buttons here
-		call_integration_hook('integrate_mark_read_button');
+		Hooks::get()->hook('mark_read_button');
 	}
 
 	/**

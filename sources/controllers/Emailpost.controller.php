@@ -166,7 +166,7 @@ class Emailpost_Controller extends Action_Controller
 		pbe_check_moderation($pbe);
 
 		// Maybe they want to do additional spam / security checking
-		call_integration_hook('integrate_mailist_checks_before', array($email_message, $pbe));
+		Hooks::get()->hook('mailist_checks_before', array($email_message, $pbe));
 
 		// Load in the correct Re: for the language
 		if ($language === $pbe['user_info']['language'])
@@ -307,7 +307,7 @@ class Emailpost_Controller extends Action_Controller
 			return pbe_emailError('error_in_maintenance_mode', $email_message);
 
 		// Any additional spam / security checking
-		call_integration_hook('integrate_mailist_checks_before', array($email_message, $pbe));
+		Hooks::get()->hook('mailist_checks_before', array($email_message, $pbe));
 
 		// To post a NEW topic, we need some board details for where it goes
 		$board_info = query_load_board_details($board_number, $pbe);

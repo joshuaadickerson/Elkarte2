@@ -179,7 +179,7 @@ function adminLogin($type = 'admin')
 
 	// Validate what type of session check this is.
 	$types = array();
-	call_integration_hook('integrate_validateSession', array(&$types));
+	Hooks::get()->hook('validateSession', array(&$types));
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
 	// They used a wrong password, log it and unset that.
@@ -447,7 +447,7 @@ function resetPassword($memID, $username = null)
 	else
 		updateMemberData($memID, array('passwd' => $db_hash));
 
-	call_integration_hook('integrate_reset_pass', array($old_user, $user, $newPassword));
+	Hooks::get()->hook('reset_pass', array($old_user, $user, $newPassword));
 
 	$replacements = array(
 		'USERNAME' => $user,
@@ -677,7 +677,7 @@ function rebuildModCache()
 		'mb' => $boards_mod,
 		'mq' => $mod_query,
 	);
-	call_integration_hook('integrate_mod_cache');
+	Hooks::get()->hook('mod_cache');
 
 	$user_info['mod_cache'] = $_SESSION['mc'];
 
@@ -708,7 +708,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 		$secure = !empty($modSettings['secureCookies']);
 
 	// Intercept cookie?
-	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly));
+	Hooks::get()->hook('cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly));
 
 	return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
 }

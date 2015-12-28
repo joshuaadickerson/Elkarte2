@@ -150,7 +150,7 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_search_settings');
+			Hooks::get()->hook('save_search_settings');
 
 			if (empty($this->_req->post->search_results_per_page))
 				$this->_req->post->search_results_per_page = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
@@ -224,7 +224,7 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_search_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -262,7 +262,7 @@ class ManageSearch_Controller extends Action_Controller
 			'search_weight_likes',
 		);
 
-		call_integration_hook('integrate_modify_search_weights', array(&$factors));
+		Hooks::get()->hook('modify_search_weights', array(&$factors));
 
 		// A form was submitted.
 		if (isset($this->_req->post->save))
@@ -270,7 +270,7 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-msw');
 
-			call_integration_hook('integrate_save_search_weights');
+			Hooks::get()->hook('save_search_weights');
 
 			$changes = array();
 			foreach ($factors as $factor)

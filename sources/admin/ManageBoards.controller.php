@@ -270,7 +270,7 @@ class ManageBoards_Controller extends Action_Controller
 			}
 		}
 
-		call_integration_hook('integrate_boards_main');
+		Hooks::get()->hook('boards_main');
 
 		$context['page_title'] = $txt['boards_and_cats'];
 		$context['sub_template'] = 'manage_boards';
@@ -370,7 +370,7 @@ class ManageBoards_Controller extends Action_Controller
 		createToken('admin-bc-' . $this->cat);
 		$context['token_check'] = 'admin-bc-' . $this->cat;
 
-		call_integration_hook('integrate_edit_category');
+		Hooks::get()->hook('edit_category');
 	}
 
 	/**
@@ -606,7 +606,7 @@ class ManageBoards_Controller extends Action_Controller
 		// Create a special token.
 		createToken('admin-be-' . $this->boardid);
 
-		call_integration_hook('integrate_edit_board');
+		Hooks::get()->hook('edit_board');
 	}
 
 	/**
@@ -712,7 +712,7 @@ class ManageBoards_Controller extends Action_Controller
 					$boardOptions['num_posts'] = 0;
 			}
 
-			call_integration_hook('integrate_save_board', array($board_id, &$boardOptions));
+			Hooks::get()->hook('save_board', array($board_id, &$boardOptions));
 
 			// Create a new board...
 			if (isset($this->_req->post->add))
@@ -790,7 +790,7 @@ class ManageBoards_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_board_settings');
+			Hooks::get()->hook('save_board_settings');
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=manageboards;sa=settings');
@@ -850,7 +850,7 @@ class ManageBoards_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_board_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_board_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

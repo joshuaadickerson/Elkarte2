@@ -346,14 +346,14 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		);
 
 		// Allow integration to modify / add to the $indexOptions
-		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
+		Hooks::get()->hook('messageindex_topics', array(&$sort_column, &$indexOptions));
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
 		$context['topics'] = Topic_Util::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
 		// Allow addons to add to the $context['topics']
-		call_integration_hook('integrate_messageindex_listing', array($topics_info));
+		Hooks::get()->hook('messageindex_listing', array($topics_info));
 
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 		if ($fake_ascending)
@@ -421,7 +421,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 		{
 			$context['qmod_actions'] = array('approve', 'remove', 'lock', 'sticky', 'move', 'merge', 'restore', 'markread');
-			call_integration_hook('integrate_quick_mod_actions');
+			Hooks::get()->hook('quick_mod_actions');
 		}
 
 		if (!empty($context['boards']) && $context['start'] == 0)
@@ -444,7 +444,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			$context['normal_buttons']['markread'] = array('text' => 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'], 'custom' => 'onclick="return markboardreadButton(this);"');
 
 		// Allow adding new buttons easily.
-		call_integration_hook('integrate_messageindex_buttons');
+		Hooks::get()->hook('messageindex_buttons');
 	}
 
 	/**

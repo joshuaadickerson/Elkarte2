@@ -214,7 +214,7 @@ class ManageFeatures_Controller extends Action_Controller
 			if (isset($this->_req->post->lastActive))
 				$this->_req->post->lastActive = min((int) $this->_req->post->lastActive, 1440);
 
-			call_integration_hook('integrate_save_basic_settings');
+			Hooks::get()->hook('save_basic_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
@@ -281,7 +281,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			checkSession();
 
-			call_integration_hook('integrate_save_layout_settings');
+			Hooks::get()->hook('save_layout_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			writeLog();
@@ -329,7 +329,7 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_karma_settings');
+			Hooks::get()->hook('save_karma_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=karma');
@@ -375,7 +375,7 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_likes_settings');
+			Hooks::get()->hook('save_likes_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=likes');
@@ -421,7 +421,7 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integrate_save_modify_mention_settings', array(&$config_vars));
+			Hooks::get()->hook('save_modify_mention_settings', array(&$config_vars));
 
 			if (empty($this->_req->post->notifications))
 			{
@@ -611,7 +611,7 @@ class ManageFeatures_Controller extends Action_Controller
 				}
 			}
 
-			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
+			Hooks::get()->hook('save_signature_settings', array(&$sig_limits, &$bbcTags));
 
 			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
@@ -1245,7 +1245,7 @@ class ManageFeatures_Controller extends Action_Controller
 					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
 			}
 
-			call_integration_hook('integrate_save_pmsettings_settings');
+			Hooks::get()->hook('save_pmsettings_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
@@ -1341,7 +1341,7 @@ class ManageFeatures_Controller extends Action_Controller
 				$config_vars['default_timezone'][2][$zone] = $zone;
 		}
 
-		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_basic_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1391,7 +1391,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'timeLoadPageEnable'),
 		);
 
-		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_layout_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1427,7 +1427,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'karmaSmiteLabel', 'mask' => 'nohtml'),
 		);
 
-		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_karma_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1461,7 +1461,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeDisplayLimit', 6)
 		);
 
-		call_integration_hook('integrate_modify_likes_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_likes_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1510,7 +1510,7 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 		}
 
-		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_mention_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1565,7 +1565,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('bbc', 'signature_bbc'),
 		);
 
-		call_integration_hook('integrate_modify_signature_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_signature_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -1602,7 +1602,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('callback', 'pm_limits'),
 		);
 
-		call_integration_hook('integrate_modify_pmsettings_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_pmsettings_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

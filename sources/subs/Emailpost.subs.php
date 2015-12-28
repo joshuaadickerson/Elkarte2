@@ -930,7 +930,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = preg_replace('~\[code(.*?)\](.*?)\[/code\]~is', '`&lt;code\\1>\\2`&lt;/code>', $message);
 
 	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	call_integration_hook('integrate_mailist_pre_parsebbc', array(&$message));
+	Hooks::get()->hook('mailist_pre_parsebbc', array(&$message));
 
 	// Convert the remaining bbc to html
 	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
@@ -963,7 +963,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	}
 
 	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	call_integration_hook('integrate_mailist_pre_markdown', array(&$message));
+	Hooks::get()->hook('mailist_pre_markdown', array(&$message));
 
 	// Convert the protected (hidden) entities back for the final conversion
 	$message = strtr($message, array(
@@ -980,7 +980,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Finally the sig, its goes as just plain text
 	if ($signature !== '')
 	{
-		call_integration_hook('integrate_mailist_pre_sig_parsebbc', array(&$signature));
+		Hooks::get()->hook('mailist_pre_sig_parsebbc', array(&$signature));
 
 		$signature = $bbc_wrapper->parseSignature($signature, false);
 		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));

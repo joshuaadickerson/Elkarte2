@@ -103,7 +103,7 @@ class ManageBBC_Controller extends Action_Controller
 			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
 
 			// Notify addons and integrations
-			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
+			Hooks::get()->hook('save_bbc_settings', array($bbcTags));
 
 			// Save the result
 			Settings_Form::save_db($config_vars, $this->_req->post);
@@ -150,7 +150,7 @@ class ManageBBC_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_bbc_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

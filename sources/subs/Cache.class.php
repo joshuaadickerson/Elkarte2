@@ -266,7 +266,7 @@ class Cache
 		@touch(CACHEDIR . '/index.php');
 
 		// Give addons a way to trigger cache cleaning.
-		call_integration_hook('integrate_clean_cache');
+		Hooks::get()->hook('clean_cache');
 
 		clearstatcache();
 	}

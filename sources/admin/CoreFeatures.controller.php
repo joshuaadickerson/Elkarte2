@@ -266,7 +266,7 @@ class CoreFeatures_Controller extends Action_Controller
 		$this->_getModulesConfig($core_features);
 
 		// Anyone who would like to add a core feature?
-		call_integration_hook('integrate_core_features', array(&$core_features));
+		Hooks::get()->hook('core_features', array(&$core_features));
 
 		return $core_features;
 	}

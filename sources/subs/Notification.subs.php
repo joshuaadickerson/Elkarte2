@@ -217,7 +217,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					$message_type .= '_once';
 
 				// Give them a way to add in their own replacements
-				call_integration_hook('integrate_notification_replacements', array(&$replacements, $row, $type, $current_language));
+				Hooks::get()->hook('notification_replacements', array(&$replacements, $row, $type, $current_language));
 
 				// Send only if once is off or it's on and it hasn't been sent.
 				if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))

@@ -884,7 +884,7 @@ class Theme extends \Theme
             );
 
             // Allow editing menu buttons easily.
-            call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
+            Hooks::get()->hook('menu_buttons', array(&$buttons, &$menu_count));
 
             // Now we put the buttons in the context so the theme can use them.
             $menu_buttons = array();
@@ -974,7 +974,7 @@ class Theme extends \Theme
 
         // Not all actions are simple.
         if (!empty($needs_action_hook))
-            call_integration_hook('integrate_current_action', array(&$current_action));
+            Hooks::get()->hook('current_action', array(&$current_action));
 
         if (isset($context['menu_buttons'][$current_action]))
             $context['menu_buttons'][$current_action]['active_button'] = true;
@@ -1038,7 +1038,7 @@ class Theme extends \Theme
             'spellcheck',
         );
 
-        call_integration_hook('integrate_simple_actions', array(&$simpleActions));
+        Hooks::get()->hook('simple_actions', array(&$simpleActions));
 
         // Output is fully XML, so no need for the index template.
         if (isset($_REQUEST['xml']))

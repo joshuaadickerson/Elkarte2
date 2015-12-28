@@ -33,7 +33,7 @@ function loadVerificationControls()
 	);
 
 	// Let integration add some more controls
-	call_integration_hook('integrate_control_verification', array(&$known_verifications));
+	Hooks::get()->hook('control_verification', array(&$known_verifications));
 
 	return $known_verifications;
 }

@@ -119,7 +119,7 @@ class ParserWrapper
 		// First see if any hooks set a parser.
 		foreach ($parsers as $parser_type => &$parser)
 		{
-			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
+			Hooks::get()->hook('' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
 
 			// If not, use the default one
 			if ($parser === false)
@@ -370,7 +370,7 @@ class ParserWrapper
 		if ($this->codes === null)
 		{
 			$additional_bbc = array();
-			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
+			Hooks::get()->hook('additional_bbc', array(&$additional_bbc));
 			$this->codes = new Codes($additional_bbc, $this->disabled);
 		}
 

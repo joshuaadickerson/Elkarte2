@@ -128,7 +128,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
-			call_integration_hook('integrate_save_general_security_settings');
+			Hooks::get()->hook('save_general_security_settings');
 
 			writeLog();
 			redirectexit('action=admin;area=securitysettings;sa=general');
@@ -197,7 +197,7 @@ class ManageSecurity_Controller extends Action_Controller
 			$config_vars[] = array('text', 'warning_settings');
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
-			call_integration_hook('integrate_save_moderation_settings');
+			Hooks::get()->hook('save_moderation_settings');
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
@@ -260,7 +260,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 			$config_vars[] = array('text', 'pm_spam_settings');
 
-			call_integration_hook('integrate_save_spam_settings');
+			Hooks::get()->hook('save_spam_settings');
 
 			// Now save.
 			Settings_Form::save_db($config_vars, $this->_req->post);
@@ -419,7 +419,7 @@ class ManageSecurity_Controller extends Action_Controller
 			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
 		);
 
-		call_integration_hook('integrate_modify_moderation_settings', array(&$config_vars));
+		Hooks::get()->hook('modify_moderation_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -465,7 +465,7 @@ class ManageSecurity_Controller extends Action_Controller
 				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
 		);
 
-		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
+		Hooks::get()->hook('general_security_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -515,7 +515,7 @@ class ManageSecurity_Controller extends Action_Controller
 		}
 
 		// @todo: it may be removed, it may stay, the two hooks may have different functions
-		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+		Hooks::get()->hook('spam_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

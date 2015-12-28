@@ -67,7 +67,7 @@ class Members_Controller extends Action_Controller
 		if (empty($user))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
-		call_integration_hook('integrate_add_buddies', array($user_info['id'], &$user));
+		Hooks::get()->hook('add_buddies', array($user_info['id'], &$user));
 
 		// Add if it's not there (and not you).
 		if (!in_array($user, $user_info['buddies']) && $user_info['id'] != $user)
@@ -108,7 +108,7 @@ class Members_Controller extends Action_Controller
 		checkSession('get');
 		is_not_guest();
 
-		call_integration_hook('integrate_remove_buddy', array($user_info['id']));
+		Hooks::get()->hook('remove_buddy', array($user_info['id']));
 
 		// Yeah, they are no longer cool
 		$user = $this->_req->getQuery('u', 'intval', '');

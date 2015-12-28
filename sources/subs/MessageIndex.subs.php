@@ -169,7 +169,7 @@ function messageIndexSort()
 		'last_post' => 't.id_last_msg'
 	);
 
-	call_integration_hook('integrate_messageindex_sort', array(&$sort_methods));
+	Hooks::get()->hook('messageindex_sort', array(&$sort_methods));
 
 	return $sort_methods;
 }
@@ -234,7 +234,7 @@ function MessageTopicIcons()
 	);
 
 	// Allow addons to add to the message icon array
-	call_integration_hook('integrate_messageindex_icons', array(&$stable_icons));
+	Hooks::get()->hook('messageindex_icons', array(&$stable_icons));
 
 	$icon_sources = array();
 	foreach ($stable_icons as $icon)

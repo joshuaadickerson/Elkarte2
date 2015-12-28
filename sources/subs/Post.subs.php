@@ -185,7 +185,7 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', 'preparsecode_font_callback', $parts[$i]);
 		}
 
-		call_integration_hook('integrate_preparse_code', array(&$parts[$i], $i, $previewing));
+		Hooks::get()->hook('preparse_code', array(&$parts[$i], $i, $previewing));
 	}
 
 	// Put it back together!
@@ -323,7 +323,7 @@ function un_preparsecode($message)
 	// We're going to unparse only the stuff outside [code]...
 	for ($i = 0, $n = count($parts); $i < $n; $i++)
 	{
-		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
+		Hooks::get()->hook('unpreparse_code', array(&$message, &$parts, &$i));
 	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
@@ -384,7 +384,7 @@ function fixTags(&$message)
 		),
 	);
 
-	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
+	Hooks::get()->hook('fixtags', array(&$fixArray, &$message));
 
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
@@ -681,7 +681,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	);
 
 	// What if we want to do anything with posts?
-	call_integration_hook('integrate_before_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
+	Hooks::get()->hook('before_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
 
 	// Insert the post.
 	$db->insert('',
@@ -697,7 +697,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		return false;
 
 	// What if we want to export new posts out to a CMS?
-	call_integration_hook('integrate_create_post', array($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters));
+	Hooks::get()->hook('create_post', array($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters));
 
 	// Insert a new topic (if the topicID was left empty.)
 	if ($new_topic)
@@ -728,7 +728,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
 		);
 
-		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
+		Hooks::get()->hook('before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
 
 		$db->insert('',
 			'{db_prefix}topics',
@@ -773,7 +773,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 
 		// What if we want to export new topics out to a CMS?
-		call_integration_hook('integrate_create_topic', array($msgOptions, $topicOptions, $posterOptions));
+		Hooks::get()->hook('create_topic', array($msgOptions, $topicOptions, $posterOptions));
 	}
 	// The topic already exists, it only needs a little updating.
 	else
@@ -804,7 +804,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if ($topicOptions['sticky_mode'] !== null)
 			$topics_columns[] = 'is_sticky = {int:is_sticky}';
 
-		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
+		Hooks::get()->hook('before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
 		$db->query('', '
@@ -987,7 +987,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		'id_msg' => $msgOptions['id'],
 	);
 
-	call_integration_hook('integrate_before_modify_post', array(&$messages_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions, &$messageInts));
+	Hooks::get()->hook('before_modify_post', array(&$messages_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions, &$messageInts));
 
 	foreach ($messages_columns as $var => $val)
 	{

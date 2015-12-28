@@ -739,7 +739,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	elseif (isset($_GET['debug']))
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
 
-	if (!empty($modSettings['queryless_urls']) && (serverIs('cgi') || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!serverIs('apache') || !serverIs('lighttpd') || !serverIs('litespeed')))
+	if (!empty($modSettings['queryless_urls']) && (!serverIs('cgi') || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (serverIs('apache') || serverIs('lighttpd') || serverIs('litespeed')))
 	{
 		if (defined('SID') && SID != '')
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);

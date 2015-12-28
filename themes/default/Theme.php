@@ -1038,7 +1038,7 @@ class Theme extends \Theme
             'spellcheck',
         );
 
-        Hooks::get()->hook('simple_actions', array(&$simpleActions));
+        \Hooks::get()->hook('simple_actions', array(&$simpleActions));
 
         // Output is fully XML, so no need for the index template.
         if (isset($_REQUEST['xml']))

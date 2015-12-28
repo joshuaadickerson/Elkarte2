@@ -51,7 +51,7 @@ class Autolink
 			$this->parseEmails($data);
 		}
 
-		Hooks::get()->hook('autolink_area', array(&$data, $this->bbc));
+		\Hooks::get()->hook('autolink_area', array(&$data, $this->bbc));
 	}
 
 	public function hasLinks($data)
@@ -115,7 +115,7 @@ class Autolink
 			'[email]$1[/email]',
 		);
 
-		Hooks::get()->hook('autolink_load', array(&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc));
+		\Hooks::get()->hook('autolink_load', array(&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc));
 
 		$this->search = $search_url;
 		$this->replace = $replace_url;
@@ -140,7 +140,7 @@ class Autolink
 		$possible_email = $this->email_enabled && strpos($message, '@') !== false;
 
 		// Your autolink integration might use something like tel.123456789.call. This makes that possible.
-		Hooks::get()->hook('possible_autolink', array(&$possible_link, &$possible_email));
+		\Hooks::get()->hook('possible_autolink', array(&$possible_link, &$possible_email));
 
 		$this->possible_link = $possible_link;
 		$this->possible_email = $possible_email;

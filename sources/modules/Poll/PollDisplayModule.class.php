@@ -88,7 +88,7 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 			);
 
 			// Allow mods to add additional buttons here
-			Hooks::get()->hook('poll_buttons', array(&$context['poll_buttons']));
+			\Hooks::get()->hook('poll_buttons', array(&$context['poll_buttons']));
 		}
 	}
 }

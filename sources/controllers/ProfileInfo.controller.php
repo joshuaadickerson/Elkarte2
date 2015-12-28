@@ -254,7 +254,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (in_array('topics', $this->_summary_areas))
 		{
 			// Is the load average still too high?
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
+			if (checkLoad('show_posts'))
 			{
 				$context['loadaverage'] = true;
 			}
@@ -322,7 +322,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (in_array('posts', $this->_summary_areas))
 		{
 			// Is the load average too high just now, then let them know
-			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
+			if (checkLoad('show_posts'))
 			{
 				$context['loadaverage'] = true;
 			}
@@ -516,7 +516,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['page_title'] = $txt['showPosts'] . ' - ' . $user_profile[$this->_memID]['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
+		if (checkLoad('show_posts'))
 			Errors::instance()->fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
@@ -958,7 +958,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$this->_memID]['real_name'];
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
+		if (checkLoad('userstats'))
 			Errors::instance()->fatal_lang_error('loadavg_userstats_disabled', false);
 
 		loadTemplate('ProfileInfo');

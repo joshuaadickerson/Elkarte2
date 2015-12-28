@@ -66,9 +66,9 @@ class ParserWrapper
 	 */
 	protected function checkLoad()
 	{
-		global $modSettings, $context;
+		global $context;
 
-		if (!empty($modSettings['bbc']) && $modSettings['current_load'] >= $modSettings['bbc'])
+		if (checkLoad('bbc'))
 		{
 			$context['disabled_parse_bbc'] = true;
 			return false;

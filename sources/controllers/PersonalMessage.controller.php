@@ -2237,7 +2237,7 @@ class PersonalMessage_Controller extends Action_Controller
 		global $scripturl, $modSettings, $context, $txt, $memberContext;
 
 		// Make sure the server is able to do this right now
-		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+		if (checkLoad('search'))
 		{
 			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 		}

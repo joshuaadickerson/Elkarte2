@@ -44,7 +44,7 @@ class Auto_Optimize implements Scheduled_Task_Interface
 		$delay = false;
 
 		// As a kind of hack, if the server load is too great delay, but only by a bit!
-		if (!empty($modSettings['load_average']) && !empty($modSettings['loadavg_auto_opt']) && $modSettings['load_average'] >= $modSettings['loadavg_auto_opt'])
+		if (checkLoad('auto_opt'))
 			$delay = true;
 
 		// Otherwise are we restricting the number of people online for this?

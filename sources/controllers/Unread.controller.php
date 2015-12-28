@@ -552,15 +552,15 @@ class Unread_Controller extends Action_Controller
 		global $context, $modSettings;
 
 		// Check for any server load issues
-		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
+		if ($context['showing_all_topics'] && checkLoad('allunread'))
 		{
 			Errors::instance()->fatal_lang_error('loadavg_allunread_disabled', false);
 		}
-		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
+		elseif ($this->_action_unreadreplies && checkLoad('unreadreplies'))
 		{
 			Errors::instance()->fatal_lang_error('loadavg_unreadreplies_disabled', false);
 		}
-		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
+		elseif (!$context['showing_all_topics'] && $this->_action_unread && checkLoad('unread'))
 		{
 			Errors::instance()->fatal_lang_error('loadavg_unread_disabled', false);
 		}

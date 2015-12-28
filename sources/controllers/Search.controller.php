@@ -83,7 +83,7 @@ class Search_Controller extends Action_Controller
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
 		// If load balancing is on and the load is high, no need to even show the form.
-		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+		if (checkLoad('search'))
 			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 
 	}
@@ -120,7 +120,7 @@ class Search_Controller extends Action_Controller
 		global $txt, $scripturl, $modSettings, $user_info, $context;
 
 		// Is the load average too high to allow searching just now?
-		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+		if (checkLoad('search'))
 			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 
 		loadLanguage('Search');

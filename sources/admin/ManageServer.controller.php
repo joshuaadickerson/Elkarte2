@@ -693,12 +693,12 @@ class ManageServer_Controller extends Action_Controller
 		else
 		{
 			require_once(SUBSDIR . '/Server.subs.php');
-			$modSettings['load_average'] = detectServerLoad();
+			$context['load_average'] = detectServerLoad();
 
-			if ($modSettings['load_average'] !== false)
+			if ($context['load_average'] !== false)
 			{
 				$disabled = false;
-				$context['settings_message'] = sprintf($txt['loadavg_warning'], $modSettings['load_average']);
+				$context['settings_message'] = sprintf($txt['loadavg_warning'], $context['load_average']);
 			}
 		}
 

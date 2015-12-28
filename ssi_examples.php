@@ -591,7 +591,7 @@ function template_ssi_above()
 		</style>
 		<script><!-- // --><![CDATA[
 			var elk_scripturl = "', $scripturl, '",
-				elk_iso_case_folding = ', $context['server']['iso_case_folding'] ? 'true' : 'false', ',
+				elk_iso_case_folding = ', serverIs('iso_case_folding') ? 'true' : 'false', ',
 				elk_charset = "UTF-8",
 				elk_theme_url = "', $settings['theme_url'], '",
 				elk_default_theme_url = "', $settings['default_theme_url'], '",

@@ -370,7 +370,7 @@ class ParserWrapper
 		if ($this->codes === null)
 		{
 			$additional_bbc = array();
-			Hooks::get()->hook('additional_bbc', array(&$additional_bbc));
+			\Hooks::get()->hook('additional_bbc', array(&$additional_bbc));
 			$this->codes = new Codes($additional_bbc, $this->disabled);
 		}
 

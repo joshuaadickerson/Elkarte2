@@ -47,7 +47,6 @@ else
 	require_once('/var/www/Settings.php');
 
 // A few files we cannot live without and will not be autoload
-require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Logging.php');

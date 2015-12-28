@@ -459,7 +459,7 @@ function loadEssentialData()
 		return throw_error('Cannot find ' . SOURCEDIR . '/database/Database.subs.php. Please check you have uploaded all source files and have the correct paths set.');
 
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
-	if (file_exists(SOURCEDIR . '/QueryString.php'))
+	if (file_exists(SOURCEDIR . '/Request.php'))
 	{
 		Request::instance()->cleanRequest()->parseRequest();
 	}
@@ -524,7 +524,7 @@ function action_welcomeLogin()
 
 	// Check for some key files - one template, one language, and a new and an old source file.
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
-		&& @file_exists(SOURCEDIR . '/QueryString.php')
+		&& @file_exists(SOURCEDIR . '/Request.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
 		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
 
@@ -1616,7 +1616,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
-		&& @file_exists(SOURCEDIR . '/QueryString.php')
+		&& @file_exists(SOURCEDIR . '/Request.php')
 		&& @file_exists(SOURCEDIR . '/ManageBoards.controller.php');
 	if (!$check && !isset($modSettings['elkVersion']))
 		print_error('Error: Some files are missing or out-of-date.', true);

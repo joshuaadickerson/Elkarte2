@@ -1,5 +1,21 @@
 <?php
+/**
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1 dev
+ *
+ */
 
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Manage templates
+ * Takes the place of a lot of old functions that were in Load.php
+ */
 class Templates
 {
     protected static $instance = null;
@@ -42,13 +58,15 @@ class Templates
      *
      * @uses $this->requireTemplate() to actually load the file.
      * @param string|false $template_name
-     * @param string[]|string $style_sheets any style sheets to load with the template
+     * @param string[]|string $style_sheets any style sheets to load with the template @deprecated
      * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
      *
      * @return boolean|null
      */
     public function load($template_name, $style_sheets = array(), $fatal = true)
     {
+		$style_sheets = !is_array($style_sheets) ? array($style_sheets) : $style_sheets;
+
         // If we don't know yet the default theme directory, let's wait a bit.
         if (empty($this->dirs))
         {
@@ -65,18 +83,21 @@ class Templates
         {
             foreach ($this->delayed as $val)
             {
-                $this->requireTemplate($val[0], $val[1], $val[2]);
-            }
+                $this->requireTemplate($val[0], $val[2]);
+				$this->loadStyleSheets($val[1]);
+
+			}
 
             // Forget about them (load them only once)
             $this->delayed = array();
         }
 
-        $this->requireTemplate($template_name, $style_sheets, $fatal);
+        $this->requireTemplate($template_name, $fatal);
+		$this->loadStyleSheets($style_sheets);
     }
 
     /**
-     * <b>Internal function! Do not use it, use loadTemplate instead</b>
+     * <b>Internal function! Do not use it, use $this->load instead</b>
      *
      * What it does:
      * - loads a template file with the name template_name from the current, default, or base theme.
@@ -91,31 +112,14 @@ class Templates
      *
      * @return boolean|null
      */
-    protected function requireTemplate($template_name, $style_sheets, $fatal)
+    protected function requireTemplate($template_name, $fatal)
     {
         global $context, $settings, $txt, $scripturl, $db_show_debug;
-
-        if (!is_array($style_sheets))
-            $style_sheets = array($style_sheets);
 
         if ($this->default_loaded === false)
         {
             loadCSSFile('index.css');
             $this->default_loaded = true;
-        }
-
-        // Any specific template style sheets to load?
-        if (!empty($style_sheets))
-        {
-            trigger_error('Use of loadTemplate to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
-            $sheets = array();
-            foreach ($style_sheets as $sheet)
-            {
-                $sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-                if ($sheet == 'admin' && !empty($context['theme_variant']))
-                    $sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
-            }
-            loadCSSFile($sheets);
         }
 
         // No template to load?
@@ -158,7 +162,7 @@ class Templates
                 $context['security_controls_files']['errors']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
             }
 
-            loadTemplate($template_name);
+            $this->load($template_name);
         }
         // Cause an error otherwise.
         elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
@@ -446,4 +450,21 @@ class Templates
     {
         return $this->templates;
     }
+
+    protected function loadStyleSheets(array $style_sheets)
+	{
+		// Any specific template style sheets to load?
+		if (!empty($style_sheets))
+		{
+			trigger_error('Use of loadTemplate to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
+			$sheets = array();
+			foreach ($style_sheets as $sheet)
+			{
+				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
+				if ($sheet == 'admin' && !empty($context['theme_variant']))
+					$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+			}
+			loadCSSFile($sheets);
+		}
+	}
 }

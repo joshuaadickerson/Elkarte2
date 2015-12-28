@@ -68,7 +68,7 @@ class Site_Dispatcher
 		);
 
 		// Reminder: hooks need to account for multiple addons setting this hook.
-		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
+		Hooks::get()->hook('integrate_action_frontpage', array(&$this->_default_action));
 
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
@@ -175,7 +175,7 @@ class Site_Dispatcher
 		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
 		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray, &$adminActions));
+		Hooks::get()->hook('integrate_actions', array(&$actionArray, &$adminActions));
 
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
@@ -253,11 +253,11 @@ class Site_Dispatcher
 			$controller->pre_dispatch();
 
 			// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
-			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+			Hooks::get()->hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
 			$result = $controller->$method();
 
-			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
+			Hooks::get()->hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 
 			return $result;
 		}

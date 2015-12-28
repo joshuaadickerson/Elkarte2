@@ -234,7 +234,7 @@ class Error_Context
 
 		$this->_loadLang();
 
-		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
+		Hooks::get()->hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
 
 		$errors = array();
 		$returns = array();

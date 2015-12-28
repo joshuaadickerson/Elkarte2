@@ -503,7 +503,7 @@ function banPermissions()
 		);
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 
-		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
+		Hooks::get()->hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
 	}
 	// Are they absolutely under moderation?
@@ -516,7 +516,7 @@ function banPermissions()
 			'post_reply_any' => 'post_unapproved_replies_any',
 			'post_attachment' => 'post_unapproved_attachments',
 		);
-		call_integration_hook('integrate_warn_permissions', array(&$permission_change));
+		Hooks::get()->hook('integrate_warn_permissions', array(&$permission_change));
 		foreach ($permission_change as $old => $new)
 		{
 			if (!in_array($old, $user_info['permissions']))
@@ -1287,7 +1287,7 @@ function spamProtection($error_type, $fatal = true)
 		'reporttm' => $modSettings['spamWaitTime'] * 4,
 		'search' => !empty($modSettings['search_floodcontrol_time']) ? $modSettings['search_floodcontrol_time'] : 1,
 	);
-	call_integration_hook('integrate_spam_protection', array(&$timeOverrides));
+	Hooks::get()->hook('integrate_spam_protection', array(&$timeOverrides));
 
 	// Moderators are free...
 	if (!allowedTo('moderate_board'))
@@ -1628,7 +1628,7 @@ function checkSecurityFiles()
 	$has_files = false;
 
 	$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-	call_integration_hook('integrate_security_files', array(&$securityFiles));
+	Hooks::get()->hook('integrate_security_files', array(&$securityFiles));
 
 	foreach ($securityFiles as $securityFile)
 	{

@@ -59,7 +59,7 @@ $ssi_on_error_method = false;
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
 // Have the ability to easily add functions to SSI.
-call_integration_hook('integrate_SSI');
+Hooks::get()->hook('integrate_SSI');
 
 // Call a function passed by GET.
 if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function']) && (!empty($modSettings['allow_guestAccess']) || !$user_info['is_guest']))

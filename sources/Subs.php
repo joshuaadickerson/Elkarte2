@@ -1892,6 +1892,29 @@ function isBrowser($browser)
 /**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
  *
+ * @deprecated use censor() or Censor class
+ *
+ * What it does:
+ * - it censors the passed string.
+ * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
+ * - if the admin setting allow_no_censored is off will censor words unless the user has set
+ * it to not censor in their profile and force is off
+ * - it caches the list of censored words to reduce parsing.
+ * - Returns the censored text
+ *
+ * @param string &$text
+ * @param bool $force = false
+ */
+function censorText(&$text, $force = false)
+{
+	$text = censor($text, $force);
+
+	return $text;
+}
+
+/**
+ * Replace all vulgar words with respective proper words. (substring or whole words..)
+ *
  * What it does:
  * - it censors the passed string.
  * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
@@ -1903,7 +1926,7 @@ function isBrowser($browser)
  * @param string $text
  * @param bool $force = false
  */
-function censorText(&$text, $force = false)
+function censor($text, $force = false)
 {
 	global $modSettings;
 	static $censor = null;
@@ -1913,11 +1936,8 @@ function censorText(&$text, $force = false)
 		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
-	$text = $censor->censor($text, $force);
-
-	return $text;
+	return $censor->censor($text, $force);
 }
-
 
 /**
  * Helper function able to determine if the current member can see at least

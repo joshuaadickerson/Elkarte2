@@ -1046,8 +1046,8 @@ class Theme extends \Theme
             loadLanguage('index+Addons');
 
             // @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
-            loadTemplate('index');
-            loadTemplate('Xml');
+            $this->templates->load('index');
+            $this->templates->load('Xml');
             \Template_Layers::getInstance()->removeAll();
         }
         // These actions don't require the index template at all.
@@ -1066,7 +1066,7 @@ class Theme extends \Theme
 
             // Load each template...
             foreach ($templates as $template)
-                loadTemplate($template);
+                $this->templates->load($template);
 
             // ...and attempt to load their associated language files.
             $required_files = implode('+', array_merge($templates, array('Addons')));

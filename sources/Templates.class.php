@@ -451,6 +451,10 @@ class Templates
         return $this->templates;
     }
 
+	/**
+	 * @deprecated
+	 * @param array $style_sheets
+	 */
     protected function loadStyleSheets(array $style_sheets)
 	{
 		// Any specific template style sheets to load?

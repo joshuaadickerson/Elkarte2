@@ -284,7 +284,7 @@ class Display_Controller extends Action_Controller
 		$context['page_title'] = $topicinfo['subject'];
 
 		// Allow addons access to the topicinfo array
-		Hooks::get()->hook('display_topic', array($topicinfo));
+		Hooks::get()->hook('display_topic', array(&$topicinfo));
 
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;

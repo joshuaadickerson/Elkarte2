@@ -56,11 +56,11 @@ class Calendar_Controller extends Action_Controller
 		isAllowedTo('calendar_view');
 
 		// This is gonna be needed...
-		loadTemplate('Calendar');
+		$this->_templates->load('Calendar');
 
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
-			Errors::instance()->fatal_lang_error('calendar_off', false);
+			$this->_errors->fatal_lang_error('calendar_off', false);
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
@@ -229,7 +229,7 @@ class Calendar_Controller extends Action_Controller
 		}
 
 		// Template, sub template, etc.
-		loadTemplate('Calendar');
+		$this->_templates->load('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];

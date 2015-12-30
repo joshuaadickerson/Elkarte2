@@ -139,7 +139,7 @@ function template_html_above()
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
 	// load in any css from addons or themes so they can overwrite if wanted
-	template_css();
+	theme()->template_css();
 
 	// Save some database hits, if a width for multiple wrappers is set in admin.
 	if (!empty($settings['forum_width']))
@@ -407,7 +407,7 @@ function template_body_below()
 		<div class="wrapper">
 			<ul>
 				<li class="copyright">',
-					theme_copyright(), '
+					theme()->theme_copyright(), '
 				</li>',
 				!empty($context['newsfeed_urls']['rss']) ? '<li>
 					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="largetext fa fa-rss"></i></a>
@@ -816,6 +816,6 @@ function template_news_fader()
 			</li>
 		</ul>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
 }

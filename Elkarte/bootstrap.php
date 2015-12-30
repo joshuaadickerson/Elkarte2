@@ -216,13 +216,13 @@ if (isset($ssi_layers))
 	$template_layers->removeAll();
 	foreach ($ssi_layers as $layer)
 		$template_layers->addBegin($layer);
-	template_header();
+	theme()->template_header();
 }
 else
 	setupThemeContext();
 
 // We need to set up user agent, and make more checks on the request
-$req = request();
+$req = \Request::instance();
 
 // Make sure they didn't muss around with the settings... but only if it's not cli.
 if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')

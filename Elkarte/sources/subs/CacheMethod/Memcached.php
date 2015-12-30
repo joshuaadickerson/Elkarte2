@@ -150,7 +150,7 @@ class Memcached extends Cache_Method_Abstract
 	public static function title()
 	{
 		if (self::available())
-			add_integration_function('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
+			\Hooks::get()->add('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
 
 		return 'Memcached';
 	}

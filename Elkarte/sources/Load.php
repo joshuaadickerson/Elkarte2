@@ -105,11 +105,11 @@ function reloadSettings()
 	{
 		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
-			add_integration_function($hook, $function);
+			Hooks::get()->add($hook, $function);
 	}
 
 	// Any files to pre include?
-	call_integration_include_hook('integrate_pre_include');
+	\Hooks::get()->include_hook('pre_include');
 
 	// Call pre load integration functions.
 	Hooks::get()->hook('pre_load');
@@ -153,7 +153,7 @@ function loadUserSettings()
 		$id_member = 0;
 
 	// We'll need IPs and user agent and stuff, they came to visit us with!
-	$req = request();
+	$req = \Request::instance();
 
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
@@ -1136,18 +1136,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 }
 
 /**
- * Loads information about what browser the user is viewing with and places it in $context
- *
- * @uses the class from BrowserDetect.class.php
- */
-function detectBrowser()
-{
-	// Load the current user's browser of choice
-	$detector = new Browser_Detector;
-	$detector->detectBrowser();
-}
-
-/**
  * @param int|0 $id_theme
  * @return int
  */
@@ -1376,7 +1364,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
-	detectBrowser();
+	$detector = new Browser_Detector;
+	$detector->detectBrowser();
 
 	// Set the top level linktree up.
 	array_unshift($context['linktree'], array(
@@ -1464,13 +1453,14 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	theme()->loadThemeJavascript();
 
-	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
+	$hooks = Hooks::get();
+	$hooks->newPath(array('$themedir' => $settings['theme_dir']));
 
 	// Any files to include at this point?
-	call_integration_include_hook('integrate_theme_include');
+	$hooks->include_hook('theme_include');
 
 	// Call load theme integration functions.
-	Hooks::get()->hook('load_theme');
+	$hooks->hook('load_theme');
 
 	// We are ready to go.
 	$context['theme_loaded'] = true;
@@ -1728,24 +1718,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 }
 
 /**
- * Load a sub-template.
- *
- * What it does:
- * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
- * - if ?debug is in the query string, shows administrators a marker after every sub template
- * for debugging purposes.
- *
- * @param string $sub_template_name
- * @param bool|string $fatal = false
- * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
- * - $fatal = 'ignore' to skip
- */
-function loadSubTemplate($sub_template_name, $fatal = false)
-{
-	return Templates::getInstance()->loadSubTemplate($sub_template_name, $fatal);
-}
-
-/**
  * Add a CSS file for output later
  *
  * @param string[]|string $filenames string or array of filenames to work on
@@ -1945,33 +1917,6 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			$cache->put($cache_name, $this_build, 600);
 		}
 	}
-}
-
-/**
- * Add a Javascript variable for output later (for feeding text strings and similar to JS)
- *
- * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
- * @param bool $escape = false, whether or not to escape the value
- */
-function addJavascriptVar($vars, $escape = false)
-{
-	theme()->addJavascriptVar($vars, $escape);
-}
-
-/**
- * Add a block of inline Javascript code to be executed later
- *
- * What it does:
- * - only use this if you have to, generally external JS files are better, but for very small scripts
- *   or for scripts that require help from PHP/whatever, this can be useful.
- * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
- *
- * @param string $javascript
- * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
- */
-function addInlineJavascript($javascript, $defer = false)
-{
-	theme()->addInlineJavascript($javascript, $defer);
 }
 
 /**
@@ -2468,27 +2413,6 @@ function determineAvatar($profile)
 	return $avatar;
 }
 
-/**
- * Get information about the server
- */
-function detectServer()
-{
-	global $context;
-
-	$context['server'] = array(
-		'is_iis'			=> serverIs('iis'),
-		'is_apache'			=> serverIs('apache'),
-		'is_litespeed' 		=> serverIs('litespeed'),
-		'is_lighttpd' 		=> serverIs('lighttpd'),
-		'is_nginx' 			=> serverIs('nginx'),
-		'is_cgi' 			=> serverIs('cgi'),
-		'is_windows' 		=> serverIs('windows'),
-		'iso_case_folding' 	=> serverIs('iso_case_folding'),
-		// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-		'needs_login_fix'	=> serverIs('needs_login_fix'),
-	);
-}
-
 function serverIs($server)
 {
 	switch ($server)
@@ -2737,7 +2661,7 @@ function loadSession()
 		// Use cache setting sessions?
 		if (empty($modSettings['databaseSession_enable']) && !empty($modSettings['cache_enable']) && php_sapi_name() != 'cli')
 		{
-			call_integration_hook('integrate_session_handlers');
+			\Hooks::get()->hook('session_handlers');
 
 			// @todo move these to a plugin.
 			if (function_exists('mmcache_set_session_handlers'))

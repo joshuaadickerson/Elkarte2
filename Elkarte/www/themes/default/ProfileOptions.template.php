@@ -125,7 +125,7 @@ function template_editBuddies()
 	</form>';
 
 	// Initialize the autosuggest object
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
 			sSessionId: elk_session_id,
@@ -227,7 +227,7 @@ function template_editIgnoreList()
 		</div>
 	</form>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
 			sSessionId: elk_session_id,

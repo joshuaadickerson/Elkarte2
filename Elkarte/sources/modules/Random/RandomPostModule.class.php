@@ -28,7 +28,7 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 		if (!empty($modSettings['enableFollowup']))
 		{
 			$return[] = array('prepare_context', array('Random_Post_Module', 'prepare_context_followup'), array());
-			add_integration_function('integrate_create_topic', 'Random_Post_Module::followup_create_topic', '', false);
+			\Hooks::get()->add('integrate_create_topic', 'Random_Post_Module::followup_create_topic', '', false);
 		}
 
 		return $return;

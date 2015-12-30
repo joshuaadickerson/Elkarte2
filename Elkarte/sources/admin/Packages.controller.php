@@ -839,7 +839,10 @@ class Packages_Controller extends Action_Controller
 				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 
 			if (strtolower(strrchr($this->_req->query->file, '.')) == '.php')
+			{
+				require_once(SUBSDIR . '/Error.subs.php');
 				$context['filedata'] = highlight_php_code($context['filedata']);
+			}
 		}
 	}
 

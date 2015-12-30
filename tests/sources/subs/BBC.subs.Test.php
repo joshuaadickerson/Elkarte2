@@ -99,7 +99,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = parse_bbc($test);
+			$result = \BBC\ParserWrapper::getInstance()->parseMessage($test);
 
 			$this->assertEquals($expected, $result);
 		}
@@ -109,7 +109,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			$name = $testcase[0];
 			$test = $testcase[1];
 
-			$result = parse_bbc($test);
+			$result = \BBC\ParserWrapper::getInstance()->parseMessage($test);
 
 			$this->assertEquals($test, $result);
 		}

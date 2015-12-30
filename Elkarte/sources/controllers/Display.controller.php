@@ -87,10 +87,10 @@ class Display_Controller extends Action_Controller
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('no_board', false);
+			$this->_errors->fatal_lang_error('no_board', false);
 
 		// Load the template
-		loadTemplate('Display');
+		$this->_templates->load('Display');
 		$context['sub_template'] = 'messages';
 
 		// And the topic functions
@@ -102,8 +102,7 @@ class Display_Controller extends Action_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$this->_template_layers = Template_Layers::getInstance();
-		$this->_template_layers->addEnd('messages_informations');
+		$this->_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
@@ -152,12 +151,12 @@ class Display_Controller extends Action_Controller
 		);
 
 		// Allow addons to add additional details to the topic query
-		Hooks::get()->hook('topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
+		\Hooks::get()->hook('topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
@@ -264,11 +263,10 @@ class Display_Controller extends Action_Controller
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
-		if ($modSettings['enablePreviousNext'])
-			$context['links'] += array(
-				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
-				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
-			);
+		$context['links'] += array(
+			'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
+			'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
+		);
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -394,7 +392,7 @@ class Display_Controller extends Action_Controller
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		Hooks::get()->hook('display_message_list', array(&$messages, &$posters));
+		\Hooks::get()->hook('display_message_list', array(&$messages, &$posters));
 
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
@@ -440,7 +438,7 @@ class Display_Controller extends Action_Controller
 			);
 			$msg_selects = array();
 			$msg_tables = array();
-			Hooks::get()->hook('message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
+			\Hooks::get()->hook('message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
 
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
@@ -454,13 +452,13 @@ class Display_Controller extends Action_Controller
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
-				addJavascriptVar(array(
+				theme()->addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
 				loadLanguage('Errors');
 
 				// Initiate likes and the tooltips for likes
-				addInlineJavascript('
+				theme()->addInlineJavascript('
 				$(document).ready(function () {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
@@ -578,7 +576,7 @@ class Display_Controller extends Action_Controller
 		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(document).ready(function() {
 			$().linkifyvideo(oEmbedtext);
 		});'
@@ -616,10 +614,10 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
-		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+		theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 		if ($context['can_send_topic'])
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'sendtopic_cancel' => $txt['modify_cancel'],
 				'sendtopic_back' => $txt['back'],
 				'sendtopic_close' => $txt['find_close'],
@@ -651,12 +649,12 @@ class Display_Controller extends Action_Controller
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
-			$this->_template_layers->add('quickreply');
-		$this->_template_layers->add('pages_and_buttons');
+			$this->_layers->add('quickreply');
+		$this->_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
-		Hooks::get()->hook('display_buttons');
-		Hooks::get()->hook('mod_buttons');
+		\Hooks::get()->hook('display_buttons');
+		\Hooks::get()->hook('mod_buttons');
 	}
 
 	/**

@@ -62,7 +62,7 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	{
 		foreach ($this->_tests as $test)
 		{
-			add_integration_function($this->_hook_name, $test['call'], $test['file'], $test['perm']);
+			\Hooks::get()->add($this->_hook_name, $test['call'], $test['file'], $test['perm']);
 			$this->assertTrue($this->_hook_exists($test, $test['perm']));
 		}
 	}
@@ -74,7 +74,7 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	 */
 	public function testCallHooks()
 	{
-		$this->_call = call_integration_hook($this->_hook_name);
+		$this->_call = \Hooks::get()->hook($this->_hook_name);
 
 		foreach ($this->_tests as $test)
 			$this->assertTrue($this->_is_hook_called($test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')));
@@ -89,7 +89,7 @@ class TestHooks extends PHPUnit_Framework_TestCase
 	{
 		foreach ($this->_tests as $test)
 		{
-			remove_integration_function($this->_hook_name, $test['call'], $test['file']);
+			\Hooks::get()->remove($this->_hook_name, $test['call'], $test['file']);
 			$this->assertFalse($this->_hook_exists($test, $test['perm']));
 		}
 	}

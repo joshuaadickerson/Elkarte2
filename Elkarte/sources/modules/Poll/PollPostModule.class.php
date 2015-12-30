@@ -91,7 +91,7 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 		if ($context['can_add_poll'])
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'poll_remove' => $txt['poll_remove'],
 				'poll_add' => $txt['add_poll']), true);
 		}

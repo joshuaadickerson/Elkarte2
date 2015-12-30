@@ -192,8 +192,7 @@ function elk_main($elk)
 	$_req = HttpReq::instance();
 
 	// Special case: session keep-alive, output a transparent pixel.
-	if ($_req->getQuery('action') === 'keepalive')
-	{
+	if ($_req->getQuery('action') === 'keepalive') {
 		header('Content-Type: image/gif');
 		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 	}
@@ -216,7 +215,10 @@ function elk_main($elk)
 
 	// Attachments don't require the entire theme to be loaded.
 	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
-		detectBrowser();
+	{
+		$detector = new Browser_Detector;
+		$detector->detectBrowser();
+	}
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else
 		loadTheme();
@@ -232,7 +234,7 @@ function elk_main($elk)
 		Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
-	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
+	\Hooks::get()->hook('integrate_pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)

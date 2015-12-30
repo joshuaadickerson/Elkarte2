@@ -204,7 +204,7 @@ function template_print_below()
 	echo '
 		</div>
 		<div id="footer" class="smalltext">
-			', theme_copyright(), '
+			', theme()->theme_copyright(), '
 		</div>
 	</body>
 </html>';

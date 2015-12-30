@@ -523,45 +523,6 @@ function un_htmlspecialchars($string)
 }
 
 /**
- * Calculates all the possible permutations (orders) of an array.
- *
- * What it does:
- * - Caution: should not be called on arrays bigger than 8 elements as this function is memory hungry
- * - returns an array containing each permutation.
- * - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
- * - A combinations without repetition N! function so 3! = 6 and 10! = 3,628,800 combinations
- * - Used by parse_bbc to allow bbc tag parameters to be in any order and still be
- * parsed properly
- *
- * @deprecated since 1.0.5
- * @param mixed[] $array index array of values
- * @return mixed[] array representing all permutations of the supplied array
- */
-function permute($array)
-{
-	$orders = array($array);
-
-	$n = count($array);
-	$p = range(0, $n);
-	for ($i = 1; $i < $n; null)
-	{
-		$p[$i]--;
-		$j = $i % 2 != 0 ? $p[$i] : 0;
-
-		$temp = $array[$i];
-		$array[$i] = $array[$j];
-		$array[$j] = $temp;
-
-		for ($i = 1; $p[$i] == 0; $i++)
-			$p[$i] = $i;
-
-		$orders[] = $array;
-	}
-
-	return $orders;
-}
-
-/**
  * Lexicographic permutation function.
  *
  * This is a special type of permutation which involves the order of the set. The next
@@ -612,95 +573,6 @@ function pc_next_permutation($p, $size)
 	}
 
 	return $p;
-}
-
-/**
- * Parse bulletin board code in a string, as well as smileys optionally.
- *
- * @deprecated since 1.1b1
- *
- * What it does:
- * - Only parses bbc tags which are not disabled in disabledBBC.
- * - Handles basic HTML, if enablePostHTML is on.
- * - Caches the from/to replace regular expressions so as not to reload them every time a string is parsed.
- * - Only parses smileys if smileys is true.
- * - Does nothing if the enableBBC setting is off.
- * - Uses the cache_id as a unique identifier to facilitate any caching it may do.
- *    - Only caches long messages, if cache is set to high then > 1000 or normal cache > 2400 characters
- *    - Only caches full parsing runs ($parse_tags set to null)
- * - Returns the modified message.
- *
- * @param string|false $message if false return list of enabled bbc codes
- * @param bool|string $smileys = true if to parse smileys as well
- * @param string $cache_id = '' the cache id to use
- * @param string[]|null $parse_tags array of tags to parse, null for all
- * @return string
- */
-function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
-{
-	// Don't waste cycles
-	if ($message === '')
-		return '';
-
-	$parser = \BBC\ParserWrapper::getInstance();
-
-	// This is a deprecated way of getting codes
-	if ($message === false)
-	{
-		return $parser->getCodes();
-	}
-
-	return $parser->parseMessage($message, $smileys);
-}
-
-/**
- * Parse smileys in the passed message.
- *
- * What it does:
- * - The smiley parsing function which makes pretty faces appear :).
- * - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
- * - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
- * - Caches the smileys from the database or array in memory.
- * - Doesn't return anything, but rather modifies message directly.
- *
- * @param string $message The string containing smileys to parse
- * @deprecated since 1.1b1
- */
-function parsesmileys(&$message)
-{
-	// No smiley set at all?!
-	if ($GLOBALS['user_info']['smiley_set'] == 'none' || trim($message) == '')
-	{
-		return;
-	}
-
-	$wrapper = \BBC\ParserWrapper::getInstance();
-	$parser = $wrapper->getSmileyParser();
-	$parser->parseBlock($message);
-}
-
-/**
- * Highlight any code.
- *
- * What it does:
- * - Uses PHP's highlight_string() to highlight PHP syntax
- * - does special handling to keep the tabs in the code available.
- * - used to parse PHP code from inside [code] and [php] tags.
- *
- * @param string $code The string containing php code
- * @return string the code with highlighted HTML.
- */
-function highlight_php_code($code)
-{
-	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
-
-	$buffer = str_replace(array("\n", "\r"), '', @highlight_string($code, true));
-
-	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
-	$buffer = preg_replace('~___TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
-
-	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }
 
 /**
@@ -832,23 +704,23 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
 
-		call_integration_buffer();
+		Hooks::get()->buffer_hook();
 
 		// Display the screen in the logical order.
-		template_header();
+		theme()->template_header();
 		$header_done = true;
 	}
 
 	if ($do_footer)
 	{
 		// Show the footer.
-		loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
+		Templates::getInstance()->loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)
 		{
 			$footer_done = true;
-			template_footer();
+			theme()->template_footer();
 
 			// Add $db_show_debug = true; to Settings.php if you want to show the debugging information.
 			// (since this is just debugging... it's okay that it's after </html>.)
@@ -859,7 +731,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Need user agent
-	$req = request();
+	$req = \Request::instance();
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	$invalid_old_url = array(
@@ -1043,74 +915,6 @@ function setTimeLimit($time_limit, $server_reset = true)
 		@apache_reset_timeout();
 
 	return ini_get('max_execution_time');
-}
-
-/**
- * This is the only template included in the sources.
- */
-function template_rawdata()
-{
-	return theme()->template_rawdata();
-}
-
-/**
- * The header template
- */
-function template_header()
-{
-	return theme()->template_header();
-}
-
-/**
- * Show the copyright.
- */
-function theme_copyright()
-{
-	return theme()->theme_copyright();
-}
-
-/**
- * The template footer
- */
-function template_footer()
-{
-	return theme()->template_footer();
-}
-
-/**
- * Output the Javascript files
- *
- * What it does:
- * - tabbing in this function is to make the HTML source look proper
- * - outputs jQuery/jQueryUI from the proper source (local/CDN)
- * - if defered is set function will output all JS (source & inline) set to load at page end
- * - if the admin option to combine files is set, will use Combiner.class
- *
- * @param bool $do_defered = false
- */
-function template_javascript($do_defered = false)
-{
-	return theme()->template_javascript($do_defered);
-}
-
-/**
- * Output the CSS files
- *
- * What it does:
- *  - If the admin option to combine files is set, will use Combiner.class
- */
-function template_css()
-{
-	return theme()->template_css();
-}
-
-/**
- * Calls on template_show_error from index.template.php to show warnings
- * and security errors for admins
- */
-function template_admin_warning_above()
-{
-	return theme()->template_admin_warning_above();
 }
 
 /**
@@ -1340,78 +1144,6 @@ function elk_seed_generator()
 	// Change the seed.
 	if (mt_rand(1, 250) == 69 || empty($modSettings['rand_seed']))
 		updateSettings(array('rand_seed' => mt_rand()));
-}
-
-/**
- * Process functions of an integration hook.
- *
- * @deprecated as of 1.1b1
- * What it does:
- * - Calls all functions of the given hook.
- * - Supports static class method calls.
- *
- * @param string $hook The name of the hook to call
- * @param mixed[] $parameters = array() Parameters to pass to the hook
- * @return mixed[] the results of the functions
- */
-function call_integration_hook($hook, $parameters = array())
-{
-	return Hooks::get()->hook($hook, $parameters);
-}
-
-/**
- * Includes files for hooks that only do that (i.e. integrate_pre_include)
- *
- * @deprecated as of 1.1b1
- * @param string $hook The name to include
- */
-function call_integration_include_hook($hook)
-{
-	Hooks::get()->include_hook($hook);
-}
-
-/**
- * Special hook call executed during obExit
- * @deprecated as of 1.1b1
- */
-function call_integration_buffer()
-{
-	Hooks::get()->buffer_hook();
-}
-
-/**
- * Add a function for integration hook.
- *
- * - Does nothing if the function is already added.
- *
- * @deprecated as of 1.1b1
- *
- * @param string $hook The name of the hook to add
- * @param string $function The function associated with the hook
- * @param string $file The file that contains the function
- * @param bool $permanent = true if true, updates the value in settings table
- */
-function add_integration_function($hook, $function, $file = '', $permanent = true)
-{
-	Hooks::get()->add($hook, $function, $file, $permanent);
-}
-
-/**
- * Remove an integration hook function.
- *
- * @deprecated as of 1.1b1
- *
- * What it does:
- * - Removes the given function from the given hook.
- * - Does nothing if the function is not available.
- *
- * @param string $hook The name of the hook to remove
- * @param string $function The name of the function
- * @param string $file The file its located in
- */
-function remove_integration_function($hook, $function, $file = '')
-{
-	Hooks::get()->remove($hook, $function, $file);
 }
 
 /**
@@ -1734,18 +1466,6 @@ function createList($listOptions)
 }
 
 /**
- * This handy function retrieves a Request instance and passes it on.
- *
- * What it does:
- * - To get hold of a Request, you can use this function or directly Request::instance().
- * - This is for convenience, it simply delegates to Request::instance().
- */
-function request()
-{
-	return Request::instance();
-}
-
-/**
  * Meant to replace any usage of $db_last_error.
  *
  * What it does:
@@ -1884,32 +1604,12 @@ function isBrowser($browser)
 
 	// Don't know any browser!
 	if (empty($context['browser']))
-		detectBrowser();
+	{
+		$detector = new Browser_Detector;
+		$detector->detectBrowser();
+	}
 
 	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
-}
-
-/**
- * Replace all vulgar words with respective proper words. (substring or whole words..)
- *
- * @deprecated use censor() or Censor class
- *
- * What it does:
- * - it censors the passed string.
- * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
- * - if the admin setting allow_no_censored is off will censor words unless the user has set
- * it to not censor in their profile and force is off
- * - it caches the list of censored words to reduce parsing.
- * - Returns the censored text
- *
- * @param string &$text
- * @param bool $force = false
- */
-function censorText(&$text, $force = false)
-{
-	$text = censor($text, $force);
-
-	return $text;
 }
 
 /**

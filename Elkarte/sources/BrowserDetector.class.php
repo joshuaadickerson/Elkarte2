@@ -85,7 +85,7 @@ class Browser_Detector
 		$this->_is_tablet = false;
 
 		// Saves us many many calls
-		$req = request();
+		$req = \Request::instance();
 		$this->_ua = empty($this->_ua) ? $req->user_agent() : $this->_ua;
 
 		// One at a time, one at a time, and in this order too

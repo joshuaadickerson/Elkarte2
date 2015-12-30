@@ -112,7 +112,7 @@ class Cache
 		if (!$this->isEnabled())
 			return;
 
-		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
+		\Hooks::get()->hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 		/* Refresh the cache if either:
 			1. Caching is disabled.
@@ -134,7 +134,7 @@ class Cache
 		if (!empty($cache_block['post_retri_eval']))
 			eval($cache_block['post_retri_eval']);
 
-		call_integration_hook('post_cache_quick_get', array($cache_block));
+		\Hooks::get()->hook('post_cache_quick_get', array($cache_block));
 
 		return $cache_block['data'];
 	}
@@ -179,7 +179,7 @@ class Cache
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
-		call_integration_hook('Cache::instance()->put', array($key, $value, $ttl));
+		\Hooks::get()->hook('cache_put_data', array($key, $value, $ttl));
 
 		if ($db_show_debug === true)
 		{
@@ -223,7 +223,7 @@ class Cache
 			Debug::get()->cache($cache_hit);
 		}
 
-		call_integration_hook('Cache::instance()->get', array($key, $ttl, $value));
+		\Hooks::get()->hook('cache_get_data', array($key, $ttl, $value));
 
 		return empty($value) ? null : @unserialize($value);
 	}
@@ -266,7 +266,7 @@ class Cache
 		@touch(CACHEDIR . '/index.php');
 
 		// Give addons a way to trigger cache cleaning.
-		Hooks::get()->hook('clean_cache');
+		\Hooks::get()->hook('clean_cache');
 
 		clearstatcache();
 	}

@@ -170,7 +170,7 @@ function determineActions($urls, $preferred_prefix = false)
 	);
 
 	// Provide integration a way to add to the allowed action array
-	call_integration_hook('integrate_whos_online_allowed', array(&$allowedActions));
+	\Hooks::get()->hook('whos_online_allowed', array(&$allowedActions));
 
 	if (!is_array($urls))
 		$url_list = array(array($urls, $user_info['id']));
@@ -327,7 +327,7 @@ function determineActions($urls, $preferred_prefix = false)
 		}
 
 		// Maybe the action is integrated into another system?
-		if (count($integrate_actions = call_integration_hook('integrate_whos_online', array($actions))) > 0)
+		if (count($integrate_actions = \Hooks::get()->hook('integrate_whos_online', array($actions))) > 0)
 		{
 			// Try each integration hook with this url and see if they can fill in the details
 			foreach ($integrate_actions as $integrate_action)

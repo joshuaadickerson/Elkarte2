@@ -479,7 +479,7 @@ class Errors
 		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'] ;
 
 		// Load the template and set the sub template.
-		loadTemplate('Errors');
+		\Templates::getInstance()->load('Errors');
 		$context['sub_template'] = 'fatal_error';
 
 		// If this is SSI, what do they want us to do?
@@ -488,7 +488,7 @@ class Errors
 			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 				$ssi_on_error_method();
 			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				loadSubTemplate('fatal_error');
+				\Templates::getInstance()->loadSubTemplate('fatal_error');
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)

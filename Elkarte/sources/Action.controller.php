@@ -53,6 +53,12 @@ abstract class Action_Controller
 	protected $_templates;
 
 	/**
+	 * Errors
+	 * @var Errors
+	 */
+	protected $_errors;
+
+	/**
 	 * Constructor...
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
@@ -75,8 +81,9 @@ abstract class Action_Controller
 		// Initialize the events associated with this controller
 		$this->_initEventManager();
 
-		$this->_layers = Template_Layers::getInstance();
-		$this->_templates = Templates::getInstance();
+		$this->_layers = \Template_Layers::getInstance();
+		$this->_templates = \Templates::getInstance();
+		$this->_errors = \Errors::instance();
 	}
 
 	/**

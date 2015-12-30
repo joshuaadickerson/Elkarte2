@@ -226,7 +226,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mods_cat_features'];
 
 		// Show / hide custom jquery fields as required
-		addInlineJavascript('showhideJqueryOptions();', true);
+		theme()->addInlineJavascript('showhideJqueryOptions();', true);
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -536,7 +536,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Disable the max smileys option if we don't allow smileys at all!
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;', true);
 
 		// Load all the signature settings.
@@ -984,8 +984,8 @@ class ManageFeatures_Controller extends Action_Controller
 			);
 
 		// All the javascript for this page... everything else is in admin.js
-		addJavascriptVar(array('startOptID' => count($context['field']['options'])));
-		addInlineJavascript('updateInputBoxes();', true);
+		theme()->addJavascriptVar(array('startOptID' => count($context['field']['options'])));
+		theme()->addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
 		if (isset($this->_req->post->onoff))

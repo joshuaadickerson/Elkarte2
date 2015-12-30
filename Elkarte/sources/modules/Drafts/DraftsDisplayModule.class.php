@@ -91,7 +91,7 @@ class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
 				else
 				{
 					loadJavascriptFile('drafts.js');
-					addInlineJavascript('
+					theme()->addInlineJavascript('
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',

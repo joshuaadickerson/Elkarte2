@@ -210,7 +210,7 @@ class ManageRegistration_Controller extends Action_Controller
 			$context['member_groups'] = array();
 
 		// Basic stuff.
-		addInlineJavascript('disableAutoComplete();', true);
+		theme()->addInlineJavascript('disableAutoComplete();', true);
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
 		createToken('admin-regc');
@@ -363,7 +363,7 @@ class ManageRegistration_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			function checkCoppa()
 			{
 				var coppaDisabled = document.getElementById(\'coppaAge\').value == 0;

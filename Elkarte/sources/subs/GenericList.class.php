@@ -347,7 +347,7 @@ class Generic_List
 
 		// Add an option for inline JavaScript.
 		if (isset($this->_listOptions['javascript']))
-			addInlineJavascript($this->_listOptions['javascript'], true);
+			theme()->addInlineJavascript($this->_listOptions['javascript'], true);
 
 		// We want a menu.
 		if (isset($this->_listOptions['list_menu']))

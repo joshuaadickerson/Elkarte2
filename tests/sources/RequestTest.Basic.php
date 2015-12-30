@@ -19,7 +19,7 @@ class TestRequest extends PHPUnit_Framework_TestCase
 		$_GET = array();
 		$_POST = array();
 
-		$this->request = request();
+		$this->request = \Request::instance();
 	}
 
 	/**

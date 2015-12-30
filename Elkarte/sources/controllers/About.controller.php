@@ -50,7 +50,7 @@ class About_Controller extends Action_Controller
 
     public function pre_dispatch()
     {
-        loadTemplate('About');
+        $this->_templates->load('About');
         loadLanguage('About');
     }
 
@@ -176,7 +176,7 @@ class About_Controller extends Action_Controller
         $context['sub_template'] = 'staff';
 
         $staff_groups = empty($modSettings['staff_groups']) ? array(1, 2) : explode(',', $modSettings['staff_groups']);
-        call_integration_hook('integrate_staff_groups', array($staff_groups));
+        \Hooks::get()->hook('staff_groups', array($staff_groups));
 
         loadStaffList($staff_groups);
 

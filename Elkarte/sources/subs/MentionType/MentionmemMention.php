@@ -85,7 +85,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 
 		loadCSSFile('jquery.atwho.css');
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 		$(document).ready(function () {
 			for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 				all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);

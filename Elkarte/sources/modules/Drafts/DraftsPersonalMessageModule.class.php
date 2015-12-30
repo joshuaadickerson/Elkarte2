@@ -45,8 +45,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 		{
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
-			add_integration_function('integrate_sa_pm_index', 'Drafts_PersonalMessage_Module::integrate_sa_pm_index', '', false);
-			add_integration_function('integrate_pm_areas', 'Drafts_PersonalMessage_Module::integrate_pm_areas', '', false);
+			\Hooks::get()->add('integrate_sa_pm_index', 'Drafts_PersonalMessage_Module::integrate_sa_pm_index', '', false);
+			\Hooks::get()->add('integrate_pm_areas', 'Drafts_PersonalMessage_Module::integrate_pm_areas', '', false);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
 				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;

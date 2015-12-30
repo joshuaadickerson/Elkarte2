@@ -60,7 +60,7 @@ function spiderCheck()
 		return false;
 
 	// We need the user agent
-	$req = request();
+	$req = \Request::instance();
 
 	// Always attempt IPv6 first.
 	if (strpos($_SERVER['REMOTE_ADDR'], ':') !== false)
@@ -154,7 +154,7 @@ function logSpider()
 	{
 		if ($modSettings['spider_mode'] > 2)
 		{
-			$req = request();
+			$req = \Request::instance();
 			$url = $_GET + array('USER_AGENT' => $req->user_agent());
 			if (isset($context['session_var']))
 				unset($url['sesc'], $url[$context['session_var']]);

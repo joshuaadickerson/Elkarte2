@@ -132,7 +132,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 			// Lets get it on!
 			// @deprecated since 1.1
-			call_integration_include_hook('integrate_autotask_include');
+			\Hooks::get()->include_hook('autotask_include');
 
 			ignore_user_abort(true);
 

@@ -61,7 +61,7 @@ class Auth_Controller extends Action_Controller
 
 		// Load the Login template/language file.
 		loadLanguage('Login');
-		loadTemplate('Login');
+		$this->_templates->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -133,7 +133,7 @@ class Auth_Controller extends Action_Controller
 		loadLanguage('Login');
 
 		// Load the template stuff
-		loadTemplate('Login');
+		$this->_templates->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -450,7 +450,7 @@ class Auth_Controller extends Action_Controller
 		global $txt, $context;
 
 		loadLanguage('Login');
-		loadTemplate('Login');
+		$this->_templates->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
@@ -768,7 +768,7 @@ function doLogin()
 		unset($_SESSION['first_login']);
 
 	// You're one of us: need to know all about you now, IP, stuff.
-	$req = request();
+	$req = \Request::instance();
 
 	// You've logged in, haven't you?
 	require_once(SUBSDIR . '/Members.subs.php');

@@ -44,7 +44,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	 */
 	public static function frontPageOptions()
 	{
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
 				if ($(this).val() == \'MessageIndex_Controller\')
@@ -431,7 +431,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
 		$template_layers->add('topic_listing');
 
-		addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
+		theme()->addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(
@@ -444,7 +444,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			$context['normal_buttons']['markread'] = array('text' => 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'], 'custom' => 'onclick="return markboardreadButton(this);"');
 
 		// Allow adding new buttons easily.
-		Hooks::get()->hook('messageindex_buttons');
+		\Hooks::get()->hook('messageindex_buttons');
 	}
 
 	/**

@@ -61,11 +61,11 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	{
 		global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
-		loadTemplate('BoardIndex');
+		$this->_templates->load('BoardIndex');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;
-		Template_Layers::getInstance()->add('boardindex_outer');
+		$this->_layers->add('boardindex_outer');
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
 		if (!empty($this->_req->query))

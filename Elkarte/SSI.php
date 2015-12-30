@@ -86,7 +86,7 @@ return true;
 function ssi_shutdown()
 {
 	if (!isset($_GET['ssi_function']) || $_GET['ssi_function'] != 'shutdown')
-		template_footer();
+		theme()->template_footer();
 }
 
 /**

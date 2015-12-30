@@ -69,8 +69,8 @@ class Theme extends \Theme
         else
             header('Content-Type: text/html; charset=UTF-8');
 
-        foreach (\Template_Layers::getInstance()->prepareContext() as $layer)
-            loadSubTemplate($layer . '_above', 'ignore');
+        foreach ($this->layers->prepareContext() as $layer)
+			$this->templates->loadSubTemplate($layer . '_above', 'ignore');
 
         if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
         {
@@ -119,8 +119,8 @@ class Theme extends \Theme
             $settings['theme_dir'] = $settings['actual_theme_dir'];
         }
 
-        foreach (\Template_Layers::getInstance()->reverseLayers() as $layer)
-            loadSubTemplate($layer . '_below', 'ignore');
+        foreach ($this->layers->reverseLayers() as $layer)
+			$this->templates->loadSubTemplate($layer . '_below', 'ignore');
 
     }
 
@@ -166,13 +166,14 @@ class Theme extends \Theme
 
     protected function templateJavascriptFiles($do_defered)
     {
-        global $boardurl, $modSettings;
+		global $boardurl, $modSettings;
+
         if (!empty($modSettings['minify_css_js']))
         {
             $combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
             $combine_name = $combiner->site_js_combine($this->js_files, $do_defered);
 
-            call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
+            \Hooks::get()->hook('post_javascript_combine', array(&$combine_name, $combiner));
 
             if (!empty($combine_name))
                 echo '
@@ -218,7 +219,7 @@ class Theme extends \Theme
         }
 
         // Use this hook to work with Javascript files and vars pre output
-        call_integration_hook('pre_javascript_output');
+        \Hooks::get()->hook('pre_javascript_output');
 
         // Combine and minify javascript source files to save bandwidth and requests
         if (!empty($this->js_files))
@@ -279,7 +280,7 @@ class Theme extends \Theme
         global $modSettings, $boardurl;
 
         // Use this hook to work with CSS files pre output
-        call_integration_hook('pre_css_output');
+        \Hooks::get()->hook('pre_css_output');
 
         // Combine and minify the CSS files to save bandwidth and requests?
         if (!empty($this->css_files))
@@ -289,7 +290,7 @@ class Theme extends \Theme
                 $combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
                 $combine_name = $combiner->site_css_combine($this->css_files);
 
-                call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
+                \Hooks::get()->hook('post_css_combine', array(&$combine_name, $combiner));
 
                 if (!empty($combine_name))
                     echo '
@@ -354,7 +355,7 @@ class Theme extends \Theme
         loadCSSFile('prettify.css');
         loadJavascriptFile('prettify.min.js', array('defer' => true));
 
-        addInlineJavascript('
+		theme()->addInlineJavascript('
 		$(document).ready(function(){
 			prettyPrint();
 		});', true);
@@ -364,7 +365,7 @@ class Theme extends \Theme
     {
         global $txt;
 
-        addInlineJavascript('
+		theme()->addInlineJavascript('
 		var oEmbedtext = ({
 			preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 			ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
@@ -397,7 +398,7 @@ class Theme extends \Theme
             $type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
             $ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
-            addInlineJavascript('
+			theme()->addInlineJavascript('
 		function elkAutoTask()
 		{
 			var tempImage = new Image();
@@ -414,7 +415,7 @@ class Theme extends \Theme
         // Relative times?
         if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
         {
-            addInlineJavascript('
+			theme()->addInlineJavascript('
 		var oRttime = ({
 			referenceTime : ' . forum_time() * 1000 . ',
 			now : ' . JavaScriptEscape($txt['rt_now']) . ',
@@ -544,7 +545,7 @@ class Theme extends \Theme
 
         // Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
         if ($context['show_pm_popup'])
-            addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(document).ready(function(){
 			new smc_Popup({
 				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
@@ -569,7 +570,7 @@ class Theme extends \Theme
         $context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
         if (empty($settings['theme_version']))
-            addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
+			theme()->addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 
         if (!isset($context['page_title']))
             $context['page_title'] = '';

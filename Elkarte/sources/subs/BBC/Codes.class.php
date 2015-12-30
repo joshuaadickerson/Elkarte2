@@ -897,7 +897,7 @@ class Codes
 	{
 		$bbc = $this->bbc;
 		$item_codes = $this->getItemCodes();
-		call_integration_hook('bbc_codes_parsing', array(&$bbc, &$item_codes));
+		\Hooks::get()->hook('bbc_codes_parsing', array(&$bbc, &$item_codes));
 
 		if (!$this->isDisabled('li') && !$this->isDisabled('list'))
 		{

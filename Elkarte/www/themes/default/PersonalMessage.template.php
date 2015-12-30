@@ -630,7 +630,7 @@ function template_search()
 		</fieldset>';
 
 		// And now some javascript for the advanced label toggling
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
@@ -667,7 +667,7 @@ function template_search()
 	}
 
 	// And the JS to make the advanced / basic form work
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		// Set the search style
 		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['pmsearch']) ? '1' : '0') . '";
 

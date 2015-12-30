@@ -183,7 +183,7 @@ function adminLogin($type = 'admin')
 	if (isset($_POST[$type . '_hash_pass']) || isset($_POST[$type . '_pass']))
 	{
 		// log some info along with it! referer, user agent
-		$req = request();
+		$req = \Request::instance();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
 		Errors::instance()->log_error($txt['security_wrong'], 'critical');
 

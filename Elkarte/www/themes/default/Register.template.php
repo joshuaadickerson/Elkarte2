@@ -22,7 +22,7 @@ function template_registration_form()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		function verifyAgree()
 		{
 			if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)

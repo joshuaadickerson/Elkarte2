@@ -340,7 +340,7 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		loadJavascriptFile('qrcode.js');
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			var secret = document.getElementById("otp_secret").value;
 
 			if (secret)

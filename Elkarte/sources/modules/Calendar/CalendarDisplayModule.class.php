@@ -34,7 +34,7 @@ class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interfac
 
 		$context['calendar_post'] = allowedTo('calendar_post');
 
-		add_integration_function('integrate_mod_buttons', 'Calendar_Display_Module::integrate_mod_buttons', '', false);
+		\Hooks::get()->add('integrate_mod_buttons', 'Calendar_Display_Module::integrate_mod_buttons', '', false);
 
 		if (!empty($modSettings['cal_showInTopic']))
 			return array(

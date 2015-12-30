@@ -535,7 +535,7 @@ class Admin_Controller extends Action_Controller
 		$this->_getModulesMenu($admin_areas);
 
 		// Any files to include for administration?
-		call_integration_include_hook('integrate_admin_include');
+		\Hooks::get()->include_hook('admin_include');
 
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 

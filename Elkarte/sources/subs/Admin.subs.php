@@ -88,7 +88,7 @@ function getServerVersions($checkFor)
 	// Server info
 	if (in_array('server', $checkFor))
 	{
-		$req = request();
+		$req = \Request::instance();
 		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $req->server_software());
 
 		// Compute some system info, if we can

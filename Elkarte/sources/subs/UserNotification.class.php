@@ -94,7 +94,7 @@ class User_Notification
 			}
 		}
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(document).ready(function() {
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
@@ -110,7 +110,7 @@ class User_Notification
 	protected function _addDesktopNotifications()
 	{
 		loadJavascriptFile('desktop-notify.js');
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(document).ready(function() {
 				ElkNotifier.add(new ElkDesktop());
 			});', true);

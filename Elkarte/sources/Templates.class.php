@@ -328,6 +328,7 @@ class Templates
             if (preg_match('~ <strong>(\d+)</strong><br( /)?' . '>$~i', $error, $match) != 0)
             {
                 $data = file($filename);
+                require_once(SUBSDIR . '/Error.subs.php');
                 $data2 = highlight_php_code(implode('', $data));
                 $data2 = preg_split('~\<br( /)?\>~', $data2);
 

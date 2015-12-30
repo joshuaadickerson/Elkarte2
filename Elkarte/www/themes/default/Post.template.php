@@ -445,7 +445,7 @@ function template_add_new_attachments()
 						</dl>';
 
 	// Load up the drag and drop attachment magic
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 	var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
 		trigger: $(\'<div class="fa share fa-share-alt-square" />\')
 	});

@@ -291,7 +291,7 @@ class ManageServer_Controller extends Action_Controller
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 		// Initial state
 		hideGlobalCookies();
 

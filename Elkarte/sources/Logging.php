@@ -57,7 +57,7 @@ function writeLog($force = false)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		$req = request();
+		$req = \Request::instance();
 		$serialized = $_GET + array('USER_AGENT' => $req->user_agent());
 
 		// In the case of a dlattach action, session_var may not be set.
@@ -111,7 +111,7 @@ function writeLog($force = false)
 	if (ELK != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
 	{
 		// We log IPs the request came with, around here
-		$req = request();
+		$req = \Request::instance();
 
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)

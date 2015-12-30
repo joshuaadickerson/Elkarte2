@@ -306,6 +306,7 @@ class ManageErrors_Controller extends Action_Controller
 		if ($max <= 0 || $min >= $max)
 			Errors::instance()->fatal_lang_error('error_bad_line');
 
+		require_once(SUBSDIR . '/Error.subs.php');
 		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
 
 		// We don't want to slice off too many so lets make sure we stop at the last one

@@ -909,7 +909,10 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 
 	// Check on some things needed by parse_bbc as an autotask does not load them
 	if (!isset($context['browser']))
-		detectBrowser();
+	{
+		$detector = new Browser_Detector;
+		$detector->detectBrowser();
+	}
 
 	// Clean it up.
 	$message = censor($message);

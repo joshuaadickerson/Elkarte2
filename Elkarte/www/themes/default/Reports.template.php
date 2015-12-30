@@ -243,7 +243,7 @@ function template_print()
 function template_print_below()
 {
 	echo '
-		<div class="copyright">', theme_copyright(), '</div>
+		<div class="copyright">', theme()->theme_copyright(), '</div>
 	</body>
 </html>';
 }

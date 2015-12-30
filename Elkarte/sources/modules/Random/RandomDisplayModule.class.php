@@ -31,8 +31,8 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 		{
 			$return[] = array('topicinfo', array('Random_Display_Module', 'topicinfo'), array('topicinfo', 'topic', 'includeUnapproved'));
 			$return[] = array('prepare_context', array('Random_Display_Module', 'prepare_context'), array());
-			add_integration_function('integrate_topic_query', 'Random_Display_Module::followup_topic_query', '', false);
-			add_integration_function('integrate_display_message_list', 'Random_Display_Module::followup_message_list', '', false);
+			\Hooks::get()->add('integrate_topic_query', 'Random_Display_Module::followup_topic_query', '', false);
+			\Hooks::get()->add('integrate_display_message_list', 'Random_Display_Module::followup_message_list', '', false);
 		}
 
 		return $return;

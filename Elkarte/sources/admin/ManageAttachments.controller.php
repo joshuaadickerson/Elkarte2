@@ -169,7 +169,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$config_vars = $this->_attachSettingsForm->settings();
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 	var storing_type = document.getElementById(\'automanage_attachments\'),
 		base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
 

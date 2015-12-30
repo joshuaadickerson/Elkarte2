@@ -48,7 +48,7 @@ class ScheduledTasks_Controller extends Action_Controller
 			$this->action_reducemailqueue();
 		else
 		{
-			call_integration_include_hook('integrate_autotask_include');
+			\Hooks::get()->include_hook('autotask_include');
 
 			// Run tasks based on this time stamp
 			$ts = $this->_req->getQuery('ts', 'intval', 0);

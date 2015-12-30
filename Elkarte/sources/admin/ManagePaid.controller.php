@@ -150,7 +150,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// We want javascript for our currency options.
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 		toggleCurrencyOther();', true);
 
 		// Saving the settings?

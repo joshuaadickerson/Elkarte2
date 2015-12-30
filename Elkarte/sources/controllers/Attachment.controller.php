@@ -66,9 +66,8 @@ class Attachment_Controller extends Action_Controller
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
 		// Set up the template details
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-		loadTemplate('Json');
+		$this->_layers->removeAll();
+		$this->_templates->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
@@ -141,9 +140,8 @@ class Attachment_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Prepare the template so we can respond with json
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-		loadTemplate('Json');
+		$this->_layers->removeAll();
+		$this->_templates->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is valid
@@ -194,7 +192,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -330,7 +328,7 @@ class Attachment_Controller extends Action_Controller
 		// Recode line endings for text files, if enabled.
 		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
 		{
-			$req = request();
+			$req = \Request::instance();
 			if (strpos($req->user_agent(), 'Windows') !== false)
 				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\r\n", $buffer);};
 			elseif (strpos($req->user_agent(), 'Mac') !== false)

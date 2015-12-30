@@ -681,7 +681,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	global $sc, $modSettings, $boardurl;
 
 	// We'll work out user agent checks
-	$req = request();
+	$req = \Request::instance();
 
 	// Is it in as $_POST['sc']?
 	if ($type == 'post')
@@ -800,7 +800,7 @@ function createToken($action, $type = 'post')
 	$token = $tokenizer->generate_hash(32);
 
 	// We need user agent and the client IP
-	$req = request();
+	$req = \Request::instance();
 	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
 
 	// Save the session token and make it available to the forms
@@ -850,7 +850,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	// 5. If it matches, success, otherwise we fallout.
 
 	// We need the user agent and client IP
-	$req = request();
+	$req = \Request::instance();
 
 	// Shortcut
 	$passed_token_var = isset($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) ? $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] : null;
@@ -1478,7 +1478,7 @@ function loadBadBehavior()
 		if ($bb_run === true)
 		{
 			$bb2_results = bb2_start(bb2_read_settings());
-			addInlineJavascript(bb2_insert_head());
+			theme()->addInlineJavascript(bb2_insert_head());
 		}
 	}
 }

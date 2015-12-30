@@ -61,6 +61,36 @@ interface Database
 	public function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function select($identifier, $db_string, array $db_values = array(), $connection = null);
+
+	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function update($identifier, $db_string, array $db_values = array(), $connection = null);
+
+	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function delete($identifier, $db_string, array $db_values = array(), $connection = null);
+
+	/**
 	 * Do a query, and returns the results.
 	 *
 	 * @param string $db_string
@@ -78,11 +108,11 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param object|null $callback
+	 * @param Callable|null $callback
 	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null);
+	public function fetchQueryCallback($db_string, $db_values = array(), Callable $callback = null, $seeds = null);
 
 	/**
 	 * Fetch next result as association.

@@ -215,7 +215,7 @@ abstract class Database_Abstract implements Database
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null)
+	public function fetchQueryCallback($db_string, $db_values = array(), Callable $callback = null, $seeds = null)
 	{
 		if ($callback === null)
 			return $this->fetchQuery($db_string, $db_values);
@@ -386,5 +386,50 @@ abstract class Database_Abstract implements Database
 			$this->_old_skip_error = $this->_skip_error;
 
 		$this->_skip_error = $set;
+	}
+
+	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function select($identifier, $db_string, array $db_values = array(), $connection = null)
+	{
+		$db_string = 'SELECT ' . $db_string;
+		call_integration_hook('integrate_db_select', array(&$identifier, &$db_string, &$db_values, &$connection));
+		return $this->query($identifier, $db_string, $db_values, $connection);
+	}
+
+	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function update($identifier, $db_string, array $db_values = array(), $connection = null)
+	{
+		$db_string = 'UPDATE ' . $db_string;
+		call_integration_hook('integrate_db_update', array(&$identifier, &$db_string, &$db_values, &$connection));
+		return $this->query($identifier, $db_string, $db_values, $connection);
+	}
+
+	/**
+	 *
+	 * @param string $identifier
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param resource|false|null $connection = null
+	 * @return type
+	 */
+	public function delete($identifier, $db_string, array $db_values = array(), $connection = null)
+	{
+		$db_string = 'DELETE ' . $db_string;
+		call_integration_hook('integrate_db_delete', array(&$identifier, &$db_string, &$db_values, &$connection));
+		return $this->query($identifier, $db_string, $db_values, $connection);
 	}
 }

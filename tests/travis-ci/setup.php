@@ -20,6 +20,7 @@ require_once(BOARDDIR . '/sources/subs/Cache.class.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
+require_once(BOARDDIR . '/sources/Services.php');
 
 /**
  * Used to install ElkArte SQL files to a database scheme

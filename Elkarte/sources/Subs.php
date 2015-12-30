@@ -1093,48 +1093,6 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 }
 
 /**
- * Creates an image/text button
- *
- * @param string $name
- * @param string $alt
- * @param string $label = ''
- * @param string|boolean $custom = ''
- * @param boolean $force_use = false
- * @return string
- *
- * @deprecated since 1.0 this will be removed at some point, do not rely on this function
- */
-function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
-{
-	global $settings, $txt;
-
-	// Does the current loaded theme have this and we are not forcing the usage of this function?
-	if (function_exists('template_create_button') && !$force_use)
-		return template_create_button($name, $alt, $label = '', $custom = '');
-
-	if (!$settings['use_image_buttons'])
-		return $txt[$alt];
-	elseif (!empty($settings['use_buttons']))
-		return '<img src="' . $settings['images_url'] . '/buttons/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />' . ($label != '' ? '&nbsp;<strong>' . $txt[$label] . '</strong>' : '');
-	else
-		return '<img src="' . $settings['lang_images_url'] . '/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />';
-}
-
-/**
- * Sets up all of the top menu buttons
- *
- * What it does:
- * - Defines every master item in the menu, as well as any sub-items
- * - Ensures the chosen action is set so the menu is highlighted
- * - Saves them in the cache if it is available and on
- * - Places the results in $context
- */
-function setupMenuContext()
-{
-	return theme()->setupMenuContext();
-}
-
-/**
  * Generate a random seed and ensure it's stored in settings.
  */
 function elk_seed_generator()

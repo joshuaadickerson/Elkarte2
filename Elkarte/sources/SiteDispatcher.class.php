@@ -33,6 +33,11 @@ if (!defined('ELK'))
 class Site_Dispatcher
 {
 	/**
+	 * @var \Pimple\Container
+	 */
+	protected $elk;
+
+	/**
 	 * Function or method to call
 	 * @var string
 	 */
@@ -56,9 +61,11 @@ class Site_Dispatcher
 	 * This does all the work to figure out which controller and method need
 	 * to be called.
 	 */
-	public function __construct()
+	public function __construct($elk)
 	{
 		global $board, $topic, $modSettings, $user_info, $maintenance;
+
+		$this->elk = $elk;
 
 		// Default action of the forum: board index
 		// Every time we don't know what to do, we'll do this :P
@@ -244,7 +251,7 @@ class Site_Dispatcher
 			}
 
 			// Initialize this controller with its event manager
-			$controller = new $this->_controller_name(new Event_Manager());
+			$controller = new $this->_controller_name($this->elk, new Event_Manager());
 
 			// Fetch controllers generic hook name from the action controller
 			$hook = $controller->getHook();

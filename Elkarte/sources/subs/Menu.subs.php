@@ -372,6 +372,8 @@ function destroyMenu($menu_id = 'last')
  */
 function callMenu($selectedMenu)
 {
+	global $elk;
+
 	// We use only $selectedMenu['function'] and
 	//  $selectedMenu['controller'] if the latter is set.
 
@@ -379,7 +381,7 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => 'ManageAttachments_Controller'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller'](new Event_Manager());
+		$controller = new $selectedMenu['controller']($elk, new Event_Manager());
 
 		// always set up the environment
 		$controller->pre_dispatch();

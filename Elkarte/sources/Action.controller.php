@@ -23,6 +23,11 @@ if (!defined('ELK'))
 abstract class Action_Controller
 {
 	/**
+	 * @var \Pimple\Container
+	 */
+	protected $elk;
+
+	/**
 	 * The event manager.
 	 * @var object
 	 */
@@ -65,10 +70,15 @@ abstract class Action_Controller
 	 *
 	 * @param null|Event_Manager $eventManager - The event manager
 	 */
-	public function __construct($eventManager = null)
+	public function __construct(\Pimple\Container $elk, $eventManager = null)
 	{
-		// Dependency injection will come later
-		$this->_req = HttpReq::instance();
+		$this->elk = $elk;
+
+		// @todo inject these in the constructor arguments
+		$this->_layers = $elk['layers'];
+		$this->_templates = $elk['templates'];
+		$this->_errors = $elk['errors'];
+		$this->_req = $elk['http_req'];
 
 		// A safety-net to remain backward compatibility
 		if ($eventManager === null)
@@ -80,10 +90,6 @@ abstract class Action_Controller
 
 		// Initialize the events associated with this controller
 		$this->_initEventManager();
-
-		$this->_layers = \Template_Layers::getInstance();
-		$this->_templates = \Templates::getInstance();
-		$this->_errors = \Errors::instance();
 	}
 
 	/**

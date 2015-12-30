@@ -121,7 +121,7 @@ class AdminLog_Controller extends Action_Controller
 		if (isset($log_functions[$sub_action]['controller']))
 		{
 			// if we have an object oriented controller, call its method
-			$controller = new $log_functions[$sub_action]['controller'](new Event_Manager());
+			$controller = new $log_functions[$sub_action]['controller']($this->elk, new Event_Manager());
 			$controller->pre_dispatch();
 			$controller->{$log_functions[$sub_action]['function']}();
 		}

@@ -45,11 +45,6 @@ if (!ob_get_level())
 
 $db_show_debug = false;
 
-// We don't need no globals. (a bug in "old" versions of PHP)
-foreach (array('db_character_set', 'cachedir') as $variable)
-	if (isset($GLOBALS[$variable]))
-		unset($GLOBALS[$variable], $GLOBALS[$variable]);
-
 // Where the Settings.php file is located
 $settings_loc = '../Settings.php';
 

@@ -189,3 +189,9 @@ $extdir = __DIR__ . '/sources/ext';
  * @var string
  */
 $languagedir = __DIR__ . '/themes/default/languages';
+
+/**
+ * Path to the vendor library directory
+ * @var string
+ */
+$vendordir = __DIR__ . '/..';

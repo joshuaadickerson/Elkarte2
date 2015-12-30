@@ -84,7 +84,7 @@ class Search_Controller extends Action_Controller
 
 		// If load balancing is on and the load is high, no need to even show the form.
 		if (checkLoad('search'))
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_search_disabled', false);
 
 	}
 
@@ -121,14 +121,14 @@ class Search_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (checkLoad('search'))
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_search_disabled', false);
 
 		loadLanguage('Search');
 
 		// Don't load this in XML mode.
 		if (!isset($_REQUEST['xml']))
 		{
-			loadTemplate('Search');
+			$this->_templates->load('Search');
 			$context['sub_template'] = 'searchform';
 			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
@@ -280,7 +280,7 @@ class Search_Controller extends Action_Controller
 
 		loadLanguage('Search');
 		if (!isset($_REQUEST['xml']))
-			loadTemplate('Search');
+			$this->_templates->load('Search');
 		// If we're doing XML we need to use the results template regardless really.
 		else
 			$context['sub_template'] = 'results';
@@ -864,10 +864,10 @@ class Search_Controller extends Action_Controller
 		{
 			// Admins can be bothered with a failure
 			if ($user_info['is_admin'])
-				Errors::instance()->fatal_lang_error('search_invalid_weights');
+				$this->_errors->fatal_lang_error('search_invalid_weights');
 
 			// Even if users will get an answer, the admin should know something is broken
-			Errors::instance()->log_lang_error('search_invalid_weights');
+			$this->_errors->log_lang_error('search_invalid_weights');
 
 			// Instead is better to give normal users and guests some kind of result
 			// using our defaults.

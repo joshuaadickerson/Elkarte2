@@ -20,7 +20,7 @@
  */
 function template_PersonalMessage_init()
 {
-	loadTemplate('GenericMessages');
+	\Templates::getInstance()->load('GenericMessages');
 }
 
 /**

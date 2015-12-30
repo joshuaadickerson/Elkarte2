@@ -59,13 +59,13 @@ class Notify_Controller extends Action_Controller
 
 		// Make sure the topic has been specified.
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		// What do we do?  Better ask if they didn't say..
 		if (empty($this->_req->query->sa))
 		{
 			// Load the template, but only if it is needed.
-			loadTemplate('Notify');
+			$this->_templates->load('Notify');
 
 			// Find out if they have notification set for this topic already.
 			$context['notification_set'] = hasTopicNotification($user_info['id'], $topic);
@@ -100,9 +100,9 @@ class Notify_Controller extends Action_Controller
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
 
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Even with Ajax, guests still can't do this
@@ -184,13 +184,13 @@ class Notify_Controller extends Action_Controller
 
 		// You have to specify a board to turn notifications on!
 		if (empty($board))
-			Errors::instance()->fatal_lang_error('no_board', false);
+			$this->_errors->fatal_lang_error('no_board', false);
 
 		// No subaction: find out what to do.
 		if (empty($this->_req->query->sa))
 		{
 			// We're gonna need the notify template...
-			loadTemplate('Notify');
+			$this->_templates->load('Notify');
 
 			// Find out if they have notification set for this board already.
 			$context['notification_set'] = hasBoardNotification($user_info['id'], $board);
@@ -226,9 +226,9 @@ class Notify_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $board, $user_info, $context;
 
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Permissions are an important part of anything ;).
@@ -326,9 +326,9 @@ class Notify_Controller extends Action_Controller
 	{
 		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
 
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Sorry guests just can't do this

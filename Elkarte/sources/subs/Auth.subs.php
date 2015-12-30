@@ -171,7 +171,7 @@ function adminLogin($type = 'admin')
 	global $context, $txt, $user_info;
 
 	loadLanguage('Admin');
-	loadTemplate('Login');
+	\Templates::getInstance()->load('Login');
 	loadJavascriptFile('sha256.js', array('defer' => true));
 
 	// Validate what type of session check this is.

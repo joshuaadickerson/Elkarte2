@@ -74,9 +74,9 @@ class Memberlist_Controller extends Action_Controller
 		// Make sure they can view the memberlist.
 		isAllowedTo('view_mlist');
 
-		loadTemplate('Memberlist');
+		$this->_templates->load('Memberlist');
 		$context['sub_template'] = 'memberlist';
-		Template_Layers::getInstance()->add('mlsearch');
+		$this->_layers->add('mlsearch');
 
 		$context['listing_by'] = $this->_req->getQuery('sa', 'trim', 'all');
 
@@ -281,7 +281,7 @@ class Memberlist_Controller extends Action_Controller
 		if (!is_numeric($start))
 		{
 			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($start), $match) === 0)
-				Errors::instance()->fatal_error('Hacker?', false);
+				$this->_errors->fatal_error('Hacker?', false);
 
 			$start = ml_alphaStart($match[0]);
 		}

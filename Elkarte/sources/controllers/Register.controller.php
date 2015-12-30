@@ -52,7 +52,7 @@ class Register_Controller extends Action_Controller
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
+			$this->_errors->fatal_lang_error('registration_disabled', false);
 	}
 
 	/**
@@ -106,7 +106,7 @@ class Register_Controller extends Action_Controller
 			redirectexit('action=about;sa=contact');
 
 		loadLanguage('Login');
-		loadTemplate('Register');
+		$this->_templates->load('Register');
 
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
@@ -141,7 +141,7 @@ class Register_Controller extends Action_Controller
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					loadLanguage('Login');
-					Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					$this->_errors->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
@@ -251,7 +251,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			loadLanguage('Login');
-			Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			$this->_errors->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
@@ -445,7 +445,7 @@ class Register_Controller extends Action_Controller
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
 		{
 			foreach ($reg_errors->prepareErrors(1) as $error)
-				Errors::instance()->fatal_error($error, 'general');
+				$this->_errors->fatal_error($error, 'general');
 		}
 
 		// Was there actually an error of some kind dear boy?
@@ -472,7 +472,7 @@ class Register_Controller extends Action_Controller
 		// Basic template variable setup.
 		elseif (!empty($modSettings['registration_method']))
 		{
-			loadTemplate('Register');
+			$this->_templates->load('Register');
 
 			$context += array(
 				'page_title' => $txt['register'],
@@ -500,11 +500,11 @@ class Register_Controller extends Action_Controller
 
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
+			$this->_errors->fatal_lang_error('registration_disabled', false);
 
 		// Make sure they didn't just register with this session.
 		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			Errors::instance()->fatal_lang_error('register_only_once', false);
+			$this->_errors->fatal_lang_error('register_only_once', false);
 	}
 
 	/**
@@ -628,8 +628,8 @@ class Register_Controller extends Action_Controller
 			if (empty($context['agreement']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
-				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
-				Errors::instance()->fatal_lang_error('registration_disabled', false);
+				$this->_errors->log_error($txt['registration_agreement_missing'], 'critical');
+				$this->_errors->fatal_lang_error('registration_disabled', false);
 			}
 		}
 	}
@@ -693,7 +693,7 @@ class Register_Controller extends Action_Controller
 		{
 			// Setup some important context.
 			loadLanguage('Profile');
-			loadTemplate('Profile');
+			$this->_templates->load('Profile');
 
 			$context['user']['is_owner'] = true;
 
@@ -735,7 +735,7 @@ class Register_Controller extends Action_Controller
 			redirectexit();
 
 		loadLanguage('Login');
-		loadTemplate('Login');
+		$this->_templates->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 
 		// Need a user id to activate
@@ -743,7 +743,7 @@ class Register_Controller extends Action_Controller
 		{
 			// Immediate 0 or disabled 3 means no need to try and activate
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 
 			// Otherwise its simply invalid
 			$context['member_id'] = 0;
@@ -825,13 +825,13 @@ class Register_Controller extends Action_Controller
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 
 			// @todo Separate the sprintf?
 			if (!Data_Validator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 			{
-				Errors::instance()->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
+				$this->_errors->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
 			}
 
 			// Make sure their email isn't banned.
@@ -841,7 +841,7 @@ class Register_Controller extends Action_Controller
 			// @todo Separate the sprintf?
 			if (userByEmail($this->_req->post->new_email))
 			{
-				Errors::instance()->fatal_lang_error('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
+				$this->_errors->fatal_lang_error('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
 			}
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -889,7 +889,7 @@ class Register_Controller extends Action_Controller
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
-			Errors::instance()->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			$this->_errors->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 	}
 
@@ -904,12 +904,12 @@ class Register_Controller extends Action_Controller
 		{
 			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
 			{
-				Errors::instance()->fatal_lang_error('already_activated', false);
+				$this->_errors->fatal_lang_error('already_activated', false);
 			}
 			elseif ($this->_row['validation_code'] === '')
 			{
 				loadLanguage('Profile');
-				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+				$this->_errors->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
 			$context['sub_template'] = 'retry_activate';
@@ -945,11 +945,11 @@ class Register_Controller extends Action_Controller
 		elseif (isset($this->_req->query->sound))
 		{
 			loadLanguage('Login');
-			loadTemplate('Register');
+			$this->_templates->load('Register');
 
 			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
 			$context['sub_template'] = 'verification_sound';
-			Template_Layers::getInstance()->removeAll();
+			$this->_layers->removeAll();
 
 			obExit();
 		}
@@ -1000,7 +1000,7 @@ class Register_Controller extends Action_Controller
 		global $context;
 
 		// This is XML!
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 		$context['sub_template'] = 'check_username';
 		$context['checked_username'] = isset($this->_req->query->username) ? un_htmlspecialchars($this->_req->query->username) : '';
 		$context['valid_username'] = true;
@@ -1027,11 +1027,11 @@ class Register_Controller extends Action_Controller
 		global $context, $modSettings, $txt;
 
 		loadLanguage('Login');
-		loadTemplate('Register');
+		$this->_templates->load('Register');
 
 		// No User ID??
 		if (!isset($this->_req->query->member))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1039,7 +1039,7 @@ class Register_Controller extends Action_Controller
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		if (isset($this->_req->query->form))
 		{
@@ -1052,7 +1052,7 @@ class Register_Controller extends Action_Controller
 			{
 				// Shortcut for producing underlines.
 				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
-				Template_Layers::getInstance()->removeAll();
+				$this->_layers->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = replaceBasicActionUrl($txt['coppa_form_title']);
 				$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $member['member_name']), replaceBasicActionUrl($txt['coppa_form_body']));

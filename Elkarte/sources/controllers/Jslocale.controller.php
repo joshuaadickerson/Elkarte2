@@ -76,7 +76,7 @@ class Jslocale_Controller extends Action_Controller
 		if (!empty($language_file))
 			loadLanguage($language_file);
 
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();

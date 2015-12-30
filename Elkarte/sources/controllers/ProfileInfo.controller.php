@@ -75,9 +75,9 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Attempt to load the member's profile data.
 		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
-			Errors::instance()->fatal_lang_error('not_a_user', false);
+			$this->_errors->fatal_lang_error('not_a_user', false);
 
-		loadTemplate('ProfileInfo');
+		$this->_templates->load('ProfileInfo');
 
 		// Set up the context stuff and load the user.
 		$context += array(
@@ -493,7 +493,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
-		loadTemplate('ProfileInfo');
+		$this->_templates->load('ProfileInfo');
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -517,7 +517,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (checkLoad('show_posts'))
-			Errors::instance()->fatal_lang_error('loadavg_show_posts_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
 		if ($this->_req->getQuery('sa', 'trim', '') === 'attach')
@@ -959,9 +959,9 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (checkLoad('userstats'))
-			Errors::instance()->fatal_lang_error('loadavg_userstats_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_userstats_disabled', false);
 
-		loadTemplate('ProfileInfo');
+		$this->_templates->load('ProfileInfo');
 
 		// General user statistics.
 		$timeDays = floor($user_profile[$this->_memID]['total_time_logged_in'] / 86400);
@@ -1014,8 +1014,8 @@ class ProfileInfo_Controller extends Action_Controller
 
 		loadLanguage('ManagePermissions');
 		loadLanguage('Admin');
-		loadTemplate('ManageMembers');
-		loadTemplate('ProfileInfo');
+		$this->_templates->load('ManageMembers');
+		$this->_templates->load('ProfileInfo');
 
 		// Load all the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
@@ -1091,12 +1091,12 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Firstly, can we actually even be here?
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
-		loadTemplate('ProfileInfo');
+		$this->_templates->load('ProfileInfo');
 
 		// We need this because of template_load_warning_variables
-		loadTemplate('Profile');
+		$this->_templates->load('Profile');
 
 		// Make sure things which are disabled stay disabled.
 		$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;

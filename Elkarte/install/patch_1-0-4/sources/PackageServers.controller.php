@@ -40,7 +40,7 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		\Templates::getInstance()->load('PackageServers', 'admin');
 	}
 
 	/**
@@ -65,7 +65,7 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		\Templates::getInstance()->load('PackageServers', 'admin');
 
 		$context['page_title'] = $txt['package_servers'];
 

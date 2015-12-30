@@ -58,7 +58,7 @@ class Stats_Controller extends Action_Controller
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			$this->_errors->fatal_lang_error('feature_disabled', true);
 
 		// Expanding out the history summary
 		list($year, $month) = $this->_expandedStats();
@@ -85,7 +85,7 @@ class Stats_Controller extends Action_Controller
 
 		// Stats it is
 		loadLanguage('Stats');
-		loadTemplate('Stats');
+		$this->_templates->load('Stats');
 		loadJavascriptFile('stats.js');
 
 		// Build the link tree......

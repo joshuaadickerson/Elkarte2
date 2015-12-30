@@ -152,7 +152,7 @@ class Recent_Controller extends Action_Controller
 		);
 
 		// Rest of the items for the template
-		loadTemplate('Recent');
+		$this->_templates->load('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
@@ -221,7 +221,7 @@ class Recent_Controller extends Action_Controller
 			$name = categoryName($categories[0]);
 
 			if (empty($name))
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 
 			$context['linktree'][] = array(
 				'url' => $scripturl . '#c' . $categories[0],
@@ -235,7 +235,7 @@ class Recent_Controller extends Action_Controller
 		$boards = array_keys($boards_posts);
 
 		if (empty($boards))
-			Errors::instance()->fatal_lang_error('error_no_boards_selected');
+			$this->_errors->fatal_lang_error('error_no_boards_selected');
 
 		// The query for getting the messages
 		$this->_grabber->setBoards($boards);
@@ -266,7 +266,7 @@ class Recent_Controller extends Action_Controller
 		// No boards, your request ends here
 		if (empty($boards))
 		{
-			Errors::instance()->fatal_lang_error('error_no_boards_selected');
+			$this->_errors->fatal_lang_error('error_no_boards_selected');
 		}
 
 		// Build the query for finding the messages

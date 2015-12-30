@@ -267,7 +267,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
-		loadTemplate('ManageCalendar');
+		$this->_templates->load('ManageCalendar');
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];

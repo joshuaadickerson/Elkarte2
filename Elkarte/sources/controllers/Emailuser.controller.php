@@ -37,7 +37,7 @@ class Emailuser_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Load the template.
-		loadTemplate('Emailuser');
+		$this->_templates->load('Emailuser');
 	}
 
 	/**
@@ -69,16 +69,16 @@ class Emailuser_Controller extends Action_Controller
 
 		// We need at least a topic... go away if you don't have one.
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		// Can't send topic if its unapproved and using post moderation.
 		if ($modSettings['postmod_active'] && !$row['approved'])
-			Errors::instance()->fatal_lang_error('not_approved_topic', false);
+			$this->_errors->fatal_lang_error('not_approved_topic', false);
 
 		// Censor the subject....
 		$row['subject'] = censor($row['subject']);
@@ -113,9 +113,9 @@ class Emailuser_Controller extends Action_Controller
 	{
 		global $topic, $modSettings, $txt, $context, $scripturl;
 
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		if (empty($this->_req->post->send))
@@ -283,7 +283,7 @@ class Emailuser_Controller extends Action_Controller
 
 		// Can the user even see this information?
 		if ($user_info['is_guest'])
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		isAllowedTo('send_email_to_members');
 
@@ -312,17 +312,17 @@ class Emailuser_Controller extends Action_Controller
 
 		// Are you sure you got the address or any data?
 		if (empty($row['email_address']) || empty($row))
-			Errors::instance()->fatal_lang_error('cant_find_user_email');
+			$this->_errors->fatal_lang_error('cant_find_user_email');
 
 		// Can they actually do this?
 		$context['show_email_address'] = showEmailAddress(!empty($row['hide_email']), $row['id_member']);
 		if ($context['show_email_address'] === 'no')
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Does the user want to be contacted at all by you?
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (!canContact($row['id_member']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Setup the context!
 		$context['recipient'] = array(
@@ -462,13 +462,13 @@ class Emailuser_Controller extends Action_Controller
 
 		// We need a message ID to check!
 		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
 		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
-			Errors::instance()->fatal_lang_error('no_board', false);
+			$this->_errors->fatal_lang_error('no_board', false);
 
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
@@ -485,7 +485,7 @@ class Emailuser_Controller extends Action_Controller
 		// Show the inputs for the comment, etc.
 		loadLanguage('Post');
 		loadLanguage('Errors');
-		loadTemplate('Emailuser');
+		$this->_templates->load('Emailuser');
 
 		theme()->addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
@@ -589,7 +589,7 @@ class Emailuser_Controller extends Action_Controller
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))
-			Errors::instance()->fatal_lang_error('no_board', false);
+			$this->_errors->fatal_lang_error('no_board', false);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
@@ -608,7 +608,7 @@ class Emailuser_Controller extends Action_Controller
 
 		// Check that moderators do exist!
 		if (empty($mod_to_notify))
-			Errors::instance()->fatal_lang_error('no_mods', false);
+			$this->_errors->fatal_lang_error('no_mods', false);
 
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))

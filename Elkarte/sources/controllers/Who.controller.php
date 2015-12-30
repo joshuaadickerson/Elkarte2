@@ -57,10 +57,10 @@ class Who_Controller extends Action_Controller
 
 		// You can't do anything if this is off.
 		if (empty($modSettings['who_enabled']))
-			Errors::instance()->fatal_lang_error('who_off', false);
+			$this->_errors->fatal_lang_error('who_off', false);
 
 		// Load the 'Who' template.
-		loadTemplate('Who');
+		$this->_templates->load('Who');
 		loadLanguage('Who');
 
 		// Sort out... the column sorting.
@@ -148,7 +148,7 @@ class Who_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $this->_req->post->start, $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $this->_req->post->start;
 		$context['sub_template'] = 'whos_online';
-		Template_Layers::getInstance()->add('whos_selection');
+		$this->_layers->add('whos_selection');
 
 		// Look for people online, provided they don't mind if you see they are.
 		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);

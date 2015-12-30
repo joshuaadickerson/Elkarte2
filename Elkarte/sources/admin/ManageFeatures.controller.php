@@ -656,7 +656,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		loadTemplate('ManageFeatures');
+		$this->_templates->load('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
 		$context['sub_template'] = 'show_custom_profile';
 
@@ -932,7 +932,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		loadTemplate('ManageFeatures');
+		$this->_templates->load('ManageFeatures');
 
 		// Sort out the context!
 		$context['fid'] = $this->_req->getQuery('fid', 'intval', 0);

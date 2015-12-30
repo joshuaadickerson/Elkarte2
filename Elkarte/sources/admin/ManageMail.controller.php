@@ -88,7 +88,7 @@ class ManageMail_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		require_once(SUBSDIR . '/Mail.subs.php');
-		loadTemplate('ManageMail');
+		$this->_templates->load('ManageMail');
 
 		// First, are we deleting something from the queue?
 		if (isset($this->_req->post->delete))

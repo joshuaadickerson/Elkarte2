@@ -27,7 +27,7 @@ class Xml_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
@@ -47,7 +47,7 @@ class Xml_Controller extends Action_Controller
 
 		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);

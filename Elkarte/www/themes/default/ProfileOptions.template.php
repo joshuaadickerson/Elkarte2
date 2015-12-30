@@ -20,7 +20,7 @@
  */
 function template_ProfileOptions_init()
 {
-	loadTemplate('GenericBoards');
+	\Templates::getInstance()->load('GenericBoards');
 }
 
 /**

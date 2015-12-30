@@ -129,7 +129,7 @@ class News_Controller extends Action_Controller
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
 			if ($num_boards == 0)
-				Errors::instance()->fatal_lang_error('no_board');
+				$this->_errors->fatal_lang_error('no_board');
 
 			$total_posts = 0;
 			$boards = array_keys($boards_data);
@@ -232,8 +232,8 @@ class News_Controller extends Action_Controller
 		elseif ($xml_format === 'rdf')
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
-		loadTemplate('Xml');
-		Template_Layers::getInstance()->removeAll();
+		$this->_templates->load('Xml');
+		$this->_layers->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
@@ -793,22 +793,4 @@ function cdata_parse($data, $ns = '')
 	$cdata .= ']]>';
 
 	return strtr($cdata, array('<![CDATA[]]>' => ''));
-}
-
-/**
- * Formats data retrieved in other functions into xml format.
- * Additionally formats data based on the specific format passed.
- * This function is recursively called to handle sub arrays of data.
- *
- * @deprecated since 1.1 - use template_xml_news instead
- *
- * @param mixed[] $data the array to output as xml data
- * @param int $i the amount of indentation to use.
- * @param string|null $tag if specified, it will be used instead of the keys of data.
- * @param string $xml_format  one of rss, rss2, rdf, atom
- */
-function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
-{
-	loadTemplate('Xml');
-	template_xml_news($data, $i, $tag, $xml_format);
 }

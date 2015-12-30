@@ -82,7 +82,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
 
-		$boardlist = new Boards_List($boardIndexOptions);
+		$boardlist = new Boards_List(database(), $boardIndexOptions);
 		$context['categories'] = $boardlist->getBoards();
 		$context['latest_post'] = $boardlist->getLatestPost();
 
@@ -158,7 +158,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		checkSession('request');
 
 		if (!isset($this->_req->query->sa))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Check if the input values are correct.
 		if (in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->_req->query->c))

@@ -70,11 +70,11 @@ class ProfileAccount_Controller extends Action_Controller
 		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
 		// Make sure the sub-template is set...
-		loadTemplate('ProfileAccount');
+		$this->_templates->load('ProfileAccount');
 		$context['sub_template'] = 'issueWarning';
 
 		// We need this because of template_load_warning_variables
-		loadTemplate('Profile');
+		$this->_templates->load('Profile');
 		loadJavascriptFile('profile.js');
 
 		// jQuery-UI FTW!
@@ -90,7 +90,7 @@ class ProfileAccount_Controller extends Action_Controller
 			|| ($context['user']['is_owner'] && !$cur_profile['warning'])
 			|| !allowedTo('issue_warning'))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 		}
 
 		// Get the base (errors related) stuff done.
@@ -523,7 +523,7 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['page_title'] = $txt['deleteAccount'] . ': ' . $cur_profile['real_name'];
 
 		// make sure the sub-template is set...
-		loadTemplate('ProfileAccount');
+		$this->_templates->load('ProfileAccount');
 		$context['sub_template'] = 'deleteAccount';
 	}
 
@@ -547,7 +547,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$this->_memID])
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		$old_profile = &$cur_profile;
 
@@ -563,7 +563,7 @@ class ProfileAccount_Controller extends Action_Controller
 			$another = isAnotherAdmin($this->_memID);
 
 			if (empty($another))
-				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
+				$this->_errors->fatal_lang_error('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?

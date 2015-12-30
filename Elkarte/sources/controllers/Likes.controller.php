@@ -42,7 +42,7 @@ class Likes_Controller extends Action_Controller
 
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			$this->_errors->fatal_lang_error('feature_disabled', true);
 	}
 
 	/**
@@ -192,7 +192,7 @@ class Likes_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Make room for ajax
-		loadTemplate('Json');
+		$this->_templates->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// No errors, build the new button tag
@@ -630,7 +630,7 @@ class Likes_Controller extends Action_Controller
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			$this->_errors->fatal_lang_error('feature_disabled', true);
 
 		// And you can see the stats
 		isAllowedTo('like_posts_stats');
@@ -672,7 +672,7 @@ class Likes_Controller extends Action_Controller
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			$this->_errors->fatal_lang_error('feature_disabled', true);
 
 		// Worthy to view like statistics?
 		isAllowedTo('like_posts_stats');
@@ -680,7 +680,7 @@ class Likes_Controller extends Action_Controller
 		// Load the required files
 		loadLanguage('LikePosts');
 		loadJavascriptFile('like_posts.js', array('defer' => true));
-		loadtemplate('LikePostsStats');
+		$this->_templates->load('LikePostsStats');
 
 		// Template and tab data
 		$context['page_title'] = $txt['like_post_stats'];

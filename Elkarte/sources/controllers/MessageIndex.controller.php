@@ -144,7 +144,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			redirectexit($board_info['redirect']);
 		}
 
-		loadTemplate('MessageIndex');
+		$this->_templates->load('MessageIndex');
 		loadJavascriptFile('topic.js');
 
 		$bbc = \BBC\ParserWrapper::getInstance();
@@ -152,7 +152,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$context['name'] = $board_info['name'];
 		$context['sub_template'] = 'topic_listing';
 		$context['description'] = $bbc->parseBoard($board_info['description']);
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = $this->_layers;
 
 		// How many topics do we have in total?
 		$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
@@ -279,7 +279,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$boardlist = new Boards_List($boardIndexOptions);
+		$boardlist = new Boards_List(database(), $boardIndexOptions);
 		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?

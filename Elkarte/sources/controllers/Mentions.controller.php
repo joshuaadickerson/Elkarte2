@@ -152,7 +152,7 @@ class Mentions_Controller extends Action_Controller
 
 		// I'm not sure this is needed, though better have it. :P
 		if (empty($modSettings['mentions_enabled']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
@@ -358,10 +358,9 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 			die();
 
-		loadTemplate('Json');
+		$this->_templates->load('Json');
 		$context['sub_template'] = 'send_json';
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
+		$this->_layers->removeAll();
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$lastsent = isset($_GET['lastsent']) ? (int) $_GET['lastsent'] : 0;

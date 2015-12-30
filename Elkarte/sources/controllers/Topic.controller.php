@@ -68,7 +68,7 @@ class Topic_Controller extends Action_Controller
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -98,7 +98,7 @@ class Topic_Controller extends Action_Controller
 			$locked = '0';
 		// You cannot unlock this!
 		else
-			Errors::instance()->fatal_lang_error('locked_by_admin', 'user');
+			$this->_errors->fatal_lang_error('locked_by_admin', 'user');
 
 		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
@@ -135,7 +135,7 @@ class Topic_Controller extends Action_Controller
 
 		// You can't sticky a board or something!
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
+			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -187,11 +187,11 @@ class Topic_Controller extends Action_Controller
 		{
 			unset($this->_req->query->action);
 			$context['theme_loaded'] = false;
-			Errors::instance()->fatal_lang_error('feature_disabled', false);
+			$this->_errors->fatal_lang_error('feature_disabled', false);
 		}
 
 		// Clean out the template layers
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = $this->_layers;
 		$template_layers->removeAll();
 
 		// Get the topic starter information.
@@ -218,7 +218,7 @@ class Topic_Controller extends Action_Controller
 		}
 
 		// Lets "output" all that info.
-		loadTemplate('Printpage');
+		$this->_templates->load('Printpage');
 		$template_layers->add('print');
 		$context['sub_template'] = 'print_page';
 		$context['board_name'] = $board_info['name'];

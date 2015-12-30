@@ -20,7 +20,7 @@
  */
 function template_SplitTopics_init()
 {
-	loadTemplate('GenericHelpers');
+	\Templates::getInstance()->load('GenericHelpers');
 }
 
 /**

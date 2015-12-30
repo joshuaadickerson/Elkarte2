@@ -184,7 +184,7 @@ class News_Controller extends Action_Controller
 		{
 			$context['user'] += $user_info;
 			$cdata_override = true;
-			loadTemplate('Xml');
+			\Templates::getInstance()->load('Xml');
 		}
 
 		// We only want some information, not all of it.

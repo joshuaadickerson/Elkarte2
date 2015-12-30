@@ -135,10 +135,10 @@ class Unread_Controller extends Action_Controller
 		);
 
 		// Prepare the template
-		loadTemplate('Recent');
+		$this->_templates->load('Recent');
 		$context['sub_template'] = 'unread';
 		$context['unread_header_title'] = $this->_action_unread ? ($context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit']) : $txt['unread_replies'];
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = $this->_layers;
 		$template_layers->add($context['sub_template']);
 
 		$this->_is_topics = $this->_action_unread;
@@ -361,7 +361,7 @@ class Unread_Controller extends Action_Controller
 
 		if (empty($this->_boards))
 		{
-			Errors::instance()->fatal_lang_error('error_no_boards_selected');
+			$this->_errors->fatal_lang_error('error_no_boards_selected');
 		}
 		else
 		{
@@ -554,15 +554,15 @@ class Unread_Controller extends Action_Controller
 		// Check for any server load issues
 		if ($context['showing_all_topics'] && checkLoad('allunread'))
 		{
-			Errors::instance()->fatal_lang_error('loadavg_allunread_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_allunread_disabled', false);
 		}
 		elseif ($this->_action_unreadreplies && checkLoad('unreadreplies'))
 		{
-			Errors::instance()->fatal_lang_error('loadavg_unreadreplies_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_unreadreplies_disabled', false);
 		}
 		elseif (!$context['showing_all_topics'] && $this->_action_unread && checkLoad('unread'))
 		{
-			Errors::instance()->fatal_lang_error('loadavg_unread_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_unread_disabled', false);
 		}
 	}
 }

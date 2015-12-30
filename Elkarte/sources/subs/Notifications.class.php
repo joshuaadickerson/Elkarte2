@@ -59,16 +59,28 @@ class Notifications extends AbstractModel
 		$this->_protect_id = false;
 
 		// Let's register all the notifications we know by default
-		$this->register(1, 'notification', array($this, '_send_notification'));
-		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
-		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
-		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
+		$this->registerDefault();
 
 		$this->_protect_id = true;
 
 		Hooks::get()->hook('notifications_methods', array($this));
 	}
 
+	/**
+	 * Register the default notifications
+	 *
+	 * @return $this
+	 * @throws Elk_Exception
+	 */
+	protected function registerDefault()
+	{
+		$this->register(1, 'notification', array($this, '_send_notification'));
+		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
+		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
+		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
+
+		return $this;
+	}
 	/**
 	 * We hax a new notification to send out!
 	 *

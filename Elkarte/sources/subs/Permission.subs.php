@@ -286,7 +286,7 @@ class InlinePermissions_Form
 		$db = database();
 
 		loadLanguage('ManagePermissions');
-		loadTemplate('ManagePermissions');
+		\Templates::getInstance()->load('ManagePermissions');
 		$context['can_change_permissions'] = allowedTo('manage_permissions');
 
 		// Nothing to initialize here.

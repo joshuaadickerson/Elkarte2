@@ -20,7 +20,7 @@
  */
 function template_MessageIndex_init()
 {
-	loadTemplate('GenericBoards');
+	\Templates::getInstance()->load('GenericBoards');
 }
 
 /**

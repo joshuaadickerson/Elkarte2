@@ -17,7 +17,7 @@
 
 function template_MergeTopics_init()
 {
-	loadTemplate('GenericHelpers');
+	\Templates::getInstance()->load('GenericHelpers');
 }
 
 /**

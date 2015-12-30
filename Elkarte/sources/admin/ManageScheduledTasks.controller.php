@@ -45,7 +45,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		global $context, $txt;
 
 		loadLanguage('ManageScheduledTasks');
-		loadTemplate('ManageScheduledTasks');
+		$this->_templates->load('ManageScheduledTasks');
 
 		$subActions = array(
 			'taskedit' => array($this, 'action_edit', 'permission' => 'admin_forum'),

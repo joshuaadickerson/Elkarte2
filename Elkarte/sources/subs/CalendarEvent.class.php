@@ -1,5 +1,8 @@
 <?php
 
+// We need this for all kinds of useful functions.
+require_once(SUBSDIR . '/Calendar.subs.php');
+
 /**
  * A class to handle the basics of calendar events.
  *
@@ -53,9 +56,6 @@ class Calendar_Event
 	{
 		$this->_settings = $settings;
 		$this->_event_id = $event_id;
-
-		// We need this for all kinds of useful functions.
-		require_once(SUBSDIR . '/Calendar.subs.php');
 	}
 
 	/**
@@ -63,6 +63,7 @@ class Calendar_Event
 	 * and permissions.
 	 *
 	 * @param mixed[] $event The options may come from a form
+	 * @return mixed[] The validated event
 	 * @throws Elk_Exception
 	 */
 	public function validate($event)
@@ -144,7 +145,21 @@ class Calendar_Event
 	 */
 	public function remove()
 	{
-		removeEvent($this->_event_id);
+		$db = database();
+
+		$db->query('', '
+		DELETE FROM {db_prefix}calendar
+		WHERE id_event = {int:id_event}',
+			array(
+				'id_event' => $this->_event_id,
+			)
+		);
+
+		Hooks::get()->hook('remove_event', array($this->_event_id));
+
+		updateSettings(array(
+			'calendar_updated' => time(),
+		));
 	}
 
 	/**

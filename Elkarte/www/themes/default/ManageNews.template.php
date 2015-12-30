@@ -20,7 +20,7 @@
  */
 function template_ManageNews_init()
 {
-	loadtemplate('GenericHelpers');
+	\Templates::getInstance()->load('GenericHelpers');
 }
 
 /**

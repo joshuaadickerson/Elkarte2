@@ -68,4 +68,47 @@ $elk['browser'] = function () {
 	return new Browser_Detector;
 };
 
-$elk['nothing'] = 'nothing';
+/**
+ * @return Site_Dispatcher
+ */
+$elk['dispatcher'] = function () use ($elk) {
+	return new Site_Dispatcher($elk);
+};
+
+/**
+ * @return Session
+ */
+$elk['session'] = function () {
+	return Session::getInstance();
+};
+
+/**
+ * @return \BBC\ParserWrapper
+ */
+$elk['bbc'] = function () {
+	global $modSettings;
+
+	$bbc = \BBC\ParserWrapper::getInstance();
+
+	// Set the default disabled BBC
+	if (!empty($modSettings['disabledBBC']))
+	{
+		$bbc->setDisabled($modSettings['disabledBBC']);
+	}
+
+	return $bbc;
+};
+
+$elk['censor'] = function () {
+	global $modSettings;
+
+	return new Censor($modSettings['censor_vulgar'], $modSettings['censor_proper'], $modSettings);
+};
+
+/**
+ * The current action
+ * @var string
+ */
+$elk['action'] = function () {
+	return isset($_GET['action']) ? $_GET['action'] : '';
+};

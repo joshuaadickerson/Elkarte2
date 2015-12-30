@@ -42,7 +42,7 @@ class PostModeration_Controller extends Action_Controller
 	{
 		// @todo We'll shift these later bud.
 		loadLanguage('ModerationCenter');
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(

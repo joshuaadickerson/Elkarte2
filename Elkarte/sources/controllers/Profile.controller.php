@@ -88,7 +88,8 @@ class Profile_Controller extends Action_Controller
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
 			loadLanguage('Profile');
-		loadTemplate('Profile');
+
+		$this->_templates->load('Profile');
 
 		// Trigger profile pre-load event
 		$this->_events->trigger('pre_load', array('post_errors' => $post_errors));
@@ -121,7 +122,7 @@ class Profile_Controller extends Action_Controller
 
 		// No menu means no access at all.
 		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];
@@ -157,7 +158,7 @@ class Profile_Controller extends Action_Controller
 		// Set the template for this area... if you still can :P
 		// and add the profile layer.
 		$context['sub_template'] = $this->_profile_include_data['function'];
-		Template_Layers::getInstance()->add('profile');
+		$this->_layers->add('profile');
 
 		// Need JS if we made it this far
 		loadJavascriptFile('profile.js');

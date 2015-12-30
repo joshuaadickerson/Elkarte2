@@ -40,7 +40,7 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers');
+		$this->_templates->load('PackageServers');
 		loadCSSFile('admin.css');
 	}
 
@@ -66,7 +66,7 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers');
+		$this->_templates->load('PackageServers');
 		loadCSSFile('admin.css');
 
 		$context['page_title'] = $txt['package_servers'];

@@ -20,7 +20,7 @@
  */
 function template_ModerationCenter_init()
 {
-	loadTemplate('GenericMessages');
+	\Templates::getInstance()->load('GenericMessages');
 }
 
 /**

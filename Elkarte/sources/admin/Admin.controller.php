@@ -59,7 +59,7 @@ class Admin_Controller extends Action_Controller
 
 		// Load the language and templates....
 		loadLanguage('Admin');
-		loadTemplate('Admin');
+		$this->_templates->load('Admin');
 		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
 

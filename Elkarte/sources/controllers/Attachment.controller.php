@@ -216,7 +216,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		if (empty($attachment))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
@@ -373,7 +373,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -398,7 +398,7 @@ class Attachment_Controller extends Action_Controller
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
 
 				if (empty($attachment))
-					Errors::instance()->fatal_lang_error('no_access', false);
+					$this->_errors->fatal_lang_error('no_access', false);
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 				// If it isn't yet approved, do they have permission to view it?
@@ -410,7 +410,7 @@ class Attachment_Controller extends Action_Controller
 		}
 		catch (\Exception $e)
 		{
-			Errors::instance()->fatal_lang_error($e->getMessage(), false);
+			$this->_errors->fatal_lang_error($e->getMessage(), false);
 		}
 		$resize = true;
 

@@ -198,11 +198,10 @@ class ManagePosts_Controller extends Action_Controller
 		if (isset($this->_req->query->xml, $this->_req->post->censortest))
 		{
 			// Clear the templates
-			$template_layers = Template_Layers::getInstance();
-			$template_layers->removeAll();
+			$this->_layers->removeAll();
 
 			// Send back a response
-			loadTemplate('Json');
+			$this->_templates->load('Json');
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'result' => true,

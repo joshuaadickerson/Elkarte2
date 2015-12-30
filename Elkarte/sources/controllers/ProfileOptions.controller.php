@@ -68,9 +68,9 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		// Can we email the user direct?
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -109,7 +109,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $user_profile, $memberContext;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editBuddies';
@@ -219,7 +219,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $user_profile, $memberContext;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
@@ -318,7 +318,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -388,7 +388,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -419,7 +419,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		$this->loadThemeOptions();
 		loadCustomFields($this->_memID, 'pmprefs');
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['pm_settings_desc'];
@@ -448,7 +448,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 			loadCustomFields($this->_memID, 'theme');
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
@@ -474,7 +474,7 @@ class ProfileOptions_Controller extends Action_Controller
 		global $context, $cur_profile, $post_errors, $modSettings;
 
 		loadLanguage('Login');
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		// We are saving?
 		if ($saving)
@@ -562,7 +562,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $user_profile, $context, $modSettings;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -841,9 +841,9 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
-			Errors::instance()->fatal_lang_error('ignoreboards_disallowed', 'user');
+			$this->_errors->fatal_lang_error('ignoreboards_disallowed', 'user');
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'ignoreboards';
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -866,7 +866,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $txt, $user_profile, $context;
 
-		loadTemplate('ProfileOptions');
+		$this->_templates->load('ProfileOptions');
 		$context['sub_template'] = 'groupMembership';
 
 		$curMember = $user_profile[$this->_memID];
@@ -933,7 +933,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
 
 		if (!isset($group_id) && !isset($this->_req->post->primary))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// GID may be from a link or a form
 		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
@@ -975,12 +975,12 @@ class ProfileOptions_Controller extends Action_Controller
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
 				if ($changeType === 'request' && $row['group_type'] != 2)
-					Errors::instance()->fatal_lang_error('no_access', false);
+					$this->_errors->fatal_lang_error('no_access', false);
 				// What about leaving a requestable group we are not a member of?
 				elseif ($changeType === 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
-					Errors::instance()->fatal_lang_error('no_access', false);
+					$this->_errors->fatal_lang_error('no_access', false);
 				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
-					Errors::instance()->fatal_lang_error('no_access', false);
+					$this->_errors->fatal_lang_error('no_access', false);
 
 				// We can't change the primary group if this is hidden!
 				if ($row['hidden'] == 2)
@@ -1002,7 +1002,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Didn't find the target?
 		if (!$foundTarget)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to admin.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -1017,7 +1017,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
-				Errors::instance()->fatal_lang_error('profile_error_already_requested_group');
+				$this->_errors->fatal_lang_error('profile_error_already_requested_group');
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');

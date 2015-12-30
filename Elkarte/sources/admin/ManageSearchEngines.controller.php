@@ -44,7 +44,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt;
 
 		loadLanguage('Search');
-		loadTemplate('ManageSearch');
+		$this->_templates->load('ManageSearch');
 
 		$subActions = array(
 			'editspiders' => array($this, 'action_editspiders', 'permission' => 'admin_forum'),
@@ -412,7 +412,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// Load the template and language just incase.
 		loadLanguage('Search');
-		loadTemplate('ManageSearch');
+		$this->_templates->load('ManageSearch');
 
 		// Did they want to delete some or all entries?
 		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))

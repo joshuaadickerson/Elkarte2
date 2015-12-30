@@ -76,7 +76,7 @@ class Maintenance_Controller extends Action_Controller
 
 		// Need something to talk about?
 		loadLanguage('Maintenance');
-		loadTemplate('Maintenance');
+		$this->_templates->load('Maintenance');
 
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -257,7 +257,7 @@ class Maintenance_Controller extends Action_Controller
 			$context['suggested_method'] = 'plain_text';
 		}
 
-		loadTemplate('Packages');
+		$this->_templates->load('Packages');
 		loadLanguage('Packages');
 
 		// $context['package_ftp'] may be set action_backup_display when an error occur
@@ -390,7 +390,7 @@ class Maintenance_Controller extends Action_Controller
 		// @todo Hacky!
 		$txt['choose_board'] = $txt['maintain_old_all'];
 		$context['boards_check_all'] = true;
-		loadTemplate('GenericBoards');
+		$this->_templates->load('GenericBoards');
 
 		$context['topics_actions'] = array(
 			'pruneold' => array(

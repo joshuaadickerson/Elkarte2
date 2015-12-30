@@ -914,33 +914,6 @@ function modifyEvent($event_id, &$eventOptions)
 }
 
 /**
- * Remove an event
- *
- * - does no permission checks.
- *
- * @package Calendar
- * @param int $event_id
- */
-function removeEvent($event_id)
-{
-	$db = database();
-
-	$db->query('', '
-		DELETE FROM {db_prefix}calendar
-		WHERE id_event = {int:id_event}',
-		array(
-			'id_event' => $event_id,
-		)
-	);
-
-	Hooks::get()->hook('remove_event', array($event_id));
-
-	updateSettings(array(
-		'calendar_updated' => time(),
-	));
-}
-
-/**
  * Gets all the events properties
  *
  * @package Calendar

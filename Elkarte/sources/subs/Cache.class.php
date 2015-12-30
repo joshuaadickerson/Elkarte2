@@ -65,10 +65,10 @@ class Cache
 	 * Initialize the class, defines the options and the caching method to use
 	 *
 	 * @param int $level The level of caching
-	 * @param string $accelerator The accelerator used
+	 * @param string $accelerator The cache method used
 	 * @param mixed[] $options Any setting necessary to the caching engine
 	 */
-	public function __construct($level, $accelerator, $options)
+	public function __construct($level, $method, $options)
 	{
 		$this->setLevel($level);
 
@@ -83,10 +83,10 @@ class Cache
 
 		$this->_options = $options;
 
-		if (empty($accelerator))
-			$accelerator = 'filebased';
+		if (empty($method))
+			$method = 'filebased';
 
-		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
+		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($method);
 		$this->_cache_obj = new $cache_class($this->_options);
 
 		if ($this->_cache_obj !== null)

@@ -315,7 +315,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		// Some javascript ma'am? (But load it only once)
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
-			loadTemplate('VerificationControls');
+			\Templates::getInstance()->load('VerificationControls');
 			loadJavascriptFile('jquery.captcha.js');
 			$context['captcha_js_loaded'] = true;
 		}
@@ -615,7 +615,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	public function prepareContext()
 	{
-		loadTemplate('VerificationControls');
+		\Templates::getInstance()->load('VerificationControls');
 
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
@@ -1049,7 +1049,7 @@ class Verification_Controls_EmptyField implements Verification_Controls
 	 */
 	public function prepareContext()
 	{
-		loadTemplate('VerificationControls');
+		\Templates::getInstance()->load('VerificationControls');
 
 		return array(
 			'template' => 'emptyfield',

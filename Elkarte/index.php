@@ -110,7 +110,6 @@ $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 
-
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
 	Debug::get()->rusage('start', $rusage_start);
@@ -120,7 +119,7 @@ if (!empty($maintenance) && $maintenance == 2)
 	Errors::instance()->display_maintenance_message();
 
 // Clean the request.
-Request::instance()->cleanRequest()->parseRequest();
+$elk['req']->cleanRequest()->parseRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
@@ -162,10 +161,10 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 }
 
 // Register error & exception handlers.
-Errors::instance()->register_handlers();
+$elk['errors']->register_handlers();
 
 // Start the session. (assuming it hasn't already been.)
-loadSession();
+$elk['session']->load();
 
 // Restore post data if we are revalidating OpenID.
 if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]['post']) && empty($_POST))
@@ -188,11 +187,8 @@ function elk_main(\Pimple\Container $elk)
 {
 	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 
-	// A safer way to work with our form globals
-	$_req = HttpReq::instance();
-
 	// Special case: session keep-alive, output a transparent pixel.
-	if ($_req->getQuery('action') === 'keepalive') {
+	if ($elk['http_req']->getQuery('action') === 'keepalive') {
 		header('Content-Type: image/gif');
 		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 	}
@@ -214,7 +210,7 @@ function elk_main(\Pimple\Container $elk)
 	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
-	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
+	if ($elk['http_req']->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
 	{
 		$detector = new Browser_Detector;
 		$detector->detectBrowser();
@@ -231,10 +227,10 @@ function elk_main(\Pimple\Container $elk)
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		Errors::instance()->fatal_lang_error('not_a_topic', false);
+		$elk['errors']->fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
-	\Hooks::get()->hook('integrate_pre_log_stats', array(&$no_stat_actions));
+	$elk['hooks']->hook('pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
@@ -250,10 +246,10 @@ function elk_main(\Pimple\Container $elk)
 	unset($no_stat_actions);
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher($elk);
+	$dispatcher = $elk['dispatcher'];
 
 	// Show where we came from, and go
 	$context['site_action'] = $dispatcher->site_action();
-	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
+	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $elk['http_req']->getQuery('action', 'trim|strval', '');
 	$dispatcher->dispatch();
 }

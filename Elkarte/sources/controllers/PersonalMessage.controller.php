@@ -74,7 +74,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if (!isset($this->_req->query->xml))
 		{
-			loadTemplate('PersonalMessage');
+			$this->_templates->load('PersonalMessage');
 		}
 
 		$this->_events->trigger('pre_dispatch', array('xml' => isset($this->_req->query->xml)));
@@ -369,7 +369,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// No menu means no access.
 		if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -388,7 +388,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Set the template for this area and add the profile layer.
 		if (!isset($this->_req->query->xml))
 		{
-			$template_layers = Template_Layers::getInstance();
+			$template_layers = $this->_layers;
 			$template_layers->add('pm');
 		}
 	}
@@ -433,7 +433,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Set the template layers we need
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = $this->_layers;
 		$template_layers->addAfter('subject_list', 'pm');
 
 		$labelQuery = $context['folder'] != 'sent' ? '
@@ -506,7 +506,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 
 			$context['current_pm'] = $pmID;
@@ -534,7 +534,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 		}
 
@@ -565,7 +565,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 		}
 
 		// If loadPMs returned results, lets show the pm subject list
@@ -676,7 +676,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if (!empty($messages_request) && !empty($context['show_delete']))
 		{
-			Template_Layers::getInstance()->addEnd('pm_pages_and_buttons');
+			$this->_layers->addEnd('pm_pages_and_buttons');
 		}
 
 		// Set up the page index.
@@ -727,7 +727,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Load in some text and template dependencies
 		loadLanguage('PersonalMessage');
-		loadTemplate('PersonalMessage');
+		$this->_templates->load('PersonalMessage');
 
 		// Set the template we will use
 		$context['sub_template'] = 'send';
@@ -747,7 +747,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				$this->_errors->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 			}
 		}
 
@@ -768,7 +768,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 
 			// Validate that this is one has been received?
@@ -778,7 +778,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
 			{
-				Errors::instance()->fatal_lang_error('pm_not_yours', false);
+				$this->_errors->fatal_lang_error('pm_not_yours', false);
 			}
 
 			// Censor the message.
@@ -972,7 +972,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					$this->_errors->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				}
 				else
 				{
@@ -1325,7 +1325,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					Errors::instance()->fatal_lang_error('pm_not_yours', false);
+					$this->_errors->fatal_lang_error('pm_not_yours', false);
 				}
 				else
 				{
@@ -1504,7 +1504,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Any errors?
 			if (!empty($updateErrors))
 			{
-				Errors::instance()->fatal_lang_error('labels_too_many', true, array($updateErrors));
+				$this->_errors->fatal_lang_error('labels_too_many', true, array($updateErrors));
 			}
 		}
 
@@ -1789,7 +1789,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Load up the profile template, its where PM settings are located
 		loadLanguage('Profile');
-		loadTemplate('Profile');
+		$this->_templates->load('Profile');
 
 		// We want them to submit back to here.
 		$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';
@@ -1855,14 +1855,14 @@ class PersonalMessage_Controller extends Action_Controller
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 		}
 
 		$pmsg = $this->_req->getQuery('pmsg', 'intval', $this->_req->getPost('pmsg', 'intval', 0));
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 		}
 
 		$context['pm_id'] = $pmsg;
@@ -1879,7 +1879,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (Util::strlen($poster_comment) > 254)
 			{
-				Errors::instance()->fatal_lang_error('post_too_long', false);
+				$this->_errors->fatal_lang_error('post_too_long', false);
 			}
 
 			// Check the session before proceeding any further!
@@ -1917,7 +1917,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
@@ -2112,13 +2112,13 @@ class PersonalMessage_Controller extends Action_Controller
 			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
 			if (empty($ruleName))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_name', false);
+				$this->_errors->fatal_lang_error('pm_rule_no_name', false);
 			}
 
 			// Sanity check...
 			if (empty($this->_req->post->ruletype) || empty($this->_req->post->acttype))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
+				$this->_errors->fatal_lang_error('pm_rule_no_criteria', false);
 			}
 
 			// Let's do the criteria first - it's also hardest!
@@ -2187,7 +2187,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
+				$this->_errors->fatal_lang_error('pm_rule_no_criteria', false);
 			}
 
 			// What are we storing?
@@ -2239,7 +2239,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure the server is able to do this right now
 		if (checkLoad('search'))
 		{
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			$this->_errors->fatal_lang_error('loadavg_search_disabled', false);
 		}
 
 		// Some useful general permissions.
@@ -2905,7 +2905,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				$this->_errors->fatal_lang_error('no_access', false);
 			}
 
 			// Well then, you get to hear about it all over again

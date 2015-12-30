@@ -101,6 +101,7 @@ class Boards_List
 	/**
 	 * Initialize the class
 	 *
+	 * @param Database $db
 	 * @param mixed[] $options - Available options and corresponding defaults are:
 	 *       'include_categories' => false
 	 *       'countChildPosts' => false
@@ -109,7 +110,7 @@ class Boards_List
 	 *       'set_latest_post' => false
 	 *       'get_moderators' => true
 	 */
-	public function __construct($options)
+	public function __construct(Database $db, $options)
 	{
 		global $user_info, $settings, $context, $scripturl, $modSettings;
 
@@ -137,7 +138,7 @@ class Boards_List
 			'mod_cache_ap' => !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : array(),
 		);
 
-		$this->_db = database();
+		$this->_db = $db;
 
 		// Start with an empty array.
 		if ($this->_options['include_categories'])

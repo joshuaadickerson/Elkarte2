@@ -309,7 +309,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$this->_initBBSettingsForm();
 
 		// Our callback templates are here
-		loadTemplate('BadBehavior');
+		$this->_templates->load('BadBehavior');
 
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])

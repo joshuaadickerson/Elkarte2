@@ -65,7 +65,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($user))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		Hooks::get()->hook('add_buddies', array($user_info['id'], &$user));
 
@@ -115,7 +115,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($user))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Remove this user, assuming we can find them
 		if (in_array($user, $user_info['buddies']))

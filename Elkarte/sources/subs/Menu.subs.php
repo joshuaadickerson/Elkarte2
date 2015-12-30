@@ -323,7 +323,7 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['can_toggle_drop_down'] = !empty($menuOptions['can_toggle_drop_down']);
 
 	// Almost there - load the template and add to the template layers.
-	loadTemplate(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
+	\Templates::getInstance()->load(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
 	$menu_context['layer_name'] = (isset($menuOptions['layer_name']) ? $menuOptions['layer_name'] : 'generic_menu') . $menuOptions['menu_type'];
 	Template_Layers::getInstance()->add($menu_context['layer_name']);
 

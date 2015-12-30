@@ -71,7 +71,7 @@ class Generic_List
 		loadLanguage('Errors');
 
 		// Load the template
-		loadTemplate('GenericList');
+		\Templates::getInstance()->load('GenericList');
 	}
 
 	/**

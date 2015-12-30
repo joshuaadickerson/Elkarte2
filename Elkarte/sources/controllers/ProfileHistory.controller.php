@@ -206,7 +206,7 @@ class ProfileHistory_Controller extends Action_Controller
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		}
 
-		loadTemplate('ProfileHistory');
+		$this->_templates->load('ProfileHistory');
 		$context['sub_template'] = 'trackActivity';
 	}
 
@@ -222,8 +222,8 @@ class ProfileHistory_Controller extends Action_Controller
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
 
-		loadTemplate('Profile');
-		loadTemplate('ProfileHistory');
+		$this->_templates->load('Profile');
+		$this->_templates->load('ProfileHistory');
 		loadLanguage('Profile');
 
 		if ($this->_memID == 0)
@@ -245,7 +245,7 @@ class ProfileHistory_Controller extends Action_Controller
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
 			&& isValidIPv6($context['ip']) === false)
 		{
-			Errors::instance()->fatal_lang_error('invalid_tracking_ip', false);
+			$this->_errors->fatal_lang_error('invalid_tracking_ip', false);
 		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);

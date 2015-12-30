@@ -143,7 +143,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
 
-		loadTemplate('ManageBoards');
+		$this->_templates->load('ManageBoards');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -292,7 +292,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boardList, $boards;
 
-		loadTemplate('ManageBoards');
+		$this->_templates->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		getBoardTree();
 
@@ -450,7 +450,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
 
-		loadTemplate('ManageBoards');
+		$this->_templates->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		getBoardTree();
@@ -778,7 +778,7 @@ class ManageBoards_Controller extends Action_Controller
 		$context['permissions_excluded'] = array(-1);
 
 		// Get the needed template bits
-		loadTemplate('ManageBoards');
+		$this->_templates->load('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 

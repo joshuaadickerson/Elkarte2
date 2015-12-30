@@ -66,7 +66,7 @@ class Suggest_Controller extends Action_Controller
 		checkSession('post');
 
 		// This requires the XML template
-		loadTemplate('Xml');
+		$this->_templates->load('Xml');
 
 		// Any parameters?
 		$context['search_param'] = isset($this->_req->post->search_param) ? unserialize(base64_decode($this->_req->post->search_param)) : array();

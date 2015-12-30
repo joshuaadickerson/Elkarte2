@@ -248,7 +248,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		// If there are attachment errors. Let's show a list to the user.
 		if ($this->_attach_errors->hasErrors())
 		{
-			loadTemplate('Errors');
+			\Templates::getInstance()->load('Errors');
 
 			$errors = $this->_attach_errors->prepareErrors();
 

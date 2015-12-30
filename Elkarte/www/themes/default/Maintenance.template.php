@@ -19,7 +19,7 @@
  */
 function template_Maintenance_init()
 {
-	loadTemplate('GenericHelpers');
+	\Templates::getInstance()->load('GenericHelpers');
 }
 
 /**

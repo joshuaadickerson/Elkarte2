@@ -1674,7 +1674,7 @@ function profileSendActivation()
 	$context['user']['is_guest'] = true;
 
 	// Send them to the done-with-registration-login screen.
-	loadTemplate('Register');
+	\Templates::getInstance()->load('Register');
 
 	$context['page_title'] = $txt['profile'];
 	$context['sub_template'] = 'after';

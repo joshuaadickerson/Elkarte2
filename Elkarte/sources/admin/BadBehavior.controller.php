@@ -50,7 +50,7 @@ class BadBehavior_Controller extends Action_Controller
 
 		// Templates, etc...
 		loadLanguage('BadBehaviorlog');
-		loadTemplate('BadBehavior');
+		$this->_templates->load('BadBehavior');
 
 		// Functions we will need
 		require_once(SUBSDIR . '/BadBehavior.subs.php');

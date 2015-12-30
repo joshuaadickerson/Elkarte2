@@ -43,7 +43,7 @@ class MergeTopics_Controller extends Action_Controller
 		global $context;
 
 		// Load the template....
-		loadTemplate('MergeTopics');
+		$this->_templates->load('MergeTopics');
 
 		$subActions = array(
 			'done' => array($this, 'action_mergeDone'),
@@ -75,7 +75,7 @@ class MergeTopics_Controller extends Action_Controller
 		// If we don't know where you are from we know where you go
 		$from = $this->_req->getQuery('from', 'intval', null);
 		if (!isset($from))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		$target_board = $this->_req->getPost('targetboard', 'intval', $board);
 		$context['target_board'] = $target_board;
@@ -101,7 +101,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// @todo review: double check the logic
 		if (empty($topic_info) || ($topic_info['id_board'] != $board) || ($onlyApproved && empty($topic_info['approved'])))
-			Errors::instance()->fatal_lang_error('no_board');
+			$this->_errors->fatal_lang_error('no_board');
 
 		// Tell the template a few things..
 		$context['origin_topic'] = $from;
@@ -113,7 +113,7 @@ class MergeTopics_Controller extends Action_Controller
 		$merge_boards = boardsAllowedTo('merge_any');
 
 		if (empty($merge_boards))
-			Errors::instance()->fatal_lang_error('cannot_merge_any', 'user');
+			$this->_errors->fatal_lang_error('cannot_merge_any', 'user');
 
 		// Get a list of boards they can navigate to to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -139,7 +139,7 @@ class MergeTopics_Controller extends Action_Controller
 		$context['topics'] = mergeableTopics($target_board, $from, $onlyApproved, $this->_req->query->start);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
-			Errors::instance()->fatal_lang_error('merge_need_more_topics');
+			$this->_errors->fatal_lang_error('merge_need_more_topics');
 
 		$context['sub_template'] = 'merge';
 	}
@@ -181,7 +181,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// There's nothing to merge with just one topic...
 		if (empty($topics) || !is_array($topics) || count($topics) == 1)
-			Errors::instance()->fatal_lang_error('merge_need_more_topics');
+			$this->_errors->fatal_lang_error('merge_need_more_topics');
 
 		// Send the topics to the TopicsMerge class
 		$merger = new TopicsMerge($topics);
@@ -189,14 +189,14 @@ class MergeTopics_Controller extends Action_Controller
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if ($merger->hasErrors())
 		{
-			Errors::instance()->fatal_lang_error($merger->firstError());
+			$this->_errors->fatal_lang_error($merger->firstError());
 		}
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.
 		if (!empty($topics))
 		{
 			isAllowedTo('merge_any', $merger->boards);
-			loadTemplate('MergeTopics');
+			$this->_templates->load('MergeTopics');
 		}
 
 		// Get the boards a user is allowed to merge in.
@@ -204,7 +204,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// No permissions to merge, your effort ends here
 		if (empty($allowedto_merge_boards))
-			Errors::instance()->fatal_lang_error('cannot_merge_any', 'user');
+			$this->_errors->fatal_lang_error('cannot_merge_any', 'user');
 
 		// Make sure they can see all boards....
 		$query_boards = array('boards' => $merger->boards);
@@ -234,7 +234,7 @@ class MergeTopics_Controller extends Action_Controller
 		{
 			if (!isset($boards_info[$board]))
 			{
-				Errors::instance()->fatal_lang_error('no_board');
+				$this->_errors->fatal_lang_error('no_board');
 			}
 		}
 
@@ -266,7 +266,7 @@ class MergeTopics_Controller extends Action_Controller
 		if ($merger->hasErrors())
 		{
 			$error = $merger->firstError();
-			Errors::instance()->fatal_lang_error($error[0], $error[1]);
+			$this->_errors->fatal_lang_error($error[0], $error[1]);
 		}
 
 		// Send them to the all done page.

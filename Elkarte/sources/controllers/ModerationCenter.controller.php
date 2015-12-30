@@ -263,7 +263,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data == false)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -305,7 +305,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_settings;
 
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
 		$context['page_title'] = $txt['moderation_center'];
@@ -378,7 +378,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// legit?
 		if (empty($notice) || !$context['can_moderate_boards'])
-			Errors::instance()->fatal_lang_error('no_access', false);
+			$this->_errors->fatal_lang_error('no_access', false);
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
@@ -387,9 +387,9 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
-		Template_Layers::getInstance()->removeAll();
+		$this->_layers->removeAll();
 
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 	}
 
 	/**
@@ -401,7 +401,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
@@ -576,7 +576,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt, $user_settings, $user_info;
 
 		// Some useful context stuff.
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 		$context['page_title'] = $txt['mc_settings'];
 		$context['sub_template'] = 'moderation_settings';
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -785,7 +785,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Have to at least give us something
 		$report = $this->_req->getQuery('report', 'intval', 0);
 		if (empty($report))
-			Errors::instance()->fatal_lang_error('mc_no_modreport_specified');
+			$this->_errors->fatal_lang_error('mc_no_modreport_specified');
 
 		// This should not be needed...
 		$show_pms = false;
@@ -800,7 +800,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// So did we find anything?
 		if ($row === false)
-			Errors::instance()->fatal_lang_error('mc_no_modreport_found');
+			$this->_errors->fatal_lang_error('mc_no_modreport_found');
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.
@@ -992,7 +992,7 @@ class ModerationCenter_Controller extends Action_Controller
 			$context[$context['moderation_menu_name']]['current_subsection'] = 'closed';
 
 		// Finally we are done :P
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 		if ($context['admin_area'] == 'pm_reports')
 		{
 			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
@@ -1021,7 +1021,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 
 		// Get some key settings!
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
@@ -1036,7 +1036,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// First off - are we deleting?
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
 		{
-			checkSession(isset($this->_req->query->delete) ? 'get' : 'post');
+			Session::getInstance()->check(isset($this->_req->query->delete) ? 'get' : 'post');
 
 			// Clicked on remove or using checkboxes to multi delete
 			$toDelete = array();
@@ -1521,7 +1521,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Some of this stuff is overseas, so to speak.
-		loadTemplate('ModerationCenter');
+		$this->_templates->load('ModerationCenter');
 		loadLanguage('Profile');
 
 		$subActions = array(

@@ -20,7 +20,7 @@
  */
 function template_MoveTopic_init()
 {
-	loadTemplate('GenericHelpers');
+	\Templates::getInstance()->load('GenericHelpers');
 }
 
 /**

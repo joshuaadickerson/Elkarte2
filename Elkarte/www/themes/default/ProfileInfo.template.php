@@ -29,7 +29,7 @@ function template_ProfileInfo_init()
 	// in the user's profile summary, change it to a number if you need any
 	$settings['attachments_on_summary'] = 10;
 
-	loadTemplate('GenericMessages');
+	\Templates::getInstance()->load('GenericMessages');
 }
 
 /**

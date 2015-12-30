@@ -54,7 +54,7 @@ class ManagePermissions_Controller extends Action_Controller
 		global $txt, $context;
 
 		loadLanguage('ManagePermissions+ManageMembers');
-		loadTemplate('ManagePermissions');
+		$this->_templates->load('ManagePermissions');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),
 		$subActions = array(

@@ -52,7 +52,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		// Language and template stuff, the usual.
 		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembergroups');
+		$this->_templates->load('ManageMembergroups');
 
 		$subActions = array(
 			'add' => array(

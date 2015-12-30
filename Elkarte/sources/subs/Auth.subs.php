@@ -97,9 +97,6 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	// Make sure the user logs in with a new session ID.
 	if (!isset($_SESSION['login_' . $cookiename]) || $_SESSION['login_' . $cookiename] !== $data)
 	{
-		// We need to meddle with the session.
-		require_once(SOURCEDIR . '/Session.php');
-
 		// Backup the old session.
 		$oldSessionData = $_SESSION;
 

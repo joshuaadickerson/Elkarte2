@@ -98,7 +98,6 @@ unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir, $vendordir);
 // Files we cannot live without.
 require_once(VENDORDIR . '/autoload.php');
 require_once(SOURCEDIR . '/QueryString.php');
-require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
@@ -177,7 +176,7 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 }
 
 // Pre-dispatch
-elk_main();
+elk_main($elk);
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);
@@ -186,7 +185,7 @@ obExit(null, null, true);
  * The main dispatcher.
  * This delegates to each area.
  */
-function elk_main()
+function elk_main($elk)
 {
 	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 

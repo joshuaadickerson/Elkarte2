@@ -70,7 +70,7 @@ class About_Controller extends Action_Controller
         // Submitted the contact form?
         if (isset($this->_req->post->send))
         {
-            checkSession('post');
+            $this->_session->check('post');
             validateToken('contact');
 
             // Can't send a lot of these in a row, no sir!

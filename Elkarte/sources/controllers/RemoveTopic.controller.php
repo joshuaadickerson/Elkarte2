@@ -69,7 +69,7 @@ class RemoveTopic_Controller extends Action_Controller
 		global $user_info, $topic, $board, $modSettings;
 
 		// Make sure they aren't being lead around by someone. (:@)
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Trying to fool us around, are we?
 		if (empty($topic))
@@ -131,7 +131,7 @@ class RemoveTopic_Controller extends Action_Controller
 	{
 		global $topic, $modSettings;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// This has some handy functions for topics
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -186,7 +186,7 @@ class RemoveTopic_Controller extends Action_Controller
 		global $modSettings;
 
 		// Check session.
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Is recycled board enabled?
 		if (empty($modSettings['recycle_enable']))

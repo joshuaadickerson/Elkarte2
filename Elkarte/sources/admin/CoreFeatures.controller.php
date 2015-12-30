@@ -72,7 +72,7 @@ class CoreFeatures_Controller extends Action_Controller
 		// Are we saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			if (isset($this->_req->query->xml))
 			{

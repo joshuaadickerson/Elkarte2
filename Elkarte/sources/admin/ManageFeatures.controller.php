@@ -208,7 +208,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Prevent absurd boundaries here - make it a day tops.
 			if (isset($this->_req->post->lastActive))
@@ -279,7 +279,7 @@ class ManageFeatures_Controller extends Action_Controller
 				}
 			}
 
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_layout_settings');
 
@@ -327,7 +327,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_karma_settings');
 
@@ -373,7 +373,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_likes_settings');
 
@@ -419,7 +419,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_modify_mention_settings', array(&$config_vars));
 
@@ -551,7 +551,7 @@ class ManageFeatures_Controller extends Action_Controller
 		if (isset($this->_req->query->apply))
 		{
 			// Security!
-			checkSession('get');
+			$this->_session->check('get');
 
 			$sig_start = time();
 
@@ -586,7 +586,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Clean up the tag stuff!
 			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
@@ -669,7 +669,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Are we saving any standard field changes?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-scp');
 
 			$changes = array();
@@ -990,7 +990,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Are we toggling which ones are active?
 		if (isset($this->_req->post->onoff))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-scp');
 
 			// Enable and disable custom fields as required.
@@ -1003,7 +1003,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Are we saving?
 		elseif (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-ecp');
 
 			// Everyone needs a name - even the (bracket) unknown...
@@ -1192,7 +1192,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Deleting?
 		elseif (isset($this->_req->post->delete) && $context['field']['colname'])
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-ecp');
 
 			// Delete the old data first, then the field.
@@ -1203,7 +1203,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Rebuild display cache etc.
 		if (isset($this->_req->post->delete) || isset($this->_req->post->save) || isset($this->_req->post->onoff))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Update the display cache
 			updateDisplayCache();
@@ -1236,7 +1236,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			foreach ($context['pm_limits'] as $group_id => $group)

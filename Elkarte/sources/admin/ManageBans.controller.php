@@ -118,7 +118,7 @@ class ManageBans_Controller extends Action_Controller
 		// User pressed the 'remove selection button'.
 		if (!empty($this->_req->post->removeBans) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Make sure every entry is a proper integer.
 			$to_remove = array_map('intval', $this->_req->post->remove);
@@ -522,7 +522,7 @@ class ManageBans_Controller extends Action_Controller
 		// Delete one or more entries.
 		if (!empty($this->_req->post->removeAll) || (!empty($this->_req->post->removeSelected) && !empty($this->_req->post->remove)))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-bl');
 
 			// 'Delete all entries' button was pressed.
@@ -663,7 +663,7 @@ class ManageBans_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		// Check with security first
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-bet');
 
 		$ban_errors = Error_Context::context('ban', 1);
@@ -892,7 +892,7 @@ class ManageBans_Controller extends Action_Controller
 
 		if (!empty($this->_req->post->remove_triggers) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Make sure every entry is a proper integer.
 			$to_remove = array_map('intval', $this->_req->post->remove);

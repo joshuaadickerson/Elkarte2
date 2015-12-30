@@ -288,7 +288,7 @@ class Groups_Controller extends Action_Controller
 			&& $context['group']['assignable'])
 		{
 			// Security first
-			checkSession();
+			$this->_session->check();
 			validateToken('mod-mgm');
 
 			// Make sure we're dealing with integers only.
@@ -300,7 +300,7 @@ class Groups_Controller extends Action_Controller
 			&& (!empty($this->_req->post->toAdd) || !empty($this->_req->post->member_add)) && $context['group']['assignable'])
 		{
 			// Make sure you can do this
-			checkSession();
+			$this->_session->check();
 			validateToken('mod-mgm');
 
 			$member_query = array(array('and' => 'not_in_group'));
@@ -446,7 +446,7 @@ class Groups_Controller extends Action_Controller
 			&& !empty($this->_req->post->groupr)
 			&& !empty($this->_req->post->req_action))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-gr');
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');

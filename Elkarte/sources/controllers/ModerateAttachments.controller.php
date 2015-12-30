@@ -49,7 +49,7 @@ class ModerateAttachments_Controller extends Action_Controller
 		global $user_info;
 
 		// Security is our primary concern...
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Is it approve or delete?
 		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject' ? true : false;

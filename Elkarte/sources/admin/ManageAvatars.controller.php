@@ -85,7 +85,7 @@ class ManageAvatars_Controller extends Action_Controller
 		// Saving avatar settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_avatar_settings');
 

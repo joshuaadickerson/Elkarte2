@@ -46,7 +46,7 @@ class MarkRead_Controller extends Action_Controller
 		// Guests can't mark things.
 		is_not_guest();
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		$redir = $this->_dispatch();
 
@@ -111,7 +111,7 @@ class MarkRead_Controller extends Action_Controller
 			return;
 		}
 
-		if (checkSession('get', '', false))
+		if ($this->_session->check('get', '', false))
 		{
 			// Again, this is a special case, someone will deal with the others later :P
 			if ($this->_req->getQuery('sa') === 'all')
@@ -249,7 +249,7 @@ class MarkRead_Controller extends Action_Controller
 	{
 		global $board, $board_info;
 
-		//checkSession('get');
+		//$this->_session->check('get');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 

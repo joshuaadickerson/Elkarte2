@@ -132,7 +132,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		if (!empty($this->_req->post->regSubmit))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-regc');
 
 			// @todo move this to a filter/sanitation class
@@ -257,7 +257,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
@@ -293,7 +293,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// Submitting new reserved words.
 		if (!empty($this->_req->post->save_reserved_names))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-regr');
 
 			// Set all the options....
@@ -343,7 +343,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Are there some contacts missing?
 			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))

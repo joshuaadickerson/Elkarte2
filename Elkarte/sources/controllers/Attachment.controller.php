@@ -71,7 +71,7 @@ class Attachment_Controller extends Action_Controller
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
-		if (checkSession('request', '', false) != '')
+		if ($this->_session->check('request', '', false) != '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
 			return false;
@@ -145,7 +145,7 @@ class Attachment_Controller extends Action_Controller
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is valid
-		if (checkSession('request', '', false) !== '')
+		if ($this->_session->check('request', '', false) !== '')
 		{
 			loadLanguage('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);

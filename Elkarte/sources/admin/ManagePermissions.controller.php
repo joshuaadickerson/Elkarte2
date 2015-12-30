@@ -485,7 +485,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Saving?
 		if (!empty($this->_req->post->save_changes) && !empty($this->_req->post->boardprofile))
 		{
-			checkSession('request');
+			$this->_session->check('request');
 			validateToken('admin-mpb');
 
 			$changes = array();
@@ -560,7 +560,7 @@ class ManagePermissions_Controller extends Action_Controller
 	{
 		global $context;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-mpq', 'quick');
 
 		// we'll need to init illegal permissions, update permissions, etc.
@@ -793,7 +793,7 @@ class ManagePermissions_Controller extends Action_Controller
 	{
 		global $context;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-mp');
 
 		// We'll need to init illegal permissions, update child permissions, etc.
@@ -905,7 +905,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			Hooks::get()->hook('save_permission_settings');
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
@@ -988,14 +988,14 @@ class ManagePermissions_Controller extends Action_Controller
 		// If we're creating a new one do it first.
 		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) != '')
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mpp');
 			copyPermissionProfile($this->_req->post->profile_name, (int) $this->_req->post->copy_from);
 		}
 		// Renaming?
 		elseif (isset($this->_req->post->rename))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mpp');
 
 			// Just showing the boxes?
@@ -1010,7 +1010,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Deleting?
 		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->delete_profile))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('admin-mpp');
 
 			$profiles = array();
@@ -1057,7 +1057,7 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Just in case.
-		checkSession('get');
+		$this->_session->check('get');
 
 		$context['page_title'] = $txt['permissions_post_moderation'];
 		$context['sub_template'] = 'postmod_permissions';

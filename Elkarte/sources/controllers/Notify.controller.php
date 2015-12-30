@@ -80,7 +80,7 @@ class Notify_Controller extends Action_Controller
 		}
 		else
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			$this->_toggle_topic_notification();
 		}
@@ -128,7 +128,7 @@ class Notify_Controller extends Action_Controller
 		}
 
 		// And sessions still matter, so you better have a valid one
-		if (checkSession('get', '', false))
+		if ($this->_session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -206,7 +206,7 @@ class Notify_Controller extends Action_Controller
 		// Turn the board level notification on/off?
 		else
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			// Turn notification on/off for this board.
 			$this->_toggle_board_notification();
@@ -255,7 +255,7 @@ class Notify_Controller extends Action_Controller
 		}
 
 		// Sessions are always verified
-		if (checkSession('get', '', false))
+		if ($this->_session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -308,7 +308,7 @@ class Notify_Controller extends Action_Controller
 		// Let's do something only if the function is enabled
 		if (!$user_info['is_guest'] && !empty($modSettings['enable_unwatch']))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			$this->_toggle_topic_watch();
 		}
@@ -354,7 +354,7 @@ class Notify_Controller extends Action_Controller
 		}
 
 		// Sessions need to be validated
-		if (checkSession('get', '', false))
+		if ($this->_session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(

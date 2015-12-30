@@ -614,7 +614,7 @@ class ManageMembers_Controller extends Action_Controller
 		global $txt, $user_info;
 
 		// @todo add a token too?
-		checkSession();
+		$this->_session->check();
 
 		// Clean the input.
 		$members = array();
@@ -1094,7 +1094,7 @@ class ManageMembers_Controller extends Action_Controller
 		global $modSettings;
 
 		// First, check our session.
-		checkSession();
+		$this->_session->check();
 
 		require_once(SUBSDIR . '/Mail.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');

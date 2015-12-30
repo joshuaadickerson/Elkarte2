@@ -203,6 +203,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Finally all the things we know how to do
 		$subActions = array(
 			'manlabels' => array($this, 'action_manlabels', 'permission' => 'pm_read'),
+			//'manlabels' => (new SubAction('manlabels', [$this, 'action_manlabels']))->permission(['pm_read']),
 			'manrules' => array($this, 'action_manrules', 'permission' => 'pm_read'),
 			'markunread' => array($this, 'action_markunread', 'permission' => 'pm_read'),
 			'pmactions' => array($this, 'action_pmactions', 'permission' => 'pm_read'),
@@ -216,6 +217,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
 			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
+			//'inbox' => (new SubAction('inbox', [$this, 'action_folder']))->permission(['pm_read']),
 		);
 
 		// Set up our action array
@@ -982,7 +984,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// If your session timed out, show an error, but do allow to re-submit.
-		if (!isset($this->_req->query->xml) && checkSession('post', '', false) != '')
+		if (!isset($this->_req->query->xml) && $this->_session->check('post', '', false) != '')
 		{
 			$post_errors->addError('session_timeout');
 		}
@@ -1419,7 +1421,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context, $user_info;
 
-		checkSession('request');
+		$this->_session->check('request');
 
 		// Sending in the single pm choice via GET
 		$pm_actions = $this->_req->getQuery('pm_actions', null, '');
@@ -1536,7 +1538,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// If all then delete all messages the user has.
 		if ($this->_req->query->f === 'all')
@@ -1563,7 +1565,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Actually delete the messages.
 		if (isset($this->_req->post->age))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Calculate the time to delete before.
 			$deleteTime = max(0, time() - (86400 * (int) $this->_req->post->age));
@@ -1619,7 +1621,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Submitting changes?
 		if (isset($this->_req->post->add) || isset($this->_req->post->delete) || isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 
 			// This will be for updating messages.
 			$message_changes = array();
@@ -1810,7 +1812,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Are they saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 
 			// Mimic what profile would do.
 			// @todo fix this when Profile.subs is not dependant on this behavior
@@ -1883,7 +1885,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Check the session before proceeding any further!
-			checkSession('post');
+			$this->_session->check('post');
 
 			// First, load up the message they want to file a complaint against, and verify it actually went to them!
 			list ($subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message) = loadPersonalMessage($pmsg);
@@ -2009,7 +2011,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Applying all rules?
 		if (isset($this->_req->query->apply))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			applyRules(true);
 			redirectexit('action=pm;sa=manrules');
@@ -2105,7 +2107,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Saving?
 		elseif (isset($this->_req->query->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			$context['rid'] = isset($this->_req->query->rid) && isset($context['rules'][$this->_req->query->rid]) ? (int) $this->_req->query->rid : 0;
 
 			// Name is easy!
@@ -2209,7 +2211,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Deleting?
 		elseif (isset($this->_req->post->delselected) && !empty($this->_req->post->delrule))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			$toDelete = array();
 			foreach ($this->_req->post->delrule as $k => $v)
 				$toDelete[] = (int) $k;
@@ -2894,7 +2896,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $context;
 
-		checkSession('request');
+		$this->_session->check('request');
 
 		$pmsg = !empty($this->_req->query->pmsg) ? (int) $this->_req->query->pmsg : null;
 

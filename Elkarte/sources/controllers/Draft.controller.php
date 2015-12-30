@@ -175,7 +175,7 @@ class Draft_Controller extends Action_Controller
 		// Perhaps a draft was selected for editing? if so pass this off
 		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			redirectexit('action=pm;sa=send;id_draft=' . $this->_req->getQuery('id_draft', 'intval'));
 		}
 
@@ -252,7 +252,7 @@ class Draft_Controller extends Action_Controller
 	private function _action_delete($redirect = '')
 	{
 
-		checkSession(empty($this->_req->post) ? 'get' : '');
+		$this->_session->check(empty($this->_req->post) ? 'get' : '');
 
 		// Lets see what we have been sent, one or many to delete
 		$toDelete = array();

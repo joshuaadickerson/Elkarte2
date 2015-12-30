@@ -124,7 +124,7 @@ class ManageSecurity_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
@@ -176,7 +176,7 @@ class ManageSecurity_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
@@ -247,7 +247,7 @@ class ManageSecurity_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Fix PM settings.
 			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
@@ -341,7 +341,7 @@ class ManageSecurity_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Make sure Bad Behavior defaults are set if nothing was specified
 			$this->_req->post->badbehavior_httpbl_threat = empty($this->_req->post->badbehavior_httpbl_threat) ? 25 : $this->_req->post->badbehavior_httpbl_threat;

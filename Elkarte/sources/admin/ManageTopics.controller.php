@@ -80,7 +80,7 @@ class ManageTopics_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			// Security checks
-			checkSession();
+			$this->_session->check();
 
 			// Notify addons and integrations of the settings change.
 			Hooks::get()->hook('save_topic_settings');

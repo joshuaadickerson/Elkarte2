@@ -57,7 +57,7 @@ class Members_Controller extends Action_Controller
 	{
 		global $user_info, $modSettings;
 
-		checkSession('get');
+		$this->_session->check('get');
 		is_not_guest();
 
 		// Who's going to be your buddy
@@ -105,7 +105,7 @@ class Members_Controller extends Action_Controller
 	{
 		global $user_info;
 
-		checkSession('get');
+		$this->_session->check('get');
 		is_not_guest();
 
 		Hooks::get()->hook('remove_buddy', array($user_info['id']));

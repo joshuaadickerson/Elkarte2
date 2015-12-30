@@ -111,7 +111,7 @@ class Announce_Controller extends Action_Controller
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
 
-		checkSession();
+		$this->_session->check();
 
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
 		$groups = array_merge($board_info['groups'], array(1));

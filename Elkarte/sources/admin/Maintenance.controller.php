@@ -456,7 +456,7 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-maint');
 
 		// Just wipe the whole cache directory!
@@ -477,7 +477,7 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-maint');
 
 		// Maintenance time was scheduled!
@@ -531,7 +531,7 @@ class Maintenance_Controller extends Action_Controller
 
 		if ($body_type === 'text' || ($body_type !== 'text' && isset($this->_req->post->do_conversion)))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-maint');
 
 			// Make it longer so we can do their limit.
@@ -554,7 +554,7 @@ class Maintenance_Controller extends Action_Controller
 		}
 		elseif ($body_type !== 'text' && (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont)))
 		{
-			checkSession();
+			$this->_session->check();
 
 			if (empty($this->_req->query->start))
 				validateToken('admin-maint');
@@ -630,7 +630,7 @@ class Maintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Some validation
-		checkSession('post');
+		$this->_session->check('post');
 		validateToken('admin-maint');
 
 		ignore_user_abort(true);
@@ -692,7 +692,7 @@ class Maintenance_Controller extends Action_Controller
 		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
-		checkSession();
+		$this->_session->check();
 
 		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -968,7 +968,7 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		checkSession();
+		$this->_session->check();
 
 		$validator = new Data_Validator();
 		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
@@ -1034,7 +1034,7 @@ class Maintenance_Controller extends Action_Controller
 		if (!allowedTo('admin_forum'))
 			Errors::instance()->fatal_lang_error('no_dump_database', 'critical');
 
-		checkSession('post');
+		$this->_session->check('post');
 
 		if (empty($iknowitmaybeunsafe))
 		{
@@ -1087,7 +1087,7 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-maint');
 
 		// Start with checking and cleaning what was sent
@@ -1134,7 +1134,7 @@ class Maintenance_Controller extends Action_Controller
 		validateToken('admin-maint');
 
 		isAllowedTo('admin_forum');
-		checkSession('post', 'admin');
+		$this->_session->check('post', 'admin');
 
 		// No boards at all?  Forget it then :/.
 		if (empty($this->_req->post->boards))
@@ -1174,7 +1174,7 @@ class Maintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// And valid requests
-		checkSession();
+		$this->_session->check();
 
 		// Set up to the context.
 		$context['page_title'] = $txt['not_done_title'];
@@ -1395,7 +1395,7 @@ class Maintenance_Controller extends Action_Controller
 		global $txt, $context;
 
 		// Check the session
-		checkSession();
+		$this->_session->check();
 
 		// Set up to the context for the pause screen
 		$context['page_title'] = $txt['not_done_title'];

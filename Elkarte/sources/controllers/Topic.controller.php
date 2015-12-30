@@ -70,7 +70,7 @@ class Topic_Controller extends Action_Controller
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Notification.subs.php');
@@ -137,7 +137,7 @@ class Topic_Controller extends Action_Controller
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// We need this for the sendNotifications() function.
 		require_once(SUBSDIR . '/Notification.subs.php');

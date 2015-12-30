@@ -174,8 +174,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		$req = HttpReq::instance();
-		if ($req->getQuery('sa') === 'fetch')
+		if ($this->_req->getQuery('sa') === 'fetch')
 		{
 			$this->action_fetch();
 		}
@@ -547,7 +546,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_markread()
 	{
-		checkSession('request');
+		$this->_session->check('request');
 
 		// Common checks to determine if we can go on
 		if (!$this->_isAccessible())
@@ -564,7 +563,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_updatestatus()
 	{
-		checkSession('request');
+		$this->_session->check('request');
 
 		$this->setData(array(
 			'id_mention' => isset($_REQUEST['item']) ? $_REQUEST['item'] : 0,

@@ -64,6 +64,11 @@ abstract class Action_Controller
 	protected $_errors;
 
 	/**
+	 * @var Session
+	 */
+	protected $_session;
+
+	/**
 	 * Constructor...
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
@@ -79,6 +84,7 @@ abstract class Action_Controller
 		$this->_templates = $elk['templates'];
 		$this->_errors = $elk['errors'];
 		$this->_req = $elk['http_req'];
+		$this->_session = $elk['session'];
 
 		// A safety-net to remain backward compatibility
 		if ($eventManager === null)

@@ -150,7 +150,7 @@ class ManageBoards_Controller extends Action_Controller
 		// Moving a board, child of, before, after, top
 		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-bm-' . (int) $this->_req->query->src_board, 'request');
 
 			// Top is special, its the top!
@@ -385,7 +385,7 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function action_cat2()
 	{
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-bc-' . $this->_req->post->cat);
 
 		require_once(SUBSDIR . '/Categories.subs.php');
@@ -624,7 +624,7 @@ class ManageBoards_Controller extends Action_Controller
 		global $context;
 
 		$board_id = $this->_req->getPost('boardid', 'intval', 0);
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-be-' . $this->_req->post->boardid);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -788,7 +788,7 @@ class ManageBoards_Controller extends Action_Controller
 		// Doing a save?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_board_settings');
 

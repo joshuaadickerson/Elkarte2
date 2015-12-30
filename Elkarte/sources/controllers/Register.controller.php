@@ -227,7 +227,7 @@ class Register_Controller extends Action_Controller
 
 		$this->_can_register();
 
-		checkSession();
+		$this->_session->check();
 		if (!validateToken('register', 'post', true, false))
 			$reg_errors->addError('token_verification');
 

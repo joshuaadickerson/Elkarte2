@@ -66,7 +66,7 @@ class Reminder_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
 
 		// Security
-		checkSession();
+		$this->_session->check();
 		//validateToken('remind');
 		createToken('remind');
 
@@ -204,7 +204,7 @@ class Reminder_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('remind-sp');
 
 		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1) || !isset($this->_req->post->passwrd2))
@@ -280,7 +280,7 @@ class Reminder_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		checkSession();
+		$this->_session->check();
 		validateToken('remind-sai');
 
 		// Hacker?  How did you get this far without an email or username?
@@ -357,7 +357,7 @@ function secretAnswerInput()
 {
 	global $context;
 
-	checkSession();
+	$this->_session->check();
 
 	// Strings for the register auto javascript clever stuffy wuffy.
 	loadLanguage('Login');

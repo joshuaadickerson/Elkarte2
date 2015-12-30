@@ -114,7 +114,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			// security checks
-			checkSession();
+			$this->_session->check();
 
 			// notify the interested addons or integrations
 			Hooks::get()->hook('save_search_engine_settings');
@@ -220,7 +220,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// User pressed the 'remove selection button'.
 		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
@@ -362,7 +362,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Are we saving?
 		if (!empty($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-ses');
 
 			// Check the IP range is valid.
@@ -417,7 +417,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Did they want to delete some or all entries?
 		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-sl');
 
 			$since = $this->_req->getPost('older', 'intval', 0);
@@ -544,7 +544,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Are we cleaning up some old stats?
 		if (!empty($this->_req->post->delete_entries) && isset($this->_req->post->older))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-ss');
 
 			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);

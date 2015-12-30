@@ -156,7 +156,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_subscription_settings');
 
@@ -433,7 +433,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Delete it?
 		if (isset($this->_req->post->delete_confirm) && isset($this->_req->query->delete))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-pmsd');
 
 			deleteSubscription($context['sub_id']);
@@ -446,7 +446,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-pms');
 
 			// Some cleaning...
@@ -829,7 +829,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Saving?
 		elseif (isset($this->_req->post->save_sub))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Work out the dates...
 			$starttime = mktime($this->_req->post->hour, $this->_req->post->minute, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year);
@@ -898,7 +898,7 @@ class ManagePaid_Controller extends Action_Controller
 		// Deleting?
 		elseif (isset($this->_req->post->delete) || isset($this->_req->post->finished))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Do the actual deletes!
 			if (!empty($this->_req->post->delsub))

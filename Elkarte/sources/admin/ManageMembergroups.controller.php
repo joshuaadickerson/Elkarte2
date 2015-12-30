@@ -355,7 +355,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		// A form was submitted, we can start adding.
 		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mmg');
 
 			$postCountBasedGroup = isset($this->_req->post->min_posts) && (!isset($this->_req->post->postgroup_based) || !empty($this->_req->post->postgroup_based));
@@ -488,7 +488,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 */
 	public function action_delete()
 	{
-		checkSession('get');
+		$this->_session->check('get');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		deleteMembergroups((int) $this->_req->query->group);
@@ -532,7 +532,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		// The delete this membergroup button was pressed.
 		if (isset($this->_req->post->delete))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
@@ -547,7 +547,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		elseif (isset($this->_req->post->save))
 		{
 			// Validate the session.
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
@@ -798,7 +798,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 			Hooks::get()->hook('save_membergroup_settings');
 
 			// Yeppers, saving this...

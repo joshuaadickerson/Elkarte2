@@ -63,7 +63,7 @@ class Suggest_Controller extends Action_Controller
 		Hooks::get()->hook('autosuggest', array(&$searchTypes));
 
 		// Good old session check
-		checkSession('post');
+		$this->_session->check('post');
 
 		// This requires the XML template
 		$this->_templates->load('Xml');

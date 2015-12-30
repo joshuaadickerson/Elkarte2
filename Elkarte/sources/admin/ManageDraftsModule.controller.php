@@ -257,7 +257,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		// Saving them ?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_drafts_settings');
 

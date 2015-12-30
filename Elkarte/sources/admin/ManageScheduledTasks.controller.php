@@ -102,7 +102,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		// Saving changes?
 		if (isset($this->_req->post->save) && isset($this->_req->post->enable_task))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -281,7 +281,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-st');
 
 			// Do we have a valid offset?
@@ -342,7 +342,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-tl');
 
 			emptyTaskLog();

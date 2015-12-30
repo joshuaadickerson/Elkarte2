@@ -114,7 +114,7 @@ class Poll_Controller extends Action_Controller
 		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
 		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($this->_req->post->options))
 		{
-			checkSession('request');
+			$this->_session->check('request');
 
 			// Find out what they voted for before.
 			$pollOptions = determineVote($user_info['id'], $row['id_poll']);
@@ -134,7 +134,7 @@ class Poll_Controller extends Action_Controller
 				redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
 		}
 
-		checkSession('request');
+		$this->_session->check('request');
 
 		// Make sure the option(s) are valid.
 		if (empty($this->_req->post->options))
@@ -200,7 +200,7 @@ class Poll_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Poll.subs.php');
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
 		$poll = pollStatus($topic);
@@ -512,7 +512,7 @@ class Poll_Controller extends Action_Controller
 
 		$poll_errors = Error_Context::context('poll');
 
-		if (checkSession('post', '', false) != '')
+		if ($this->_session->check('post', '', false) != '')
 			$poll_errors->addError('session_timeout');
 
 		// HACKERS (!!) can't edit :P.
@@ -699,7 +699,7 @@ class Poll_Controller extends Action_Controller
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Verify the session.
-		checkSession('get');
+		$this->_session->check('get');
 
 		// We need to work with them polls.
 		require_once(SUBSDIR . '/Poll.subs.php');

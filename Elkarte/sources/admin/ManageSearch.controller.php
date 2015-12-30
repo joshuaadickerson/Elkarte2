@@ -148,7 +148,7 @@ class ManageSearch_Controller extends Action_Controller
 		// A form was submitted.
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_search_settings');
 
@@ -267,7 +267,7 @@ class ManageSearch_Controller extends Action_Controller
 		// A form was submitted.
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-msw');
 
 			Hooks::get()->hook('save_search_weights');
@@ -324,7 +324,7 @@ class ManageSearch_Controller extends Action_Controller
 		// Creating index, removing or simply changing the one in use?
 		if ($this->_req->getQuery('sa', 'trim', '') === 'createfulltext')
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-msm', 'get');
 
 			$context['fulltext_index'] = 'body';
@@ -332,7 +332,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($context['fulltext_index']))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-msm', 'get');
 
 			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index']);
@@ -347,7 +347,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removecustom')
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-msm', 'get');
 
 			drop_log_search_words();
@@ -365,7 +365,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-msmpost');
 
 			updateSettings(array(
@@ -475,7 +475,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 
 		if ($context['step'] !== 0)
-			checkSession('request');
+			$this->_session->check('request');
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
@@ -538,7 +538,7 @@ class ManageSearch_Controller extends Action_Controller
 		// Saving the settings
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mssphinx');
 
 			updateSettings(array(
@@ -555,7 +555,7 @@ class ManageSearch_Controller extends Action_Controller
 		// Checking if we can connect?
 		elseif (isset($this->_req->post->checkconnect))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mssphinx');
 
 			// If they have not picked sphinx yet, let them know, but we can still check connections
@@ -616,7 +616,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->createconfig))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mssphinx');
 			require_once(SUBSDIR . '/ManageSearch.subs.php');
 

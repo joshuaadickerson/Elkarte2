@@ -457,7 +457,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		global $board, $user_info, $modSettings, $context;
 
 		// Check the session = get or post.
-		checkSession('request');
+		$this->_session->check('request');
 
 		// Lets go straight to the restore area.
 		if ($this->_req->getPost('qaction') === 'restore' && !empty($this->_req->post->topics))

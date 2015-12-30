@@ -133,7 +133,7 @@ class Karma_Controller extends Action_Controller
 		is_not_guest();
 		isAllowedTo('karma_edit');
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// We hold karma here.
 		require_once(SUBSDIR . '/Karma.subs.php');

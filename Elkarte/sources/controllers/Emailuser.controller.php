@@ -94,7 +94,7 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		// Actually send the message...
-		checkSession();
+		$this->_session->check();
 		spamProtection('sendtopic');
 
 		$result = $this->_sendTopic($row);
@@ -134,7 +134,7 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		// Is the session valid?
-		if (checkSession('post', '', false))
+		if ($this->_session->check('post', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -343,7 +343,7 @@ class Emailuser_Controller extends Action_Controller
 		// Are we actually sending it?
 		if (isset($this->_req->post->send, $this->_req->post->email_body))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Don't let them send too many!
 			spamProtection('sendmail');
@@ -539,7 +539,7 @@ class Emailuser_Controller extends Action_Controller
 		$report_errors = Error_Context::context('report', 1);
 
 		// Check their session.
-		if (checkSession('post', '', false) != '')
+		if ($this->_session->check('post', '', false) != '')
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.

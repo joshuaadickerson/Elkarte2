@@ -532,7 +532,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// If just deleting a message, do it and then redirect back.
 		if (isset($this->_req->query->delete) && !$context['is_topics'])
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
 			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);

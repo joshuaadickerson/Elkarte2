@@ -81,7 +81,7 @@ class ManageServer_Controller extends Action_Controller
 
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
-		checkSession('request');
+		$this->_session->check('request');
 
 		$subActions = array(
 			'general' => array($this, 'action_generalSettings_display', 'permission' => 'admin_forum'),

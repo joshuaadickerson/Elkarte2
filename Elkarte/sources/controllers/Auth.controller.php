@@ -112,7 +112,7 @@ class Auth_Controller extends Action_Controller
 			redirectexit();
 
 		// Are you guessing with a script?
-		checkSession('post');
+		$this->_session->check('post');
 		validateToken('login');
 		spamProtection('login');
 
@@ -373,7 +373,7 @@ class Auth_Controller extends Action_Controller
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
-			checkSession('get');
+			$this->_session->check('get');
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 

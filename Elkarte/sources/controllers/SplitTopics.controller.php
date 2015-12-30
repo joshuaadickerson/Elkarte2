@@ -172,7 +172,7 @@ class SplitTopics_Controller extends Action_Controller
 		global $txt, $context, $topic;
 
 		// Check the session to make sure they meant to do this.
-		checkSession();
+		$this->_session->check();
 
 		// Set the form options in to session
 		$this->_set_session_values();
@@ -251,7 +251,7 @@ class SplitTopics_Controller extends Action_Controller
 		global $txt, $topic, $context;
 
 		// Make sure the session id was passed with post.
-		checkSession();
+		$this->_session->check();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 

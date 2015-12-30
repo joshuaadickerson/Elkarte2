@@ -445,7 +445,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Are we doing any work?
 		if ((isset($this->_req->query->ignore) || isset($this->_req->query->close)) && isset($this->_req->query->rid))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			$rid = $this->_req->getQuery('rid', 'intval');
 
 			// Update the report...
@@ -460,7 +460,7 @@ class ModerationCenter_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->close) && isset($this->_req->post->close_selected))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 
 			// All the ones to update...
 			$toClose = array_map('intval', $this->_req->post->close);
@@ -614,7 +614,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Are we saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-set');
 
 			/* Current format of mod_prefs is:
@@ -705,7 +705,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Wait, we are saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-wt');
 
 			// To check the BBC is pretty good...
@@ -806,7 +806,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// If they are adding a comment then... add a comment.
 		if (isset($this->_req->post->add_comment) && !empty($this->_req->post->mod_comment))
 		{
-			checkSession();
+			$this->_session->check();
 
 			$newComment = trim(Util::htmlspecialchars($this->_req->post->mod_comment));
 
@@ -1411,7 +1411,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Deleting and existing one
 		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-wt');
 
 			removeWarningTemplate($this->_req->post->deltpl);
@@ -1754,7 +1754,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Are we saving a note?
 		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
 		{
-			checkSession();
+			$this->_session->check();
 
 			$new_note = Util::htmlspecialchars(trim($this->_req->post->new_note));
 
@@ -1776,7 +1776,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Bye... bye...
 		if (isset($this->_req->query->notes) && isset($this->_req->query->delete) && is_numeric($this->_req->query->delete))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			// Just checkin'!
 			$id_delete = (int) $this->_req->query->delete;

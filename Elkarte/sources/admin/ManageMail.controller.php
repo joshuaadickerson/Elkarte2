@@ -93,7 +93,7 @@ class ManageMail_Controller extends Action_Controller
 		// First, are we deleting something from the queue?
 		if (isset($this->_req->post->delete))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			deleteMailQueueItems($this->_req->post->delete);
 		}
 
@@ -257,7 +257,7 @@ class ManageMail_Controller extends Action_Controller
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
 				$postobj = array('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
 			}
-			checkSession();
+			$this->_session->check();
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
@@ -384,7 +384,7 @@ class ManageMail_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// This is certainly needed!
 		require_once(SUBSDIR . '/Mail.subs.php');

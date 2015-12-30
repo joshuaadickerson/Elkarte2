@@ -140,7 +140,7 @@ class ManageNews_Controller extends Action_Controller
 		// The 'remove selected' button was pressed.
 		if (!empty($this->_req->post->delete_selection) && !empty($this->_req->post->remove))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Store the news temporarily in this array.
 			$temp_news = explode("\n", $modSettings['news']);
@@ -158,7 +158,7 @@ class ManageNews_Controller extends Action_Controller
 		// The 'Save' button was pressed.
 		elseif (!empty($this->_req->post->save_items))
 		{
-			checkSession();
+			$this->_session->check();
 
 			foreach ($this->_req->post->news as $i => $news)
 			{
@@ -548,7 +548,7 @@ class ManageNews_Controller extends Action_Controller
 		if (!empty($this->_req->post->send_pm))
 			$num_at_once /= 2;
 
-		checkSession();
+		$this->_session->check();
 
 		// Where are we actually to?
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
@@ -902,7 +902,7 @@ class ManageNews_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_news_settings');
 

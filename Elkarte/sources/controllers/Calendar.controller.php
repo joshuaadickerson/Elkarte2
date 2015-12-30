@@ -246,7 +246,7 @@ class Calendar_Controller extends Action_Controller
 	{
 		global $modSettings, $user_info, $scripturl;
 
-		checkSession();
+		$this->_session->check();
 
 		// Cast this for safety...
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;

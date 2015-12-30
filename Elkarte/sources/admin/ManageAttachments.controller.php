@@ -182,7 +182,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Changing the attachment upload directory
 			if (isset($this->_req->post->attachmentUploadDir))
@@ -682,7 +682,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public function action_byAge()
 	{
-		checkSession('post', 'admin');
+		$this->_session->check('post', 'admin');
 
 		// @todo Ignore messages in topics that are stickied?
 
@@ -713,7 +713,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public function action_bySize()
 	{
-		checkSession('post', 'admin');
+		$this->_session->check('post', 'admin');
 
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
@@ -734,7 +734,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $txt, $language, $user_info;
 
-		checkSession('post');
+		$this->_session->check('post');
 
 		if (!empty($this->_req->post->remove))
 		{
@@ -772,7 +772,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $txt;
 
-		checkSession('get', 'admin');
+		$this->_session->check('get', 'admin');
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
@@ -805,7 +805,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $modSettings, $context, $txt;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// If we choose cancel, redirect right back.
 		if (isset($this->_req->post->cancel))
@@ -1059,7 +1059,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 0);
 			$new_dirs = array();
@@ -1285,7 +1285,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Saving a base directory?
 		if (isset($this->_req->post->save2))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Changing the current base directory?
 			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
@@ -1561,7 +1561,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $modSettings, $txt;
 
-		checkSession();
+		$this->_session->check();
 
 		// The list(s) of directory's that are available.
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);

@@ -148,7 +148,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			$this->_req->post->smiley_sets_default = $this->_req->getPost('smiley_sets_default', 'trim|strval', 'default');
 
@@ -380,7 +380,7 @@ class ManageSmileys_Controller extends Action_Controller
 		if (isset($this->_req->post->smiley_save) || isset($this->_req->post->delete_set))
 		{
 			// Security first
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mss', 'request');
 
 			// Delete selected smiley sets.
@@ -538,7 +538,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Importing any smileys from an existing set?
 		if ($context['sub_action'] === 'import')
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-mss', 'request');
 
 			$set = (int) $this->_req->query->set;
@@ -580,7 +580,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Submitting a form?
 		if (isset($this->_req->post->$context['session_var'], $this->_req->post->smiley_code))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Some useful arrays... types we allow - and ports we don't!
 			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
@@ -801,7 +801,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Submitting a form?
 		if (isset($this->_req->post->smiley_save) || isset($this->_req->post->smiley_action))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Changing the selected smileys?
 			if (isset($this->_req->post->smiley_action) && !empty($this->_req->post->checked_smileys))
@@ -1165,7 +1165,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Submitting a form?
 		if (isset($this->_req->post->icons_save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Deleting icons?
 			if (isset($this->_req->post->delete) && !empty($this->_req->post->checked_icons))
@@ -1396,7 +1396,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Move smileys to another position.
 		if (isset($this->_req->query->reorder))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			$this->_req->query->location = empty($this->_req->query->location) || $this->_req->query->location != 'popup' ? 0 : 2;
 			$this->_req->query->source = empty($this->_req->query->source) ? 0 : (int) $this->_req->query->source;
@@ -1470,7 +1470,7 @@ class ManageSmileys_Controller extends Action_Controller
 		global $modSettings, $scripturl, $context, $txt, $user_info;
 
 		isAllowedTo('manage_smileys');
-		checkSession('request');
+		$this->_session->check('request');
 
 		// One of these two may be necessary
 		loadLanguage('Errors');

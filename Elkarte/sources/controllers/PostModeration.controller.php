@@ -126,7 +126,7 @@ class PostModeration_Controller extends Action_Controller
 		// Right, so we have something to do?
 		if (!empty($toAction) && isset($curAction))
 		{
-			checkSession('request');
+			$this->_session->check('request');
 
 			require_once(SUBSDIR . '/Topic.subs.php');
 			require_once(SUBSDIR . '/Messages.subs.php');
@@ -304,7 +304,7 @@ class PostModeration_Controller extends Action_Controller
 		// Something to do, let's do it!
 		if (!empty($attachments) && isset($curAction))
 		{
-			checkSession('request');
+			$this->_session->check('request');
 
 			// This will be handy.
 			require_once(SUBSDIR . '/ManageAttachments.subs.php');
@@ -477,7 +477,7 @@ class PostModeration_Controller extends Action_Controller
 	{
 		global $user_info, $topic, $board;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
 

@@ -154,7 +154,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		// Submitting something...
 		if (isset($this->_req->query->delete) && !empty($this->_req->query->holiday))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mc');
 
 			$to_remove = array_map('intval', array_keys($this->_req->query->holiday));
@@ -280,7 +280,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 		if (isset($this->_req->post->$context['session_var']) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Not too long good sir?
 			$this->_req->post->title = Util::substr($this->_req->post->title, 0, 60);
@@ -340,7 +340,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 			Hooks::get()->hook('save_calendar_settings');
 			Settings_Form::save_db($config_vars, $this->_req->post);
 

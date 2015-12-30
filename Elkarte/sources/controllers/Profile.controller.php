@@ -141,7 +141,7 @@ class Profile_Controller extends Action_Controller
 		$this->_saving = $this->_req->getPost('save', 'trim', $this->_req->getQuery('save', 'trim', null));
 		if (isset($this->_profile_include_data['sc']) && (isset($this->_saving) || $context['do_preview']))
 		{
-			checkSession($this->_profile_include_data['sc']);
+			$this->_session->check($this->_profile_include_data['sc']);
 			$this->_completed_save = true;
 		}
 

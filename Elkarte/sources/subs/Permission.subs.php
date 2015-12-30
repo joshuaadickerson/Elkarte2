@@ -221,7 +221,7 @@ class InlinePermissions_Form
 			return;
 
 		// Almighty session check, verify our ways.
-		checkSession();
+		\Session::getInstance()->check();
 		validateToken('admin-mp');
 
 		// Make sure they can't do certain things,

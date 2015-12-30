@@ -155,7 +155,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		// Just in case, no need, no need.
 		$context['robot_no_index'] = true;
 
-		checkSession('request');
+		$this->_session->check('request');
 
 		if (!isset($this->_req->query->sa))
 			$this->_errors->fatal_lang_error('no_access', false);

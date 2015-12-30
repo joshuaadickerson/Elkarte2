@@ -77,7 +77,7 @@ class ManageErrors_Controller extends Action_Controller
 		if ($type !== false)
 		{
 			// Make sure the session exists and is correct; otherwise, might be a hacker.
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-el');
 
 			$error_list = $this->_req->getPost('delete');

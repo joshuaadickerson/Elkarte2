@@ -251,7 +251,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-tm');
 
 			// What themes are being made as known to the members
@@ -329,7 +329,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-tl');
 
 			$themes = installedThemes();
@@ -442,7 +442,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Submit?
 		if (isset($this->_req->post->submit) && empty($this->_req->post->who))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-sto');
 
 			if (empty($this->_req->post->options))
@@ -482,7 +482,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Changing the current options for all members using this theme
 		elseif (isset($this->_req->post->submit) && $this->_req->post->who == 1)
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-sto');
 
 			$this->_options = empty($this->_req->post->options) ? array() : $this->_req->post->options;
@@ -530,7 +530,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Remove all members options and use the defaults
 		elseif (!empty($this->_req->query->who) && $this->_req->query->who == 2)
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-stor', 'request');
 
 			removeThemeOptions($theme, 'members');
@@ -676,7 +676,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (isset($this->_req->post->save))
 		{
 			// Allowed?
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-sts');
 
 			$options = array();
@@ -800,7 +800,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		checkSession('get');
+		$this->_session->check('get');
 		validateToken('admin-tr', 'request');
 
 		// The theme's ID must be an integer.
@@ -846,7 +846,7 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Validate what was sent
-		if (checkSession('get', '', false))
+		if ($this->_session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -974,7 +974,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Have we made a decision, or are we just browsing?
 		if (isset($this->_req->query->th))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			$th = $this->_req->getQuery('th', 'intval');
 			$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
@@ -1117,7 +1117,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
-		checkSession('request');
+		$this->_session->check('request');
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -1362,7 +1362,7 @@ class ManageThemes_Controller extends Action_Controller
 		global $settings, $user_info, $options, $modSettings;
 
 		// Check the session id.
-		checkSession('get');
+		$this->_session->check('get');
 
 		// This good-for-nothing pixel is being used to keep the session alive.
 		if (empty($this->_req->query->var) || !isset($this->_req->query->val))
@@ -1618,7 +1618,7 @@ class ManageThemes_Controller extends Action_Controller
 		$is_css = substr($this->_req->post->filename, -4) == '.css';
 
 		// Check you up
-		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) == true)
+		if ($this->_session->check('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) == true)
 		{
 			// Consolidate the format in which we received the file contents
 			if (is_array($file))

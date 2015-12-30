@@ -209,7 +209,7 @@ class BadBehavior_Controller extends Action_Controller
 		$type = isset($this->_req->post->delall) ? 'delall' : 'delete';
 
 		// Make sure the session exists and the token is correct
-		checkSession();
+		$this->_session->check();
 		validateToken('admin-bbl');
 
 		$redirect = deleteBadBehavior($type, $filter);

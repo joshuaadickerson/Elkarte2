@@ -166,7 +166,7 @@ class MergeTopics_Controller extends Action_Controller
 		global $txt, $context;
 
 		// Check the session.
-		checkSession('request');
+		$this->_session->check('request');
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');

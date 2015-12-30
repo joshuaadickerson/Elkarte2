@@ -396,7 +396,7 @@ class ProfileAccount_Controller extends Action_Controller
 		if (isset($this->_req->post->save))
 		{
 			// Security is good here.
-			checkSession('post');
+			$this->_session->check('post');
 
 			// There must be a reason, and use of flowery words is allowed.
 			$warn_reason = $this->_req->getPost('warn_reason', 'trim|Util::htmlspecialchars', '');
@@ -543,7 +543,7 @@ class ProfileAccount_Controller extends Action_Controller
 		elseif (!allowedTo('profile_remove_any'))
 			isAllowedTo('profile_remove_own');
 
-		checkSession();
+		$this->_session->check();
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$this->_memID])

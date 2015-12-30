@@ -165,7 +165,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// Setting a new default?
 		if (!empty($this->_req->post->set_default) && !empty($this->_req->post->def_language))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-lang');
 
 			$lang_exists = false;
@@ -318,7 +318,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// Can we actually do the installation - and do they want to?
 		if (!empty($this->_req->post->do_install) && !empty($this->_req->post->copy_file))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-dlang');
 
 			$chmod_files = array();
@@ -711,7 +711,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// @deprecated since 1.0
 		if (!empty($this->_req->post->delete_main) && $context['lang_id'] != 'english')
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mlang');
 
 			// @todo FTP Controls?
@@ -771,7 +771,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$madeSave = false;
 		if (!empty($this->_req->post->save_main) && !$current_file)
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mlang');
 
 			// Read in the current file.
@@ -816,7 +816,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$save_strings = array();
 		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-mlang');
 
 			// Clean each entry!
@@ -985,7 +985,7 @@ class ManageLanguages_Controller extends Action_Controller
 			// Any saves to make?
 			if (!empty($final_saves))
 			{
-				checkSession();
+				$this->_session->check();
 
 				$file_contents = implode('', file($current_file));
 				foreach ($final_saves as $save)
@@ -1034,7 +1034,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_language_settings');
 

@@ -128,7 +128,7 @@ class ProfileOptions_Controller extends Action_Controller
 		// Removing a buddy?
 		if (isset($this->_req->query->remove))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			Hooks::get()->hook('remove_buddy', array($this->_memID));
 
@@ -150,7 +150,7 @@ class ProfileOptions_Controller extends Action_Controller
 		// Or adding a new one
 		elseif (isset($this->_req->post->new_buddy))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Prepare the string for extraction...
 			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
@@ -236,7 +236,7 @@ class ProfileOptions_Controller extends Action_Controller
 		// Removing a member from the ignore list?
 		if (isset($this->_req->query->remove))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($ignoreArray as $key => $id_remove)
@@ -255,7 +255,7 @@ class ProfileOptions_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->new_ignore))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// Prepare the string for extraction...
 			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
@@ -936,7 +936,7 @@ class ProfileOptions_Controller extends Action_Controller
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// GID may be from a link or a form
-		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
+		$this->_session->check(isset($this->_req->query->gid) ? 'get' : 'post');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 

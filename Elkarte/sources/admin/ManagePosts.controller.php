@@ -116,7 +116,7 @@ class ManagePosts_Controller extends Action_Controller
 		if (!empty($this->_req->post->save_censor))
 		{
 			// Make sure censoring is something they can do.
-			checkSession();
+			$this->_session->check();
 			validateToken('admin-censor');
 
 			$censored_vulgar = array();
@@ -241,7 +241,7 @@ class ManagePosts_Controller extends Action_Controller
 		// Are we saving them - are we??
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
 			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')

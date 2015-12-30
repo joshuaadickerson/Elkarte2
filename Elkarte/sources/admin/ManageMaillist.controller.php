@@ -322,7 +322,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt, $context;
 
 		allowedTo('approve_emails');
-		checkSession('get');
+		$this->_session->check('get');
 		validateToken('admin-ml', 'get');
 
 		$id = (int) $this->_req->query->item;
@@ -378,7 +378,7 @@ class ManageMaillist_Controller extends Action_Controller
 	public function action_delete_email()
 	{
 		allowedTo('approve_emails');
-		checkSession('get');
+		$this->_session->check('get');
 		validateToken('admin-ml', 'get');
 
 		$id = (int) $this->_req->query->item;
@@ -408,7 +408,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		allowedTo('approve_emails');
-		checkSession('get');
+		$this->_session->check('get');
 		validateToken('admin-ml', 'get');
 
 		// Get the id to approve
@@ -486,7 +486,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		if (!isset($this->_req->query->bounce))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			validateToken('admin-ml', 'get');
 		}
 
@@ -543,7 +543,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Check if they are sending the notice
 		if (isset($this->_req->query->bounce) && isset($temp_email))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('admin-ml');
 
 			// They did check the box, how else could they have posted
@@ -910,7 +910,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Saving the new or edited entry?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_filter_settings');
 
@@ -1010,7 +1010,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Removing the filter?
 		if (isset($this->_req->query->f_id))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			$id = (int) $this->_req->query->f_id;
 
 			maillist_delete_filter_parser($id);
@@ -1299,7 +1299,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Check if they are saving the changes
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_parser_settings');
 
@@ -1399,7 +1399,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Removing the filter?
 		if (isset($this->_req->query->f_id))
 		{
-			checkSession('get');
+			$this->_session->check('get');
 			$id = (int) $this->_req->query->f_id;
 
 			maillist_delete_filter_parser($id);
@@ -1446,7 +1446,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			Hooks::get()->hook('save_maillist_settings');
 
@@ -1662,7 +1662,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Deleting and existing one
 		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-mlt');
 			removeWarningTemplate($this->_req->post->deltpl, 'bnctpl');
 		}
@@ -1801,7 +1801,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Wait, we are saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 			validateToken('mod-mlt');
 
 			// To check the BBC is good...

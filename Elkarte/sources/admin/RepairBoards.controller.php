@@ -75,7 +75,7 @@ class RepairBoards_Controller extends Action_Controller
 
 		// Start displaying errors without fixing them.
 		if (isset($this->_req->query->fixErrors))
-			checkSession('get');
+			$this->_session->check('get');
 
 		// Will want this.
 		loadForumTests();

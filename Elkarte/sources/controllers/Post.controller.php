@@ -623,7 +623,7 @@ class Post_Controller extends Action_Controller
 		$context['current_action'] = 'post2';
 
 		// If the session has timed out, let the user re-submit their form.
-		if (checkSession('post', '', false) != '')
+		if ($this->_session->check('post', '', false) != '')
 		{
 			$this->_post_errors->addError('session_timeout');
 
@@ -1175,7 +1175,7 @@ class Post_Controller extends Action_Controller
 		if (empty($topic))
 			obExit(false);
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 

@@ -81,13 +81,13 @@ class Modlog_Controller extends Action_Controller
 		// Handle deletion...
 		if (isset($this->_req->post->removeall) && $context['can_delete'])
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('mod-ml');
 			deleteLogAction($context['log_type'], $context['hoursdisable']);
 		}
 		elseif (!empty($this->_req->post->remove) && isset($this->_req->post->delete) && $context['can_delete'])
 		{
-			checkSession();
+			$this->_session->check();
 			validateToken('mod-ml');
 			deleteLogAction($context['log_type'], $context['hoursdisable'], $this->_req->post->delete);
 		}

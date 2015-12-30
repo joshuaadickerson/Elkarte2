@@ -364,9 +364,9 @@ class PackageServers_Controller extends Action_Controller
 
 		// Security is good...
 		if (isset($this->_req->query->server))
-			checkSession('get');
+			$this->_session->check('get');
 		else
-			checkSession();
+			$this->_session->check();
 
 		// To download something, we need either a valid server or url.
 		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
@@ -623,7 +623,7 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Validate the user.
-		checkSession();
+		$this->_session->check();
 
 		// If they put a slash on the end, get rid of it.
 		if (substr($this->_req->post->serverurl, -1) == '/')
@@ -649,7 +649,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_remove()
 	{
-		checkSession('get');
+		$this->_session->check('get');
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 

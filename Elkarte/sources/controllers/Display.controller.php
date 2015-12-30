@@ -666,7 +666,7 @@ class Display_Controller extends Action_Controller
 		global $topic, $board, $user_info, $context, $modSettings;
 
 		// Check the session = get or post.
-		checkSession('request');
+		$this->_session->check('request');
 
 		require_once(SUBSDIR . '/Messages.subs.php');
 

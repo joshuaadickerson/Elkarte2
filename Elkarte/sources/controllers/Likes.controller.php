@@ -224,7 +224,7 @@ class Likes_Controller extends Action_Controller
 		$check = true;
 
 		// Valid request
-		checkSession('get');
+		$this->_session->check('get');
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();

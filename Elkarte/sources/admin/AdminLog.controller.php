@@ -164,7 +164,7 @@ class AdminLog_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 			$savevar = array(
 				array('text', 'pruningOptions')

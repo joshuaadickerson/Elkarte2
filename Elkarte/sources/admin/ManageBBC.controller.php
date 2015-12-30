@@ -87,7 +87,7 @@ class ManageBBC_Controller extends Action_Controller
 		// Save page
 		if (isset($this->_req->query->save))
 		{
-			checkSession();
+			$this->_session->check();
 
 
 			// Security: make a pass through all tags and fix them as necessary

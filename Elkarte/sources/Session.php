@@ -9,26 +9,6 @@ function loadSession()
 }
 
 /**
- * Make sure the user's correct session was passed, and they came from here.
- *
- * What it does:
- * - Checks the current session, verifying that the person is who he or she should be.
- * - Also checks the referrer to make sure they didn't get sent here.
- * - Depends on the disableCheckUA setting, which is usually missing.
- * - Will check GET, POST, or REQUEST depending on the passed type.
- * - Also optionally checks the referring action if passed. (note that the referring action must be by GET.)
- *
- * @param string $type = 'post' (post, get, request)
- * @param string $from_action = ''
- * @param bool $is_fatal = true
- * @return string the error message if is_fatal is false.
- */
-function checkSession($type = 'post', $from_action = '', $is_fatal = true)
-{
-	return Session::getInstance()->check($type, $from_action, $is_fatal);
-}
-
-/**
  * Check if the user is who he/she says he is.
  *
  * What it does:
@@ -330,7 +310,7 @@ class Session
 		// Coming from the login screen
 		if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 		{
-			checkSession();
+			$this->check();
 			validateToken('admin-login');
 
 			// Hashed password, ahoy!

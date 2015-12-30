@@ -531,7 +531,7 @@ class Packages_Controller extends Action_Controller
 
 		// Make sure we don't install this addon twice.
 		checkSubmitOnce('check');
-		checkSession();
+		$this->_session->check();
 
 		// If there's no package file, what are we installing?
 		$this->_filename = $this->_req->getQuery('package', 'trim');
@@ -852,7 +852,7 @@ class Packages_Controller extends Action_Controller
 	public function action_flush()
 	{
 		// Always check the session.
-		checkSession('get');
+		$this->_session->check('get');
 
 		include_once(SUBSDIR . '/Package.subs.php');
 
@@ -873,7 +873,7 @@ class Packages_Controller extends Action_Controller
 		global $scripturl;
 
 		// Check it.
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
 		if (!isset($this->_req->query->package) || $this->_req->query->package == 'index.php' || $this->_req->query->package == 'installed.list' || $this->_req->query->package == 'backups')
@@ -1029,7 +1029,7 @@ class Packages_Controller extends Action_Controller
 	{
 		global $context, $txt, $package_ftp;
 
-		checkSession('get');
+		$this->_session->check('get');
 
 		// Try to make the FTP connection.
 		create_chmod_control(array(), array('force_find_error' => true));
@@ -1064,7 +1064,7 @@ class Packages_Controller extends Action_Controller
 
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			$this->_session->check('post');
 
 			updateSettings(array(
 				'package_server' => $this->_req->getPost('pack_server', 'trim|Util::htmlspecialchars'),
@@ -1184,7 +1184,7 @@ class Packages_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $package_ftp;
 
 		// Let's try and be good, yes?
-		checkSession('get');
+		$this->_session->check('get');
 
 		// If we're restoring permissions this is just a pass through really.
 		if (isset($this->_req->query->restore))

@@ -132,7 +132,7 @@ class MoveTopic_Controller extends Action_Controller
 
 		$this->_check_access_2();
 
-		checkSession();
+		$this->_session->check();
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 

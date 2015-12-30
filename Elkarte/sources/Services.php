@@ -83,6 +83,13 @@ $elk['session'] = function () {
 };
 
 /**
+ * @return Debug
+ */
+$elk['debug'] = function () {
+	return Debug::get();
+};
+
+/**
  * @return \BBC\ParserWrapper
  */
 $elk['bbc'] = function () {
@@ -99,6 +106,9 @@ $elk['bbc'] = function () {
 	return $bbc;
 };
 
+/**
+ * @return Censor
+ */
 $elk['censor'] = function () {
 	global $modSettings;
 

@@ -108,7 +108,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	{
 		foreach ($changeArray as $variable => $value)
 		{
-			$db->query('', '
+			$db->update('', '
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
@@ -165,8 +165,6 @@ function removeSettings($toRemove)
 {
 	global $modSettings;
 
-	$db = database();
-
 	if (empty($toRemove))
 		return;
 
@@ -174,7 +172,7 @@ function removeSettings($toRemove)
 		$toRemove = array($toRemove);
 
 	// Remove the setting from the db
-	$db->query('', '
+	database()->delete('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_name})',
 		array(
@@ -184,8 +182,12 @@ function removeSettings($toRemove)
 
 	// Remove it from $modSettings now so it does not persist
 	foreach ($toRemove as $setting)
+	{
 		if (isset($modSettings[$setting]))
+		{
 			unset($modSettings[$setting]);
+		}
+	}
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
 	Cache::instance()->remove('modSettings');

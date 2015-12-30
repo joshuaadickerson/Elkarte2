@@ -872,8 +872,8 @@ function action_upgradeOptions()
 	$db = load_database();
 
 	// No one opts in so why collect incomplete stats
-	$db->query('', '
-		DELETE FROM {db_prefix}settings
+	$db->delete('', '
+		FROM {db_prefix}settings
 		WHERE variable = {string:allow_sm_stats}',
 		array(
 			'allow_sm_stats' => 'allow_sm_stats',
@@ -882,8 +882,8 @@ function action_upgradeOptions()
 	);
 
 	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
-	$db->query('', '
-		DELETE FROM {db_prefix}settings
+	$db->delete('', '
+		FROM {db_prefix}settings
 		WHERE variable = {string:integrate}',
 		array(
 			'integrate' => 'integrate_%',

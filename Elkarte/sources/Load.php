@@ -44,7 +44,7 @@ function reloadSettings()
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
 	{
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array(
@@ -473,7 +473,7 @@ function loadBoard()
 		// Wanna grab something more from the boards table or another table at all?
 		Hooks::get()->hook('load_board_query', array(&$select_columns, &$select_tables));
 
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, IFNULL(mem.id_member, 0) AS id_moderator,
@@ -553,7 +553,7 @@ function loadBoard()
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
-				$request = $db->query('', '
+				$request = $db->select('', '
 					SELECT COUNT(id_topic)
 					FROM {db_prefix}topics
 					WHERE id_member_started={int:id_member}
@@ -722,7 +722,7 @@ function loadPermissions()
 	if (empty($user_info['permissions']))
 	{
 		// Get the general permissions.
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -752,7 +752,7 @@ function loadPermissions()
 		if (!isset($board_info['profile']))
 			Errors::instance()->fatal_lang_error('no_board');
 
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -883,7 +883,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($users))
 	{
 		// Load the member's data.
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
@@ -906,7 +906,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Custom profile fields as well
 	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
-		$request = $db->query('', '
+		$request = $db->select('', '
 			SELECT id_member, variable, value
 			FROM {db_prefix}custom_fields_data
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
@@ -1210,7 +1210,7 @@ function getThemeData($id_theme, $member)
 		$db = database();
 
 		// Load variables from the current or default theme, global or this user's.
-		$result = $db->query('', '
+		$result = $db->select('', '
 			SELECT variable, value, id_member, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '

@@ -110,8 +110,8 @@ class DatabaseSessionHandler extends \SessionHandler
 			return false;
 
 		// Just delete the row...
-		return $this->db->query('', '
-		DELETE FROM {db_prefix}sessions
+		return $this->db->delete('', '
+		FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 			array(
 				'session_id' => $session_id,
@@ -131,8 +131,8 @@ class DatabaseSessionHandler extends \SessionHandler
 			$max_lifetime = max($modSettings['databaseSession_lifetime'], 60);
 
 		// Clean up after yerself ;).
-		return $this->db->query('', '
-		DELETE FROM {db_prefix}sessions
+		return $this->db->delete('', '
+		FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 			array(
 				'last_update' => time() - $maxlifetime,

@@ -398,8 +398,11 @@ abstract class Database_Abstract implements Database
 	 */
 	public function select($identifier, $db_string, array $db_values = array(), $connection = null)
 	{
-		$db_string = 'SELECT ' . $db_string;
-		call_integration_hook('integrate_db_select', array(&$identifier, &$db_string, &$db_values, &$connection));
+		// Add the SELECT only if it's not there
+		if (strpos(ltrim($db_string), 'SELECT') !== 0)
+			$db_string = 'SELECT ' . $db_string;
+
+		\Hooks::get()->hook('db_select', array(&$identifier, &$db_string, &$db_values, &$connection));
 		return $this->query($identifier, $db_string, $db_values, $connection);
 	}
 
@@ -413,8 +416,10 @@ abstract class Database_Abstract implements Database
 	 */
 	public function update($identifier, $db_string, array $db_values = array(), $connection = null)
 	{
-		$db_string = 'UPDATE ' . $db_string;
-		call_integration_hook('integrate_db_update', array(&$identifier, &$db_string, &$db_values, &$connection));
+		if (strpos(ltrim($db_string), 'UPDATE') !== 0)
+			$db_string = 'UPDATE ' . $db_string;
+
+		\Hooks::get()->hook('db_update', array(&$identifier, &$db_string, &$db_values, &$connection));
 		return $this->query($identifier, $db_string, $db_values, $connection);
 	}
 
@@ -428,8 +433,10 @@ abstract class Database_Abstract implements Database
 	 */
 	public function delete($identifier, $db_string, array $db_values = array(), $connection = null)
 	{
-		$db_string = 'DELETE ' . $db_string;
-		call_integration_hook('integrate_db_delete', array(&$identifier, &$db_string, &$db_values, &$connection));
+		if (strpos(ltrim($db_string), 'DELETE') !== 0)
+			$db_string = 'DELETE ' . $db_string;
+
+		\Hooks::get()->hook('db_delete', array(&$identifier, &$db_string, &$db_values, &$connection));
 		return $this->query($identifier, $db_string, $db_values, $connection);
 	}
 }

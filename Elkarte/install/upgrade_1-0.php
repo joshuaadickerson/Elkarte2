@@ -53,7 +53,7 @@ class UpgradeInstructions_upgrade_1_0
 						array(),
 						'ignore'
 					);
-				}
+				},
 				'debug_title' => 'More space for email filters...',
 				'function' => function($db, $db_table)
 				{
@@ -67,7 +67,7 @@ class UpgradeInstructions_upgrade_1_0
 						array(),
 						'ignore'
 					);
-				}
+				},
 				'debug_title' => 'Possible wrong type for mail_queue...',
 				'function' => function($db, $db_table)
 				{

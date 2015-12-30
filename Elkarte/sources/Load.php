@@ -46,9 +46,11 @@ function reloadSettings()
 	{
 		$request = $db->select('', '
 			SELECT variable, value
-			FROM {db_prefix}settings',
-			array(
-			)
+			FROM {db_prefix}settings
+			WHERE {string:key_group}',
+			[
+				'key_group' => 'settings',
+			]
 		);
 		$modSettings = array();
 		if (!$request)

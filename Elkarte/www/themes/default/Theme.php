@@ -103,13 +103,13 @@ class Theme extends \Theme
      */
     function template_footer()
     {
-        global $context, $settings, $modSettings, $time_start;
+        global $context, $settings, $modSettings;
 
         $db = database();
 
         // Show the load time?  (only makes sense for the footer.)
         $context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
-        $context['load_time'] = round(microtime(true) - $time_start, 3);
+        $context['load_time'] = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3);
         $context['load_queries'] = $db->num_queries();
 
         if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))

@@ -417,13 +417,13 @@ class ManageMail_Controller extends Action_Controller
 	 */
 	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{
-		global $context, $txt, $time_start;
+		global $context, $txt;
 
 		// Try get more time...
 		setTimeLimit(600);
 
 		// Have we already used our maximum time?
-		if (time() - array_sum(explode(' ', $time_start)) < 5)
+		if (time() - array_sum(explode(' ', $_SERVER['REQUEST_TIME_FLOAT'])) < 5)
 			return;
 
 		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $all_emails . ';sent=' . $sent_emails . ';' . $context['session_var'] . '=' . $context['session_id'];

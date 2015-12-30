@@ -567,7 +567,7 @@ function processNextTasks($ts = 0)
  */
 function run_this_task($id_task, $task_name)
 {
-	global $time_start, $modSettings;
+	global $modSettings;
 
 	Elk_Autoloader::getInstance()->register(SUBSDIR . '/ScheduledTask', '\\ElkArte\\sources\\subs\\ScheduledTask');
 
@@ -600,7 +600,7 @@ function run_this_task($id_task, $task_name)
 				updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
 		}
 
-		$total_time = round(microtime(true) - $time_start, 3);
+		$total_time = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3);
 
 		// If the task ended successfully, then log the proper time taken to complete
 		logTask($log_task_id, $id_task, $total_time);

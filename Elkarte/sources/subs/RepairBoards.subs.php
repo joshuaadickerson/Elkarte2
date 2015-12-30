@@ -1344,13 +1344,13 @@ function createSalvageArea()
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
-	global $context, $txt, $time_start, $db_show_debug;
+	global $context, $txt, $db_show_debug;
 
 	// More time, I need more time!
 	setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
-	if (!$force && microtime(true) - $time_start > 3)
+	if (!$force && microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 		return;
 
 	// Restore the query cache if interested.

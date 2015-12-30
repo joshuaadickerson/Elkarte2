@@ -1760,13 +1760,13 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{
-		global $context, $txt, $time_start;
+		global $context, $txt;
 
 		// Try get more time...
 		setTimeLimit(600);
 
 		// Have we already used our maximum time?
-		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)
+		if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] < 3 || $this->starting_substep == $this->substep)
 			return;
 
 		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];

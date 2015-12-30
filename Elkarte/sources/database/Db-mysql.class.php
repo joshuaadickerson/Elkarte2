@@ -122,7 +122,7 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_show_debug, $time_start;
+		global $db_show_debug;
 		global $db_unbuffered, $db_callback, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
@@ -193,7 +193,7 @@ class Database_MySQL extends Database_Abstract
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
-			$db_cache['s'] = $st - $time_start;
+			$db_cache['s'] = $st - $_SERVER['REQUEST_TIME_FLOAT'];
 		}
 
 		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.

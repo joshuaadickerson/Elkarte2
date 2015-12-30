@@ -27,7 +27,7 @@ define('ELK', 'SSI');
 define('CACHE_STALE', '?R11');
 
 // We're going to want a few globals... these are all set later.
-global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
+global $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
@@ -42,7 +42,7 @@ if (function_exists('getrusage'))
 else
 	$rusage_start = array();
 
-$time_start = microtime(true);
+$time_start = $_SERVER['REQUEST_TIME_FLOAT'];
 $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)

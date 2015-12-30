@@ -506,7 +506,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_convertmsgbody_display()
 	{
-		global $context, $txt, $modSettings, $time_start;
+		global $context, $txt, $modSettings;
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
@@ -580,7 +580,7 @@ class Maintenance_Controller extends Action_Controller
 
 				$start += $increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					createToken('admin-convertMsg');
 					$context['continue_post_data'] = '
@@ -689,7 +689,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_recount_display()
 	{
-		global $txt, $context, $modSettings, $time_start;
+		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
 		checkSession();
@@ -732,7 +732,7 @@ class Maintenance_Controller extends Action_Controller
 				recountUnapprovedMessages($this->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 0);
@@ -756,7 +756,7 @@ class Maintenance_Controller extends Action_Controller
 				updateBoardsCounter('posts', $this->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((200 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 1);
@@ -779,7 +779,7 @@ class Maintenance_Controller extends Action_Controller
 				updateBoardsCounter('topics', $this->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((300 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 2);
@@ -802,7 +802,7 @@ class Maintenance_Controller extends Action_Controller
 				updateBoardsCounter('unapproved_posts', $this->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((400 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 3);
@@ -825,7 +825,7 @@ class Maintenance_Controller extends Action_Controller
 				updateBoardsCounter('unapproved_topics', $this->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((500 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 4);
@@ -842,7 +842,7 @@ class Maintenance_Controller extends Action_Controller
 		{
 			updatePersonalMessagesCounter();
 
-			if (microtime(true) - $time_start > 3)
+			if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 			{
 				$this->start = 0;
 				$percent = round(700 / $this->total_steps);
@@ -862,7 +862,7 @@ class Maintenance_Controller extends Action_Controller
 				updateMessagesBoardID($this->_req->query->start, $this->increment);
 				$this->start += $this->increment;
 
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					$percent = round((700 + 100 * $this->start / $modSettings['maxMsgID']) / $this->total_steps);
 					$this->_buildContinue($percent, 6);
@@ -1168,7 +1168,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_massmove_display()
 	{
-		global $context, $txt, $time_start;
+		global $context, $txt;
 
 		// Only admins.
 		isAllowedTo('admin_forum');
@@ -1224,7 +1224,7 @@ class Maintenance_Controller extends Action_Controller
 				$context['start'] += 10;
 
 				// If this is really taking some time, show the pause screen
-				if (microtime(true) - $time_start > 3)
+				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
 				{
 					createToken('admin_movetopics');
 

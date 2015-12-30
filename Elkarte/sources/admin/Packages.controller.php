@@ -1489,7 +1489,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_perms_save()
 	{
-		global $context, $txt, $time_start, $package_ftp;
+		global $context, $txt, $package_ftp;
 
 		umask(0);
 
@@ -1581,7 +1581,7 @@ class Packages_Controller extends Action_Controller
 				unset($context['to_process'][$path]);
 
 				// See if we're out of time?
-				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+				if (time() - array_sum(explode(' ', $_SERVER['REQUEST_TIME_FLOAT'])) > $timeout_limit)
 					pausePermsSave();
 			}
 		}
@@ -1643,7 +1643,7 @@ class Packages_Controller extends Action_Controller
 						}
 
 						// See if we're out of time?
-						if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+						if (!$dont_chmod && time() - array_sum(explode(' ', $_SERVER['REQUEST_TIME_FLOAT'])) > $timeout_limit)
 						{
 							$dont_chmod = true;
 
@@ -1674,7 +1674,7 @@ class Packages_Controller extends Action_Controller
 				unset($context['directory_list'][$path]);
 
 				// See if we're out of time?
-				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+				if (time() - array_sum(explode(' ', $_SERVER['REQUEST_TIME_FLOAT'])) > $timeout_limit)
 					pausePermsSave();
 			}
 		}

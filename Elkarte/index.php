@@ -19,7 +19,7 @@
  *
  */
 
-$time_start = microtime(true);
+$time_start = $_SERVER['REQUEST_TIME_FLOAT'];
 
 // The software version
 const FORUM_VERSION = 'ElkArte 1.1';

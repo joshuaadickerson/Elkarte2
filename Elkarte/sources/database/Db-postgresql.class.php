@@ -122,7 +122,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_show_debug, $time_start, $db_callback, $modSettings;
+		global $db_show_debug, $db_callback, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -242,7 +242,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
-			$db_cache['s'] = $st - $time_start;
+			$db_cache['s'] = $st - $_SERVER['REQUEST_TIME_FLOAT'];
 		}
 
 		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.

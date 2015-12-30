@@ -80,7 +80,6 @@ DEFINE('ADDONSDIR', $boarddir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
-require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
@@ -118,7 +117,7 @@ if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
 
 // Clean the request.
-cleanRequest();
+Request::instance()->cleanRequest()->parseRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();

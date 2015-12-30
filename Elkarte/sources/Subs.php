@@ -90,10 +90,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  *
  * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
  * @param bool $update Use an UPDATE query instead of a REPLACE query
- * @param bool $debug = false Not used at this time, see todo
- * @todo: add debugging features, $debug isn't used
+ * @param string|null $group The key group
  */
-function updateSettings($changeArray, $update = false, $debug = false)
+function updateSettings($changeArray, $update = false, $group = null)
 {
 	global $modSettings;
 
@@ -102,6 +101,8 @@ function updateSettings($changeArray, $update = false, $debug = false)
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
+
+	$group = $group === null ? 'settings' : $group;
 
 	// In some cases, this may be better and faster, but for large sets we don't want so many UPDATEs.
 	if ($update)
@@ -137,7 +138,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		elseif (!isset($modSettings[$variable]) && empty($value))
 			continue;
 
-		$replaceArray[] = array($variable, $value);
+		$replaceArray[] = array($variable, $value, $group);
 
 		$modSettings[$variable] = $value;
 	}
@@ -147,7 +148,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 
 	$db->insert('replace',
 		'{db_prefix}settings',
-		array('variable' => 'string-255', 'value' => 'string-65534'),
+		array('variable' => 'string-255', 'value' => 'string-65534', 'key_group' => 'string-255'),
 		$replaceArray,
 		array('variable')
 	);

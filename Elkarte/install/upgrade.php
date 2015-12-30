@@ -19,7 +19,7 @@ require('installcore.php');
 
 // General options for the script.
 $timeLimitThreshold = 3;
-$upgrade_path = realpath(__DIR__ . '/..');
+$upgrade_path = realpath(__DIR__ . '/Elkarte');
 $upgradeurl = $_SERVER['PHP_SELF'];
 
 // Disable the need for admins to login?
@@ -1104,7 +1104,7 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (file_exists(__DIR__ . '/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) < 0)
+			if (file_exists(__DIR__ . 'upgrade.php/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) < 0)
 			{
 				$files_todo[] = $file;
 				$upcontext['file_count']++;
@@ -1121,9 +1121,9 @@ function action_databaseChanges()
 		$upcontext['cur_file_name'] = $file[0];
 
 		// @todo Do we actually need to do this still?
-		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
+		if (file_exists(__DIR__ . 'upgrade.php/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
 		{
-			$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
+			$nextFile = parse_sql(__DIR__ . 'upgrade.php/' . $file[0]);
 			if ($nextFile)
 			{
 				// Only update the version of this if complete.

@@ -119,7 +119,7 @@ class Install_Controller
         {
             if ($db['supported'])
             {
-                if (!empty($db['additional_file']) && !file_exists(__DIR__ . '/' . $db['additional_file']))
+                if (!empty($db['additional_file']) && !file_exists(__DIR__ . 'Install_Controller.php/' . $db['additional_file']))
                 {
                     $databases[$key]['supported'] = false;
                     $notFoundSQLFile = true;
@@ -785,7 +785,7 @@ class Install_Controller
 
         if (!empty($databases[$db_type]['additional_file']))
         {
-            parse_sqlLines(__DIR__ . '/' . $databases[$db_type]['additional_file'], $replaces);
+            parse_sqlLines(__DIR__ . 'Install_Controller.php/' . $databases[$db_type]['additional_file'], $replaces);
         }
 
         // Read in the SQL.  Turn this on and that off... internationalize... etc.

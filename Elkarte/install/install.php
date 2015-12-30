@@ -58,7 +58,7 @@ function initialize_inputs()
 	error_reporting(E_ALL | E_STRICT);
 
 	if (!defined('TMP_BOARDDIR'))
-		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
+		define('TMP_BOARDDIR', realpath(__DIR__ . '/Elkarte'));
 
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))

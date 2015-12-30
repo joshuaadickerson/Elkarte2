@@ -1,9 +1,9 @@
-Settings.php
-Settings_bak.php
+Elkarte/Settings.php
+Elkarte/Settings_bak.php
 db_last_error.php
-cache/data*.php
-Packages/backups/*
-Packages/temp
+Elkarte/cache/data*.php
+Elkarte/packages/backups/*
+Elkarte/packages/temp
 *.*~
 .buildpath
 .project

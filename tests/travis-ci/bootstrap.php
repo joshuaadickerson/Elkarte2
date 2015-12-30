@@ -30,7 +30,7 @@ if (!defined('ELK'))
 	DEFINE('CACHE_STALE', '?R11');
 
 	// Get the forum's settings for database and file paths.
-	require_once('/var/www/Settings.php');
+	require_once('/var/www/Elkarte/Settings.php');
 
 	// Set our site "variable" constants
 	DEFINE('BOARDDIR', $boarddir);
@@ -42,12 +42,13 @@ if (!defined('ELK'))
 	DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 	DEFINE('SUBSDIR', $sourcedir . '/subs');
 	DEFINE('ADDONSDIR', $sourcedir . '/addons');
+	DEFINE('VENDORDIR', $vendordir . '/vendor');
 }
 else
-	require_once('/var/www/Settings.php');
+	require_once('/var/www/Elkarte/Settings.php');
 
 // A few files we cannot live without and will not be autoload
-require_once(SOURCEDIR . '/Session.php');
+require_once(VENDORDIR . '/autoload.php');
 require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
@@ -60,6 +61,8 @@ $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 
+$elk = new Pimple\Container;
+
 // Used by the test, add others as needed or ...
 $context = array();
 $context['forum_name'] = $mbname;
@@ -67,7 +70,6 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 
 // Just like we are starting, almost
 Request::instance()->cleanRequest()->parseRequest();
-
 loadDatabase();
 Hooks::init(database(), Debug::get());
 reloadSettings();

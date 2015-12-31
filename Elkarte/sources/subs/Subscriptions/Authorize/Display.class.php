@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Subscriptions\Authorize;
+
 /**
  * Payment Gateway: Authorize
  *
@@ -23,7 +25,7 @@ if (!defined('ELK'))
  *
  * @package Subscriptions
  */
-class Authorize_Display
+class Authorize
 {
 	/**
 	 * Title of this payment gateway

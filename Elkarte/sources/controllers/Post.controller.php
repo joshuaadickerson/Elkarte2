@@ -833,7 +833,7 @@ class Post_Controller extends Action_Controller
 				}
 
 				// Now make sure this email address is not banned from posting.
-				isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
+				$this->elk['ban_check']->isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 			}
 
 			// In case they are making multiple posts this visit, help them along by storing their name.

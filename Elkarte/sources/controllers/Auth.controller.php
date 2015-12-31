@@ -746,7 +746,7 @@ function doLogin()
 	$user_info['is_admin'] = $user_settings['id_group'] == 1 || in_array(1, $user_settings['additional_groups']);
 
 	// Are you banned?
-	is_not_banned(true);
+	$GLOBALS['elk']['ban_check']->isNotBanned(true);
 
 	// An administrator, set up the login so they don't have to type it again.
 	if ($user_info['is_admin'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))

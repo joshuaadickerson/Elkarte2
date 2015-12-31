@@ -22,7 +22,7 @@ namespace Themes\DefaultTheme;
 if (!defined('ELK'))
     die('No access...');
 
-class Theme extends \Theme
+class Theme extends \AbstractTheme
 {
     protected $id = 0;
 

@@ -480,7 +480,7 @@ class Hooks
 		}
 
 		// Get the permanent functions.
-		$request = $this->_db->query('', '
+		$request = $this->_db->select('', '
 			SELECT variable, value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}

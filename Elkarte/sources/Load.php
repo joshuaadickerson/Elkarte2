@@ -401,8 +401,6 @@ function loadBoard()
 	$db = database();
 	$cache = Cache::instance();
 
-	$parser = \BBC\ParserWrapper::getInstance();
-
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	$context['user']['is_mod'] = &$user_info['is_mod'];
@@ -683,13 +681,13 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings;
+	global $user_info, $board, $board_info, $modSettings, $elk;
 
 	$db = database();
 
 	if ($user_info['is_admin'])
 	{
-		banPermissions();
+		$elk['ban_check']->banPermissions();
 		return;
 	}
 
@@ -710,7 +708,7 @@ function loadPermissions()
 		if ($cache->checkLevel(2) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			list ($user_info['permissions']) = $temp;
-			banPermissions();
+			$elk['ban_check']->banPermissions();
 
 			return;
 		}
@@ -784,7 +782,7 @@ function loadPermissions()
 		$cache->put('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
 
 	// Banned?  Watch, don't touch..
-	banPermissions();
+	$elk['ban_check']->banPermissions();
 
 	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
 	if (!$user_info['is_guest'])

@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Subscriptions\PayPal;
+
 /**
  * Payment Gateway: PayPal
  *

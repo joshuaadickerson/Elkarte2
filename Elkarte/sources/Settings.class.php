@@ -4,7 +4,8 @@ namespace ElkArte;
 
 class Settings implements \ArrayAccess
 {
-	protected $group_keys = array(0);
+	protected $data = [];
+	protected $group_keys = array('settings' => []);
 
 	public function __construct(\Database $db, \Cache $cache, \Errors $errors)
 	{
@@ -24,33 +25,41 @@ class Settings implements \ArrayAccess
 	protected function loadDefaults()
 	{
 		$defaults = array(
-			'defaultMaxTopics'   	=> 20,
-			'defaultMaxMessages' 	=> 15,
-			'defaultMaxMembers'		=> 30,
-			'subject_length' 		=> 24,
+			'defaultMaxTopics'   			=> 20,
+			'defaultMaxMessages' 			=> 15,
+			'defaultMaxMembers'				=> 30,
+			'subject_length' 				=> 24,
+			'currentAttachmentUploadDir' 	=> 1,
 		);
 
 		foreach ($defaults as $key => $value)
 		{
 			if (!isset($this->data[$key]))
 			{
-				$this->data($key, $value);
+				$this->data[$key] = $value;
 			}
 		}
 	}
 
 	public function isAutoloaded($key)
 	{
-		return isset($this->group_keys[0][$key]);
+		return isset($this->group_keys['settings'][$key]);
 	}
 
-	public function getByGroup($group)
+	public function getByGroup($group, $no_cache = false)
 	{
-		$group = (int) $group;
+		$group = (string) $group;
 
 		if (!isset($this->group_keys[$group]))
 		{
-			$this->loadFromCache($group);
+			if (!$no_cache)
+			{
+				$this->loadFromCache($group);
+			}
+			else
+			{
+				$this->loadFromDatabase($group);
+			}
 		}
 
 		$return = array();
@@ -62,14 +71,43 @@ class Settings implements \ArrayAccess
 		return $return;
 	}
 
-	protected function loadFromDatabase($group = 0)
+	protected function loadFromDatabase($group = '')
 	{
+		$request = $this->db->select('', '
+			SELECT variable, value
+			FROM {db_prefix}settings
+			WHERE key_group = {string:key_group}',
+			[
+				'key_group' => $group,
+			]
+		);
 
+		if (!$request)
+			$this->errors->display_db_error();
+
+		while ($row = $this->db->fetch_row($request))
+		{
+			$this->data[$row[0]] = $row[1];
+
+			$this->group_keys[$group] = $row[0];
+		}
+
+		$this->db->free_result($request);
+
+		$this->group_keys[$group] = array_unique($this->group_keys);
 	}
 
-	protected function loadFromCache($group = 0)
+	protected function loadFromCache($group = '')
 	{
+		$result = $this->cache->get('settings-' . $group);
 
+		if ($this->cache->isMiss())
+		{
+			$result = $this->loadFromDatabase($group);
+			$this->cache->put('settings-' . $group, $this->data[$group]);
+		}
+
+		return $result;
 	}
 
 

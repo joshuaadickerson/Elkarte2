@@ -25,6 +25,8 @@ class Templates
     protected $templates = array();
     protected $default_loaded = false;
 
+    protected $subtemplate = 'main';
+
     public static function getInstance()
     {
         if (self::$instance === null)
@@ -186,7 +188,7 @@ class Templates
      * @param bool|string $fatal = false, $fatal = true is for templates that
      *                 shouldn't get a 'pretty' error screen 'ignore' to skip
      */
-    public function loadSubTemplate($sub_template_name, $fatal = false)
+    public function loadSubTemplate($sub_template_name = 'main', $fatal = false)
     {
         global $txt, $db_show_debug;
 
@@ -202,6 +204,13 @@ class Templates
             Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
         elseif ($fatal !== 'ignore')
             die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+    }
+
+    public function setSubTemplate($name)
+    {
+        $this->subtemplate = $name;
+        $context['sub_template'] = &$this->subtemplate;
+        return $this;
     }
 
     /**

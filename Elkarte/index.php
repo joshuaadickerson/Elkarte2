@@ -30,8 +30,10 @@ const ELK = '1';
 // Shortcut for the browser cache stale
 const CACHE_STALE = '?R11';
 
-// Report errors but not depreciated ones
-error_reporting(E_ALL | E_STRICT & ~8192);
+// Report errors but not deprecated ones
+// @todo before release turn this back or maybe we should just let the environment decide what to do?
+//error_reporting(E_ALL | E_STRICT & ~8192);
+error_reporting(E_ALL);
 
 // Directional only script time usage for display
 if (function_exists('getrusage'))
@@ -112,11 +114,11 @@ $autoloder->register(SOURCEDIR, '\\ElkArte');
 
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
-	Debug::get()->rusage('start', $rusage_start);
+	$elk['debug']->rusage('start', $rusage_start);
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
-	Errors::instance()->display_maintenance_message();
+	$elk['errors']->display_maintenance_message();
 
 // Clean the request.
 $elk['req']->cleanRequest()->parseRequest();
@@ -125,7 +127,7 @@ $elk['req']->cleanRequest()->parseRequest();
 loadDatabase();
 
 // Let's set up out shiny new hooks handler.
-Hooks::init(database(), Debug::get());
+Hooks::init($elk['db'], $elk['debug']);
 
 // It's time for settings loaded from the database.
 reloadSettings();
@@ -223,7 +225,7 @@ function elk_main(\Pimple\Container $elk)
 	loadBBCParsers();
 
 	// Check if the user should be disallowed access.
-	is_not_banned();
+	$elk['ban_check']->isNotBanned();
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))

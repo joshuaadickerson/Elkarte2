@@ -525,7 +525,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// @todo move to controller
 	// You may not be allowed to register this email.
 	if (!empty($regOptions['check_email_ban']))
-		isBannedEmail($regOptions['email'], 'cannot_register', $txt['ban_register_prohibited']);
+		$GLOBALS['elk']['ban_check']->isBannedEmail($regOptions['email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 	// Check if the email address is in use.
 	if (userByEmail($regOptions['email'], $regOptions['username']))

@@ -105,6 +105,8 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	 */
 	public function action_index()
 	{
+		loadBoard();
+
 		// Forward to message index, it's not like we know much more :P
 		$this->action_messageindex();
 	}

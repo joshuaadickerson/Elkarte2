@@ -90,6 +90,13 @@ $elk['debug'] = function () {
 };
 
 /**
+ * @return BanCheck
+ */
+$elk['ban_check'] = function () use ($elk) {
+	return new BanCheck($elk['http_req'], $elk['db'], $elk['errors'], $elk['hooks']);
+};
+
+/**
  * @return \BBC\ParserWrapper
  */
 $elk['bbc'] = function () {
@@ -122,3 +129,5 @@ $elk['censor'] = function () {
 $elk['action'] = function () {
 	return isset($_GET['action']) ? $_GET['action'] : '';
 };
+
+return $elk;

@@ -149,7 +149,7 @@ class Xml_Controller extends Action_Controller
 		$validation = validateSession();
 		if ($validation === true)
 		{
-			$controller = new CoreFeatures_Controller(new Event_Manager());
+			$controller = new CoreFeatures_Controller($this->elk, new Event_Manager());
 			$controller->pre_dispatch();
 			$result = $controller->action_index();
 

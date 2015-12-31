@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Subscriptions\twoCheckOut;
+
 /**
  * Payment Gateway: twoCheckOut
  *

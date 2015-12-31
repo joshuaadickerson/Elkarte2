@@ -251,4 +251,61 @@ abstract class Action_Controller
 			$this->_events->register($name, array($name, array($class, $method, 0)));
 		}
 	}
+
+	// @todo move is_not_guest() to here
+	protected function isNotGuest($message = '', $is_fatal = true)
+	{
+		global $user_info, $txt, $context, $scripturl;
+
+		// Luckily, this person isn't a guest.
+		if (isset($user_info['is_guest']) && !$user_info['is_guest'])
+			return true;
+
+		// People always worry when they see people doing things they aren't actually doing...
+		$_GET['action'] = '';
+		$_GET['board'] = '';
+		$_GET['topic'] = '';
+		writeLog(true);
+
+		// Just die.
+		if (isset($_REQUEST['xml']) || !$is_fatal)
+			obExit(false);
+
+		// Attempt to detect if they came from dlattach.
+		if (ELK != 'SSI' && empty($context['theme_loaded']))
+			loadTheme();
+
+		// Never redirect to an attachment
+		if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+
+		// Load the Login template and language file.
+		loadLanguage('Login');
+
+		// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
+		if (!$this->_layers->hasLayers())
+		{
+			$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
+			redirectexit('action=login');
+		}
+		elseif (isset($_GET['api']))
+			return false;
+		else
+		{
+			$this->_templates->load('Login');
+			loadJavascriptFile('sha256.js', array('defer' => true));
+			$context['sub_template'] = 'kick_guest';
+			$context['robot_no_index'] = true;
+		}
+
+		// Use the kick_guest sub template...
+		$context['kick_message'] = $message;
+		$context['page_title'] = $txt['login'];
+
+		obExit();
+
+		// We should never get to this point, but if we did we wouldn't know the user isn't a guest.
+		trigger_error('Hacking attempt...', E_USER_ERROR);
+	}
+
 }

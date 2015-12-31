@@ -45,6 +45,8 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function action_index()
 	{
+		loadBoard();
+
 		// What to do... boardindex, 'course!
 		$this->action_boardindex();
 	}

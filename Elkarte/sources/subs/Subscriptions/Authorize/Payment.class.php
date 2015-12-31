@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Subscriptions\Authorize;
+
 /**
  * Payment Gateway: Authorize
  *

@@ -556,7 +556,7 @@ class Emailuser_Controller extends Action_Controller
 			if (!Data_Validator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
 				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
-			isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
+			$this->elk['ban_check']->isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
 			$user_info['email'] = htmlspecialchars($this->_req->post->email, ENT_COMPAT, 'UTF-8');
 		}

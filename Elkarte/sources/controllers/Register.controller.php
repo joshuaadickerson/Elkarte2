@@ -835,7 +835,7 @@ class Register_Controller extends Action_Controller
 			}
 
 			// Make sure their email isn't banned.
-			isBannedEmail($this->_req->post->new_email, 'cannot_register', $txt['ban_register_prohibited']);
+			$this->elk['ban_check']->isBannedEmail($this->_req->post->new_email, 'cannot_register', $txt['ban_register_prohibited']);
 
 			// Ummm... don't take someone else's email during the change
 			// @todo Separate the sprintf?

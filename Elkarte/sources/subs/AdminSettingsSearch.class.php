@@ -228,6 +228,8 @@ class AdminSettings_Search
 	 */
 	private function _load_settings($settings_search)
 	{
+		global $elk;
+
 		$settings = array();
 
 		foreach ($settings_search as $setting_area)
@@ -236,7 +238,8 @@ class AdminSettings_Search
 			if (isset($setting_area[2]))
 			{
 				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2]();
+				// @todo this is a really bad way of doing this. Shouldn't it be calling the dispatcher?
+				$controller = new $setting_area[2]($elk);
 				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}

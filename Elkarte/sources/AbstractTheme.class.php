@@ -20,7 +20,7 @@
 if (!defined('ELK'))
     die('No access...');
 
-abstract class Theme
+abstract class AbstractTheme
 {
     const STANDARD = 'standard';
     const DEFERRED = 'defer';

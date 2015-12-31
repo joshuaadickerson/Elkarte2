@@ -65,7 +65,7 @@
 						new_url = '',
 						i = 0;
 
-					// The admin area is a bit different unfortunately
+					// The Admin area is a bit different unfortunately
 					if (settings.admin)
 					{
 						settings.imageURL = $('#verification_image' + uniqueID).attr('src').replace(/.$/, '') + $this.val();

@@ -103,7 +103,7 @@ class Ila_Integrate
 		// Enabled and we have ila tags, then hide them from parsebbc where approriate
 		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
-			require_once(SUBSDIR . '/InLineAttachment.class.php');
+			require_once(SUBSDIR . '/InLineAttachment.php');
 			ila_hide_bbc($message);
 		}
 	}

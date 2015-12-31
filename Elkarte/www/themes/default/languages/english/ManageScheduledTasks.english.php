@@ -9,7 +9,7 @@ $txt['scheduled_tasks_regularity'] = 'Regularity';
 $txt['scheduled_tasks_enabled'] = 'Enabled';
 $txt['scheduled_tasks_run_now'] = 'Run Now';
 $txt['scheduled_tasks_save_changes'] = 'Save Changes';
-$txt['scheduled_tasks_time_offset'] = '<strong>Note:</strong> All times given below are <em>server time</em> and do not take any time offsets setup within the admin panel into account.';
+$txt['scheduled_tasks_time_offset'] = '<strong>Note:</strong> All times given below are <em>server time</em> and do not take any time offsets setup within the Admin panel into account.';
 $txt['scheduled_tasks_were_run'] = 'All selected tasks were completed';
 $txt['scheduled_tasks_were_run_errors'] = 'The following errors occurred while running the scheduled tasks:';
 
@@ -35,7 +35,7 @@ $txt['scheduled_task_desc_remove_topic_redirect'] = 'Deletes "MOVED:" topic noti
 $txt['scheduled_task_remove_temp_attachments'] = 'Remove Temporary Attachment Files';
 $txt['scheduled_task_desc_remove_temp_attachments'] = 'Deletes temporary files created while attaching a file to a post that for any reason weren\'t renamed or deleted before.';
 $txt['scheduled_task_remove_old_drafts'] = 'Remove Old Drafts';
-$txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the admin panel.';
+$txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the Admin panel.';
 $txt['scheduled_task_remove_old_followups'] = 'Remove Old Follow-ups';
 $txt['scheduled_task_desc_remove_old_followups'] = 'Deletes follow-up entries still present in the database, but pointing to non-existent topics.';
 $txt['scheduled_task_maillist_fetch_IMAP'] = 'Fetch Emails from IMAP';

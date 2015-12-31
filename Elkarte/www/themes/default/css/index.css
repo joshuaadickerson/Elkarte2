@@ -52,7 +52,7 @@
 /* Width control for top bar, header, main content and footer content. */
 .wrapper {
 	margin: 0 auto;
-	/* Next controls forum width, when it is not set in admin. */
+	/* Next controls forum width, when it is not set in Admin. */
 	width: 90%;
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */
@@ -989,8 +989,8 @@ a.bbc_link {
 /*	$MENUS                                                 */
 /* ------------------------------------------------------- */
 /* This section contains code for the main forum menu (#main_menu),
-/* and for the secondary menus in admin/profile/pm (.admin_menu),
-/* and for the tertiary menu strip in admin/etc (#adm_submenus).
+/* and for the secondary menus in Admin/profile/pm (.admin_menu),
+/* and for the tertiary menu strip in Admin/etc (#adm_submenus).
 /*
 /* Top level <ul> elements have the class or id mentioned above.
 /* <li> elements are for positioning only (classes are listlevel1, etc).
@@ -1007,12 +1007,12 @@ a.bbc_link {
 	position: relative;
 }
 
-/* Wrapper for primary admin/profile/etc menus. */
+/* Wrapper for primary Admin/profile/etc menus. */
 .admin_menu {
 	padding: 0 3px;
 }
 
-/* Wrapper for secondary admin/profile/etc menus. */
+/* Wrapper for secondary Admin/profile/etc menus. */
 #adm_submenus {
 	overflow: auto;
 	padding: 0 3px;
@@ -4461,8 +4461,8 @@ a.help .icon {
 	text-align: justify;
 }
 
-/* Common for all admin sections. */
-/* The admin logon form */
+/* Common for all Admin sections. */
+/* The Admin logon form */
 #admin_content {
 	clear: both;
 	padding-top: 8px;

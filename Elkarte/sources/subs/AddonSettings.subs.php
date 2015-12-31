@@ -190,7 +190,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 		theme()->addInlineJavascript('
 			var hook_name_header = document.getElementById(\'header_list_integration_hooks_hook_name\');
 			hook_name_header.innerHTML += ' . JavaScriptEscape('
-				<select onchange="window.location = \'' . $scripturl . '?action=admin;area=maintain;sa=hooks\' + (this.value ? \';filter=\' + this.value : \'\');">
+				<select onchange="window.location = \'' . $scripturl . '?action=Admin;area=maintain;sa=hooks\' + (this.value ? \';filter=\' + this.value : \'\');">
 					<option>---</option>
 					<option value="">' . $txt['hooks_reset_filter'] . '</option>' . implode('', $hooks_filters) . '</select>' . '
 				</select>') . ';', true);

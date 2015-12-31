@@ -282,7 +282,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		Errors::instance()->fatal_lang_error('email_error_no_filter');
+		$GLOBALS['elk']['errors']->fatal_lang_error('email_error_no_filter');
 
 	return $row;
 }
@@ -310,7 +310,7 @@ function maillist_delete_filter_parser($id)
 }
 
 /**
- * Creates a select list of boards for the admin
+ * Creates a select list of boards for the Admin
  *
  * - Sets the first one as a blank for use in a template select element
  *

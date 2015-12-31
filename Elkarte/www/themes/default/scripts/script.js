@@ -656,7 +656,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
 }
 
 /**
- * Password hashing for admin login
+ * Password hashing for Admin login
  *
  * @param {type} doForm
  * @param {type} username

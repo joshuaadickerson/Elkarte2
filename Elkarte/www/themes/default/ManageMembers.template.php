@@ -24,7 +24,7 @@ function template_search_members()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" id="admin_form_wrapper">
+		<form action="', $scripturl, '?action=Admin;area=viewmembers" method="post" accept-charset="UTF-8" id="admin_form_wrapper">
 			<h2 class="category_header">
 					<span class="floatleft">', $txt['search_for'], '</span>
 					<span class="smalltext floatright">', $txt['wild_cards_allowed'], '</span>
@@ -236,7 +236,7 @@ function template_search_members()
 }
 
 /**
- * Template to browse members in admin panel
+ * Template to browse members in Admin panel
  */
 function template_admin_browse()
 {
@@ -247,12 +247,12 @@ function template_admin_browse()
 
 	template_show_list('approve_list');
 
-	// If we have lots of outstanding members try and make the admin's life easier.
+	// If we have lots of outstanding members try and make the Admin's life easier.
 	if ($context['approve_list']['total_num_items'] > 10)
 	{
 		echo '
 		<br />
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" name="postFormOutstanding" id="postFormOutstanding" onsubmit="return onOutstandingSubmit();">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=viewmembers" method="post" accept-charset="UTF-8" name="postFormOutstanding" id="postFormOutstanding" onsubmit="return onOutstandingSubmit();">
 			<h2 class="category_header">', $txt['admin_browse_outstanding'], '</h2>
 			<script><!-- // --><![CDATA[
 				function onOutstandingSubmit()

@@ -50,8 +50,8 @@ $db_show_debug = false;
 // Where the Settings.php file is located
 $settings_loc = '../Settings.php';
 
-// First thing: if the install dir exists, just send anybody there
-if (file_exists('install'))
+// First thing: if the Install dir exists, just send anybody there
+if (file_exists('Install'))
 {
 	if (file_exists($settings_loc))
 	{
@@ -61,7 +61,7 @@ if (file_exists('install'))
 	// The ignore_install_dir var is for developers only. Do not add it on production sites
 	if (empty($GLOBALS['ignore_install_dir']))
 	{
-		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/install.php');
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/Install/Install.php');
 		die;
 	}
 }
@@ -73,8 +73,8 @@ else
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists('agreement.txt'))
 	$boarddir = __DIR__;
-if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
-	$sourcedir = $boarddir . '/sources';
+if (!file_exists($sourcedir . '/SiteDispatcher.php') && file_exists($boarddir . '/Sources'))
+	$sourcedir = $boarddir . '/Sources';
 
 // Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
@@ -91,26 +91,28 @@ DEFINE('EXTDIR', $extdir);
 DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
-DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('CONTROLLERDIR', $sourcedir . '/Controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 DEFINE('ADDONSDIR', $boarddir . '/addons');
 DEFINE('VENDORDIR', $vendordir . '/vendor');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir, $vendordir);
 
 // Files we cannot live without.
-require_once(VENDORDIR . '/autoload.php');
-require_once(SOURCEDIR . '/Services.php');
-require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Logging.php');
-require_once(SOURCEDIR . '/Load.php');
-require_once(SOURCEDIR . '/Security.php');
-require_once(SUBSDIR . '/Cache.subs.php');
+require_once(__DIR__ . '/src/Elkarte/Subs.php');
+require_once(__DIR__ . '/src/Elkarte/Logging.php');
+require_once(__DIR__ . '/src/Elkarte/Load.php');
+require_once(__DIR__ . '/src/Elkarte/Security/Security.php');
+require_once(__DIR__ . '/src/Elkarte/Cache/Cache.subs.php');
 
 // Initialize the class Autoloader
-require(SOURCEDIR . '/Autoloader.class.php');
-$autoloder = Elk_Autoloader::getInstance();
-$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-$autoloder->register(SOURCEDIR, '\\ElkArte');
+//require(SOURCEDIR . '/Autoloader.class.php');
+//$autoloder = Elk_Autoloader::getInstance();
+//$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+//$autoloder->register(SOURCEDIR, '\\ElkArte');
+
+require_once(VENDORDIR . '/autoload.php');
+require_once(__DIR__ . '/src/Elkarte/Services.php');
+
 
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
@@ -124,10 +126,13 @@ if (!empty($maintenance) && $maintenance == 2)
 $elk['req']->cleanRequest()->parseRequest();
 
 // Initiate the database connection and define some database functions to use.
-loadDatabase();
+if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	loadDatabase($db_persist, $db_server, $ssi_db_user, $ssi_db_passwd, $db_port, $db_type, $db_name, $db_prefix);
+else
+	loadDatabase($db_persist, $db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix);
 
 // Let's set up out shiny new hooks handler.
-Hooks::init($elk['db'], $elk['debug']);
+//Hooks::init($elk['db'], $elk['debug']);
 
 // It's time for settings loaded from the database.
 reloadSettings();
@@ -214,7 +219,7 @@ function elk_main(\Pimple\Container $elk)
 	// Attachments don't require the entire theme to be loaded.
 	if ($elk['http_req']->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
 	{
-		$detector = new Browser_Detector;
+		$detector = new BrowserDetector;
 		$detector->detectBrowser();
 	}
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)

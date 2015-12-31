@@ -136,7 +136,7 @@ function template_options()
 }
 
 /**
- * Set the theme settings for display and edit in admin panel.
+ * Set the theme settings for display and edit in Admin panel.
  */
 function template_settings()
 {

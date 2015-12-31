@@ -148,7 +148,7 @@ function determineActions($urls, $preferred_prefix = false)
 
 	// Actions that require a specific permission level.
 	$allowedActions = array(
-		'admin' => array('moderate_forum', 'manage_membergroups', 'manage_bans', 'admin_forum', 'manage_permissions', 'send_mail', 'manage_attachments', 'manage_smileys', 'manage_boards', 'edit_news'),
+		'Admin' => array('moderate_forum', 'manage_membergroups', 'manage_bans', 'admin_forum', 'manage_permissions', 'send_mail', 'manage_attachments', 'manage_smileys', 'manage_boards', 'edit_news'),
 		'ban' => array('manage_bans'),
 		'boardrecount' => array('admin_forum'),
 		'calendar' => array('calendar_view'),
@@ -190,8 +190,8 @@ function determineActions($urls, $preferred_prefix = false)
 		if ($actions === false)
 			continue;
 
-		// If it's the admin or moderation center, and there is an area set, use that instead.
-		if (isset($actions['action']) && ($actions['action'] == 'admin' || $actions['action'] == 'moderate') && isset($actions['area']))
+		// If it's the Admin or moderation center, and there is an area set, use that instead.
+		if (isset($actions['action']) && ($actions['action'] == 'Admin' || $actions['action'] == 'moderate') && isset($actions['area']))
 			$actions['action'] = $actions['area'];
 
 		// Check if there was no action or the action is display.
@@ -298,7 +298,7 @@ function determineActions($urls, $preferred_prefix = false)
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
 			}
-			// Viewable only by administrators.. (if it starts with whoadmin, it's admin only!)
+			// Viewable only by administrators.. (if it starts with whoadmin, it's Admin only!)
 			elseif (allowedTo('moderate_forum') && isset($txt['whoadmin_' . $actions['action']]))
 				$data[$k] = $txt['whoadmin_' . $actions['action']];
 			// Viewable by permission level.

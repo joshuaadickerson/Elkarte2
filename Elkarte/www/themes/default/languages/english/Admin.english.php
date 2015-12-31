@@ -2,7 +2,7 @@
 // Version: 1.1; Admin
 
 $txt['admin_boards'] = 'Boards';
-$txt['admin_back_to'] = 'Back to admin panel';
+$txt['admin_back_to'] = 'Back to Admin panel';
 $txt['admin_users'] = 'Members';
 $txt['admin_newsletters'] = 'Newsletters';
 $txt['include_these'] = 'Members to include';
@@ -65,7 +65,7 @@ $txt['admin_ban_name'] = 'Mass-user Ban';
 $txt['remove_groups'] = 'Remove all groups';
 
 $txt['admin_repair'] = 'Repair All boards and topics';
-$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="%3$s/helptopics.png" alt="%2$s" title="%2$s" /> symbols for more information on the related functions.';
+$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, Install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="%3$s/helptopics.png" alt="%2$s" title="%2$s" /> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span>[b]</span>, <span>[i]</span> and <span>[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';
 $txt['administrators'] = 'Forum Administrators';
 $txt['admin_reserved_desc'] = 'Reserved names will keep members from registering certain user names or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
@@ -121,7 +121,7 @@ $txt['attachment_name'] = 'Attachment name';
 $txt['attachment_file_size'] = 'File Size';
 $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set';
 $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set';
-$txt['attachment_delete_admin'] = '[attachment deleted by admin]';
+$txt['attachment_delete_admin'] = '[attachment deleted by Admin]';
 $txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
@@ -783,7 +783,7 @@ $txt['words_sep'] = 'Words separator';
 $txt['admin_order_title'] = 'Ordering Error';
 $txt['admin_order_error'] = 'An unknown error occurred while processing your request';
 
-// Known controllers that can work on the front page
+// Known Controllers that can work on the front page
 $txt['default'] = 'Default';
 $txt['front_page'] = 'Select the action to show on the front page:';
 

@@ -270,7 +270,7 @@ function generateSubscriptionError($text)
 	}
 
 	// Then just log and die.
-	Errors::instance()->log_error($text);
+	$GLOBALS['elk']['errors']->log_error($text);
 
 	exit;
 }

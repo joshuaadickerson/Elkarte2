@@ -46,8 +46,8 @@ function template_servers()
 					<li class="flow_auto">
 						<strong>' . $server['name'] . '</strong>
 						<span class="package_server floatright">
-							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">' . $txt['package_browse'] . '</a>
-							&nbsp;<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">' . $txt['delete'] . '</a>
+							<a class="linkbutton" href="' . $scripturl . '?action=Admin;area=packageservers;sa=browse;server=' . $server['id'] . '">' . $txt['package_browse'] . '</a>
+							&nbsp;<a class="linkbutton" href="' . $scripturl . '?action=Admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">' . $txt['delete'] . '</a>
 						</span>
 					</li>';
 
@@ -56,7 +56,7 @@ function template_servers()
 			</fieldset>
 			<fieldset>
 				<legend>' . $txt['add_server'] . '</legend>
-				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
+				<form action="' . $scripturl . '?action=Admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
 							<label for="servername">' . $txt['server_name'] . ':</label>
@@ -79,7 +79,7 @@ function template_servers()
 			</fieldset>
 			<fieldset>
 				<legend>', $txt['package_download_by_url'], '</legend>
-				<form action="', $scripturl, '?action=admin;area=packageservers;sa=download" method="post" accept-charset="UTF-8">
+				<form action="', $scripturl, '?action=Admin;area=packageservers;sa=download" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
 							<label for="package">' . $txt['serverurl'] . ':</label>
@@ -337,12 +337,12 @@ function template_downloaded()
 				<li>
 					<span class="floatleft"><strong>', $context['package']['name'], '</strong></span>
 					<span class="package_server floatright">', $context['package']['list_files']['link'], '</span>
-					<span class="package_server floatright">', $context['package']['install']['link'], '</span>
+					<span class="package_server floatright">', $context['package']['Install']['link'], '</span>
 				</li>
 			</ul>
 		</div>
 		<div class="submitbutton">
-			<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
+			<a class="linkbutton" href="', $scripturl, '?action=Admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
 		</div>
 	</div>';
 }
@@ -374,7 +374,7 @@ function template_upload()
 
 	echo '
 		<div class="content">
-			<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+			<form action="' . $scripturl . '?action=Admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
 				<dl class="settings">
 					<dt>
 						<label for="package">' . $txt['package_upload_select'] . ':</label>
@@ -394,7 +394,7 @@ function template_upload()
 
 /**
  * Section of package servers tabs
- * It displays a form to connect to admin's FTP account.
+ * It displays a form to connect to Admin's FTP account.
  */
 function template_ftp_form_required()
 {
@@ -406,7 +406,7 @@ function template_ftp_form_required()
 			<p>
 				', $txt['package_ftp_why_download'], '
 			</p>
-			<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=packageservers" method="post" accept-charset="UTF-8">
 				<dl class="settings">
 					<dt>
 						<label for="ftp_server">', $txt['package_ftp_server'], ':</label>

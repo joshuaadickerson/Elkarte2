@@ -128,7 +128,7 @@ function deleteMembers($users, $check_not_admin = false)
 	{
 		$log_changes[] = array(
 			'action' => 'delete_member',
-			'log_type' => 'admin',
+			'log_type' => 'Admin',
 			'extra' => array(
 				'member' => $user[0],
 				'name' => $user[1],
@@ -449,7 +449,7 @@ function deleteMembers($users, $check_not_admin = false)
  * Registers a member to the forum.
  *
  * What it does:
- * - Allows two types of interface: 'guest' and 'admin'. The first
+ * - Allows two types of interface: 'guest' and 'Admin'. The first
  * - includes hammering protection, the latter can perform the registration silently.
  * - The strings used in the options array are assumed to be escaped.
  * - Allows to perform several checks on the input, e.g. reserved names.
@@ -491,7 +491,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
 
 	// Valid emails only
-	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
+	if (!DataValidator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError('bad_email');
 
 	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
@@ -561,7 +561,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-		Errors::instance()->fatal_lang_error('no_theme');
+		$GLOBALS['elk']['errors']->fatal_lang_error('no_theme');
 
 	$tokenizer = new Token_Hash();
 
@@ -573,8 +573,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'password_salt' => $tokenizer->generate_hash(4),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
-		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
-		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
+		'member_ip' => $regOptions['interface'] == 'Admin' ? '127.0.0.1' : $regOptions['ip'],
+		'member_ip2' => $regOptions['interface'] == 'Admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,
 		'real_name' => $regOptions['username'],
 		'personal_text' => $modSettings['default_personal_text'],
@@ -721,7 +721,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	);
 
 	// Administrative registrations are a bit different...
-	if ($regOptions['interface'] == 'admin')
+	if ($regOptions['interface'] == 'Admin')
 	{
 		if ($regOptions['require'] == 'activation')
 			$email_message = 'admin_register_activate';
@@ -753,7 +753,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 			}
 
-			// Send admin their notification.
+			// Send Admin their notification.
 			require_once(SUBSDIR . '/Notification.subs.php');
 			sendAdminNotifications('standard', $memberID, $regOptions['username']);
 		}
@@ -830,7 +830,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			if ($reserved == '')
 				continue;
 
-			// The admin might've used entities too, level the playing field.
+			// The Admin might've used entities too, level the playing field.
 			$reservedCheck = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $reserved);
 
 			// Case sensitive name?
@@ -840,7 +840,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			// If it's not just entire word, check for it in there somewhere...
 			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
-					Errors::instance()->fatal_lang_error('username_reserved', 'password', array($reserved));
+					$GLOBALS['elk']['errors']->fatal_lang_error('username_reserved', 'password', array($reserved));
 				else
 					return true;
 		}
@@ -848,7 +848,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		$censor_name = $name;
 		if (censor($censor_name) != $name)
 			if ($fatal)
-				Errors::instance()->fatal_lang_error('name_censored', 'password', array($name));
+				$GLOBALS['elk']['errors']->fatal_lang_error('name_censored', 'password', array($name));
 			else
 				return true;
 	}
@@ -857,7 +857,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	foreach (array('*') as $char)
 		if (strpos($checkName, $char) !== false)
 			if ($fatal)
-				Errors::instance()->fatal_lang_error('username_reserved', 'password', array($char));
+				$GLOBALS['elk']['errors']->fatal_lang_error('username_reserved', 'password', array($char));
 			else
 				return true;
 
@@ -958,7 +958,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
-				Errors::instance()->fatal_lang_error('no_board');
+				$GLOBALS['elk']['errors']->fatal_lang_error('no_board');
 			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else
@@ -1360,7 +1360,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 }
 
 /**
- * Find out if there is another admin than the given user.
+ * Find out if there is another Admin than the given user.
  *
  * @package Members
  * @param int $memberID ID of the member, to compare with.
@@ -1555,7 +1555,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
  * - It is used in personal messages reporting.
  *
  * @package Members
- * @param int $id_admin = 0 if requested, only data about a specific admin is retrieved
+ * @param int $id_admin = 0 if requested, only data about a specific Admin is retrieved
  */
 function admins($id_admin = 0)
 {
@@ -2258,10 +2258,10 @@ function canContact($who)
 	// 1 = all except ignore
 	elseif ($receive_from == 1)
 		return !(!empty($ignore_list) && in_array($user_info['id'], $ignore_list));
-	// 2 = buddies and admin
+	// 2 = buddies and Admin
 	elseif ($receive_from == 2)
 		return ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)));
-	// 3 = admin only
+	// 3 = Admin only
 	else
 		return (bool) $user_info['is_admin'];
 }

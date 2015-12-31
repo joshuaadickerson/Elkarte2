@@ -375,7 +375,7 @@ function list_getLanguagesList()
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
-				'install_link' => '<a href="' . $scripturl . '?action=admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elk_install'] . '</a>',
+				'install_link' => '<a href="' . $scripturl . '?action=Admin;area=languages;sa=downloadlang;did=' . $file->fetch('id') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['add_language_elk_install'] . '</a>',
 			);
 		}
 		if (empty($languages))

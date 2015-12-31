@@ -5,7 +5,7 @@
 /* Once I can see how it looks without the crud, I can decide what it really needs.
 /* Can be simplified quite a lot before production builds. */
 
-/* @todo - Special styling for admin descriptions. */
+/* @todo - Special styling for Admin descriptions. */
 .action_admin .generic_list_wrapper .information {
 	margin: 8px 0;
 	padding: 4px 12px 2px 12px;
@@ -43,7 +43,7 @@
 	margin-left: 12px;
 }
 
-/* @todo - A general admin wrapper class. */
+/* @todo - A general Admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
 #core_features,
@@ -181,7 +181,7 @@ fieldset dl {
 	margin: 0;
 }
 
-/* Styles for the admin home screen.
+/* Styles for the Admin home screen.
 ------------------------------------------------------- */
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
@@ -313,7 +313,7 @@ fieldset dl {
 	margin: 6px 0;
 }
 
-/* Links to handy sections of admin.
+/* Links to handy sections of Admin.
 ----------------------------------*/
 /* The <li>'s here have been set to a height in em with hidden overflow.
 /* Yes, this will clip the blurb when using very large font sizes on a narrowish screen.
@@ -348,7 +348,7 @@ fieldset dl {
 /* Hey, people might actually want to put their names on it now!
 /* Only a couple of trivial markup hacks that wont break any mods or themes.
 /* The older I get, the more devious I get. :D
-/* Nobody ever themes admin anyway. That's why it looked like crap.
+/* Nobody ever themes Admin anyway. That's why it looked like crap.
 -----------------------------------------------------------------*/
 #support_credits {
 	position: relative;

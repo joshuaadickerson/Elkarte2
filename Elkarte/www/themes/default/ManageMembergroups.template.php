@@ -36,7 +36,7 @@ function template_new_group()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" name="new_group" action="', $scripturl, '?action=admin;area=membergroups;sa=add" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" name="new_group" action="', $scripturl, '?action=Admin;area=membergroups;sa=add" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['membergroups_new_group'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -149,7 +149,7 @@ function template_new_group()
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['membergroups_add_group'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
+					<input type="hidden" name="', $context['Admin-mmg_token_var'], '" value="', $context['Admin-mmg_token'], '" />
 				</div>
 			</div>';
 
@@ -184,7 +184,7 @@ function template_edit_group()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" name="groupForm" action="', $scripturl, '?action=admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" >
+		<form id="admin_form_wrapper" name="groupForm" action="', $scripturl, '?action=Admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" >
 			<h2 class="category_header">', $txt['membergroups_edit_group'], ' - ', $context['group']['name'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -348,7 +348,7 @@ function template_edit_group()
 					<input type="submit" name="save" value="', $txt['membergroups_edit_save'], '" />', $context['group']['allow_delete'] ? '
 					<input type="submit" name="delete" value="' . $txt['membergroups_delete'] . '" onclick="return confirm(\'' . $txt['membergroups_confirm_delete'] . '\');" />' : '', '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
+					<input type="hidden" name="', $context['Admin-mmg_token_var'], '" value="', $context['Admin-mmg_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -413,7 +413,7 @@ function template_edit_group()
 /**
  * Template to edit the boards and groups access to them
  *
- * Accessed with ?action=admin;area=membergroups;sa=add
+ * Accessed with ?action=Admin;area=membergroups;sa=add
  *
  * @param int $form_id
  * @param bool $collapse

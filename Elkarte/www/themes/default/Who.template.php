@@ -67,7 +67,7 @@ function template_whos_online()
 						<div class="online_action">', $txt['who_action'], '</div>
 					</dt>';
 
-	// For every member display their name, time and action (and more for admin).
+	// For every member display their name, time and action (and more for Admin).
 	foreach ($context['members'] as $member)
 	{
 		echo '

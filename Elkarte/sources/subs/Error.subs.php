@@ -147,8 +147,8 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 				$log['errors'][$row['id_error']]['file'] = array(
 				'file' => $row['file'],
 				'line' => $row['line'],
-				'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
-				'link' => $linkfile ? '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
+				'href' => $scripturl . '?action=Admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
+				'link' => $linkfile ? '<a href="' . $scripturl . '?action=Admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
 				'search' => base64_encode($row['file']),
 			);
 		}
@@ -194,7 +194,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 		$types[$sum] = array(
 			'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 			'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
+			'url' => $scripturl . '?action=Admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
 			'is_selected' => !empty($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}

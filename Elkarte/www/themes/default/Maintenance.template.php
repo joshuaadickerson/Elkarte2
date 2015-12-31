@@ -40,12 +40,12 @@ function template_maintain_database()
 	<div id="manage_maintenance">
 		<h2 class="category_header">', $txt['maintain_optimize'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=optimize" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=database;activity=optimize" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_optimize_info'], '</p>
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['maintain_run_now'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+					<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 				</div>
 			</form>
 		</div>
@@ -55,7 +55,7 @@ function template_maintain_database()
 			</a> ', $txt['maintain_backup'], '
 		</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_backup_info'], '</p>';
 
 	if ($context['safe_mode_enable'])
@@ -87,7 +87,7 @@ function template_maintain_database()
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+					<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 				</div>
 			</form>
 		</div>';
@@ -97,13 +97,13 @@ function template_maintain_database()
 		echo '
 		<h2 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
 				<p>', $txt['mediumtext_introduction'], '</p>',
 				$context['convert_to_suggest'] ? '<p class="successbox">' . $txt['convert_to_suggest_text'] . '</p>' : '', '
 				<div class="submitbutton">
 					<input type="submit" name="evaluate_conversion" value="', $txt['maintain_run_now'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+					<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 				</div>
 			</form>
 		</div>';
@@ -182,7 +182,7 @@ function template_maintain_members()
 	echo '
 		<h2 class="category_header">', $txt['maintain_reattribute_posts'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=reattribute" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=members;activity=reattribute" method="post" accept-charset="UTF-8">
 				<p><strong>', $txt['reattribute_guest_posts'], '</strong></p>
 				<dl class="settings">
 					<dt>
@@ -213,14 +213,14 @@ function template_maintain_members()
 				<div class="submitbutton">
 					<input type="submit" id="do_attribute" value="', $txt['reattribute'], '" onclick="if (!checkAttributeValidity()) return false;return confirm(warningMessage);" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+					<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 				</div>
 			</form>
 		</div>
 		<h2 class="category_header">
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['maintain_members'], '
 		</h2>
-		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
+		<form action="', $scripturl, '?action=Admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
 			<div class="content">
 				<a id="membersLink"></a>',
 				str_replace(array('{select_conditions}', '{num_days}'), array('
@@ -245,18 +245,18 @@ function template_maintain_members()
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_members_confirm'], '\');" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+				<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 			</div>
 		</form>
 		<h2 class="category_header">', $txt['maintain_recountposts'], '</h2>
-		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
+		<form action="', $scripturl, '?action=Admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
 			<div class="content">
 				', $txt['maintain_recountposts_info'], '
 			</div>
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['maintain_run_now'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+				<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 			</div>
 		</form>
 	</div>
@@ -392,7 +392,7 @@ function template_optimize()
 	echo '
 			</p>
 			<p>
-				<a href="', $scripturl, '?action=admin;area=maintain">', $txt['maintain_return'], '</a>
+				<a href="', $scripturl, '?action=Admin;area=maintain">', $txt['maintain_return'], '</a>
 			</p>
 		</div>
 	</div>';
@@ -430,11 +430,11 @@ function template_convert_msgbody()
 			<p class="successbox">', $txt['convert_to_text'], '</p>';
 
 	echo '
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
 			<hr />
 			<div class="submitbutton">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+				<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 				<input type="submit" name="do_conversion" value="', $txt['convert_proceed'], '" />
 			</div>
 			</form>

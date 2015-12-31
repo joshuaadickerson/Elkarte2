@@ -16,7 +16,7 @@
  */
 
 /**
- * The sidebar menu option. Used for all admin, moderation, profile and PM pages.
+ * The sidebar menu option. Used for all Admin, moderation, profile and PM pages.
  */
 function template_generic_menu_sidebar_above()
 {
@@ -93,7 +93,7 @@ function template_generic_menu_sidebar_above()
 			</ul>';
 	}
 
-	// This is where the actual "main content" area for the admin section starts.
+	// This is where the actual "main content" area for the Admin section starts.
 	echo '
 		</div>
 		<div id="main_admsection">';
@@ -114,7 +114,7 @@ function template_generic_menu_sidebar_below()
 }
 
 /**
- * The drop menu option. Used for all admin, moderation, profile and PM pages.
+ * The drop menu option. Used for all Admin, moderation, profile and PM pages.
  */
 function template_generic_menu_dropdown_above()
 {
@@ -197,7 +197,7 @@ function template_generic_menu_dropdown_above()
 }
 
 /**
- * Part of the admin layer - used with admin_above to close the table started in it.
+ * Part of the Admin layer - used with admin_above to close the table started in it.
  */
 function template_generic_menu_dropdown_below()
 {
@@ -240,7 +240,7 @@ function template_generic_menu_tabs(&$menu_context)
 				elseif (!isset($tab_context['tabs'][$id]['label']))
 					$tab_context['tabs'][$id]['label'] = $tab['label'];
 
-				// Has a custom URL defined in the main admin structure?
+				// Has a custom URL defined in the main Admin structure?
 				if (isset($tab['url']) && !isset($tab_context['tabs'][$id]['url']))
 					$tab_context['tabs'][$id]['url'] = $tab['url'];
 
@@ -317,7 +317,7 @@ function template_generic_menu_tabs(&$menu_context)
 	// Print out all the items in this tab (if any).
 	if (!empty($tab_context['tabs']))
 	{
-		// The admin tabs.
+		// The Admin tabs.
 		echo '
 					<ul id="adm_submenus">';
 

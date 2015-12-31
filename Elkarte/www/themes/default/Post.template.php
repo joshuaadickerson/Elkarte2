@@ -323,7 +323,7 @@ function template_additional_options_below()
 {
 	global $context, $settings, $options, $txt;
 
-	// If the admin has enabled the hiding of the additional options - show a link and image for it.
+	// If the Admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">

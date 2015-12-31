@@ -24,7 +24,7 @@ function template_ManageNews_init()
 }
 
 /**
- * Template for the email to members page in admin panel.
+ * Template for the email to members page in Admin panel.
  * It allows to select members and membergroups.
  */
 function template_email_members()
@@ -33,7 +33,7 @@ function template_email_members()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=news;sa=mailingcompose" method="post" id="admin_newsletters" class="flow_hidden" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=news;sa=mailingcompose" method="post" id="admin_newsletters" class="flow_hidden" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['admin_newsletters'], '</h2>
 			<div class="information">
 				', $txt['admin_news_select_recipients'], '
@@ -194,7 +194,7 @@ function template_email_members_compose()
 
 	echo '
 	<div id="admincenter">
-		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
+		<form name="newsmodify" action="', $scripturl, '?action=Admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h2>
@@ -315,7 +315,7 @@ function template_email_members_send()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
+		<form action="', $scripturl, '?action=Admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
 			</h2>
@@ -369,7 +369,7 @@ function template_email_members_succeeded()
 				', $txt['email_members_succeeded'], '
 			</div>
 			<hr />
-			<a href="', $scripturl, '?action=admin" class="linkbutton right_submit">', $txt['admin_back_to'], '</a>
+			<a href="', $scripturl, '?action=Admin" class="linkbutton right_submit">', $txt['admin_back_to'], '</a>
 		</div>
 	</div>';
 }

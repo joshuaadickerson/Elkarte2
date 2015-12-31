@@ -65,7 +65,7 @@ function template_edit_scheduled_tasks()
 	// Starts off with general maintenance procedures.
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=scheduledtasks;sa=taskedit;save;tid=', $context['task']['id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=scheduledtasks;sa=taskedit;save;tid=', $context['task']['id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['scheduled_task_edit'], '</h2>
 			<div class="information">
 				<em>', sprintf($txt['scheduled_task_time_offset'], $context['server_time']), ' </em>
@@ -110,7 +110,7 @@ function template_edit_scheduled_tasks()
 				</dl>
 				<div class="submitbutton">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-st_token_var'], '" value="', $context['admin-st_token'], '" />
+					<input type="hidden" name="', $context['Admin-st_token_var'], '" value="', $context['Admin-st_token'], '" />
 					<input type="submit" name="save" value="', $txt['scheduled_tasks_save_changes'], '" />
 				</div>
 			</div>

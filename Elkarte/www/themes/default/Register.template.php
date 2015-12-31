@@ -517,7 +517,7 @@ function template_admin_register()
 	echo '
 	<div id="admincenter">
 		<div id="admin_form_wrapper">
-			<form id="postForm" action="', $scripturl, '?action=admin;area=regcenter" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
+			<form id="postForm" action="', $scripturl, '?action=Admin;area=regcenter" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
 				<h2 class="category_header">', $txt['admin_browse_register_new'], '</h2>
 				<div id="register_screen" class="content">';
 
@@ -593,7 +593,7 @@ function template_admin_register()
 						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
+						<input type="hidden" name="', $context['Admin-regc_token_var'], '" value="', $context['Admin-regc_token'], '" />
 					</div>
 				</div>
 			</form>
@@ -610,7 +610,7 @@ function template_edit_agreement()
 
 	// Just a big box to edit the text file ;).
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=regcenter" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['registration_agreement'], '</h2>';
 
 	// Warning for if the file isn't writable.
@@ -660,7 +660,7 @@ function template_edit_agreement()
 						<input type="submit" name="save" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" />
 						<input type="hidden" name="sa" value="agreement" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-rega_token_var'], '" value="', $context['admin-rega_token'], '" />
+						<input type="hidden" name="', $context['Admin-rega_token_var'], '" value="', $context['Admin-rega_token'], '" />
 					</div>
 				</div>
 			</div>
@@ -668,14 +668,14 @@ function template_edit_agreement()
 }
 
 /**
- * Interface to edit reserved words in admin panel.
+ * Interface to edit reserved words in Admin panel.
  */
 function template_edit_reserved_words()
 {
 	global $context, $scripturl, $txt;
 
 	echo '
-		<form id="admin_form_wrapper" class="content" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" class="content" action="', $scripturl, '?action=Admin;area=regcenter" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['admin_reserved_set'], '</h2>
 			<div class="content">
 				<h4>', $txt['admin_reserved_line'], '</h4>
@@ -712,7 +712,7 @@ function template_edit_reserved_words()
 					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-regr_token_var'], '" value="', $context['admin-regr_token'], '" />
+					<input type="hidden" name="', $context['Admin-regr_token_var'], '" value="', $context['Admin-regr_token'], '" />
 				</div>
 			</div>
 		</form>';

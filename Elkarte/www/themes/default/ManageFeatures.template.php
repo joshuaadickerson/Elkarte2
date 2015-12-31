@@ -57,7 +57,7 @@ function template_edit_profile_field()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="content">
 				<fieldset>
@@ -262,7 +262,7 @@ function template_edit_profile_field()
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-ecp_token_var'], '" value="', $context['admin-ecp_token'], '" />
+					<input type="hidden" name="', $context['Admin-ecp_token_var'], '" value="', $context['Admin-ecp_token'], '" />
 				</div>
 			</div>
 		</form>

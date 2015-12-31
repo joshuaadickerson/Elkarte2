@@ -807,7 +807,7 @@ div.bbc_footnotes .meaction {
 	font-size: 1.286em;
 }
 
-/* Level 2: dividers between admin/moderation, and pm/profile links. */
+/* Level 2: dividers between Admin/moderation, and pm/profile links. */
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
 	margin-top: 7px;
 	padding-top: 4px;

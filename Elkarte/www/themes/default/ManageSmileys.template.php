@@ -46,7 +46,7 @@ function template_modifyset()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 			', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
 			</h2>';
@@ -56,7 +56,7 @@ function template_modifyset()
 	{
 		echo '
 			<div class="information">
-				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=', $context['admin-mss_token'], '">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
+				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=Admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-mss_token_var'], '=', $context['Admin-mss_token'], '">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
 			</div>';
 	}
 
@@ -120,7 +120,7 @@ function template_modifyset()
 				<div class="submitbutton">
 					<input type="submit" name="smiley_save" value="', $txt['smiley_sets_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mss_token_var'], '" value="', $context['admin-mss_token'], '" />
+					<input type="hidden" name="', $context['Admin-mss_token_var'], '" value="', $context['Admin-mss_token'], '" />
 					<input type="hidden" name="set" value="', $context['current_set']['id'], '" />
 				</div>
 			</div>
@@ -137,7 +137,7 @@ function template_modifysmiley()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
 			<h2 class="category_header">', $txt['smiley_modify_existing'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -235,7 +235,7 @@ function template_addsmiley()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
 			<h2 class="category_header">', $txt['smileys_add_method'], '</h2>
 			<div class="content">
 				<ul>
@@ -374,7 +374,7 @@ function template_setorder()
 	foreach ($context['smileys'] as $location)
 	{
 		echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $location['title'], '</h2>
 			<div class="information">
 				', $location['description'], '
@@ -386,7 +386,7 @@ function template_setorder()
 		{
 			if (!empty($context['move_smiley']))
 				echo '
-				<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+				<a href="', $scripturl, '?action=Admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 
 			echo '
 				<ul id="smiley_' . $location['id'] . '|' . $key . '" class="sortable_smiley">';
@@ -396,14 +396,14 @@ function template_setorder()
 				if (empty($context['move_smiley']))
 					echo '
 					<li id="smile_' . $smiley['id'] . '">
-						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '">
+						<a href="', $scripturl, '?action=Admin;area=smileys;sa=setorder;move=', $smiley['id'], '">
 							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" />
 						</a>
 					</li>';
 				else
 					echo '
 					<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
-					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '">
+					<a href="', $scripturl, '?action=Admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '">
 						<img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" />
 					</a>';
 			}
@@ -418,7 +418,7 @@ function template_setorder()
 
 		if (!empty($context['move_smiley']))
 			echo '
-				<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $location['last_row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+				<a href="', $scripturl, '?action=Admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $location['last_row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 
 		echo '
 			</div>
@@ -436,10 +436,10 @@ function template_setorder()
 			tag: "[id^=smiley_]",
 			connect: ".sortable_smiley",
 			containment: "document",
-			href: "?action=admin;area=smileys;sa=setorder",
+			href: "?action=Admin;area=smileys;sa=setorder",
 			axis: "",
 			placeholder: "ui-state-highlight",
-			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"}
+			token: {token_var: "' . $context['Admin-sort_token_var'] . '", token_id: "' . $context['Admin-sort_token'] . '"}
 		});
 	// ]]></script>';
 }
@@ -453,7 +453,7 @@ function template_editicon()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editicon;icon=', $context['new_icon'] ? '0' : $context['icon']['id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=smileys;sa=editicon;icon=', $context['new_icon'] ? '0' : $context['icon']['id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $context['new_icon'] ? $txt['icons_new_icon'] : $txt['icons_edit_icon'], '
 			</h2>

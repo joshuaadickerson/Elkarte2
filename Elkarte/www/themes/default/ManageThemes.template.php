@@ -29,7 +29,7 @@ function template_manage_themes()
 			', $txt['themeadmin_explain'], '
 		</div>
 		<div id="admin_form_wrapper">
-			<form action="', $scripturl, '?action=admin;area=theme;sa=admin" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=theme;sa=Admin" method="post" accept-charset="UTF-8">
 				<h2 class="category_header">
 					<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_forum_theme" onclick="return reqOverlayDiv(this.href);" id="theme_forum_theme" title="', $txt['help'], '"></a> ', $txt['theme_forum_theme'], '
 				</h2>
@@ -96,7 +96,7 @@ function template_manage_themes()
 					<div class="submitbutton">
 						<input type="submit" name="save" value="' . $txt['save'] . '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
+						<input type="hidden" name="', $context['Admin-tm_token_var'], '" value="', $context['Admin-tm_token'], '" />
 					</div>
 				</div>
 			</form>';
@@ -105,7 +105,7 @@ function template_manage_themes()
 			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
 			</h2>
-			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
+			<form action="', $scripturl, '?action=Admin;area=theme;sa=Install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="content">';
 
 	// Warn them if theme creation isn't possible!
@@ -148,7 +148,7 @@ function template_manage_themes()
 					<div class="submitbutton">
 						<input type="submit" name="save" value="', $txt['theme_install_go'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-tm_token_var'], '" value="', $context['admin-tm_token'], '" />
+						<input type="hidden" name="', $context['Admin-tm_token_var'], '" value="', $context['Admin-tm_token'], '" />
 					</div>
 				</div>
 			</form>
@@ -170,7 +170,7 @@ function template_list_themes()
 			', $txt['themeadmin_list_tip'], '
 		</div>
 
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8">';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=theme;', $context['session_var'], '=', $context['session_id'], ';sa=list" method="post" accept-charset="UTF-8">';
 
 	// Show each theme.... with X for delete and a link to settings.
 	foreach ($context['themes'] as $theme)
@@ -183,7 +183,7 @@ function template_list_themes()
 		// You *cannot* delete the default theme. It's important!
 		if ($theme['id'] != 1)
 			echo '
-						<a class="delete_theme icon" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '">
+						<a class="delete_theme icon" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=Admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-tr_token_var'], '=', $context['Admin-tr_token'], '">
 							<img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" />
 						</a>';
 		else
@@ -193,7 +193,7 @@ function template_list_themes()
 		echo '
 				</h2>
 				<dl class="content settings themes_list">
-					<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
+					<dt><a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
 					<dt>', $txt['themeadmin_list_theme_dir'], '</dt>
 					<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
 					<dt>', $txt['themeadmin_list_theme_url'], '</dt>
@@ -225,7 +225,7 @@ function template_list_themes()
 			<div class="submitbutton">
 				<input type="submit" name="save" value="', $txt['themeadmin_list_reset_go'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
+				<input type="hidden" name="', $context['Admin-tl_token_var'], '" value="', $context['Admin-tl_token'], '" />
 			</div>
 		</form>
 	</div>';
@@ -256,13 +256,13 @@ function template_reset_list()
 				<h3 class="secondary_header">', $theme['name'], '</h3>
 				<ul class="content">
 					<li>
-						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset">', $txt['themeadmin_reset_defaults'], '</a> <em class="smalltext">(', $theme['num_default_options'], ' ', $txt['themeadmin_reset_defaults_current'], ')</em>
+						<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset">', $txt['themeadmin_reset_defaults'], '</a> <em class="smalltext">(', $theme['num_default_options'], ' ', $txt['themeadmin_reset_defaults_current'], ')</em>
 					</li>
 					<li>
-						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=1">', $txt['themeadmin_reset_members'], '</a>
+						<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=1">', $txt['themeadmin_reset_members'], '</a>
 					</li>
 					<li>
-						<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=2;', $context['admin-stor_token_var'], '=', $context['admin-stor_token'], '" onclick="return confirm(\'', $txt['themeadmin_reset_remove_confirm'], '\');">', $txt['themeadmin_reset_remove'], '</a>
+						<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=reset;who=2;', $context['Admin-stor_token_var'], '=', $context['Admin-stor_token'], '" onclick="return confirm(\'', $txt['themeadmin_reset_remove_confirm'], '\');">', $txt['themeadmin_reset_remove'], '</a>
 						<em class="smalltext">(', $theme['num_members'], ' ', $txt['themeadmin_reset_remove_current'], ')</em>
 					</li>
 				</ul>
@@ -288,7 +288,7 @@ function template_set_options()
 			', $context['theme_options_reset'] ? $txt['themeadmin_reset_options_info'] : $txt['theme_options_defaults'], '
 		</div>';
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
 			<h2 class="category_header">', $context['theme_settings']['name'], '</h2>
 			<div class="content">
@@ -372,7 +372,7 @@ function template_set_options()
 				<div class="submitbutton">
 					<input type="submit" name="submit" value="', $txt['save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-sto_token_var'], '" value="', $context['admin-sto_token'], '" />
+					<input type="hidden" name="', $context['Admin-sto_token_var'], '" value="', $context['Admin-sto_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -391,7 +391,7 @@ function template_set_settings()
 		<h2 class="category_header">
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 		</h2>
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">';
 
 	echo '
 			<h2 class="category_header hdicon cat_img_config">
@@ -399,10 +399,10 @@ function template_set_settings()
 			</h2>
 			<ul class="content">
 				<li>
-					<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
+					<a href="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
 				</li>
 				<li>
-					<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
+					<a href="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
 				</li>
 			</ul>';
 
@@ -589,7 +589,7 @@ function template_set_settings()
 				<div class="submitbutton">
 					<input type="submit" name="save" value="', $txt['save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-sts_token_var'], '" value="', $context['admin-sts_token'], '" />
+					<input type="hidden" name="', $context['Admin-sts_token_var'], '" value="', $context['Admin-sts_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -721,10 +721,10 @@ function template_installed()
 		<h2 class="category_header">', $context['page_title'], '</h2>
 		<div class="content">
 			<p>
-				<a href="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['installed_theme']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['installed_theme']['name'], '</a> ', $txt['theme_installed_message'], '
+				<a href="', $scripturl, '?action=Admin;area=theme;sa=list;th=', $context['installed_theme']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['installed_theme']['name'], '</a> ', $txt['theme_installed_message'], '
 			</p>
 			<p>
-				<a href="', $scripturl, '?action=admin;area=theme;sa=admin;', $context['session_var'], '=', $context['session_id'], '">', $txt['back'], '</a>
+				<a href="', $scripturl, '?action=Admin;area=theme;sa=Admin;', $context['session_var'], '=', $context['session_id'], '">', $txt['back'], '</a>
 			</p>
 		</div>
 	</div>';
@@ -750,18 +750,18 @@ function template_themelist()
 		echo '
 		<div>
 			<h2 class="category_header">
-				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
+				<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
 				<em>(' . $theme['version'] . ')</em>' : '', '
 			</h2>
 			<ul class="content">
 				<li>
-					<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a>
+					<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a>
 				</li>', $theme['can_edit_style'] ? '
 				<li>
-					<a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a>
+					<a href="' . $scripturl . '?action=Admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a>
 				</li>' : '', '
 				<li>
-					<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a>
+					<a href="', $scripturl, '?action=Admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a>
 				</li>
 			</ul>
 		</div>';
@@ -795,7 +795,7 @@ function template_copy_template()
 				<span class="floatright">';
 
 		if ($template['can_copy'])
-			echo '<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy;template=', $template['value'], '" onclick="return confirm(\'', $template['already_exists'] ? $txt['themeadmin_edit_overwrite_confirm'] : $txt['themeadmin_edit_copy_confirm'], '\');">', $txt['themeadmin_edit_do_copy'], '</a>';
+			echo '<a href="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy;template=', $template['value'], '" onclick="return confirm(\'', $template['already_exists'] ? $txt['themeadmin_edit_overwrite_confirm'] : $txt['themeadmin_edit_copy_confirm'], '\');">', $txt['themeadmin_edit_do_copy'], '</a>';
 		else
 			echo $txt['themeadmin_edit_no_copy'];
 
@@ -810,7 +810,7 @@ function template_copy_template()
 }
 
 /**
- * Interface to browse the files of a theme in admin panel.
+ * Interface to browse the files of a theme in Admin panel.
  */
 function template_browse()
 {
@@ -882,7 +882,7 @@ function template_edit_style()
 
 	// Just show a big box.... gray out the Save button if it's not saveable... (ie. not 777.)
 	echo '
-		<form action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8" name="stylesheetForm" id="stylesheetForm">
+		<form action="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8" name="stylesheetForm" id="stylesheetForm">
 			<h2 class="category_header">', $txt['theme_edit'], ' - ', $context['edit_filename'], '</h2>
 			<div class="content">';
 
@@ -899,9 +899,9 @@ function template_edit_style()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
 
 	// Hopefully our token exists.
-	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
+	if (isset($context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
 		echo '
-					<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+					<input type="hidden" name="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
 
 	echo '		</div>
 			</div>
@@ -933,7 +933,7 @@ function template_edit_template()
 	// Just show a big box.... gray out the Save button if it's not saveable... (ie. not 777.)
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['theme_edit'], ' - ', $context['edit_filename'], '</h2>
 			<div class="content">';
 
@@ -955,9 +955,9 @@ function template_edit_template()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
 
 	// You better have one of these to do that
-	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
+	if (isset($context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
 		echo '
-					<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+					<input type="hidden" name="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
 
 	echo '
 				</div>
@@ -989,7 +989,7 @@ function template_edit_file()
 	// Just show a big box.... gray out the Save button if it's not save-able... (ie. not 777.)
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=theme;th=', $context['theme_id'], ';sa=edit" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['theme_edit'], ' - ', $context['edit_filename'], '</h2>
 			<div class="content">
 				<textarea name="entire_file" id="entire_file" cols="80" rows="20" class="edit_file">', $context['entire_file'], '</textarea><br />
@@ -999,9 +999,9 @@ function template_edit_file()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
 
 	// Hopefully it exists.
-	if (isset($context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
+	if (isset($context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token']))
 		echo '
-					<input type="hidden" name="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
+					<input type="hidden" name="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token_var'], '" value="', $context['Admin-te-' . md5($context['theme_id'] . '-' . $context['edit_filename']) . '_token'], '" />';
 
 	echo '
 				</div>

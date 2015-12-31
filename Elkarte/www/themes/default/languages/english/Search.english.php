@@ -41,7 +41,7 @@ $txt['search_settings_desc'] = 'Here you can change the basic settings of the se
 $txt['search_settings_title'] = 'Search Settings';
 
 $txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating.';
-$txt['search_weights_sphinx'] = 'To update weight factors with Sphinx, you must generate and install a new sphinx.conf file.';
+$txt['search_weights_sphinx'] = 'To update weight factors with Sphinx, you must generate and Install a new sphinx.conf file.';
 $txt['search_weights_title'] = 'Search - weights';
 $txt['search_weights_total'] = 'Total';
 $txt['search_weights_save'] = 'Save';
@@ -132,7 +132,7 @@ $txt['show_spider_online'] = 'Show spiders in the online list';
 $txt['show_spider_online_no'] = 'Not at all';
 $txt['show_spider_online_summary'] = 'Show spider quantity';
 $txt['show_spider_online_detail'] = 'Show spider names';
-$txt['show_spider_online_detail_admin'] = 'Show spider names - admin only';
+$txt['show_spider_online_detail_admin'] = 'Show spider names - Admin only';
 
 $txt['spider_name'] = 'Spider Name';
 $txt['spider_last_seen'] = 'Last Seen';

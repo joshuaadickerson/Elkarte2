@@ -78,7 +78,7 @@ function deleteMembergroups($groups)
 	// Log the deletion.
 	$groups_to_log = membergroupsById($groups, 0);
 	foreach ($groups_to_log as $key => $row)
-		logAction('delete_group', array('group' => $row['group_name']), 'admin');
+		logAction('delete_group', array('group' => $row['group_name']), 'Admin');
 
 	Hooks::get()->hook('delete_membergroups', array($groups));
 
@@ -198,7 +198,7 @@ function deleteMembergroups($groups)
 
 	// Have we deleted the spider group?
 	// @memo we are lucky that the group 1 and 0 cannot be deleted
-	// $modSettings['spider_group'] is set to 1 (admin) for regular members (that usually is group 0)
+	// $modSettings['spider_group'] is set to 1 (Admin) for regular members (that usually is group 0)
 	if (isset($modSettings['spider_group']) && in_array($modSettings['spider_group'], $groups))
 		$settings_update['spider_group'] = 0;
 
@@ -213,7 +213,7 @@ function deleteMembergroups($groups)
  *
  * - Requires the manage_membergroups permission.
  * - Function includes a protection against removing from implicit groups.
- * - Non-admins are not able to remove members from the admin group.
+ * - Non-admins are not able to remove members from the Admin group.
  *
  * @package Membergroups
  * @param int[]|int $members
@@ -247,7 +247,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			$members[$key] = (int) $value;
 	}
 
-	// Before we get started, let's check we won't leave the admin group empty!
+	// Before we get started, let's check we won't leave the Admin group empty!
 	if ($groups === null || $groups == 1 || (is_array($groups) && in_array(1, $groups)))
 	{
 		$admins = array();
@@ -287,7 +287,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 
 		// Log what just happened.
 		foreach ($members as $member)
-			logAction('removed_all_groups', array('member' => $member), 'admin');
+			logAction('removed_all_groups', array('member' => $member), 'Admin');
 
 		return true;
 	}
@@ -328,7 +328,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			$protected_groups[] = $row['id_group'];
 		$db->free_result($request);
 
-		// If you're not an admin yourself, you can't touch protected groups!
+		// If you're not an Admin yourself, you can't touch protected groups!
 		$groups = array_diff($groups, array_unique($protected_groups));
 	}
 
@@ -398,7 +398,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
 		foreach ($log_inserts as $extra)
-			logAction('removed_from_group', $extra, 'admin');
+			logAction('removed_from_group', $extra, 'Admin');
 
 	// Mission successful.
 	return true;
@@ -409,7 +409,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  *
  * - Requires the manage_membergroups permission.
  * - Function has protection against adding members to implicit groups.
- * - Non-admins cannot add members to the admin group, or protected groups.
+ * - Non-admins cannot add members to the Admin group, or protected groups.
  *
  * @package Membergroups
  * @param int|int[] $members
@@ -527,7 +527,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
-		logAction('added_to_group', array('group' => $group_names[$group], 'member' => $member), 'admin');
+		logAction('added_to_group', array('group' => $group_names[$group], 'member' => $member), 'Admin');
 
 	return true;
 }
@@ -1043,9 +1043,9 @@ function membergroupById($group_id, $detailed = false, $assignable = false)
  *
  * - the $includes and $excludes array is used for granular filtering the output.
  * - We need to exclude groups sometimes because they are special ones.
- * Example: getBasicMembergroupData(array('admin', 'mod', 'globalmod'));
+ * Example: getBasicMembergroupData(array('Admin', 'mod', 'globalmod'));
  * $includes parameters:
- * - 'admin' includes the admin: id_group = 1
+ * - 'Admin' includes the Admin: id_group = 1
  * - 'mod' includes the local moderator: id_group = 3
  * - 'globalmod' includes the global moderators: id_group = 2
  * - 'member' includes the ungrouped users from id_group = 0
@@ -1089,7 +1089,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	// Include the global moderators?
 	$where .= in_array('globalmod', $includes) ? '' : ' AND id_group != {int:global_mod_group}';
 	// Include the admins?
-	$where .= in_array('admin', $includes) ? '' : ' AND id_group != {int:admin_group}';
+	$where .= in_array('Admin', $includes) ? '' : ' AND id_group != {int:admin_group}';
 	// Local Moderators?
 	$where .= in_array('mod', $includes) ? '' : ' AND id_group != {int:moderator_group}';
 	// Ignore the first post based group?

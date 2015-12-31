@@ -162,7 +162,7 @@ $txt['moveto_noboards'] = 'There are no boards to move this topic to!';
 $txt['topic_already_moved'] = 'This topic %1$s has been moved to the board %2$s, please check its new location before moving it again.';
 
 $txt['already_activated'] = 'We\'d love to process your request, but your account has already been activated.';
-$txt['still_awaiting_approval'] = 'Your account is still awaiting admin approval.';
+$txt['still_awaiting_approval'] = 'Your account is still awaiting Admin approval.';
 
 $txt['invalid_email'] = 'Invalid email address / email address range.<br />Example of a valid email address: evil.user@badsite.com.<br />Example of a valid email address range: *@*.badsite.com';
 $txt['invalid_expiration_date'] = 'Expiration date is not valid';
@@ -171,7 +171,7 @@ $txt['invalid_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address:
 $txt['invalid_tracking_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address: 127.0.0.1<br />Example of a valid IP range: 127.0.0.*';
 $txt['invalid_username'] = 'Member name not found';
 $txt['no_user_selected'] = 'Member not found';
-$txt['no_ban_admin'] = 'Hey! We can\'t let you ban an admin. If you are certain about this, demote them first!';
+$txt['no_ban_admin'] = 'Hey! We can\'t let you ban an Admin. If you are certain about this, demote them first!';
 $txt['no_bantype_selected'] = 'No ban type was selected';
 $txt['ban_not_found'] = 'Ban not found';
 $txt['ban_unknown_restriction_type'] = 'Restriction type unknown';
@@ -279,7 +279,7 @@ $txt['package_no_file'] = 'Unable to find package file!';
 $txt['packageget_unable'] = 'Unable to connect to the server.  Please try using <a href="%1$s" target="_blank" class="new_win">this URL</a> instead.';
 $txt['not_valid_server'] = 'Sorry, packages can only be downloaded like this from servers you have first authorized.';
 $txt['package_cant_uninstall'] = 'This package was either never installed or was already uninstalled - you can\'t uninstall it now.';
-$txt['package_cant_download'] = 'You cannot download or install new packages because the &quot;packages&quot; directory or one of the files in it are not writable!';
+$txt['package_cant_download'] = 'You cannot download or Install new packages because the &quot;packages&quot; directory or one of the files in it are not writable!';
 $txt['package_upload_error_nofile'] = 'You did not select a package to upload.';
 $txt['package_upload_error_failed'] = 'Could not upload package, please check directory permissions!';
 $txt['package_upload_error_exists'] = 'The file you are uploading already exists on the server. Please delete it first, then try again.';
@@ -287,11 +287,11 @@ $txt['package_upload_already_exists'] = 'The package you are trying to upload al
 $txt['package_upload_error_supports'] = 'The package manager currently allows only these file types: %1$s.';
 $txt['package_upload_error_broken'] = 'Package upload failed due to the following error:<br />&quot;%1$s&quot;';
 
-$txt['package_get_error_not_found'] = 'The package you are trying to install cannot be located. You may want to manually upload the package to your &quot;packages&quot; directory.';
-$txt['package_get_error_missing_xml'] = 'The package you are attempting to install is missing the package-info.xml that must be in the root package directory.';
+$txt['package_get_error_not_found'] = 'The package you are trying to Install cannot be located. You may want to manually upload the package to your &quot;packages&quot; directory.';
+$txt['package_get_error_missing_xml'] = 'The package you are attempting to Install is missing the package-info.xml that must be in the root package directory.';
 $txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the &quot;packages&quot; directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your &quot;packages&quot; directory and try again. For example, if the package was called shout.tar.gz you should:<br />1) Download the package to your local PC and extract its files.<br />2) Create a new directory in your &quot;packages&quot; folder using an FTP client, in this example you may call it "shout".<br />3) Upload all the files from the extracted package to this directory.<br />4) Go back to the package manager browse page. The package will be automatically found.';
 $txt['package_get_error_packageinfo_corrupt'] = 'Unable to find any valid information within the package-info.xml file included within the package. There may be an error in the add-on, or the package may be corrupt.';
-$txt['package_get_error_is_theme'] = 'You can\'t install a theme from this section, please use the <a href="{MANAGETHEMEURL}">Theme Management</a> page to upload it';
+$txt['package_get_error_is_theme'] = 'You can\'t Install a theme from this section, please use the <a href="{MANAGETHEMEURL}">Theme Management</a> page to upload it';
 
 $txt['no_membergroup_selected'] = 'No member group selected';
 $txt['membergroup_does_not_exist'] = 'The member group doesn\'t exist or is invalid.';
@@ -411,7 +411,7 @@ $txt['error_custom_field_empty'] = 'The &quot;%1$s&quot; field cannot be left bl
 
 $txt['email_no_template'] = 'The email template &quot;%1$s&quot; could not be found.';
 
-$txt['search_api_missing'] = 'The search API could not be found. Please contact the admin to check they have uploaded the correct files.';
+$txt['search_api_missing'] = 'The search API could not be found. Please contact the Admin to check they have uploaded the correct files.';
 $txt['search_api_not_compatible'] = 'The selected search API the forum is using is out of date - falling back to standard search. Please check the file %1$s.';
 
 // Restore topic/posts

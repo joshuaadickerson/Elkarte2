@@ -328,7 +328,7 @@ function get_file_listing($path, $relative)
 
 	// Is it even a directory?
 	if (!is_dir($path))
-		Errors::instance()->fatal_lang_error('error_invalid_dir', 'critical');
+		$GLOBALS['elk']['errors']->fatal_lang_error('error_invalid_dir', 'critical');
 
 	// Read this directory's contents
 	$entries = array();
@@ -358,7 +358,7 @@ function get_file_listing($path, $relative)
 				'is_template' => false,
 				'is_image' => false,
 				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
+				'href' => $scripturl . '?action=Admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
 				'size' => '',
 			);
 		// A file entry has some more checks
@@ -379,7 +379,7 @@ function get_file_listing($path, $relative)
 				'is_template' => preg_match('~\.template\.php$~', $entry) != 0,
 				'is_image' => preg_match('~\.(jpg|jpeg|gif|bmp|png|ico)$~', $entry) != 0,
 				'is_editable' => $writable && preg_match('~\.(' . $editable . ')$~', $entry) != 0,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
+				'href' => $scripturl . '?action=Admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
 				'size' => $size,
 				'last_modified' => standardTime(filemtime($path . '/' . $entry)),
 			);
@@ -735,7 +735,7 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
-		Errors::instance()->fatal_lang_error('no_access', false);
+		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -901,7 +901,7 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 
 /**
  * Used when installing a theme that is based off an existing theme (an therefore is dependant on)
- * Returns based-on theme directory values needed by the install function in ManageThemes.controller
+ * Returns based-on theme directory values needed by the Install function in ManageThemes.controller
  *
  * @todo may be merged with something else?
  * @param string $based_on name of theme this is based on, will do a LIKE search

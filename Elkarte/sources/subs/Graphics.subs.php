@@ -108,7 +108,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 {
 	$fp = fopen($fileName, 'rb');
 	if (!$fp)
-		Errors::instance()->fatal_lang_error('attach_timeout');
+		$GLOBALS['elk']['errors']->fatal_lang_error('attach_timeout');
 
 	$prev_chunk = '';
 	while (!feof($fp))
@@ -769,7 +769,7 @@ function showCodeImage($code)
 	// from 0 as disabled through to 4 as "Very hard".
 	$imageType = $modSettings['visual_verification_type'];
 
-	// Special case to allow the admin center to show samples.
+	// Special case to allow the Admin center to show samples.
 	if ($user_info['is_admin'] && isset($_GET['type']))
 		$imageType = (int) $_GET['type'];
 

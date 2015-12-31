@@ -28,7 +28,7 @@ class Theme extends \AbstractTheme
 
 
     /**
-     * This is the only template included in the sources.
+     * This is the only template included in the Sources.
      */
     function template_rawdata()
     {
@@ -204,7 +204,7 @@ class Theme extends \AbstractTheme
      * - tabbing in this function is to make the HTML source look proper
      * - outputs jQuery/jQueryUI from the proper source (local/CDN)
      * - if defered is set function will output all JS (source & inline) set to load at page end
-     * - if the admin option to combine files is set, will use Combiner.class
+     * - if the Admin option to combine files is set, will use Combiner.class
      *
      * @param bool $do_defered = false
      */
@@ -273,7 +273,7 @@ class Theme extends \AbstractTheme
      * Output the CSS files
      *
      * What it does:
-     *  - If the admin option to combine files is set, will use Combiner.class
+     *  - If the Admin option to combine files is set, will use Combiner.class
      */
     function template_css()
     {
@@ -340,7 +340,7 @@ class Theme extends \AbstractTheme
             template_show_error('new_version_updates');
         }
 
-        // Any special notices to remind the admin about?
+        // Any special notices to remind the Admin about?
         if (!empty($context['warning_controls']))
         {
             $context['warning_controls']['errors'] = $context['warning_controls'];
@@ -554,7 +554,7 @@ class Theme extends \AbstractTheme
 			});
 		});', true);
 
-        // This looks weird, but it's because BoardIndex.controller.php references the variable.
+        // This looks weird, but it's because BoardIndexController.php references the variable.
         $context['common_stats']['latest_member'] = array(
             'id' => $modSettings['latestMember'],
             'name' => $modSettings['latestRealName'],
@@ -664,40 +664,40 @@ class Theme extends \AbstractTheme
                 )
             );
 
-            // Will change title correctly if user is either a mod or an admin.
+            // Will change title correctly if user is either a mod or an Admin.
             // Button highlighting works properly too (see current action stuffz).
             if ($context['allow_admin'])
             {
-                $buttons['admin'] = array(
-                    'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
+                $buttons['Admin'] = array(
+                    'title' => $context['current_action'] !== 'moderate' ? $txt['Admin'] : $txt['moderate'],
                     'counter' => 'grand_total',
-                    'href' => $scripturl . '?action=admin',
+                    'href' => $scripturl . '?action=Admin',
                     'data-icon' => '&#xf013;',
                     'show' => true,
                     'sub_buttons' => array(
                         'admin_center' => array(
                             'title' => $txt['admin_center'],
-                            'href' => $scripturl . '?action=admin',
+                            'href' => $scripturl . '?action=Admin',
                             'show' => $context['allow_admin'],
                         ),
                         'featuresettings' => array(
                             'title' => $txt['modSettings_title'],
-                            'href' => $scripturl . '?action=admin;area=featuresettings',
+                            'href' => $scripturl . '?action=Admin;area=featuresettings',
                             'show' => allowedTo('admin_forum'),
                         ),
                         'packages' => array(
                             'title' => $txt['package'],
-                            'href' => $scripturl . '?action=admin;area=packages',
+                            'href' => $scripturl . '?action=Admin;area=packages',
                             'show' => allowedTo('admin_forum'),
                         ),
                         'permissions' => array(
                             'title' => $txt['edit_permissions'],
-                            'href' => $scripturl . '?action=admin;area=permissions',
+                            'href' => $scripturl . '?action=Admin;area=permissions',
                             'show' => allowedTo('manage_permissions'),
                         ),
                         'errorlog' => array(
                             'title' => $txt['errlog'],
-                            'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
+                            'href' => $scripturl . '?action=Admin;area=logs;sa=errorlog;desc',
                             'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
                         ),
                         'moderate_sub' => array(
@@ -732,7 +732,7 @@ class Theme extends \AbstractTheme
                                 'postbyemail' => array(
                                     'title' => $txt['mc_emailerror'],
                                     'counter' => 'emailmod',
-                                    'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+                                    'href' => $scripturl . '?action=Admin;area=maillist;sa=emaillist',
                                     'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
                                 ),
                             ),
@@ -742,7 +742,7 @@ class Theme extends \AbstractTheme
             }
             else
             {
-                $buttons['admin'] = array(
+                $buttons['Admin'] = array(
                     'title' => $txt['moderate'],
                     'counter' => 'grand_total',
                     'href' => $scripturl . '?action=moderate',
@@ -775,7 +775,7 @@ class Theme extends \AbstractTheme
                         'postbyemail' => array(
                             'title' => $txt['mc_emailerror'],
                             'counter' => 'emailmod',
-                            'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+                            'href' => $scripturl . '?action=Admin;area=maillist;sa=emaillist',
                             'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
                         ),
                     ),
@@ -965,13 +965,13 @@ class Theme extends \AbstractTheme
         elseif ($context['current_action'] == 'profile')
             $current_action = 'pm';
         elseif ($context['current_action'] == 'theme')
-            $current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
+            $current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'Admin';
         elseif ($context['current_action'] == 'login2' || ($user_info['is_guest'] && $context['current_action'] == 'reminder'))
             $current_action = 'login';
         elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
             $current_action = 'moderate';
         elseif ($context['current_action'] == 'moderate' && $context['allow_admin'])
-            $current_action = 'admin';
+            $current_action = 'Admin';
 
         // Not all actions are simple.
         if (!empty($needs_action_hook))
@@ -1049,13 +1049,13 @@ class Theme extends \AbstractTheme
             // @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
             $this->templates->load('index');
             $this->templates->load('Xml');
-            \Template_Layers::getInstance()->removeAll();
+            \TemplateLayers::getInstance()->removeAll();
         }
         // These actions don't require the index template at all.
         elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
         {
             loadLanguage('index+Addons');
-            \Template_Layers::getInstance()->removeAll();
+            \TemplateLayers::getInstance()->removeAll();
         }
         else
         {
@@ -1079,7 +1079,7 @@ class Theme extends \AbstractTheme
             else
                 $layers = array('html', 'body');
 
-            $template_layers = \Template_Layers::getInstance(true);
+            $template_layers = \TemplateLayers::getInstance(true);
             foreach ($layers as $layer)
                 $template_layers->addBegin($layer);
         }

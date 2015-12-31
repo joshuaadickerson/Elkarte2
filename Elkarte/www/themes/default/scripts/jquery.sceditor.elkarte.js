@@ -338,7 +338,7 @@ $.sceditor.command
  * ElkArte custom bbc tags added to provide for the existing user experience
  *
  * These command define what happens to tags as to toggle from and to wizzy mode
- * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
+ * It converts html back to bbc or bbc back to html.  Read the sceditor Docs for more
  *
  * Adds / modifies BBC codes List, Tt, Pre, quote, footnote, code, img
  */

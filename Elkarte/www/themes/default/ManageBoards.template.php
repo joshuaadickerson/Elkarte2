@@ -30,7 +30,7 @@ function template_manage_boards()
 	if (!empty($context['move_board']))
 		echo '
 		<div class="information">
-			<p>', $context['move_title'], ' [<a href="', $scripturl, '?action=admin;area=manageboards">', $txt['mboards_cancel_moving'], '</a>]', '</p>
+			<p>', $context['move_title'], ' [<a href="', $scripturl, '?action=Admin;area=manageboards">', $txt['mboards_cancel_moving'], '</a>]', '</p>
 		</div>';
 
 	// No categories so show a label.
@@ -50,13 +50,13 @@ function template_manage_boards()
 		echo '
 			<h2 class="category_header">
 			<i class="fa fa-pencil-square-o"></i>
-				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
-				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">&nbsp;', $txt['catModify'], '</a>
+				<a href="' . $scripturl . '?action=Admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
+				<a href="' . $scripturl . '?action=Admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">&nbsp;', $txt['catModify'], '</a>
 			</h2>';
 
 		// Boards table header.
 		echo '
-		<form action="', $scripturl, '?action=admin;area=manageboards;sa=newboard;cat=', $category['id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=manageboards;sa=newboard;cat=', $category['id'], '" method="post" accept-charset="UTF-8">
 			<div id="category_', $category['id'], '" class="content">
 				<ul class="nolist">';
 
@@ -95,10 +95,10 @@ function template_manage_boards()
 
 			echo '
 					<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? 'class="recycle_board"' : ''), ' style="', $board['move'] ? ';color: red;' : '', '">
-						<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"><img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
-						<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
-						<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
-						<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
+						<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=Admin;area=manageboards;sa=settings"><img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
+						<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a href="' . $scripturl . '?action=Admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
+						<span class="modify_boards"><a href="', $scripturl, '?action=Admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
+						<span class="modify_boards"><a href="', $scripturl, '?action=Admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
 
 			if (!empty($board['move_links']))
 			{
@@ -156,11 +156,11 @@ function template_manage_boards()
 			sa: "boardorder",
 			error: "' . $txt['admin_order_error'] . '",
 			title: "' . $txt['admin_order_title'] . '",
-			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
+			token: {token_var: "' . $context['Admin-sort_token_var'] . '", token_id: "' . $context['Admin-sort_token'] . '"},
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
 			containment: "document",
-			href: "?action=admin;area=manageboards",
+			href: "?action=Admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
 			axis: "",
@@ -179,7 +179,7 @@ function template_modify_category()
 	// Print table header.
 	echo '
 	<div id="manage_boards">
-		<form action="', $scripturl, '?action=admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="cat" value="', $context['category']['id'], '" />
 				<h2 class="category_header">
 					', isset($context['category']['is_new']) ? $txt['mboards_new_cat_name'] : $txt['catEdit'], '
@@ -264,7 +264,7 @@ function template_confirm_category_delete()
 	// Print table header.
 	echo '
 	<div id="manage_boards">
-		<form action="', $scripturl, '?action=admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="cat" value="', $context['category']['id'], '" />
 			<h2 class="category_header">', $txt['mboards_delete_cat'], '</h2>
 			<div class="content">
@@ -320,7 +320,7 @@ function template_modify_board()
 	// The main table header.
 	echo '
 	<div id="manage_boards">
-		<form action="', $scripturl, '?action=admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="boardid" value="', $context['board']['id'], '" />
 			<h2 class="category_header">
 				', isset($context['board']['is_new']) ? $txt['mboards_new_board_name'] : $txt['boardsEdit'], '
@@ -395,7 +395,7 @@ function template_modify_board()
 					</dd>
 					<dt>
 						<label for="profile">', $txt['permission_profile'], ':</label><br />
-						<span class="smalltext">', $context['can_manage_permissions'] ? sprintf($txt['permission_profile_desc'], $scripturl . '?action=admin;area=permissions;sa=profiles;' . $context['session_var'] . '=' . $context['session_id']) : strip_tags($txt['permission_profile_desc']), '</span>
+						<span class="smalltext">', $context['can_manage_permissions'] ? sprintf($txt['permission_profile_desc'], $scripturl . '?action=Admin;area=permissions;sa=profiles;' . $context['session_var'] . '=' . $context['session_id']) : strip_tags($txt['permission_profile_desc']), '</span>
 					</dt>
 					<dd>
 						<select id="profile" name="profile">';
@@ -617,7 +617,7 @@ function template_modify_board()
 				<div class="submitbutton">
 					<input type="hidden" name="rid" value="', $context['redirect_location'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['admin-be-' . $context['board']['id'] . '_token'], '" />';
+					<input type="hidden" name="', $context['Admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['Admin-be-' . $context['board']['id'] . '_token'], '" />';
 
 	// If this board has no children don't bother with the next confirmation screen.
 	if ($context['board']['no_children'])
@@ -711,7 +711,7 @@ function template_confirm_board_delete()
 	// Print table header.
 	echo '
 	<div id="manage_boards">
-		<form action="', $scripturl, '?action=admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="boardid" value="', $context['board']['id'], '" />
 			<h2 class="category_header">', $txt['mboards_delete_board'], '</h2>
 			<div class="content">
@@ -745,7 +745,7 @@ function template_confirm_board_delete()
 					<input type="submit" name="cancel" value="', $txt['mboards_delete_cancel'], '" />
 					<input type="hidden" name="confirmation" value="1" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['admin-be-' . $context['board']['id'] . '_token'], '" />
+					<input type="hidden" name="', $context['Admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['Admin-be-' . $context['board']['id'] . '_token'], '" />
 				</div>
 			</div>
 		</form>

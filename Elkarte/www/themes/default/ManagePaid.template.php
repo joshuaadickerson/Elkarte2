@@ -24,7 +24,7 @@ function template_modify_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], '" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], '" method="post">
 			<h2 class="category_header">', $txt['paid_' . $context['action_type'] . '_subscription'], '</h2>';
 
 	if (!empty($context['disable_groups']))
@@ -192,7 +192,7 @@ function template_modify_subscription()
 				<div class="submitbutton">
 					<input type="submit" name="save" value="', $txt['paid_settings_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-pms_token_var'], '" value="', $context['admin-pms_token'], '" />
+					<input type="hidden" name="', $context['Admin-pms_token_var'], '" value="', $context['Admin-pms_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -208,14 +208,14 @@ function template_delete_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], ';delete" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modify;sid=', $context['sub_id'], ';delete" method="post">
 			<h2 class="category_header">', $txt['paid_delete_subscription'], '</h2>
 				<div class="content">
 				<p class="warningbox">', $txt['paid_mod_delete_warning'], '</p>
 				<div class="submitbutton">
 					<input type="submit" name="delete_confirm" value="', $txt['paid_delete_subscription'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-pmsd_token_var'], '" value="', $context['admin-pmsd_token'], '" />
+					<input type="hidden" name="', $context['Admin-pmsd_token_var'], '" value="', $context['Admin-pmsd_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -231,7 +231,7 @@ function template_modify_user_subscription()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $context['sub_id'], ';lid=', $context['log_id'], '" method="post">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modifyuser;sid=', $context['sub_id'], ';lid=', $context['log_id'], '" method="post">
 			<h2 class="category_header">
 				', $txt['paid_' . $context['action_type'] . '_subscription'], ' - ', $context['current_subscription']['name'], '
 				', empty($context['sub']['username']) ? '' : ' (' . $txt['user'] . ': ' . $context['sub']['username'] . ')', '
@@ -367,8 +367,8 @@ function template_modify_user_subscription()
 			echo '
 					<li>
 						', $payment['desc'], '
-						<a class="linkbutton_left" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
-						<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
+						<a class="linkbutton_left" href="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
+						<a class="linkbutton_right" href="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
 					</li>';
 		}
 
@@ -453,7 +453,7 @@ function template_user_subscription()
 			}
 			else
 				echo '
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $subscription['id'], ';uid=', $context['member']['id'], (empty($context['current'][$subscription['id']]) ? '' : ';lid=' . $context['current'][$subscription['id']]['id']), '">', empty($context['current'][$subscription['id']]) ? $txt['paid_admin_add'] : $txt['paid_edit_subscription'], '</a>';
+				<a class="linkbutton" href="', $scripturl, '?action=Admin;area=paidsubscribe;sa=modifyuser;sid=', $subscription['id'], ';uid=', $context['member']['id'], (empty($context['current'][$subscription['id']]) ? '' : ';lid=' . $context['current'][$subscription['id']]['id']), '">', empty($context['current'][$subscription['id']]) ? $txt['paid_admin_add'] : $txt['paid_edit_subscription'], '</a>';
 
 			echo '
 			</div>';
@@ -492,7 +492,7 @@ function template_user_subscription()
 			echo '
 					<tr>
 						<td>
-							', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
+							', (allowedTo('admin_forum') ? '<a href="' . $scripturl . '?action=Admin;area=paidsubscribe;sa=modifyuser;lid=' . $sub['id'] . '">' . $sub['name'] . '</a>' : $sub['name']), '
 						</td><td>
 							<span style="color: ', ($sub['status'] == 2 ? 'green' : ($sub['status'] == 1 ? 'red' : 'orange')), '"><strong>', $sub['status_text'], '</strong></span>
 						</td><td>

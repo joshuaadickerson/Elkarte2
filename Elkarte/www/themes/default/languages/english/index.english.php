@@ -89,7 +89,7 @@ $txt['calendar'] = 'Calendar';
 $txt['members'] = 'Members';
 $txt['recent_posts'] = 'Recent Posts';
 
-$txt['admin'] = 'Admin';
+$txt['Admin'] = 'Admin';
 // Sub menu labels
 $txt['errlog'] = 'Error Log';
 $txt['package'] = 'Package Manager';
@@ -281,7 +281,7 @@ $txt['title'] = 'Title';
 $txt['post_by'] = 'Post by';
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
-$txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
+$txt['admin_session_active'] = 'You have an active Admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
 $txt['admin_maintenance_active'] = 'Your forum is currently in maintenance mode, only admins can log in.  Remember to <strong><a class="strong" href="%1$s">exit maintenance</a></strong> once you have finished your administrative tasks.';
 $txt['query_command_denied'] = 'The following MySQL errors are occurring, please verify your setup:';
 $txt['query_command_denied_guests'] = 'It seems something has gone sour on the forum with the database. This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please report the following message to the administrator:';

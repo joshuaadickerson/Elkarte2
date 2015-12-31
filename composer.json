@@ -32,8 +32,11 @@
 		"phpunit/phpunit-selenium": "1.4.*"
 	},
   	"autoload": {
-		"PSR-4": {
-		  	"Elkarte\\Subscriptions\\": "Elkarte/subs/Subscriptions/"
+		"psr-4": {
+		  	"": "Elkarte/Sources/",
+		  	"Elkarte\\": "Elkarte/src/",
+		  	"Elkarte\\Elkarte\\": "Elkarte/src/Elkarte/",
+		  	"Elkarte\\Elkarte\\Events\\": "Elkarte/src/Elkarte/Events"
 		}
 	}
 }

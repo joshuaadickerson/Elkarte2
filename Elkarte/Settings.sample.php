@@ -173,16 +173,16 @@ $cachedir = __DIR__ . '/cache';
 $boarddir = __DIR__;
 
 /**
- * Path to the sources directory.
+ * Path to the Sources directory.
  * @var string
  */
-$sourcedir = __DIR__ . '/sources';
+$sourcedir = __DIR__ . '/Sources';
 
 /**
  * Path to the external resources directory.
  * @var string
  */
-$extdir = __DIR__ . '/sources/ext';
+$extdir = __DIR__ . '/Sources/ext';
 
 /**
  * Path to the languages directory.

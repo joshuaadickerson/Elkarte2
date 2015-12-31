@@ -16,7 +16,7 @@
  */
 
 /**
- * This template shows an admin information on a users IP addresses used and errors attributed to them.
+ * This template shows an Admin information on a users IP addresses used and errors attributed to them.
  */
 function template_trackActivity()
 {
@@ -75,14 +75,14 @@ function template_trackActivity()
 }
 
 /**
- * The template for trackIP, allowing the admin to see where/who a certain IP has been used.
+ * The template for trackIP, allowing the Admin to see where/who a certain IP has been used.
  */
 function template_trackIP()
 {
 	global $context, $txt;
 
 	// This function always defaults to the last IP used by a member but can be set to track any IP.
-	// The first table in the template gives an input box to allow the admin to enter another IP to track.
+	// The first table in the template gives an input box to allow the Admin to enter another IP to track.
 	echo '
 	<div>
 		<h2 class="category_header">', $txt['trackIP'], '</h2>

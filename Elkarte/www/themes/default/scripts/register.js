@@ -342,7 +342,7 @@ function updateAuthMethod()
 }
 
 /**
- * Used when the admin registers a new member, enable or disables the email activation
+ * Used when the Admin registers a new member, enable or disables the email activation
  */
 function onCheckChange()
 {

@@ -76,9 +76,9 @@ $txt['pm_preferences'] = 'Preferences';
 $txt['pm_is_replied_to'] = 'You have forwarded or responded to this message.';
 
 // Reporting messages.
-$txt['pm_report_to_admin'] = 'Report to admin';
+$txt['pm_report_to_admin'] = 'Report to Admin';
 $txt['pm_report_title'] = 'Report personal message';
-$txt['pm_report_desc'] = 'From this page you can report the personal message you received to the admin team of the forum. Please be sure to include a description of why you are reporting the message, as this will be sent along with the contents of the original message.';
+$txt['pm_report_desc'] = 'From this page you can report the personal message you received to the Admin team of the forum. Please be sure to include a description of why you are reporting the message, as this will be sent along with the contents of the original message.';
 $txt['pm_report_admins'] = 'Administrator to send report to';
 $txt['pm_report_all_admins'] = 'Send to all forum administrators';
 $txt['pm_report_reason'] = 'Reason why you are reporting this message';
@@ -93,7 +93,7 @@ $txt['pm_report_pm_hidden'] = '%1$d hidden recipient(s)';
 $txt['pm_report_pm_unedited_below'] = 'Below are the original contents of the personal message which was reported:';
 $txt['pm_report_pm_sent'] = 'Sent:';
 
-$txt['pm_report_done'] = 'Thank you for submitting this report. You should hear back from the admin team shortly.';
+$txt['pm_report_done'] = 'Thank you for submitting this report. You should hear back from the Admin team shortly.';
 $txt['pm_report_return'] = 'Return to the inbox';
 
 $txt['pm_search_title'] = 'Search personal messages';

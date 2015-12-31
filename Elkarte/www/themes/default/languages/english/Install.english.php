@@ -20,7 +20,7 @@ $txt['installer_language_set'] = 'Set';
 $txt['congratulations'] = 'Congratulations, the installation process is complete!';
 $txt['congratulations_help'] = 'If at any time you need support, or the forum fails to work properly, please remember that <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">help is available</a> if you need it.';
 $txt['still_writable'] = 'Your installation directory is still writable.  It\'s a good idea to chmod it so that it is not writable for security reasons.';
-$txt['delete_installer'] = 'Click here to try to delete the install directory now.';
+$txt['delete_installer'] = 'Click here to try to delete the Install directory now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
 $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed forum</a> and begin to use it.  You should first make sure you are logged in, after which you will be able to access the administration center.';
 $txt['good_luck'] = 'Thanks for installing ElkArte!';
@@ -92,7 +92,7 @@ $txt['install_settings_url_info'] = 'This is the URL to your forum <strong>witho
 $txt['install_settings_compress'] = 'Gzip Output';
 $txt['install_settings_compress_title'] = 'Compress output to save bandwidth.';
 // In this string, you can translate the word "PASS" to change what it says when the test passes.
-$txt['install_settings_compress_info'] = 'This function does not work properly on all servers, but can save you a lot of bandwidth.<br /><a href="install.php?obgz=1&amp;pass_string=PASS" onclick="return reqWin(this.href, 200, 60);" target="_blank">Click here to test it</a>. (it should just say "PASS".)';
+$txt['install_settings_compress_info'] = 'This function does not work properly on all servers, but can save you a lot of bandwidth.<br /><a href="Install.php?obgz=1&amp;pass_string=PASS" onclick="return reqWin(this.href, 200, 60);" target="_blank">Click here to test it</a>. (it should just say "PASS".)';
 $txt['install_settings_dbsession'] = 'Database Sessions';
 $txt['install_settings_dbsession_title'] = 'Use the database for sessions instead of using files.';
 $txt['install_settings_dbsession_info1'] = 'This feature is almost always for the best, as it makes sessions more dependable.';
@@ -117,10 +117,10 @@ $txt['db_settings_database_info_note'] = 'If this database does not exist, this 
 $txt['db_settings_database_file'] = 'Database file name';
 $txt['db_settings_database_file_info'] = 'This is the name of the file in which to store the ElkArte data. We recommend you use the randomly generated name for this and set the path of this file to be outside of the public area of your webserver.';
 $txt['db_settings_prefix'] = 'Table prefix';
-$txt['db_settings_prefix_info'] = 'The prefix for every table in the database.  <strong>Do not install two forums with the same prefix!</strong><br />This value allows for multiple installations in one database.';
+$txt['db_settings_prefix_info'] = 'The prefix for every table in the database.  <strong>Do not Install two forums with the same prefix!</strong><br />This value allows for multiple installations in one database.';
 $txt['db_populate'] = 'Populated Database';
 $txt['db_populate_info'] = 'Your settings have now been saved and the database has been populated with all the data required to get your forum up and running. Summary of population:';
-$txt['db_populate_info2'] = 'Click &quot;Continue&quot; to progress to the admin account creation page.';
+$txt['db_populate_info2'] = 'Click &quot;Continue&quot; to progress to the Admin account creation page.';
 $txt['db_populate_inserts'] = 'Inserted %1$d rows.';
 $txt['db_populate_tables'] = 'Created %1$d tables.';
 $txt['db_populate_insert_dups'] = 'Ignored %1$d duplicated inserts.';
@@ -139,7 +139,7 @@ $txt['user_settings_email_info'] = 'Provide your email address as well.  <strong
 $txt['user_settings_database'] = 'Database Password';
 $txt['user_settings_database_info'] = 'The installer requires that you supply the database password to create an administrator account, for security reasons.';
 $txt['user_settings_skip'] = 'Skip';
-$txt['user_settings_skip_sure'] = 'Are you sure you wish to skip admin account creation?';
+$txt['user_settings_skip_sure'] = 'Are you sure you wish to skip Admin account creation?';
 $txt['user_settings_proceed'] = 'Finish';
 
 $txt['ftp_checking_writable'] = 'Checking if files are writable';
@@ -172,7 +172,7 @@ $txt['error_db_database'] = 'The installer was unable to access the &quot;<em>%1
 $txt['error_db_queries'] = 'Some of the queries were not executed properly.  This could be caused by an unsupported (development or old) version of your database software.<br /><br />Technical information about the queries:';
 $txt['error_db_queries_line'] = 'Line #';
 $txt['error_db_missing'] = 'The installer was unable to detect database support in PHP that ElkArte can utilize.  Please ask your host to ensure that PHP was compiled with the desired database, or that the proper php extension is being loaded.  Currently ElkArte supports the:  &quot;%1$s&quot; extensions';
-$txt['error_db_script_missing'] = 'The installer could not find any install script files for the detected databases. Please check you have uploaded the necessary install script files to your forum directory, for example &quot;%1$s&quot;';
+$txt['error_db_script_missing'] = 'The installer could not find any Install script files for the detected databases. Please check you have uploaded the necessary Install script files to your forum directory, for example &quot;%1$s&quot;';
 $txt['error_session_missing'] = 'The installer was unable to detect sessions support in your server\'s installation of PHP.  Please ask your host to ensure that PHP was compiled with session support (in fact, it has to be explicitly compiled without it.)'; // note: is this actually true? I see a contradiction here...!
 $txt['error_user_settings_again_match'] = 'You typed in two completely different passwords!';
 $txt['error_user_settings_no_password'] = 'Your password must be at least four characters long.';
@@ -183,13 +183,13 @@ $txt['error_db_alter_priv'] = 'The database account you specified does not have 
 $txt['error_versions_do_not_match'] = 'The installer has detected another version of ElkArte already installed with the specified information.  If you are trying to upgrade, you should use the upgrader, not the installer.<br /><br />Otherwise, you may wish to use different information, or create a backup and then delete the data currently in the database.';
 $txt['error_mod_security'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before ElkArte gets a say in anything. ElkArte has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.elkarte.net/redirect/mod_security" target="_blank" class="new_win">More information about disabling mod_security</a>';
 $txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before ElkArte gets a say in anything. ElkArte has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.elkarte.net/redirect/mod_security" target="_blank" class="new_win">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your FTP client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
-$txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can not install ElkArte';
+$txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can not Install ElkArte';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
-$txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<ul><li>If you have just finished to install your forum and want to use it, please delete the install directory from your server. {try_delete}</li><li>If you wish to upgrade please visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.</li><li>If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.</li></ul>';
+$txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<ul><li>If you have just finished to Install your forum and want to use it, please delete the Install directory from your server. {try_delete}</li><li>If you wish to upgrade please visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.</li><li>If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.</li></ul>';
 $txt['error_no_settings'] = 'It looks like Settings.php and/or Settings_bak.php are missing from the default directory of your forum, ElkArte will try to rename the sample files provided with the installation. If this operation fails, please rename Settings.sample.php and Settings_bak.sample.php respectively to Settings.php and Setting_bak.php before running this script.';
 $txt['error_settings_do_not_exist'] = 'Elkarte is not able to find and create the file/s <strong>%1$s</strong>. Please use ftp to go to the directory of your forum and rename the sample files provided with the installation package as follows before running again this script: <ul>%2$s</ul> If any of the files do not exist, create an empty file with the same name.';
 $txt['error_warning_notice'] = 'Warning!';
-$txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br />
+$txt['error_script_outdated'] = 'This Install script is out of date! The current version of ElkArte is %1$s but this Install script is for %2$s.<br />
 	It is recommended that you visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte</a> website to ensure you are installing the latest version.';
 $txt['error_db_filename'] = 'You must enter a name for the database file name for SQLite.';
 $txt['error_db_prefix_numeric'] = 'The selected database type does not support the use of numeric prefixes.';

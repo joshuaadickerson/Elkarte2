@@ -1197,7 +1197,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	//  - is not allowed to see poll in any board,
 	//  - or:
 	//     - is not allowed in the specific board, and
-	//     - is not an admin
+	//     - is not an Admin
 	// fail
 	if (empty($boards_can_poll) || (!in_array($topicinfo['id_board'], $boards_can_poll) && !in_array(0, $boards_can_poll)))
 		return array();

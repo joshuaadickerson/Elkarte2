@@ -13,7 +13,7 @@
  */
 
 /**
- * Handle the JavaScript surrounding the admin and moderation center.
+ * Handle the JavaScript surrounding the Admin and moderation center.
  */
 
 /**
@@ -38,7 +38,7 @@ function elk_AdminIndex(oOptions)
 	this.init();
 }
 
-// Initialize the admin index to handle announcement, current version and updates
+// Initialize the Admin index to handle announcement, current version and updates
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
@@ -209,7 +209,7 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 	return normalVersion;
 };
 
-// Checks if a new version of ElkArte is available and if so updates the admin info box
+// Checks if a new version of ElkArte is available and if so updates the Admin info box
 elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
@@ -692,7 +692,7 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 }
 
 /**
- * News admin page
+ * News Admin page
  */
 function addAnotherNews()
 {
@@ -864,7 +864,7 @@ function testFTP()
 		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + document.getElementById(oPostData[i]).value.php_urlencode();
 
 	// Post the data out.
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=Admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
 }
 
 /**
@@ -961,7 +961,7 @@ function expandFolder(folderIdent, folderReal)
 	else
 	{
 		ajax_indicator(true);
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=Admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 	}
 
 	return false;
@@ -1501,7 +1501,7 @@ function navigatePreview(url)
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
-			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
+			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=Admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
 
 			refreshPreviewCache = null;
 			refreshPreview(false);
@@ -1733,7 +1733,7 @@ function ajax_getCensorPreview()
 	$.ajax({
 		type: 'POST',
 		dataType: 'json',
-		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;xml",
+		url: elk_scripturl + "?action=Admin;area=postsettings;sa=censor;xml",
 		data: {
 			censortest: $("#censortest").val()
 		}

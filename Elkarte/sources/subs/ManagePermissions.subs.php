@@ -344,7 +344,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	}
 	// $profile and $group are both null!
 	else
-		Errors::instance()->fatal_lang_error('no_access', false);
+		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 }
 
 /**
@@ -1292,7 +1292,7 @@ function deletePermissionProfiles($profiles)
 		)
 	);
 	if ($db->num_rows($request) != 0)
-		Errors::instance()->fatal_lang_error('no_access', false);
+		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 	$db->free_result($request);
 
 	// Oh well, delete.

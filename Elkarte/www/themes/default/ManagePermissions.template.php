@@ -16,7 +16,7 @@
  */
 
 /**
- * Template for the permissions page in admin panel.
+ * Template for the permissions page in Admin panel.
  */
 function template_permission_index()
 {
@@ -26,12 +26,12 @@ function template_permission_index()
 	if (!$context['can_modify'])
 		echo '
 	<div class="errorbox">
-		', sprintf($txt['permission_cannot_edit'], $scripturl . '?action=admin;area=permissions;sa=profiles'), '
+		', sprintf($txt['permission_cannot_edit'], $scripturl . '?action=Admin;area=permissions;sa=profiles'), '
 	</div>';
 
 	echo '
 	<div id="admin_form_wrapper">
-		<form action="', $scripturl, '?action=admin;area=permissions;sa=quick" method="post" accept-charset="UTF-8" name="permissionForm" id="permissionForm">';
+		<form action="', $scripturl, '?action=Admin;area=permissions;sa=quick" method="post" accept-charset="UTF-8" name="permissionForm" id="permissionForm">';
 
 	if (!empty($context['profile']))
 		echo '
@@ -210,7 +210,7 @@ function template_permission_index()
 
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-mpq_token_var'], '" value="', $context['admin-mpq_token'], '" />';
+			<input type="hidden" name="', $context['Admin-mpq_token_var'], '" value="', $context['Admin-mpq_token'], '" />';
 	}
 	else
 		echo '
@@ -230,7 +230,7 @@ function template_by_board()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=permissions;sa=board" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=permissions;sa=board" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['permissions_boards'], '</h2>
 			<div class="information">
 				', $txt['permissions_boards_desc'], '
@@ -239,7 +239,7 @@ function template_by_board()
 	if (!$context['edit_all'])
 		echo '
 			<div class="content submitbutton">
-				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=Admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
 			</div>';
 
 	foreach ($context['categories'] as $category)
@@ -261,7 +261,7 @@ function template_by_board()
 			echo '
 					<li class="flow_hidden">
 						<span class="perm_board floatleft">
-							<a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], ';rid=permissions;', $context['session_var'], '=', $context['session_id'], '">', str_repeat('-', $board['child_level']), ' ', $board['name'], '</a>
+							<a href="', $scripturl, '?action=Admin;area=manageboards;sa=board;boardid=', $board['id'], ';rid=permissions;', $context['session_var'], '=', $context['session_id'], '">', str_repeat('-', $board['child_level']), ' ', $board['name'], '</a>
 						</span>
 						<span class="perm_boardprofile floatleft">';
 
@@ -280,9 +280,9 @@ function template_by_board()
 			}
 			else
 				echo '
-							<a id="edit_board_', $board['id'], '" href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>
+							<a id="edit_board_', $board['id'], '" href="', $scripturl, '?action=Admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>
 						</span>
-						<a class="edit_board" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
+						<a class="edit_board" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=Admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
 
 			echo '
 					</li>';
@@ -302,14 +302,14 @@ function template_by_board()
 				<input type="submit" name="save_changes" value="', $txt['save'], '" class="right_submit" />';
 	else
 		echo '
-				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
+				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=Admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
 				<script><!-- // --><![CDATA[
 					initEditProfileBoards();
 				// ]]></script>';
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-mpb_token_var'], '" value="', $context['admin-mpb_token'], '" />
+				<input type="hidden" name="', $context['Admin-mpb_token_var'], '" value="', $context['Admin-mpb_token'], '" />
 			</div>
 		</form>
 	</div>';
@@ -324,7 +324,7 @@ function template_edit_profiles()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<form action="', $scripturl, '?action=admin;area=permissions;sa=profiles" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=permissions;sa=profiles" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['permissions_profile_edit'], '</h2>
 			<table class="table_grid">
 				<thead>
@@ -347,7 +347,7 @@ function template_edit_profiles()
 							<input type="text" name="rename_profile[', $profile['id'], ']" value="', $profile['name'], '" class="input_text" />';
 		else
 			echo '
-							<a ', $profile['can_edit'] ? 'class="rename_profile" data-pid="' . $profile['id'] . '" ' : '', 'href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $profile['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $profile['name'], '</a>';
+							<a ', $profile['can_edit'] ? 'class="rename_profile" data-pid="' . $profile['id'] . '" ' : '', 'href="', $scripturl, '?action=Admin;area=permissions;sa=index;pid=', $profile['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $profile['name'], '</a>';
 
 		echo '
 						</td>
@@ -365,7 +365,7 @@ function template_edit_profiles()
 			</table>
 			<div class="submitbutton">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />';
+				<input type="hidden" name="', $context['Admin-mpp_token_var'], '" value="', $context['Admin-mpp_token'], '" />';
 
 	if ($context['can_edit_something'])
 		echo '
@@ -378,7 +378,7 @@ function template_edit_profiles()
 			</div>
 		</form>
 		<br />
-		<form action="', $scripturl, '?action=admin;area=permissions;sa=profiles" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=permissions;sa=profiles" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['permissions_profile_new'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -404,7 +404,7 @@ function template_edit_profiles()
 				</dl>
 				<hr />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />
+				<input type="hidden" name="', $context['Admin-mpp_token_var'], '" value="', $context['Admin-mpp_token'], '" />
 				<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="right_submit" />
 			</div>
 		</form>
@@ -426,7 +426,7 @@ function template_modify_group()
 	{
 		echo '
 		<div class="errorbox">
-			', sprintf($txt['permission_cannot_edit'], $scripturl . '?action=admin;area=permissions;sa=profiles'), '
+			', sprintf($txt['permission_cannot_edit'], $scripturl . '?action=Admin;area=permissions;sa=profiles'), '
 		</div>';
 	}
 	else
@@ -447,7 +447,7 @@ function template_modify_group()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=permissions;sa=modify2;group=', $context['group']['id'], ';pid=', $context['profile']['id'], '" method="post" accept-charset="UTF-8" name="permissionForm" onsubmit="return warnAboutDeny();">';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=permissions;sa=modify2;group=', $context['group']['id'], ';pid=', $context['profile']['id'], '" method="post" accept-charset="UTF-8" name="permissionForm" onsubmit="return warnAboutDeny();">';
 
 	if (!empty($modSettings['permission_enable_deny']) && $context['group']['id'] != -1)
 		echo '
@@ -497,7 +497,7 @@ function template_modify_group()
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />
+			<input type="hidden" name="', $context['Admin-mp_token_var'], '" value="', $context['Admin-mp_token'], '" />
 		</form>
 	</div>';
 }
@@ -770,7 +770,7 @@ function template_postmod_permissions()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<form action="', $scripturl, '?action=admin;area=permissions;sa=postmod;', $context['session_var'], '=', $context['session_id'], '" method="post" name="postmodForm" id="postmodForm" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=permissions;sa=postmod;', $context['session_var'], '=', $context['session_id'], '" method="post" name="postmodForm" id="postmodForm" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['permissions_post_moderation'], '</h2>';
 
 	// Got advanced permissions - if so warn!
@@ -813,18 +813,18 @@ function template_postmod_permissions()
 						<th class="grid30">
 							', $txt['permissions_post_moderation_group'], '
 						</th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/Admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -862,14 +862,14 @@ function template_postmod_permissions()
 			</table>
 			<div class="submitbutton">
 				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" />
-				<input type="hidden" name="', $context['admin-mppm_token_var'], '" value="', $context['admin-mppm_token'], '" />
+				<input type="hidden" name="', $context['Admin-mppm_token_var'], '" value="', $context['Admin-mppm_token'], '" />
 			</div>
 		</form>
 		<p class="smalltext" style="padding-left: 10px;">
 			<strong>', $txt['permissions_post_moderation_legend'], ':</strong><br />
-			<img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" /> - ', $txt['permissions_post_moderation_allow'], '<br />
-			<img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" /> - ', $txt['permissions_post_moderation_moderate'], '<br />
-			<img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" /> - ', $txt['permissions_post_moderation_disallow'], '
+			<img src="', $settings['default_images_url'], '/Admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" /> - ', $txt['permissions_post_moderation_allow'], '<br />
+			<img src="', $settings['default_images_url'], '/Admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" /> - ', $txt['permissions_post_moderation_moderate'], '<br />
+			<img src="', $settings['default_images_url'], '/Admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" /> - ', $txt['permissions_post_moderation_disallow'], '
 		</p>
 	</div>';
 }

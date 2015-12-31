@@ -22,7 +22,7 @@ function template_admin()
 {
 	global $context, $settings, $scripturl, $txt;
 
-	// Welcome message for the admin.
+	// Welcome message for the Admin.
 	echo '
 		<div id="admincenter">';
 
@@ -48,7 +48,7 @@ function template_admin()
 	echo '
 				<div id="supportVersionsTable" class="floatright">
 					<h2 class="category_header">
-						<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+						<a class="hdicon cat_img_plus" href="', $scripturl, '?action=Admin;area=credits">', $txt['support_title'], '</a>
 					</h2>
 						<div class="content">
 						<div id="version_details">
@@ -57,7 +57,7 @@ function template_admin()
 							<em id="installedVersion">', $context['forum_version'], '</em><br />
 							', $txt['support_versions_current'], ':
 							<em id="latestVersion">??</em><br />
-							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
+							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=Admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
 	echo '
@@ -83,7 +83,7 @@ function template_admin()
 	foreach ($context['quick_admin_tasks'] as $task)
 		echo '
 					<li>
-						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
+						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/Admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
 						<h5>', $task['link'], '</h5>
 						<span class="task">', $task['description'], '</span>
 					</li>';
@@ -132,7 +132,7 @@ function template_admin()
 							</div>
 						</div>
 				'), ',
-				sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+				sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=Admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 			});
 		// ]]></script>';
@@ -155,7 +155,7 @@ function template_credits()
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
 									', $txt['support_versions_forum'], ':
-								<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+								<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=Admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 									', $txt['support_versions_current'], ':
 								<em id="latestVersion">??</em><br />';
 
@@ -188,7 +188,7 @@ function template_credits()
 								', $context['latest_updates'], '
 							</div>';
 
-	// Point the admin to common support resources.
+	// Point the Admin to common support resources.
 	echo '
 							<div id="support_resources">
 								<h2 class="category_header">
@@ -321,7 +321,7 @@ function template_view_versions()
 	echo '
 									<tr>
 										<td>
-											<a href="#" id="sources-link">', $txt['dvc_sources'], '</a>
+											<a href="#" id="Sources-link">', $txt['dvc_sources'], '</a>
 										</td>
 										<td>
 											<em id="yoursources">??</em>
@@ -333,7 +333,7 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table id="sources" class="table_grid">
+							<table id="Sources" class="table_grid">
 							<tbody>';
 
 	// Loop through every source file displaying its version - using javascript.
@@ -351,18 +351,18 @@ function template_view_versions()
 									</td>
 								</tr>';
 
-	// Done with sources
+	// Done with Sources
 	echo '
 							</tbody>
 							</table>';
 
-	// List all the admin file versions, starting with the overall version (if all match!).
+	// List all the Admin file versions, starting with the overall version (if all match!).
 	echo '
 							<table class="table_grid">
 								<tbody>
 									<tr>
 										<td class="versionFile">
-											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
+											<a href="#" id="Admin-link">', $txt['dvc_admin'], '</a>
 										</td>
 										<td class="versionNumber">
 											<em id="youradmin">??</em>
@@ -374,10 +374,10 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table id="admin" class="table_grid">
+							<table id="Admin" class="table_grid">
 							<tbody>';
 
-	// Loop through every admin file displaying its version - using javascript.
+	// Loop through every Admin file displaying its version - using javascript.
 	foreach ($context['file_versions_admin'] as $filename => $version)
 		echo '
 								<tr>
@@ -392,7 +392,7 @@ function template_view_versions()
 									</td>
 								</tr>';
 
-	// Close the admin section
+	// Close the Admin section
 	echo '
 							</tbody>
 							</table>';
@@ -403,7 +403,7 @@ function template_view_versions()
 								<tbody>
 									<tr>
 										<td class="versionFile">
-											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
+											<a href="#" id="Controllers-link">', $txt['dvc_controllers'], '</a>
 										</td>
 										<td class="versionNumber">
 											<em id="yourcontrollers">??</em>
@@ -415,7 +415,7 @@ function template_view_versions()
 								</tbody>
 							</table>
 
-							<table id="controllers" class="table_grid">
+							<table id="Controllers" class="table_grid">
 							<tbody>';
 
 	// Loop through every controller file displaying its version - using javascript.
@@ -654,7 +654,7 @@ function template_view_versions()
 	/* Below is the javascript for this. Upon opening the page it checks the current file versions with ones
 	  held at ElkArte.net and works out if they are up to date.  If they aren't it colors that files number
 	  red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
-	  file categories. (sources, languages, and templates.) */
+	  file categories. (Sources, languages, and templates.) */
 	echo '
 						<script src="', $context['detailed_version_url'], '"></script>
 						<script><!-- // --><![CDATA[
@@ -664,9 +664,9 @@ function template_view_versions()
 									\'.', $context['default_known_languages']), '\'
 								],
 								oSectionContainerIds: {
-									sources: \'sources\',
-									admin: \'admin\',
-									controllers: \'controllers\',
+									Sources: \'Sources\',
+									Admin: \'Admin\',
+									Controllers: \'Controllers\',
 									database: \'database\',
 									subs: \'subs\',
 									Default: \'Default\',
@@ -696,7 +696,7 @@ function template_edit_censored()
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter" class="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
 			</h2>
@@ -758,7 +758,7 @@ function template_edit_censored()
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input id="token" type="hidden" name="', $context['admin-censor_token_var'], '" value="', $context['admin-censor_token'], '" />
+			<input id="token" type="hidden" name="', $context['Admin-censor_token_var'], '" value="', $context['Admin-censor_token'], '" />
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
@@ -1062,17 +1062,17 @@ function template_show_settings()
 			</div>';
 
 	// At least one token has to be used!
-	if (isset($context['admin-ssc_token']))
+	if (isset($context['Admin-ssc_token']))
 		echo '
-			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
+			<input type="hidden" name="', $context['Admin-ssc_token_var'], '" value="', $context['Admin-ssc_token'], '" />';
 
-	if (isset($context['admin-dbsc_token']))
+	if (isset($context['Admin-dbsc_token']))
 		echo '
-			<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
+			<input type="hidden" name="', $context['Admin-dbsc_token_var'], '" value="', $context['Admin-dbsc_token'], '" />';
 
-	if (isset($context['admin-mp_token']))
+	if (isset($context['Admin-mp_token']))
 		echo '
-			<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />';
+			<input type="hidden" name="', $context['Admin-mp_token_var'], '" value="', $context['Admin-mp_token'], '" />';
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1085,7 +1085,7 @@ function template_show_settings()
 }
 
 /**
- * Results page for an admin search.
+ * Results page for an Admin search.
  */
 function template_admin_search_results()
 {
@@ -1094,7 +1094,7 @@ function template_admin_search_results()
 	echo '
 					<h2 class="category_header hdicon cat_img_search">
 						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
-						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
+						<form id="quick_search" class="floatright" action="', $scripturl, '?action=Admin;area=search" method="post" accept-charset="UTF-8">
 							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
 							<input type="hidden" name="sa" value="', $context['search_type'], '" />
@@ -1289,14 +1289,14 @@ function template_repair_boards()
 				', $txt['errors_fix'], '
 			</p>
 			<p>
-				<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
+				<strong><a class="linkbutton" href="', $scripturl, '?action=Admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=Admin;area=maintain">', $txt['no'], '</a></strong>
 			</p>';
 		}
 		else
 			echo '
 			<p class="infobox">', $txt['maintain_no_errors'], '</p>
 			<p>
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+				<a class="linkbutton" href="', $scripturl, '?action=Admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 			</p>';
 	}
 	else
@@ -1307,7 +1307,7 @@ function template_repair_boards()
 			<p>
 				', $txt['errors_do_recount'], '
 			</p>
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
 			</form>';
@@ -1317,7 +1317,7 @@ function template_repair_boards()
 			echo '
 		<p class="successbox">', $txt['errors_fixed'], '</p>
 		<p>
-			<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+			<a class="linkbutton" href="', $scripturl, '?action=Admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 		</p>';
 		}
 	}
@@ -1422,11 +1422,11 @@ function template_clean_cache_button_below()
 	<div class="generic_list_wrapper">
 		<h2 class="category_header">', $txt['maintain_cache'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
 				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
+				<input type="hidden" name="', $context['Admin-maint_token_var'], '" value="', $context['Admin-maint_token'], '" />
 			</form>
 		</div>
 	</div>';
@@ -1441,7 +1441,7 @@ function template_admin_quick_search()
 
 	if ($context['user']['is_admin'])
 		echo '
-			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
+			<form action="', $scripturl, '?action=Admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">

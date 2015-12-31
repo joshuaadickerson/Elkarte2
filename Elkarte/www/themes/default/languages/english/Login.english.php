@@ -62,7 +62,7 @@ $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
 $txt['register_agree'] = 'Please read and accept the agreement before registering.';
 $txt['register_passwords_differ_js'] = 'The two passwords you entered are not the same!';
 
-$txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
+$txt['approval_after_registration'] = 'Thank you for registering. The Admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
 
 $txt['admin_settings_desc'] = 'Here you can change a variety of settings related to registration of new members.';
 

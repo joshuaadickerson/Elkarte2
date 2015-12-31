@@ -295,7 +295,7 @@ function template_admin_login()
 				<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
 			</a>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
+			<input type="hidden" name="', $context['Admin-login_token_var'], '" value="', $context['Admin-login_token'], '" />
 			<p>
 				<input type="submit" value="', $txt['login'], '" />
 			</p>';

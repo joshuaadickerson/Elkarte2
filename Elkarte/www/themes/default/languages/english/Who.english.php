@@ -2,7 +2,7 @@
 // Version: 1.1; Who
 
 $txt['who_hidden'] = '<em>hmm... no idea, sorry</em>';
-$txt['who_admin'] = 'Viewing the admin portal';
+$txt['who_admin'] = 'Viewing the Admin portal';
 $txt['who_moderate'] = 'Viewing the moderator portal';
 $txt['who_generic'] = 'Viewing the %1$s';
 $txt['who_unknown'] = '<em>Unknown Action</em>';

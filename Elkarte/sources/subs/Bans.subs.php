@@ -283,7 +283,7 @@ function validateTriggers(&$triggers)
 				if (preg_match('/[^\w.\-\+*@]/', $value) == 1)
 					$ban_errors->addError('invalid_email');
 
-				// Check the user is not banning an admin.
+				// Check the user is not banning an Admin.
 				$request = $db->query('', '
 					SELECT id_member
 					FROM {db_prefix}members
@@ -829,7 +829,7 @@ function validateIPBan($ip_array, $fullip = '')
 		list ($error_id_ban, $error_ban_name) = $db->fetch_row($request);
 		$values = array('error' => array('ban_trigger_already_exists', array(
 			$fullip,
-			'<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $error_id_ban . '">' . $error_ban_name . '</a>',
+			'<a href="' . $scripturl . '?action=Admin;area=ban;sa=edit;bg=' . $error_id_ban . '">' . $error_ban_name . '</a>',
 		)));
 	}
 	$db->free_result($request);
@@ -859,7 +859,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 		return $return;
 
 	if ($return['error'] === 'ban_trigger_already_exists')
-		Errors::instance()->fatal_lang_error($return['error'][0], false, $return['error'][1]);
+		$GLOBALS['elk']['errors']->fatal_lang_error($return['error'][0], false, $return['error'][1]);
 
 	return false;
 }
@@ -1131,7 +1131,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 				continue;
 
 			// Prepare the link for context.
-			$ban_explanation = sprintf($txt['user_cannot_due_to'], implode(', ', $ban_restrictions), '<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $row['id_ban_group'] . '">' . $row['name'] . '</a>');
+			$ban_explanation = sprintf($txt['user_cannot_due_to'], implode(', ', $ban_restrictions), '<a href="' . $scripturl . '?action=Admin;area=ban;sa=edit;bg=' . $row['id_ban_group'] . '">' . $row['name'] . '</a>');
 
 			$bans[$row['id_ban_group']] = array(
 				'reason' => empty($row['reason']) ? '' : '<br /><br /><strong>' . $txt['ban_reason'] . ':</strong> ' . $row['reason'],
@@ -1288,7 +1288,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		Errors::instance()->fatal_lang_error('ban_not_found', false);
+		$GLOBALS['elk']['errors']->fatal_lang_error('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))

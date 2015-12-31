@@ -777,7 +777,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 		// If they need to be approved add more info...
 		if ($type == 'approval')
 		{
-			$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
+			$replacements['APPROVALLINK'] = $scripturl . '?action=Admin;area=viewmembers;sa=browse;type=approve';
 			$emailtype .= '_approval';
 		}
 

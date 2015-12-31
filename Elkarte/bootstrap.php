@@ -56,8 +56,8 @@ require_once(__DIR__ . '/Settings.php');
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
 	$boarddir = __DIR__;
-if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
-	$sourcedir = $boarddir . '/sources';
+if (!file_exists($sourcedir . '/SiteDispatcher.php') && file_exists($boarddir . '/Sources'))
+	$sourcedir = $boarddir . '/Sources';
 
 // Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
@@ -73,8 +73,8 @@ DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
 DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
-DEFINE('ADMINDIR', $sourcedir . '/admin');
-DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('ADMINDIR', $sourcedir . '/Admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/Controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 DEFINE('ADDONSDIR', $boarddir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
@@ -213,7 +213,7 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
-	$template_layers = Template_Layers::getInstance();
+	$template_layers = TemplateLayers::getInstance();
 	$template_layers->removeAll();
 	foreach ($ssi_layers as $layer)
 		$template_layers->addBegin($layer);

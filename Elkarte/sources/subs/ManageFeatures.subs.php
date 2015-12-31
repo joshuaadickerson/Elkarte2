@@ -747,13 +747,13 @@ function loadAllCustomFields()
 
 function getNotificationTypes()
 {
-	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\Sources\\subs\\MentionType');
 
 	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
 	foreach ($glob as $file)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
+		$class_name = '\\ElkArte\\Sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
 		$types[] = $class_name::getType();
 	}
 
@@ -777,7 +777,7 @@ function getMentionsModules($enabled_mentions)
 
 	foreach ($enabled_mentions as $mention)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+		$class_name = '\\ElkArte\\Sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
 		$modules = $class_name::getModules($modules);
 	}
 
@@ -793,7 +793,7 @@ function getFrontPageControllers()
 	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob);
 
-	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator(ADDONSDIR . '/*/Controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));

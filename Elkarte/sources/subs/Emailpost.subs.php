@@ -615,7 +615,7 @@ function pbe_check_moderation(&$pbe)
 /**
  * Creates a failed email entry in the postby_emails_error table
  *
- * - Attempts an auto-correct for common errors so the admin / moderator
+ * - Attempts an auto-correct for common errors so the Admin / moderator
  * - can choose to approve the email with the corrections
  *
  * @package Maillist
@@ -740,7 +740,7 @@ function pbe_emailError($error, $email_message)
 	{
 		// Back to the form we go
 		$_SESSION['email_error'] = $txt[$error];
-		redirectexit('action=admin;area=maillist');
+		redirectexit('action=Admin;area=maillist');
 	}
 
 	return false;
@@ -910,7 +910,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Check on some things needed by parse_bbc as an autotask does not load them
 	if (!isset($context['browser']))
 	{
-		$detector = new Browser_Detector;
+		$detector = new BrowserDetector;
 		$detector->detectBrowser();
 	}
 

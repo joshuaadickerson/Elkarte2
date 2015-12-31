@@ -47,7 +47,7 @@ function template_core_features()
 			$(".core_features_img").click(function(){
 				var cc = $(this),
 					cf = $(this).attr("id").substring(7),
-					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
+					imgs = new Array("', $settings['images_url'], '/Admin/switch_off.png", "', $settings['images_url'], '/Admin/switch_on.png"),
 					new_state = !$("#feature_" + cf).attr("checked"),
 					ajax_infobar = document.createElement(\'div\');
 
@@ -125,7 +125,7 @@ function template_core_features()
 	}
 
 	echo '
-		<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
+		<form id="core_features" action="', $scripturl, '?action=Admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div id="activation_message" class="errorbox hide"></div>';
 
 	// Loop through all the shiny features.
@@ -135,7 +135,7 @@ function template_core_features()
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
 				<div class="features_switch" id="js_feature_', $id, '">
 					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-					<img id="switch_', $id, '" class="core_features_img ', $feature['state'], ' hide" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" />
+					<img id="switch_', $id, '" class="core_features_img ', $feature['state'], ' hide" src="', $settings['images_url'], '/Admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" />
 				</div>
 				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
 				<p>', $feature['desc'], '</p>
@@ -145,7 +145,7 @@ function template_core_features()
 	echo '
 			<div class="righttext">
 				<input id="core_features_session" type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input id="core_features_token" type="hidden" name="', $context['admin-core_token_var'], '" value="', $context['admin-core_token'], '" />
+				<input id="core_features_token" type="hidden" name="', $context['Admin-core_token_var'], '" value="', $context['Admin-core_token'], '" />
 				<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="right_submit" />
 			</div>
 		</form>

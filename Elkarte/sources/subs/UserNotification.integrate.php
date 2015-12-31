@@ -30,7 +30,7 @@ class User_Notification_Integrate
 	}
 
 	/**
-	 * Dynamically registers the admin panel hooks for the feature.
+	 * Dynamically registers the Admin panel hooks for the feature.
 	 */
 	public static function settingsRegister()
 	{
@@ -53,7 +53,7 @@ class User_Notification_Integrate
 	}
 
 	/**
-	 * Adds the settings to the admin page.
+	 * Adds the settings to the Admin page.
 	 */
 	public static function integrate_modify_mention_settings(&$config_vars)
 	{

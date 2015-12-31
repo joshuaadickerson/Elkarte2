@@ -45,7 +45,7 @@ function template_download_language()
 	// Provide something of an introduction...
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=languages;sa=downloadlang;did=', $context['download_id'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=languages;sa=downloadlang;did=', $context['download_id'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['languages_download'], '</h2>
 			<div class="content">
 				<p>
@@ -128,7 +128,7 @@ function template_download_language()
 	echo '
 			<div class="submitbutton">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
+				<input type="hidden" name="', $context['Admin-dlang_token_var'], '" value="', $context['Admin-dlang_token'], '" />
 				<input type="submit" name="do_install" value="', $txt['add_language_elk_install'], '" />
 			</div>
 		</form>
@@ -180,7 +180,7 @@ function template_modify_language_entries()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['edit_languages'], '</h2>
 			<div class="information">
 				', $txt['edit_language_entries_primary'], '
@@ -230,7 +230,7 @@ function template_modify_language_entries()
 				</fieldset>
 				<div class="submitbutton">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+					<input type="hidden" name="', $context['Admin-mlang_token_var'], '" value="', $context['Admin-mlang_token'], '" />
 					<input type="submit" name="save_main" value="', $txt['save'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' />';
 
 	// Allow deleting entries.
@@ -246,7 +246,7 @@ function template_modify_language_entries()
 			</div>
 		</form>
 
-		<form id="entry_form" action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries#entry_form" method="post" accept-charset="UTF-8">
+		<form id="entry_form" action="', $scripturl, '?action=Admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries#entry_form" method="post" accept-charset="UTF-8">
 			<div class="category_header well">
 				<h3 class="floatleft">
 					', $txt['edit_language_entries'], '
@@ -268,7 +268,7 @@ function template_modify_language_entries()
 	echo '
 					</select>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+					<input type="hidden" name="', $context['Admin-mlang_token_var'], '" value="', $context['Admin-mlang_token'], '" />
 					<noscript><input type="submit" value="', $txt['go'], '" /></noscript>
 				</div>
 			</div>';
@@ -320,7 +320,7 @@ function template_add_language()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper"action="', $scripturl, '?action=admin;area=languages;sa=add;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper"action="', $scripturl, '?action=Admin;area=languages;sa=add;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['add_language'], '</h2>
 			<div class="content">
 				<fieldset>

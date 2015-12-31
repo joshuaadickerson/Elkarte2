@@ -141,7 +141,7 @@ function template_html_above()
 	// load in any css from addons or themes so they can overwrite if wanted
 	theme()->template_css();
 
-	// Save some database hits, if a width for multiple wrappers is set in admin.
+	// Save some database hits, if a width for multiple wrappers is set in Admin.
 	if (!empty($settings['forum_width']))
 		echo '
 	<style>
@@ -401,7 +401,7 @@ function template_body_below()
 	</div>';
 
 	// Show RSS link, as well as the copyright.
-	// Footer is full-width. Wrapper inside automatically matches admin width setting.
+	// Footer is full-width. Wrapper inside automatically matches Admin width setting.
 	echo '
 	<div id="footer_section"><a id="bot"></a>
 		<div class="wrapper">

@@ -218,8 +218,8 @@ h2 a.collapse {
 
 /*	$MENUS	*/
 /* This section contains code for the main forum menu (#main_menu),
-/* and for the secondary menus in admin/profile/pm (.admin_menu),
-/* and for the tertiary menu strip in admin/etc (#adm_submenus).
+/* and for the secondary menus in Admin/profile/pm (.admin_menu),
+/* and for the tertiary menu strip in Admin/etc (#adm_submenus).
 /*
 /* Top level <ul> elements have the class or id mentioned above.
 /* <li> elements are for positioning only (classes are listlevel1, etc).
@@ -1030,7 +1030,7 @@ div.labels {
 	margin: 0 25px 0 0;
 }
 
-/* Yes some ugly importants since we don't have specific admin rtl css */
+/* Yes some ugly importants since we don't have specific Admin rtl css */
 .settings .help .icon {
 	margin: 1px -25px 0 0 !important;
     position: absolute !important;

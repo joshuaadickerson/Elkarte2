@@ -35,7 +35,7 @@ function template_show_email()
 			</dl>
 		</div>
 		<div class="centertext">
-			<a class="linkbutton" href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
+			<a class="linkbutton" href="' . $boardurl . '/index.php?action=Admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
 		</div>';
 }
 
@@ -81,7 +81,7 @@ function template_bounce_email()
 	// ]]></script>';
 
 	echo '
-	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
 		<h2 class="category_header hdicon cat_img_mail">
 			', $txt['show_notice'], '
 		</h2>';
@@ -141,11 +141,11 @@ function template_bounce_email()
 				</dd>
 			</dl>
 			<div class="submitbutton">
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=maillist;sa=emaillist;">', $txt['back'], '</a>
+				<a class="linkbutton" href="', $scripturl, '?action=Admin;area=maillist;sa=emaillist;">', $txt['back'], '</a>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="item" value="', $context['item'], '" />
 				<input type="submit" name="bounce" value="', $txt['bounce_issue'], '" />
-				<input type="hidden" name="', $context['admin-ml_token_var'], '" value="', $context['admin-ml_token'], '" />
+				<input type="hidden" name="', $context['Admin-ml_token_var'], '" value="', $context['Admin-ml_token'], '" />
 			</div>
 		</div>
 	</form>';
@@ -233,7 +233,7 @@ function template_bounce_template()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
 		<div id="preview_section"', isset($context['template_preview']) ? '' : ' class="hide"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', $txt['preview'], '</span>

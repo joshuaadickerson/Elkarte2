@@ -948,7 +948,7 @@ function template_send()
 				<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
 				<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
 
-	// If the admin enabled the pm drafts feature, show a draft selection box
+	// If the Admin enabled the pm drafts feature, show a draft selection box
 	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '

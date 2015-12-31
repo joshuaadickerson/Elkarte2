@@ -65,7 +65,7 @@ function allMembergroups($group_clause, $query_groups = array())
 
 	$group_clause = !empty($group_clause) ? $group_clause : '1=1';
 
-	// Get all the possible membergroups, except admin!
+	// Get all the possible membergroups, except Admin!
 	$request = $db->query('', '
 		SELECT id_group, group_name
 		FROM {db_prefix}membergroups

@@ -225,7 +225,7 @@ function template_deleteAccount()
 	echo '
 			<div class="content">';
 
-	// If they are deleting their account AND the admin needs to approve it - give them another piece of info ;)
+	// If they are deleting their account AND the Admin needs to approve it - give them another piece of info ;)
 	if ($context['needs_approval'])
 		echo '
 				<div class="warningbox">', $txt['deleteAccount_approval'], '</div>';
@@ -251,7 +251,7 @@ function template_deleteAccount()
 					<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 				</div>';
 	}
-	// Otherwise an admin doesn't need to enter a password - but they still get a warning - plus the option to delete lovely posts!
+	// Otherwise an Admin doesn't need to enter a password - but they still get a warning - plus the option to delete lovely posts!
 	else
 	{
 		echo '

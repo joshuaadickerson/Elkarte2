@@ -17,7 +17,7 @@
 
 /**
  * Template for the section that allows to modify weights for search settings
- * in admin panel.
+ * in Admin panel.
  */
 function template_modify_weights()
 {
@@ -25,7 +25,7 @@ function template_modify_weights()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['search_weights'], '
 			</h2>';
@@ -108,7 +108,7 @@ function template_modify_weights()
 				<div class="submitbutton">
 					<input type="submit" name="save" value="', $txt['search_weights_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-msw_token_var'], '" value="', $context['admin-msw_token'], '" />
+					<input type="hidden" name="', $context['Admin-msw_token_var'], '" value="', $context['Admin-msw_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -117,7 +117,7 @@ function template_modify_weights()
 
 /**
  * Template for the section to select a search method
- * in search area of admin panel.
+ * in search area of Admin panel.
  */
 function template_select_search_method()
 {
@@ -129,7 +129,7 @@ function template_select_search_method()
 		<div class="infobox">
 			<a href="', $scripturl, '?action=quickhelp;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a>
 		</div>
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=method" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=managesearch;sa=method" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['search_method'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -174,13 +174,13 @@ function template_select_search_method()
 
 		if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
 			echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>';
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=Admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-msm_token_var'], '=', $context['Admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>';
 		elseif (empty($context['fulltext_index']) && !empty($context['cannot_create_fulltext']))
 			echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_fulltext_cannot_create'];
 		else
 			echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a><br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=Admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-msm_token_var'], '=', $context['Admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['fulltext_length'];
 
 		echo '
@@ -198,15 +198,15 @@ function template_select_search_method()
 
 	if ($context['custom_index'])
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a><br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=Admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-msm_token_var'], '=', $context['Admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	elseif ($context['partial_custom_index'])
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>] [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=Admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-msm_token_var'], '=', $context['Admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>] [<a href="', $scripturl, '?action=Admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['Admin-msm_token_var'], '=', $context['Admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	else
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>';
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=Admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>';
 
 	echo '
 							</p>
@@ -243,7 +243,7 @@ function template_select_search_method()
 			<div class="submitbutton">
 				<input type="submit" name="save" value="', $txt['search_method_save'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
+				<input type="hidden" name="', $context['Admin-msmpost_token_var'], '" value="', $context['Admin-msmpost_token'], '" />
 			</div>
 		</form>
 	</div>
@@ -265,7 +265,7 @@ function template_create_index()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" method="post" accept-charset="UTF-8" name="create_index">
+		<form action="', $scripturl, '?action=Admin;area=managesearch;sa=createmsgindex;step=1" method="post" accept-charset="UTF-8" name="create_index">
 			<h2 class="category_header">', $txt['search_create_index'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -298,7 +298,7 @@ function template_create_index_progress()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" name="autoSubmit" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=Admin;area=managesearch;sa=createmsgindex;step=1" name="autoSubmit" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['search_create_index'], '</h2>
 			<div class="content">
 				<div>
@@ -336,7 +336,7 @@ function template_create_index_done()
 		<div class="content">
 			<p>', $txt['search_create_index_done'], '</p>
 			<p>
-				<strong><a href="', $scripturl, '?action=admin;area=managesearch;sa=method">', $txt['search_create_index_done_link'], '</a></strong>
+				<strong><a href="', $scripturl, '?action=Admin;area=managesearch;sa=method">', $txt['search_create_index_done_link'], '</a></strong>
 			</p>
 		</div>
 	</div>';
@@ -351,7 +351,7 @@ function template_spider_edit()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=editspiders;sid=', $context['spider']['id'], '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=sengines;sa=editspiders;sid=', $context['spider']['id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="information">
 				', $txt['add_spider_desc'], '
@@ -383,7 +383,7 @@ function template_spider_edit()
 				<div class="submitbutton">
 					<input type="submit" name="save" value="', $context['page_title'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-ses_token_var'], '" value="', $context['admin-ses_token'], '" />
+					<input type="hidden" name="', $context['Admin-ses_token_var'], '" value="', $context['Admin-ses_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -404,7 +404,7 @@ function template_show_spider_logs()
 	template_show_list('spider_logs');
 
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="content">
 				<p>
@@ -413,7 +413,7 @@ function template_show_spider_logs()
 				<div class="submitbutton">
 					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-sl_token_var'], '" value="', $context['admin-sl_token'], '" />
+					<input type="hidden" name="', $context['Admin-sl_token_var'], '" value="', $context['Admin-sl_token'], '" />
 				</div>
 			</div>
 		</form>
@@ -434,7 +434,7 @@ function template_show_spider_stats()
 	template_show_list('spider_stat_list');
 
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=stats" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=sengines;sa=stats" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="content">
 				<p>
@@ -442,7 +442,7 @@ function template_show_spider_stats()
 				</p>
 				<div class="submitbutton">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-ss_token_var'], '" value="', $context['admin-ss_token'], '" />
+					<input type="hidden" name="', $context['Admin-ss_token_var'], '" value="', $context['Admin-ss_token'], '" />
 					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" />
 				</div>
 			</div>
@@ -459,7 +459,7 @@ function template_manage_sphinx()
 
 	echo '
 	<div id="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="UTF-8" name="create_index">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="UTF-8" name="create_index">
 			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// any results to show?
@@ -541,7 +541,7 @@ function template_manage_sphinx()
 					<input type="submit" name="checkconnect" value="', $txt['sphinx_test_connection'], '" />
 					<input type="submit" name="save" value="', $txt['save'], '"  />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mssphinx_token_var'], '" value="', $context['admin-mssphinx_token'], '" />
+					<input type="hidden" name="', $context['Admin-mssphinx_token_var'], '" value="', $context['Admin-mssphinx_token'], '" />
 				</div>
 			</div>
 		</form>

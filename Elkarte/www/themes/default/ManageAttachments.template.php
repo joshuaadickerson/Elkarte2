@@ -48,7 +48,7 @@ function template_maintenance()
 		<div class="separator"></div>
 		<h2 class="category_header">', $txt['attachment_integrity_check'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=manageattachments;sa=repair;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 				<p>', $txt['attachment_integrity_check_desc'], '</p>
 				<div class="submitbutton">
 					<input type="submit" name="repair" value="', $txt['attachment_check_now'], '" />
@@ -58,7 +58,7 @@ function template_maintenance()
 		<div class="separator"></div>
 		<h2 class="category_header">', $txt['attachment_pruning'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
+			<form action="', $scripturl, '?action=Admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 				<label for="age">', sprintf($txt['attachment_remove_old'], ' <input type="text" id="age" name="age" value="25" size="4" class="input_text" /> '), '</label><br />
 				<label for="age_notice">', $txt['attachment_pruning_message'], '</label>: <input type="text" id="age_notice" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 				<div class="submitbutton">
@@ -69,7 +69,7 @@ function template_maintenance()
 				</div>
 			</form>
 			<hr />
-			<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
+			<form action="', $scripturl, '?action=Admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 				<label for="size">', sprintf($txt['attachment_remove_size'], ' <input type="text" name="size" id="size" value="100" size="4" class="input_text" /> '), '</label><br />
 				<label for="size_notice">', $txt['attachment_pruning_message'], '</label>: <input type="text" id="size_notice" name="notice" value="', $txt['attachment_delete_admin'], '" size="40" class="input_text" /><br />
 				<div class="submitbutton">
@@ -80,7 +80,7 @@ function template_maintenance()
 				</div>
 			</form>
 			<hr />
-			<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
+			<form action="', $scripturl, '?action=Admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');">
 				<label for="avatar_age">', sprintf($txt['attachment_manager_avatars_older'], '
  					<input type="text" id="avatar_age" name="age" value="45" size="4" class="input_text" /> '), '
 				</label>
@@ -106,7 +106,7 @@ function template_maintenance()
 	// Lots-o-options
 	echo '
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=Admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
 				<p class="infobox">', $txt['attachment_transfer_desc'], '</p>
 				<dl class="settings">
 					<dt>
@@ -230,7 +230,7 @@ function template_attachment_repair()
 	else
 	{
 		echo '
-	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;fixErrors=1;step=0;substep=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=manageattachments;sa=repair;fixErrors=1;step=0;substep=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 		<h2 class="category_header">', $txt['repair_attachments'], '</h2>
 		<div class="content">
 			<p>', $txt['repair_attachments_error_desc'], '</p>';

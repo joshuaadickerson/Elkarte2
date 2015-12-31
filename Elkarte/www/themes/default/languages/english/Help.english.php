@@ -77,8 +77,8 @@ $helptxt['view_members'] = '
 		</li>
 		<li>
 			<strong>Awaiting Approval</strong><br />
-			This section is only shown if you have enabled admin approval of all new registrations. Anyone who registers to join your
-			forum will only become a full member once they have been approved by an admin. The section lists all those members who
+			This section is only shown if you have enabled Admin approval of all new registrations. Anyone who registers to join your
+			forum will only become a full member once they have been approved by an Admin. The section lists all those members who
 			are still awaiting approval, along with their email and IP address. You can choose to either accept or reject (delete)
 			any member on the list by checking the box next to the member and choosing the action from the drop-down box at the bottom
 			of the screen. When rejecting a member you can choose to delete the member either with or without notifying them of your decision.<br /><br />
@@ -94,7 +94,7 @@ $helptxt['view_members'] = '
 
 $helptxt['ban_members'] = '<strong>Ban Members</strong><br />
 	This provides the ability to &quot;ban&quot; users, to prevent people who have violated the trust of the board
-	by spamming, trolling, etc. from continuing. This allows you to ban those users who are detrimental to your forum. As an admin,
+	by spamming, trolling, etc. from continuing. This allows you to ban those users who are detrimental to your forum. As an Admin,
 	when you view messages, you can see each user\'s IP address used to post at that time. In the ban list,
 	you simply type that IP address in, save, and they can no longer post from that location.<br />
 	You can also ban people through their email address.';
@@ -149,7 +149,7 @@ $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 		<li>
 			<strong>Register new member</strong><br />
 			From this screen you can choose to register accounts for new members on their behalf. This can be useful in forums where registration is closed
-			to new members, or in cases where the admin wishes to create a test account. If the option to require activation of the account
+			to new members, or in cases where the Admin wishes to create a test account. If the option to require activation of the account
 			is selected the member will be emailed a activation link which must be clicked before they can use the account. Similarly you can
 			select to email the users new password to the stated email address.<br /><br />
 		</li>
@@ -173,12 +173,12 @@ $helptxt['modlog'] = '<strong>Moderation Log</strong><br />
 	This section allows members of the moderation team to track all the moderation actions that the forum moderators have performed. To ensure that
 	moderators cannot remove references to the actions they have performed, entries may not be deleted until 24 hours after the action was taken.';
 $helptxt['adminlog'] = '<strong>Administration Log</strong><br />
-	This section allows members of the admin team to track some of the administrative actions that have occurred on the forum. To ensure that
+	This section allows members of the Admin team to track some of the administrative actions that have occurred on the forum. To ensure that
 	admins cannot remove references to the actions they have performed, entries may not be deleted until 24 hours after the action was taken.';
 $helptxt['badbehaviorlog'] = '<strong>Bad Behavior Log</strong><br />
-	This section allows members of the admin team to view some of the bad behavior actions that have occurred on the forum. This log is automatically pruned by the bad behavior function so it will only contain the last week of activity.';
+	This section allows members of the Admin team to view some of the bad behavior actions that have occurred on the forum. This log is automatically pruned by the bad behavior function so it will only contain the last week of activity.';
 $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
-	This feature enables members of the admin and moderation team to issue warnings to members - and to use a members warning level to determine the
+	This feature enables members of the Admin and moderation team to issue warnings to members - and to use a members warning level to determine the
 	actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define
 	which groups may assign warnings to members. Warning levels can be adjusted from a members profile. The following additional options are available:';
 $helptxt['watch_enable'] = '<strong>Warning Level for Member Watch</strong><br />This setting defines the percentage warning level a member must reach to automatically assign a &quot;watch&quot; to the member. Any member who is being &quot;watched&quot; will appear in the relevant area of the moderation center.';
@@ -345,7 +345,7 @@ $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tag
 
 // Initial theme settings - Manage and Install
 $helptxt['themes'] = 'Here you can select whether the default theme can be chosen, what theme guests will use, as well as other options. Click on a theme to the right to change the settings for it.';
-$helptxt['theme_install'] = 'This section permits you to install new themes. You do this by uploading an archived file for the theme from your personal computer, installing from a theme directory on the host server or by copying the default theme and renaming that copied file.<br /><br />Please remember this: the archived file or directory must have a <span class="alert">theme_info.xml</span> definition file as a part of the archive or the directory.';
+$helptxt['theme_install'] = 'This section permits you to Install new themes. You do this by uploading an archived file for the theme from your personal computer, installing from a theme directory on the host server or by copying the default theme and renaming that copied file.<br /><br />Please remember this: the archived file or directory must have a <span class="alert">theme_info.xml</span> definition file as a part of the archive or the directory.';
 $helptxt['theme_forum_theme'] = 'Changing the overall forum default does not affect members that have selected another available theme. You must also \'Reset\' all members to force them to the new forum default. You can also set a forum default theme that is seen by guests and then reset members to a different theme. <br /><br />Remember that when permitted to select their own themes, members can overide the theme set by you.';
 
 // Theme Management and Options - Theme settings
@@ -368,7 +368,7 @@ $helptxt['globalCookies'] = 'Makes login cookies available across subdomains.  F
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when login cookies are available across subdomains';
 $helptxt['httponlyCookies'] = 'With this setting on, cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
-$helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (equals a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
+$helptxt['admin_session_lifetime'] = 'This controls the length of time an Admin session can remain active. Once this timer expires the session will end, requiring you to enter your Admin credentials to continue accessing the Admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (equals a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
 $helptxt['auto_admin_session'] = 'This controls whether an administrative session is activated during logon or not.';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';
 $helptxt['securityDisable_why'] = 'This is your current password. (the same one you use to login.)<br /><br />Having to type this helps ensure that you want to do whatever administration you are doing, and that it is <strong>you</strong> doing it.';
@@ -444,7 +444,7 @@ $helptxt['registration_method'] = 'This option determines what method of registr
 				When this option is enabled any members registering with the forum will have an activation link emailed to them which they must click before they can become full members.<br />
 		</li><li>
 			<strong>Admin Approval</strong><br />
-				This option will make it so that all new members registering with the forum will need to be approved by an admin before they become full members.
+				This option will make it so that all new members registering with the forum will need to be approved by an Admin before they become full members.
 		</li>
 	</ul>';
 $helptxt['register_openid'] = '<strong>Authenticate with OpenID</strong><br />
@@ -487,7 +487,7 @@ $helptxt['latest_packages'] = 'Here you can see some of the most popular and som
 $helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
 $helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that ElkArte will never tell you, or anyone else, what they are.';
-$helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="%1$s?action=admin;area=manageboards" target="_blank" class="new_win">board management interface</a>.';
+$helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="%1$s?action=Admin;area=manageboards" target="_blank" class="new_win">board management interface</a>.';
 
 $helptxt['permissions'] = 'Permissions are how you either allow groups to, or deny groups from, doing specific things.<br /><br />You can modify multiple boards at once with the checkboxes, or look at the permissions for a specific group by clicking \'Modify.\'';
 $helptxt['permissions_board'] = 'If a board is set to \'Global,\' it means that the board will not have any special permissions.  \'Local\' means it will have its own permissions - separate from the global ones.  This allows you to have a board that has more or less permissions than another, without requiring you to set them for each and every board.';
@@ -579,7 +579,7 @@ $helptxt['show_spider_online'] = 'This setting allows you to select whether spid
 		</li>
 	</ul>';
 
-$helptxt['birthday_email'] = 'Choose the index of the birthday email message to use.  A preview will be shown in the Email Subject and Email Body fields.<br /><strong>Note:</strong> Setting this option does not automatically enable birthday emails.  To enable birthday emails use the <a href="%1$s?action=admin;area=scheduledtasks;%3$s=%2$s" target="_blank" class="new_win">Scheduled Tasks</a> page and enable the birthday email task.';
+$helptxt['birthday_email'] = 'Choose the index of the birthday email message to use.  A preview will be shown in the Email Subject and Email Body fields.<br /><strong>Note:</strong> Setting this option does not automatically enable birthday emails.  To enable birthday emails use the <a href="%1$s?action=Admin;area=scheduledtasks;%3$s=%2$s" target="_blank" class="new_win">Scheduled Tasks</a> page and enable the birthday email task.';
 $helptxt['pm_bcc'] = 'When sending a personal message you can choose to add a recipient as BCC or &quot;Blind Carbon Copy&quot;. BCC recipients do not have their identities revealed to other recipients of the message.';
 
 $helptxt['move_topics_maintenance'] = 'This will allow you to move all the posts from one board to another board.';

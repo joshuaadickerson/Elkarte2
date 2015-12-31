@@ -745,7 +745,7 @@ function template_profile_block_contact()
 		if ($context['member']['show_email'] == 'yes')
 			echo '
 						<a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $txt['email'], '</a>';
-		// ... Or if the one looking at the profile is an admin they can see it anyway.
+		// ... Or if the one looking at the profile is an Admin they can see it anyway.
 		elseif ($context['member']['show_email'] == 'yes_permission_override')
 			echo '
 						<em><a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a></em>';

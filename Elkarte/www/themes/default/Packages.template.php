@@ -16,7 +16,7 @@
  */
 
 /**
- * Shows the screen for the package install / uninstall
+ * Shows the screen for the package Install / uninstall
  * Displays license, readme, and test results
  */
 function template_view_package()
@@ -38,13 +38,13 @@ function template_view_package()
 	echo $txt['package_installed_warning3'], '
 		</div>';
 
-	// Do errors exist in the install? If so light them up like a Christmas tree.
+	// Do errors exist in the Install? If so light them up like a Christmas tree.
 	if ($context['has_failure'])
 	{
 		echo '
 		<div class="errorbox">
-			', sprintf($txt['package_will_fail_title'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]), '<br />
-			', sprintf($txt['package_will_fail_warning'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'install')]),
+			', sprintf($txt['package_will_fail_title'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'Install')]), '<br />
+			', sprintf($txt['package_will_fail_warning'], $txt['package_' . ($context['uninstalling'] ? 'uninstall' : 'Install')]),
 		!empty($context['failure_details']) ? '<br /><br /><strong>' . $context['failure_details'] . '</strong>' : '', '
 		</div>';
 	}
@@ -57,7 +57,7 @@ function template_view_package()
 			<div class="content">
 				', $context['package_readme'], '
 				<span class="floatright">', $txt['package_available_readme_language'], '
-					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
+					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=Admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'Install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 
 		foreach ($context['readmes'] as $a => $b)
 			echo '
@@ -78,7 +78,7 @@ function template_view_package()
 			<div class="content">
 				', $context['package_license'], '
 				<span class="floatright">', $txt['package_available_license_language'], '
-					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
+					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=Admin;area=packages;sa=Install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 
 		foreach ($context['licenses'] as $a => $b)
 			echo '
@@ -182,8 +182,8 @@ function template_view_package()
 							<tr>
 								<td style="width:0;"></td>
 								<td style="width: 30px;" class="smalltext">
-									<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);">
-										<img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" />
+									<a href="' . $scripturl . '?action=Admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);">
+										<img src="', $settings['default_images_url'], '/Admin/package_ops.png" alt="" />
 									</a>
 								</td>
 								<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
@@ -210,7 +210,7 @@ function template_view_package()
 			</table>
 			';
 
-		// What if we have custom themes we can install into? List them too!
+		// What if we have custom themes we can Install into? List them too!
 		if (!empty($context['theme_actions']))
 		{
 			echo '
@@ -278,8 +278,8 @@ function template_view_package()
 								<tr>
 									<td style="width:0"></td>
 									<td style="width: 30px;" class="smalltext">
-										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
-											<img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" />
+										<a href="' . $scripturl . '?action=Admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
+											<img src="', $settings['default_images_url'], '/Admin/package_ops.png" alt="" />
 										</a>
 									</td>
 									<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
@@ -307,7 +307,7 @@ function template_view_package()
 		}
 	}
 
-	// Are we effectively ready to install?
+	// Are we effectively ready to Install?
 	if (!$context['ftp_needed'] && (!empty($context['actions']) || !empty($context['database_changes'])))
 	{
 		echo '
@@ -432,7 +432,7 @@ function template_extract_package()
 	{
 		echo '
 				', $context['redirect_text'], '<br /><br />
-				<a href="', $context['redirect_url'], '">', $txt['package_installed_redirect_go_now'], '</a> | <a href="', $scripturl, '?action=admin;area=packages;sa=browse">', $txt['package_installed_redirect_cancel'], '</a>';
+				<a href="', $context['redirect_url'], '">', $txt['package_installed_redirect_go_now'], '</a> | <a href="', $scripturl, '?action=Admin;area=packages;sa=browse">', $txt['package_installed_redirect_cancel'], '</a>';
 	}
 	elseif ($context['uninstalling'])
 		echo '
@@ -484,12 +484,12 @@ function template_list()
 
 	foreach ($context['files'] as $fileinfo)
 		echo '
-				<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['size'], ' ', $txt['package_bytes'], ')</li>';
+				<li><a href="', $scripturl, '?action=Admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['size'], ' ', $txt['package_bytes'], ')</li>';
 
 	echo '
 			</ol>
 			<br />
-			<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
+			<a class="linkbutton_right" href="', $scripturl, '?action=Admin;area=packages">', $txt['back'], '</a>
 		</div>
 	</div>';
 }
@@ -507,7 +507,7 @@ function template_examine()
 		<h2 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h2>
 		<div class="content">
 			<pre class="file_content">', $context['filedata'], '</pre>
-			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
+			<a href="', $scripturl, '?action=Admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
 		</div>
 	</div>';
 }
@@ -541,7 +541,7 @@ function template_browse()
 }
 
 /**
- * Show the install options
+ * Show the Install options
  */
 function template_install_options()
 {
@@ -553,7 +553,7 @@ function template_install_options()
 		<div class="information">
 			', $txt['package_install_options_ftp_why'], '
 		</div>
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=Admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
 			<dl class="settings">
 				<dt>
 					<label for="pack_server">', $txt['package_install_options_ftp_server'], ':</label>
@@ -726,7 +726,7 @@ function template_view_operations()
 	<head>
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/Admin.css', CACHE_STALE, '" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'index', $context['theme_variant'], '.css', CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js', CACHE_STALE, '"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/theme.js', CACHE_STALE, '"></script>
@@ -749,7 +749,7 @@ function template_file_permissions()
 	global $txt, $scripturl, $context, $settings;
 
 	// This will handle expanding the selection.
-	// @todo most of this code should go in to admin.js
+	// @todo most of this code should go in to Admin.js
 	echo '
 	<script><!-- // --><![CDATA[
 		var oRadioColors = {
@@ -771,7 +771,7 @@ function template_file_permissions()
 		{
 			ajax_indicator(true);
 
-			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
+			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + Admin + (AdminInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
 		}
 
 		// Getting something back?
@@ -964,7 +964,7 @@ function template_file_permissions()
 		</div>
 	</div>
 
-	<form id="admin_form_wrapper" class="file_permissions" action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+	<form id="admin_form_wrapper" class="file_permissions" action="', $scripturl, '?action=admin;area=packages;sa=perms;', $contAdminsession_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 		<h2 class="category_header">
 			<span class="floatleft">', $txt['package_file_perms'], '</span><span class="fperm floatright">', $txt['package_file_perms_new_status'], '</span>
 		</h2>
@@ -1101,7 +1101,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 			echo '
 				<tr id="content_', $cur_ident, '">
 					<td class="smalltext grid30">' . str_repeat('&nbsp;', $level * 5), '
-						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
+						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' .Admin64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
 
 			if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
 				echo '
@@ -1135,7 +1135,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		echo '
 	<tr id="content_', $js_ident, '_more">
 		<td class="smalltext" style="width: 40%;">', str_repeat('&nbsp;', $level * 5), '
-			&#171; <a href="', $scripturl, '?action=admin;area=packages;sa=perms;find=', base64_encode($ident), ';fileoffset=', ($context['file_offset'] + $context['file_limit']), ';', $context['session_var'], '=', $context['session_id'], '#fol_', preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident), '">', $txt['package_file_perms_more_files'], '</a> &#187;
+			&#171; <a href="', $scripturl, '?action=admin;area=packages;sa=perms;find=', Admin4_encode($ident), ';fileoffset=', ($context['file_offset'] + $context['file_limit']), ';', $context['session_var'], '=', $context['session_id'], '#fol_', preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident), '">', $txt['package_file_perms_more_files'], '</a> &#187;
 		</td>
 		<td colspan="6"></td>
 	</tr>';
@@ -1210,7 +1210,7 @@ function template_pause_action_permissions()
 	}
 
 	echo '
-			<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="UTF-8">
+			<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $contAdminsession_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="UTF-8">
 				<div class="submitbutton">';
 
 	// Put out the right hidden data.

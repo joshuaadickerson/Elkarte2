@@ -272,7 +272,7 @@ $txt['primary_membergroup'] = 'Primary Membergroup';
 $txt['additional_membergroups'] = 'Additional Membergroups';
 $txt['additional_membergroups_show'] = 'Show additional groups';
 $txt['no_primary_membergroup'] = '(no primary membergroup)';
-$txt['deadmin_confirm'] = 'Are you sure you wish to irrevocably remove your admin status?';
+$txt['deadmin_confirm'] = 'Are you sure you wish to irrevocably remove your Admin status?';
 
 $txt['account_activate_method_2'] = 'Account requires reactivation after email change';
 $txt['account_activate_method_3'] = 'Account is not approved';

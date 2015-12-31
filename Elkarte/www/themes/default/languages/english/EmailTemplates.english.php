@@ -105,7 +105,7 @@ This is due to the following reason: {REASON}
 $txt['admin_approve_accept_subject'] = 'Welcome to {FORUMNAME}';
 $txt['admin_approve_accept_body'] = 'Welcome, {NAME}
 
-Your account has been activated manually by the admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
+Your account has been activated manually by the Admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
 
 {REGARDS}';
 
@@ -553,7 +553,7 @@ Should you have any problems with activation, please visit {ACTIVATIONLINKWITHOU
 $txt['register_coppa_subject'] = 'Welcome to {FORUMNAME}';
 $txt['register_coppa_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}
 
-Before you can login, the admin requires consent from your parent/guardian for you to join the community. You can obtain more information at the link below:
+Before you can login, the Admin requires consent from your parent/guardian for you to join the community. You can obtain more information at the link below:
 
 {COPPALINK}
 
@@ -573,7 +573,7 @@ $txt['register_openid_coppa_body'] = 'Thank you for registering at {FORUMNAME}. 
 You have chosen to authenticate using the following OpenID identity:
 {OPENID}
 
-Before you can login, the admin requires consent from your parent/guardian for you to join the community. You can obtain more information at the link below:
+Before you can login, the Admin requires consent from your parent/guardian for you to join the community. You can obtain more information at the link below:
 
 {COPPALINK}
 

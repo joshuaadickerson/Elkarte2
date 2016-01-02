@@ -1173,7 +1173,7 @@ class Install_Controller
         updateMemberStats();
         require_once(SUBSDIR . '/Messages.subs.php');
         updateMessageStats();
-        require_once(SUBSDIR . '/Topic.subs.php');
+        require_once(ROOTDIR . '/Topics/Topic.subs.php');
         updateTopicStats();
 
         $request = $db->query('', '

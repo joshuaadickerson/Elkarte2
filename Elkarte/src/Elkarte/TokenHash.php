@@ -12,7 +12,7 @@
  *
  */
 
-namespace Elkarke\Elkarte;
+namespace Elkarte\Elkarte;
 
 /**
  * Class Random_Hash
@@ -27,7 +27,7 @@ class TokenHash
 	 * Available characters for private salt
 	 * @var string
 	 */
-	private $itoa64;
+	private $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 	/**
 	 * Random digits for initial seeding
@@ -46,9 +46,6 @@ class TokenHash
 	 */
 	public function __construct()
 	{
-		// Valid salt characters for crypt
-		$this->itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
 		// Set a random state to initialize
 		$this->_state_seed();
 	}

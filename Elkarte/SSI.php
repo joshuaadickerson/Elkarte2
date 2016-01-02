@@ -1178,7 +1178,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	static $last_board = null;
 
 	require_once(SUBSDIR . '/Poll.subs.php');
-	require_once(SUBSDIR . '/Topic.subs.php');
+	require_once(ROOTDIR . '/Topics/Topic.subs.php');
 
 	if ($topicID === null && isset($_REQUEST['ssi_topic']))
 		$topicID = (int) $_REQUEST['ssi_topic'];

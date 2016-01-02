@@ -157,7 +157,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				);
 
 				// Move the topics to the recycle board.
-				require_once(SUBSDIR . '/Topic.subs.php');
+				require_once(ROOTDIR . '/Topics/Topic.subs.php');
 				moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 				// Close reports that are being recycled.
@@ -2549,7 +2549,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	}
 
 	// Any associated reported posts better follow...
-	require_once(SUBSDIR . '/Topic.subs.php');
+	require_once(ROOTDIR . '/Topics/Topic.subs.php');
 	updateSplitTopics(array(
 		'splitMessages' => $splitMessages,
 		'split1_replies' => $split1_replies,
@@ -2587,7 +2587,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		while ($row = $request->fetchAssoc())
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['unwatched']);
 
-		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}

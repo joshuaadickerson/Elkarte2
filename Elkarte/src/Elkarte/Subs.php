@@ -1231,24 +1231,21 @@ function prepareSearchEngines()
  * @param bool $reset
  * @return integer|boolean
  */
-function currentContext($messages_request, $reset = false)
+function currentContext(\Elkarte\ElkArte\Database\Drivers\ResultInterface $messages_request, $reset = false)
 {
-	// Can't work with a database without a database :P
-	$db = $GLOBALS['elk']['db'];
-
 	// Start from the beginning...
 	if ($reset)
-		return $db->data_seek($messages_request, 0);
+		return $messages_request->dataSeek(0);
 
 	// If the query has already returned false, get out of here
 	if ($messages_request == false)
 		return false;
 
 	// Attempt to get the next message.
-	$message = $db->fetch_assoc($messages_request);
+	$message = $messages_request->fetchAssoc();
 	if (!$message)
 	{
-		$db->free_result($messages_request);
+		$messages_request->free();
 		return false;
 	}
 
@@ -1268,6 +1265,7 @@ function currentContext($messages_request, $reset = false)
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
+ * @return array
  */
 function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {

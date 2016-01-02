@@ -388,7 +388,7 @@ class TopicsMerge
 		$id_board = $topic_info['id_board'];
 
 		// Update all the statistics.
-		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		updateTopicStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateSubjectStats($id_topic, $target_subject);

@@ -235,6 +235,7 @@ function cleanTokens($complete = false, $suffix = '')
  *
  * @param string $action
  * @param bool $is_fatal = true
+ * @return bool
  */
 function checkSubmitOnce($action, $is_fatal = false)
 {
@@ -246,7 +247,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$tokenizer = new TokenHash();
+		$tokenizer = new \Elkarte\Elkarte\TokenHash();
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 			$context['form_sequence_number'] = $tokenizer->generate_hash();

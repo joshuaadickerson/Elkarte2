@@ -30,7 +30,7 @@ function getLastPosts($latestPostOptions)
 {
 	global $scripturl, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessible...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
@@ -61,7 +61,7 @@ function getLastPosts($latestPostOptions)
 	$posts = array();
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Censor the subject and post for the preview ;).
 		$row['body'] = censor($row['subject']);
@@ -96,7 +96,7 @@ function getLastPosts($latestPostOptions)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $posts;
 }
@@ -208,7 +208,7 @@ function earliest_msg()
 {
 	global $board, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!empty($board))
 	{
@@ -222,8 +222,8 @@ function earliest_msg()
 				'current_member' => $user_info['id'],
 			)
 		);
-		list ($earliest_msg) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($earliest_msg) = $request->fetchRow();
+		$request->free();
 	}
 	else
 	{
@@ -236,8 +236,8 @@ function earliest_msg()
 				'current_member' => $user_info['id'],
 			)
 		);
-		list ($earliest_msg) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($earliest_msg) = $request->fetchRow();
+		$request->free();
 	}
 
 	// This is needed in case of topics marked unread.
@@ -259,8 +259,8 @@ function earliest_msg()
 					'current_member' => $user_info['id'],
 				)
 			);
-			list ($earliest_msg2) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($earliest_msg2) = $request->fetchRow();
+			$request->free();
 
 			// In theory this could be zero, if the first ever post is unread, so fudge it ;)
 			if ($earliest_msg2 == 0)

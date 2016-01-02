@@ -54,7 +54,7 @@ if (!empty($modSettings['paid_email_to']))
 		);
 }
 
-$db = database();
+$db = $GLOBALS['elk']['db'];
 
 // We need to see whether we can find the correct payment gateway,
 // Go through all our gateway scripts and find out if they are happy with what we have.

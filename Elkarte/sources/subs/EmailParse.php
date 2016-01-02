@@ -240,7 +240,7 @@ class Email_Parse
 	 */
 	private function _query_load_email($id)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// Nothing to load then
 		if (empty($id))

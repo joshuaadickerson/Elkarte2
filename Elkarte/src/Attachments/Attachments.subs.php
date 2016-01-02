@@ -658,7 +658,7 @@ function attachmentChecks($attachID)
 {
 	global $modSettings, $context, $attachmentOptions;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if (empty($_SESSION['temp_attachments'][$attachID]))
@@ -846,7 +846,7 @@ function createAttachment(&$attachmentOptions)
 {
 	global $modSettings, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
 
@@ -1034,7 +1034,7 @@ function createAttachment(&$attachmentOptions)
  */
 function getAvatar($id_attach)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Use our cache when possible
 	if ($GLOBALS['elk']['cache']->getVar($cache, 'getAvatar_id-' . $id_attach))
@@ -1077,7 +1077,7 @@ function getAvatar($id_attach)
  */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
@@ -1112,7 +1112,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  */
 function increaseDownloadCounter($id_attach)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('attach_download_increase', '
 		UPDATE LOW_PRIORITY {db_prefix}attachments
@@ -1147,7 +1147,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
 	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
@@ -1416,7 +1416,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$attachments = array();
 	$request = $db->query('', '
@@ -1465,7 +1465,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
  */
 function getAvatarsDefault()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQuery('
 		SELECT id_attach, id_folder, id_member, filename, file_hash
@@ -1605,7 +1605,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$thumb_filename = $filename . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// Add this beauty to the database.
 		$db->insert('',
@@ -1652,7 +1652,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($include_count)
 	{
@@ -1891,7 +1891,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
  */
 function bindMessageAttachments($id_msg, $attachment_ids)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}attachments

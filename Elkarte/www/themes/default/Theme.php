@@ -2,7 +2,7 @@
 
 namespace Themes\DefaultTheme;
 
-use ElkArte\ElkArte\View\AbstractTheme;
+use Elkarte\Elkarte\View\AbstractTheme;
 
 /**
  * The default theme
@@ -24,7 +24,6 @@ use ElkArte\ElkArte\View\AbstractTheme;
 class Theme extends AbstractTheme
 {
     protected $id = 0;
-
 
     /**
      * This is the only template included in the Sources.
@@ -104,7 +103,7 @@ class Theme extends AbstractTheme
     {
         global $context, $settings, $modSettings;
 
-        $db = database();
+        $db = $GLOBALS['elk']['db'];
 
         // Show the load time?  (only makes sense for the footer.)
         $context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
@@ -458,7 +457,7 @@ class Theme extends AbstractTheme
         $context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
         $context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 
-        $bbc_parser = \BBC\ParserWrapper::getInstance();
+        $bbc_parser = $GLOBALS['elk']['bbc'];
 
         // Get some news...
         $context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
@@ -575,7 +574,7 @@ class Theme extends AbstractTheme
             $context['page_title'] = '';
 
         // Set some specific vars.
-        $context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+        $context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
         // Load a custom CSS file?
         if (file_exists($settings['theme_dir'] . '/css/custom.css'))
@@ -1078,7 +1077,7 @@ class Theme extends AbstractTheme
             else
                 $layers = array('html', 'body');
 
-            $template_layers = \TemplateLayers::getInstance(true);
+            $template_layers = $GLOBALS['elk']['layers']->setErrorSafe(true);
             foreach ($layers as $layer)
                 $template_layers->addBegin($layer);
         }

@@ -27,15 +27,15 @@ if (!defined('ELK'))
  */
 function countMessages()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages',
 		array()
 	);
-	list ($messages) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($messages) = $request->fetchRow();
+	$request->free();
 
 	return $messages;
 }
@@ -47,7 +47,7 @@ function countMessages()
  */
 function flushLogTables()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online');
@@ -132,7 +132,7 @@ function resizeMessageTableBody($type)
  */
 function detectExceedingMessages($start, $increment)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ id_msg
@@ -164,7 +164,7 @@ function getExceedingMessages($msg)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT id_msg, id_topic, subject
@@ -192,7 +192,7 @@ function getElkTables()
 {
 	global $db_prefix;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$tables = array();
 
@@ -228,7 +228,7 @@ function optimizeTable($tablename)
  */
 function getMaxTopicID()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT MAX(id_topic)
@@ -236,8 +236,8 @@ function getMaxTopicID()
 		array(
 		)
 	);
-	list ($id_topic) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($id_topic) = $request->fetchRow();
+	$request->free();
 
 	return $id_topic;
 }
@@ -251,7 +251,7 @@ function getMaxTopicID()
  */
 function recountApprovedMessages($start, $increment)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Recount approved messages
 	$db->fetchQueryCallback('
@@ -284,7 +284,7 @@ function recountApprovedMessages($start, $increment)
  */
 function recountUnapprovedMessages($start, $increment)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Recount unapproved messages
 	$db->fetchQueryCallback('
@@ -319,7 +319,7 @@ function recountUnapprovedMessages($start, $increment)
  */
 function resetBoardsCounter($column)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
 
@@ -347,7 +347,7 @@ function resetBoardsCounter($column)
  */
 function updateBoardsCounter($type, $start, $increment)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	switch ($type)
 	{
@@ -365,7 +365,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'is_approved' => 1,
 				)
 			);
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$db->query('', '
 					UPDATE {db_prefix}boards
@@ -377,7 +377,7 @@ function updateBoardsCounter($type, $start, $increment)
 					)
 				);
 			}
-			$db->free_result($request);
+			$request->free();
 			break;
 
 		case 'topics':
@@ -394,7 +394,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_max' => $start + $increment,
 				)
 			);
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$db->query('', '
 					UPDATE {db_prefix}boards
@@ -406,7 +406,7 @@ function updateBoardsCounter($type, $start, $increment)
 					)
 				);
 			}
-			$db->free_result($request);
+			$request->free();
 			break;
 
 		case 'unapproved_posts':
@@ -423,7 +423,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'is_approved' => 0,
 				)
 			);
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$db->query('', '
 					UPDATE {db_prefix}boards
@@ -435,7 +435,7 @@ function updateBoardsCounter($type, $start, $increment)
 					)
 				);
 			}
-			$db->free_result($request);
+			$request->free();
 			break;
 
 		case 'unapproved_topics':
@@ -452,7 +452,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_max' => $start + $increment,
 				)
 			);
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$db->query('', '
 					UPDATE {db_prefix}boards
@@ -464,7 +464,7 @@ function updateBoardsCounter($type, $start, $increment)
 					)
 				);
 			}
-			$db->free_result($request);
+			$request->free();
 			break;
 
 		default:
@@ -479,7 +479,7 @@ function updateBoardsCounter($type, $start, $increment)
  */
 function updatePersonalMessagesCounter()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	require_once(SUBSDIR . '/Members.subs.php');
 
@@ -526,7 +526,7 @@ function updatePersonalMessagesCounter()
  */
 function updateMessagesBoardID($start, $increment)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
@@ -540,9 +540,9 @@ function updateMessagesBoardID($start, $increment)
 		)
 	);
 	$boards = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$boards[$row['id_board']][] = $row['id_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	foreach ($boards as $board_id => $messages)
 		$db->query('', '
@@ -563,7 +563,7 @@ function updateMessagesBoardID($start, $increment)
  */
 function updateBoardsLastMessage()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Update the latest message of each board.
 	$request = $db->query('', '
@@ -576,9 +576,9 @@ function updateBoardsLastMessage()
 		)
 	);
 	$realBoardCounts = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
@@ -587,12 +587,12 @@ function updateBoardsLastMessage()
 		)
 	);
 	$resort_me = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
 		$resort_me[$row['child_level']][] = $row;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	krsort($resort_me);
 
@@ -635,7 +635,7 @@ function updateBoardsLastMessage()
  */
 function countTopicsFromBoard($id_board)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -645,8 +645,8 @@ function countTopicsFromBoard($id_board)
 			'id_board' => $id_board,
 		)
 	);
-	list ($total_topics) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_topics) = $request->fetchRow();
+	$request->free();
 
 	return $total_topics;
 }
@@ -659,7 +659,7 @@ function countTopicsFromBoard($id_board)
  */
 function getTopicsToMove($id_board)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Lets get the topics.
 	$db->fetchQueryCallback('
@@ -685,7 +685,7 @@ function getTopicsToMove($id_board)
  */
 function countContributors()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(DISTINCT m.id_member)
@@ -698,8 +698,8 @@ function countContributors()
 	);
 
 	// save it so we don't do this again for this task
-	list ($total_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_members) = $request->fetchRow();
+	$request->free();
 
 	return $total_members;
 }
@@ -716,7 +716,7 @@ function updateMembersPostCount($start, $increment)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
@@ -734,13 +734,13 @@ function updateMembersPostCount($start, $increment)
 			'zero' => 0,
 		)
 	);
-	$total_rows = $db->num_rows($request);
+	$total_rows = $request->numRows();
 
 	// Update the post count for this group
 	require_once(SUBSDIR . '/Members.subs.php');
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		updateMemberData($row['id_member'], array('posts' => $row['posts']));
-	$db->free_result($request);
+	$request->free();
 
 	return $total_rows;
 }
@@ -757,7 +757,7 @@ function updateZeroPostMembers()
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$createTemporary = $db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
@@ -819,7 +819,7 @@ function updateZeroPostMembers()
  */
 function purgeMembers($type, $groups, $time_limit)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$where_vars = array(
 		'time_limit' => $time_limit,
@@ -839,7 +839,7 @@ function purgeMembers($type, $groups, $time_limit)
 		array(
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Avoid this one?
 		if (!in_array($row['id_group'], $groups))
@@ -857,7 +857,7 @@ function purgeMembers($type, $groups, $time_limit)
 			}
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// If we have ungrouped unselected we need to avoid those guys.
 	if (!in_array(0, $groups))
@@ -875,12 +875,12 @@ function purgeMembers($type, $groups, $time_limit)
 		$where_vars
 	);
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!$row['is_mod'] || !in_array(3, $groups))
 			$members[] = $row['id_member'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $members;
 }

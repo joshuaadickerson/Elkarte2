@@ -37,7 +37,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 {
 	global $modSettings, $sc, $user_info, $scripturl, $last_error;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	static $tried_hook = false;
 
 	// Check if error logging is actually on.
@@ -404,7 +404,7 @@ function display_db_error()
 	global $mbname, $modSettings, $maintenance;
 	global $webmaster_email, $db_last_error, $db_error_send;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$cache = $GLOBALS['elk']['cache'];
 
 	// Just check we're not in any buffers, just in case.

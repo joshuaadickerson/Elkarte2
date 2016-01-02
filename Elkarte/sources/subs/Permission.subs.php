@@ -28,7 +28,7 @@ function loadIllegalPermissions()
 	if (!allowedTo('manage_permissions'))
 		$context['illegal_permissions'][] = 'manage_permissions';
 
-	Hooks::get()->hook('load_illegal_permissions');
+	$GLOBALS['elk']['hooks']->hook('load_illegal_permissions');
 }
 
 /**
@@ -72,7 +72,7 @@ function loadIllegalGuestPermissions()
 		'like_posts',
 	);
 
-	Hooks::get()->hook('load_illegal_guest_permissions');
+	$GLOBALS['elk']['hooks']->hook('load_illegal_guest_permissions');
 }
 
 /**
@@ -83,7 +83,7 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// All the parent groups to sort out.
 	if (!is_array($parents))
@@ -103,13 +103,13 @@ function updateChildPermissions($parents, $profile = null)
 	$children = array();
 	$parents = array();
 	$child_groups = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$children[$row['id_parent']][] = $row['id_group'];
 		$child_groups[] = $row['id_group'];
 		$parents[] = $row['id_parent'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	$parents = array_unique($parents);
 
@@ -130,10 +130,10 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['permission'], $row['add_deny']);
-		$db->free_result($request);
+		$request->free();
 
 		$db->query('', '
 			DELETE FROM {db_prefix}permissions
@@ -172,10 +172,10 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
-		$db->free_result($request);
+		$request->free();
 
 		$db->query('', '
 			DELETE FROM {db_prefix}board_permissions
@@ -214,7 +214,7 @@ class InlinePermissions_Form
 	{
 		global $context;
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -283,10 +283,10 @@ class InlinePermissions_Form
 	{
 		global $context, $txt, $modSettings;
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		loadLanguage('ManagePermissions');
-		\Templates::getInstance()->load('ManagePermissions');
+		$GLOBALS['elk']['templates']->load('ManagePermissions');
 		$context['can_change_permissions'] = allowedTo('manage_permissions');
 
 		// Nothing to initialize here.
@@ -322,9 +322,9 @@ class InlinePermissions_Form
 				'on' => 'on',
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
-		$db->free_result($request);
+		$request->free();
 
 		$request = $db->query('', '
 			SELECT mg.id_group, mg.group_name, mg.min_posts, IFNULL(p.add_deny, -1) AS status, p.permission
@@ -341,7 +341,7 @@ class InlinePermissions_Form
 				'permissions' => $permissions,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			// Initialize each permission as being 'off' until proven otherwise.
 			foreach ($permissions as $permission)
@@ -355,7 +355,7 @@ class InlinePermissions_Form
 
 			$context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
 		}
-		$db->free_result($request);
+		$request->free();
 
 		// Some permissions cannot be given to certain groups. Remove the groups.
 		foreach ($excluded_groups as $group)

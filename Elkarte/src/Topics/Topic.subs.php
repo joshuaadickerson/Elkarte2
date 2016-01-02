@@ -71,7 +71,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	if (empty($topics))
 		return;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$cache = $GLOBALS['elk']['cache'];
 
 	// Only a single topic.
@@ -445,7 +445,7 @@ function moveTopicsPermissions($moveCache)
 {
 	global $board, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// I know - I just KNOW you're trying to beat the system.  Too bad for you... we CHECK :P.
 	$request = $db->query('', '
@@ -551,7 +551,7 @@ function moveTopics($topics, $toBoard, $log = false)
 	if (empty($topics) || empty($toBoard))
 		return;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Only a single topic.
 	if (!is_array($topics))
@@ -858,7 +858,7 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 	// @deprecated since 1.1
 	global $board, $topic;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// @deprecated since 1.1
 	if ($move_from === null && isset($_GET['current_board']))
@@ -935,7 +935,7 @@ function removeDeleteConcurrence()
  */
 function increaseViewCounter($id_topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}topics
@@ -955,7 +955,7 @@ function increaseViewCounter($id_topic)
  */
 function markTopicsRead($mark_topics, $was_set = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!is_array($mark_topics))
 		return;
@@ -981,7 +981,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Check for notifications on this topic OR board.
 	$request = $db->query('', '
@@ -1035,7 +1035,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1068,7 +1068,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
  */
 function hasTopicNotification($id_member, $id_topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find out if they have notification set for this topic already.
 	$request = $db->query('', '
@@ -1097,7 +1097,7 @@ function hasTopicNotification($id_member, $id_topic)
  */
 function setTopicNotification($id_member, $id_topic, $on = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($on)
 	{
@@ -1167,7 +1167,7 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT t2.id_topic
@@ -1243,7 +1243,7 @@ function setTopicWatch($id_member, $topic, $on = false)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// find the current entry if it exists that is
 	$was_set = getLoggedTopics($user_info['id'], array($topic));
@@ -1276,7 +1276,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 {
 	global $user_info, $modSettings, $board;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Nothing to do
 	if (empty($topic_parameters))
@@ -1340,7 +1340,7 @@ function getTopicInfoByMsg($topic, $msg = null)
 	if (empty($topic))
 		return false;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1381,7 +1381,7 @@ function getTopicInfoByMsg($topic, $msg = null)
  */
 function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Custom conditions.
 	$condition = '';
@@ -1440,7 +1440,7 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
  */
 function topicsStartedBy($memberID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Fetch all topics started by this user.
 	$request = $db->query('', '
@@ -1473,7 +1473,7 @@ function topicsStartedBy($memberID)
  */
 function messagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Fetch the message IDs of the topic that are at or after the message.
 	$request = $db->query('', '
@@ -1509,7 +1509,7 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
  */
 function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Give us something to work with
 	if (empty($id_topic) || empty($id_msg))
@@ -1549,7 +1549,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1582,7 +1582,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  */
 function selectMessages($topic, $start, $items_per_page, $messages = array(), $only_approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the messages and stick them into an array.
 	$request = $db->query('', '
@@ -1647,7 +1647,7 @@ function topicMessages($topic, $render = 'print')
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
@@ -1705,7 +1705,7 @@ function messagesAttachments($id_messages)
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1771,7 +1771,7 @@ function messagesAttachments($id_messages)
  */
 function unapprovedPosts($id_topic, $id_member)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// not all guests are the same!
 	if (empty($id_member))
@@ -1802,7 +1802,7 @@ function unapprovedPosts($id_topic, $id_member)
  */
 function updateSplitTopics($options, $id_board)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Any associated reported posts better follow...
 	$db->query('', '
@@ -1888,7 +1888,7 @@ function topicStatus($topic)
  */
 function setTopicAttribute($topic, $attributes)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$update = array();
 	foreach ($attributes as $key => $attr)
@@ -1929,7 +1929,7 @@ function setTopicAttribute($topic, $attributes)
  */
 function topicAttribute($id_topic, $attributes)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// @todo maybe add a filer for known attributes... or not
 // 	$attributes = array(
@@ -1982,7 +1982,7 @@ function topicAttribute($id_topic, $attributes)
  */
 function topicUserAttributes($id_topic, $user)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2027,7 +2027,7 @@ function topicsDetails($topics)
  */
 function toggleTopicSticky($topics, $log = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$topics = is_array($topics) ? $topics : array($topics);
 
@@ -2075,7 +2075,7 @@ function toggleTopicSticky($topics, $log = false)
  */
 function getLoggedTopics($member, $topics)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_topic, id_msg, unwatched
@@ -2108,7 +2108,7 @@ function topicsList($topic_ids)
 	if (empty($topic_ids))
 		return array();
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$topics = array();
 
@@ -2152,7 +2152,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$topic_details = array(
 		'messages' => array(),
@@ -2261,7 +2261,7 @@ function approveTopics($topics, $approve = true, $log = false)
 	if (empty($topics))
 		return false;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$approve_type = $approve ? 0 : 1;
 
@@ -2373,7 +2373,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Nothing to split?
 	if (empty($splitMessages))
@@ -2624,7 +2624,7 @@ function splitAttemptMove($boards, $totopic)
 {
 	global $board, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)
@@ -2724,7 +2724,7 @@ function topicNotificationCount($memID)
 {
 	global $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -2759,7 +2759,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 {
 	global $scripturl, $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// All the topics with notification on...
 	$request = $db->query('', '
@@ -2822,7 +2822,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
  */
 function postersCount($id_topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// We only care about approved topics, the rest don't count.
 	$request = $db->query('', '
@@ -2857,7 +2857,7 @@ function postersCount($id_topic)
  */
 function countTopicsByBoard($board, $approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// How many topics are on this board?  (used for paging.)
 	$request = $db->query('', '
@@ -2889,7 +2889,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 {
 	global $modSettings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get some topics to merge it with.
 	$request = $db->query('', '
@@ -2940,7 +2940,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
  */
 function messagesInTopics($topics)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Obtain all the message ids we are going to affect.
 	$request = $db->query('', '
@@ -2966,7 +2966,7 @@ function messagesInTopics($topics)
  */
 function topicsPosters($topics)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Obtain all the member ids
 	$members = array();
@@ -2997,7 +2997,7 @@ function topicsPosters($topics)
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete the remaining topics.
 	$deleted_topics = array_diff($topics, array($id_topic));
@@ -3151,7 +3151,7 @@ function getSubject($id_topic)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT ms.subject
@@ -3187,7 +3187,7 @@ function updateTopicStats($increment = null)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($increment === true)
 		updateSettings(array('totalTopics' => true), true);
@@ -3220,7 +3220,7 @@ function toggleTopicsLock($topics, $log = false)
 {
 	global $board, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$needs_check = !empty($board) && !allowedTo('lock_any');
 	$lockCache = array();

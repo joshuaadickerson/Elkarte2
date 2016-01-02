@@ -62,7 +62,7 @@ function getNews()
  */
 function excludeBannedMembers()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$excludes = array();
 
@@ -79,9 +79,9 @@ function excludeBannedMembers()
 			'current_time' => time(),
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$excludes[] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	$request = $db->query('', '
 		SELECT DISTINCT bi.email_address
@@ -100,12 +100,12 @@ function excludeBannedMembers()
 	$condition_array = array();
 	$condition_array_params = array();
 	$count = 0;
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$condition_array[] = '{string:email_' . $count . '}';
 		$condition_array_params['email_' . $count++] = $row['email_address'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($condition_array))
 	{
@@ -115,9 +115,9 @@ function excludeBannedMembers()
 			WHERE email_address IN(' . implode(', ', $condition_array) . ')',
 			$condition_array_params
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$excludes[] = $row['id_member'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	return $excludes;
@@ -131,7 +131,7 @@ function excludeBannedMembers()
  */
 function getModerators()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$mods = array();
 
@@ -144,9 +144,9 @@ function getModerators()
 			'is_activated' => 1,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$mods[] = $row['identifier'];
-	$db->free_result($request);
+	$request->free();
 
 	return $mods;
 }
@@ -164,7 +164,7 @@ function getModerators()
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$recipients = array();
 
@@ -186,9 +186,9 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 			'is_activated' => 1,
 		))
 	);
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 		$recipients[] = $row;
-	$db->free_result($result);
+	$result->free();
 
 	return $recipients;
 }
@@ -209,7 +209,7 @@ function getXMLNews($query_this_board, $board, $limit)
 {
 	global $modSettings, $board, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$done = false;
 	$loops = 0;
@@ -242,9 +242,9 @@ function getXMLNews($query_this_board, $board, $limit)
 			)
 		);
 		// If we don't have $limit results, we try again with an unoptimized version covering all rows.
-		if ($loops < 2 && $db->num_rows($request) < $limit)
+		if ($loops < 2 && $request->numRows() < $limit)
 		{
-			$db->free_result($request);
+			$request->free();
 
 			if (empty($_REQUEST['boards']) && empty($board))
 				unset($context['optimize_msg']['lowest']);
@@ -258,10 +258,10 @@ function getXMLNews($query_this_board, $board, $limit)
 			$done = true;
 	}
 	$data = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$data[] = $row;
 
-	$db->free_result($request);
+	$request->free();
 
 	return $data;
 }
@@ -278,7 +278,7 @@ function getXMLRecent($query_this_board, $board, $limit)
 {
 	global $modSettings, $board, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$done = false;
 	$loops = 0;
@@ -304,9 +304,9 @@ function getXMLRecent($query_this_board, $board, $limit)
 			)
 		);
 		// If we don't have $limit results, try again with an unoptimized version covering all rows.
-		if ($loops < 2 && $db->num_rows($request) < $limit)
+		if ($loops < 2 && $request->numRows() < $limit)
 		{
-			$db->free_result($request);
+			$request->free();
 
 			if (empty($_REQUEST['boards']) && empty($board))
 				unset($context['optimize_msg']['lowest']);
@@ -319,9 +319,9 @@ function getXMLRecent($query_this_board, $board, $limit)
 			$done = true;
 	}
 	$messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$messages[] = $row['id_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	// No messages found, then return nothing
 	if (empty($messages))
@@ -352,10 +352,10 @@ function getXMLRecent($query_this_board, $board, $limit)
 		)
 	);
 	$data = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$data[] = $row;
 
-	$db->free_result($request);
+	$request->free();
 
 	return $data;
 }

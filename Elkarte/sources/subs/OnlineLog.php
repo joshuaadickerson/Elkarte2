@@ -240,7 +240,7 @@ class OnlineLog
 		);
 
 		$return = array();
-		while ($row = $this->db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$return[$row['session']] = $row;
 		}

@@ -33,7 +33,7 @@ function loadVerificationControls()
 	);
 
 	// Let integration add some more controls
-	Hooks::get()->hook('control_verification', array(&$known_verifications));
+	$GLOBALS['elk']['hooks']->hook('control_verification', array(&$known_verifications));
 
 	return $known_verifications;
 }
@@ -315,7 +315,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		// Some javascript ma'am? (But load it only once)
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
-			\Templates::getInstance()->load('VerificationControls');
+			$GLOBALS['elk']['templates']->load('VerificationControls');
 			loadJavascriptFile('jquery.captcha.js');
 			$context['captcha_js_loaded'] = true;
 		}
@@ -615,7 +615,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	public function prepareContext()
 	{
-		\Templates::getInstance()->load('VerificationControls');
+		$GLOBALS['elk']['templates']->load('VerificationControls');
 
 		$_SESSION[$this->_options['id'] . '_vv']['q'] = array();
 
@@ -794,8 +794,8 @@ class Verification_Controls_Questions implements Verification_Controls
 	{
 		global $modSettings;
 
-		$db = database();
-		$cache = Cache::instance();
+		$db = $GLOBALS['elk']['db'];
+		$cache = $GLOBALS['elk']['cache'];
 
 		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
 		{
@@ -805,9 +805,9 @@ class Verification_Controls_Questions implements Verification_Controls
 				array()
 			);
 			$modSettings['question_id_cache'] = array();
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
-			$db->free_result($request);
+			$request->free();
 
 			$cache->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
 		}
@@ -822,7 +822,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	private function _loadAntispamQuestions($filter = null)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$available_filters = array(
 			'language' => 'language = {string:current_filter}',
@@ -839,7 +839,7 @@ class Verification_Controls_Questions implements Verification_Controls
 				'current_filter' => $filter['value'],
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
@@ -848,7 +848,7 @@ class Verification_Controls_Questions implements Verification_Controls
 				'language' => $row['language'],
 			);
 		}
-		$db->free_result($request);
+		$request->free();
 
 		return $question_answers;
 	}
@@ -860,7 +860,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	private function _delete($id)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$db->query('', '
 			DELETE FROM {db_prefix}antispam_questions
@@ -881,7 +881,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	private function _update($id, $question, $answers, $language)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$db->query('', '
 			UPDATE {db_prefix}antispam_questions
@@ -907,7 +907,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 */
 	private function _insert($questions)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$db->insert('',
 			'{db_prefix}antispam_questions',
@@ -1049,7 +1049,7 @@ class Verification_Controls_EmptyField implements Verification_Controls
 	 */
 	public function prepareContext()
 	{
-		\Templates::getInstance()->load('VerificationControls');
+		$GLOBALS['elk']['templates']->load('VerificationControls');
 
 		return array(
 			'template' => 'emptyfield',

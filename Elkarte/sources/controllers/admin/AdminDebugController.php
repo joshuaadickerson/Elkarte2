@@ -57,7 +57,7 @@ class AdminDebug_Controller extends AbstractController
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
-		$debug = Debug::get();
+		$debug = $GLOBALS['elk']['debug'];
 
 		// If we're just hiding/showing, do it now.
 		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')

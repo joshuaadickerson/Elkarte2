@@ -28,7 +28,7 @@ if (!defined('ELK'))
  */
 function smileyExists($smileys)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$found = array();
 	$request = $db->query('', '
@@ -39,9 +39,9 @@ function smileyExists($smileys)
 			'smiley_list' => $smileys,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$found[] = $row['filename'];
-	$db->free_result($request);
+	$request->free();
 
 	return $found;
 }
@@ -55,7 +55,7 @@ function smileyExists($smileys)
  */
 function validateDuplicateSmiley($code, $current = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_smiley
@@ -68,9 +68,9 @@ function validateDuplicateSmiley($code, $current = null)
 			'smiley_code' => $code,
 		)
 	);
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 		return true;
-	$db->free_result($request);
+	$request->free();
 
 	return false;
 }
@@ -82,7 +82,7 @@ function validateDuplicateSmiley($code, $current = null)
  */
 function nextSmileyLocation($location)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT MAX(smiley_order) + 1
@@ -94,8 +94,8 @@ function nextSmileyLocation($location)
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($smiley_order) = $request->fetchRow();
+	$request->free();
 
 	return $smiley_order;
 }
@@ -107,7 +107,7 @@ function nextSmileyLocation($location)
  */
 function addSmiley($param)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}smileys',
@@ -126,7 +126,7 @@ function addSmiley($param)
  */
 function deleteSmileys($smileys)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}smileys
@@ -145,7 +145,7 @@ function deleteSmileys($smileys)
  */
 function updateSmileyDisplayType($smileys, $display_type)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
@@ -165,7 +165,7 @@ function updateSmileyDisplayType($smileys, $display_type)
  */
 function updateSmiley($param)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
@@ -193,7 +193,7 @@ function updateSmiley($param)
  */
 function getSmiley($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
@@ -203,10 +203,10 @@ function getSmiley($id)
 			'current_smiley' => $id,
 		)
 	);
-	if ($db->num_rows($request) != 1)
+	if ($request->numRows() != 1)
 		$GLOBALS['elk']['errors']->fatal_lang_error('smiley_not_found');
-	$current_smiley = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$current_smiley = $request->fetchAssoc();
+	$request->free();
 
 	return $current_smiley;
 }
@@ -220,7 +220,7 @@ function getSmiley($id)
  */
 function getSmileyPosition($location, $id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$smiley = array();
 
@@ -234,9 +234,9 @@ function getSmileyPosition($location, $id)
 			'id_smiley' => $id,
 		)
 	);
-	list ($smiley['row'], $smiley['order'], $smiley['location']) = $db->fetch_row($request);
+	list ($smiley['row'], $smiley['order'], $smiley['location']) = $request->fetchRow();
 
-	$db->free_result($request);
+	$request->free();
 
 	return $smiley;
 }
@@ -249,7 +249,7 @@ function getSmileyPosition($location, $id)
  */
 function moveSmileyPosition($smiley, $source)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
@@ -289,7 +289,7 @@ function moveSmileyPosition($smiley, $source)
  */
 function updateSmileyRow($id, $row, $location)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
@@ -312,7 +312,7 @@ function updateSmileyRow($id, $row, $location)
  */
 function updateSmileyOrder($id, $order)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
@@ -330,7 +330,7 @@ function updateSmileyOrder($id, $order)
  */
 function getSmileys()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
@@ -349,7 +349,7 @@ function getSmileys()
 			'rows' => array(),
 		),
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$location = empty($row['hidden']) ? 'postform' : 'popup';
 		$smileys[$location]['rows'][$row['smiley_row']][] = array(
@@ -362,7 +362,7 @@ function getSmileys()
 			'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $smileys;
 }
@@ -375,7 +375,7 @@ function getSmileys()
  */
 function isSmileySetInstalled($set)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT version, themes_installed, db_changes
@@ -389,7 +389,7 @@ function isSmileySetInstalled($set)
 			'current_package' => $set,
 		)
 	);
-	return !($db->num_rows($request) > 0);
+	return !($request->numRows() > 0);
 }
 
 /**
@@ -399,7 +399,7 @@ function isSmileySetInstalled($set)
  */
 function logPackageInstall($param)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}log_packages',
@@ -425,7 +425,7 @@ function logPackageInstall($param)
  */
 function getMaxSmileyOrder()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT MAX(smiley_order)
@@ -437,8 +437,8 @@ function getMaxSmileyOrder()
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($smiley_order) = $request->fetchRow();
+	$request->free();
 
 	return $smiley_order;
 }
@@ -451,7 +451,7 @@ function getMaxSmileyOrder()
  */
 function sortSmileyTable()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Order the table by code length.
 	$db->query('alter_table', '
@@ -533,7 +533,7 @@ function list_getNumSmileySets()
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
@@ -544,9 +544,9 @@ function list_getSmileys($start, $items_per_page, $sort)
 		)
 	);
 	$smileys = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$smileys[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $smileys;
 }
@@ -556,7 +556,7 @@ function list_getSmileys($start, $items_per_page, $sort)
  */
 function list_getNumSmileys()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -564,8 +564,8 @@ function list_getNumSmileys()
 		array(
 		)
 	);
-	list ($numSmileys) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numSmileys) = $request->fetchRow();
+	$request->free();
 
 	return $numSmileys;
 }

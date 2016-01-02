@@ -85,6 +85,7 @@ if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir
 	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
+DEFINE('ROOTDIR', __DIR__ . '/src');
 DEFINE('BOARDDIR', $boarddir);
 DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
@@ -99,8 +100,8 @@ unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir, $vendordir);
 
 // Files we cannot live without.
 require_once(__DIR__ . '/src/Elkarte/Subs.php');
-require_once(__DIR__ . '/src/Elkarte/Logging.php');
 require_once(__DIR__ . '/src/Elkarte/Load.php');
+require_once(__DIR__ . '/src/Elkarte/Log/Logging.php');
 require_once(__DIR__ . '/src/Elkarte/Security/Security.php');
 require_once(__DIR__ . '/src/Elkarte/Cache/Cache.subs.php');
 
@@ -213,8 +214,7 @@ function elk_main(\Pimple\Container $elk)
 	// Attachments don't require the entire theme to be loaded.
 	if ($elk['http_req']->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
 	{
-		$detector = new BrowserDetector;
-		$detector->detectBrowser();
+		$elk['browser'];
 	}
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else

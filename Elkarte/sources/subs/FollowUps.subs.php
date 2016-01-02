@@ -23,7 +23,7 @@ if (!defined('ELK'))
  */
 function followupTopics($messages, $include_approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT fu.derived_from, fu.follow_up, m.subject
@@ -40,7 +40,7 @@ function followupTopics($messages, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$returns[$row['derived_from']][] = $row;
 
 	return $returns;
@@ -54,7 +54,7 @@ function followupTopics($messages, $include_approved = false)
  */
 function topicStartedHere($topic, $include_approved = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT fu.derived_from, m.subject
@@ -71,7 +71,7 @@ function topicStartedHere($topic, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$returns = $row;
 
 	return $returns;
@@ -85,7 +85,7 @@ function topicStartedHere($topic, $include_approved = false)
  */
 function linkMessages($msg, $topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('ignore',
 		'{db_prefix}follow_ups',
@@ -105,7 +105,7 @@ function linkMessages($msg, $topic)
  */
 function unlinkMessages($msg, $topic)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
@@ -126,7 +126,7 @@ function unlinkMessages($msg, $topic)
  */
 function removeFollowUpsByTopic($topics)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
@@ -144,7 +144,7 @@ function removeFollowUpsByTopic($topics)
  */
 function removeFollowUpsByMessage($msgs)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups

@@ -26,7 +26,7 @@ if (!defined('ELK'))
  */
 function deleteErrors($type, $filter = null, $error_list = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete all or just some?
 	if ($type == 'delall' && empty($filter))
@@ -63,7 +63,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
  */
 function numErrors($filter = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Just how many errors are there?
 	$result = $db->query('', '
@@ -76,7 +76,7 @@ function numErrors($filter = array())
 	);
 	list ($num_errors) = $db->fetch_row($result);
 
-	$db->free_result($result);
+	$result->free();
 
 	return $num_errors;
 }
@@ -92,7 +92,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
 	global $modSettings, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find and sort out the errors.
 	$request = $db->query('', '
@@ -108,7 +108,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$log = array();
 
-	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
+	for ($i = 0; $row = $request->fetchAssoc(); $i++)
 	{
 		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->escape_wildcard_string($row['message']));
 		if (!empty($filter) && $search_message == $filter['value']['sql'])
@@ -156,7 +156,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 		// Make a list of members to load later.
 		$log['members'][$row['id_member']] = $row['id_member'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return($log);
 }
@@ -171,7 +171,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 {
 	global $txt, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$sum = 0;
 	$types = array();
@@ -186,7 +186,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'critical_type' => 'critical',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Total errors so far?
 		$sum += $row['num_errors'];
@@ -198,7 +198,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'is_selected' => !empty($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $types;
 }

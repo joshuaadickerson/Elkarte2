@@ -35,7 +35,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 {
 	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
 	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
@@ -76,7 +76,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	);
 	$topicData = array();
 	$boards_index = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		// Convert to markdown e.g. text ;) and clean it up
 		pbe_prepare_text($row['body'], $row['subject'], $row['signature']);
@@ -97,7 +97,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'attachments' => $row['num_attach'],
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -217,7 +217,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					$message_type .= '_once';
 
 				// Give them a way to add in their own replacements
-				Hooks::get()->hook('notification_replacements', array(&$replacements, $row, $type, $current_language));
+				$GLOBALS['elk']['hooks']->hook('notification_replacements', array(&$replacements, $row, $type, $current_language));
 
 				// Send only if once is off or it's on and it hasn't been sent.
 				if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
@@ -395,7 +395,7 @@ function sendBoardNotifications(&$topicData)
 {
 	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 	require_once(SUBSDIR . '/Emailpost.subs.php');
@@ -561,7 +561,7 @@ function sendApprovalNotifications(&$topicData)
 {
 	global $scripturl, $language, $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -710,7 +710,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 {
 	global $modSettings, $language, $scripturl, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -743,9 +743,9 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 			'moderate_forum' => 'moderate_forum',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$groups[] = $row['id_group'];
-	$db->free_result($request);
+	$request->free();
 
 	// Add administrators too...
 	$groups[] = 1;
@@ -766,7 +766,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 	);
 
 	$current_language = $user_info['language'];
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$replacements = array(
 			'USERNAME' => $member_name,
@@ -786,7 +786,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 		// And do the actual sending...
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
@@ -861,7 +861,7 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  */
 function getUsersNotificationsPreferences($notification_types, $members)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
@@ -879,7 +879,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 	);
 	$results = array();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($results[$row['id_member']]))
 			$results[$row['id_member']] = array();
@@ -887,7 +887,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	$defaults = array();
 	foreach ($notification_types as $val)
@@ -918,7 +918,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
  */
 function saveUserNotificationsPreferences($member, $notification_data)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// First drop the existing settings
 	$db->query('', '

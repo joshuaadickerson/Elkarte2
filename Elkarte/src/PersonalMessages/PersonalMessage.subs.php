@@ -33,7 +33,7 @@ function loadMessageLimit()
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($user_info['is_admin'])
 		$message_limit = 0;
@@ -70,7 +70,7 @@ function loadPMLabels($labels)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Looks like we need to reseek!
 	$result = $db->query('', '
@@ -119,7 +119,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Figure out how many messages there are.
 	if ($context['folder'] == 'sent')
@@ -174,7 +174,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($owner === null)
 		$owner = array($user_info['id']);
@@ -318,7 +318,7 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($owner === null)
 		$owner = $user_info['id'];
@@ -355,7 +355,7 @@ function markMessagesUnread($personal_messages)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($personal_messages))
 		return;
@@ -395,7 +395,7 @@ function updatePMMenuCounts($owner)
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($owner == $user_info['id'])
 	{
@@ -452,7 +452,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -510,7 +510,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 {
 	global $scripturl, $txt, $user_info, $language, $modSettings, $webmaster_email;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make sure the PM language file is loaded, we might need something out of it.
 	loadLanguage('PersonalMessage');
@@ -938,7 +938,7 @@ function loadPMs($pm_options, $id_member)
 {
 	global $options;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// First work out what messages we need to see - if grouped is a little trickier...
 	// Conversation mode
@@ -1097,7 +1097,7 @@ function loadPMs($pm_options, $id_member)
  */
 function pmCount($id_member, $time)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1129,7 +1129,7 @@ function applyRules($all_messages = false)
 {
 	global $user_info, $context, $options;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Want this - duh!
 	loadRules();
@@ -1241,7 +1241,7 @@ function loadRules($reload = false)
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (isset($context['rules']) && !$reload)
 		return;
@@ -1297,7 +1297,7 @@ function loadRules($reload = false)
  */
 function toggleNewPM($id_member, $new = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
@@ -1319,7 +1319,7 @@ function toggleNewPM($id_member, $new = false)
  */
 function loadPMLimits($id_group = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1351,7 +1351,7 @@ function loadPMLimits($id_group = false)
  */
 function getDiscussions($id_pms)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1378,7 +1378,7 @@ function getDiscussions($id_pms)
  */
 function getPmsFromDiscussion($pm_heads)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$pms = array();
 	$request = $db->query('', '
@@ -1411,7 +1411,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 {
 	global $options;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$to_update = array();
 
@@ -1466,7 +1466,7 @@ function changePMLabels($to_label, $label_type, $user_id)
  */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Now find the messages to change.
 	$request = $db->query('', '
@@ -1518,7 +1518,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
  */
 function updatePMLabels($to_update, $user_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$updateErrors = 0;
 
@@ -1560,7 +1560,7 @@ function updatePMLabels($to_update, $user_id)
  */
 function getPMsOlderThan($user_id, $time)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Array to store the IDs in.
 	$pm_ids = array();
@@ -1614,7 +1614,7 @@ function getPMsOlderThan($user_id, $time)
  */
 function deletePMRules($id_member, $rule_changes)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}pm_rules
@@ -1637,7 +1637,7 @@ function deletePMRules($id_member, $rule_changes)
  */
 function updatePMRuleAction($id_rule, $id_member, $actions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_rules
@@ -1665,7 +1665,7 @@ function updatePMRuleAction($id_rule, $id_member, $actions)
  */
 function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}pm_rules',
@@ -1694,7 +1694,7 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
  */
 function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_rules
@@ -1723,7 +1723,7 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
  */
 function setPMRepliedStatus($id_member, $replied_to)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
@@ -1751,7 +1751,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1805,7 +1805,7 @@ function loadConversationUnreadStatus($pms)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make it an array if its not
 	if (!is_array($pms))
@@ -1873,7 +1873,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 {
 	global $txt, $user_info, $scripturl, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the recipients for all these PM's
 	$request = $db->query('', '
@@ -1932,7 +1932,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Separate query for these bits!
 	$subjects_request = $db->query('', '
@@ -1967,7 +1967,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$messages_request = $db->query('', '
 		SELECT
@@ -1998,7 +1998,7 @@ function checkPMReceived($pmsg)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2029,7 +2029,7 @@ function loadPMQuote($pmsg, $isReceived)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the quoted message (and make sure you're allowed to see this quote!).
 	$request = $db->query('', '
@@ -2069,7 +2069,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
 	global $user_info, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2125,7 +2125,7 @@ function loadPersonalMessage($pm_id)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// First, pull out the message contents, and verify it actually went to them!
 	$request = $db->query('', '
@@ -2170,7 +2170,7 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 {
 	global $context, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the amount of results.
 	$request = $db->query('', '
@@ -2211,7 +2211,7 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
 {
 	global $context, $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2258,7 +2258,7 @@ function loadPMSearchHeads($head_pms)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2294,7 +2294,7 @@ function loadPMSearchHeads($head_pms)
  */
 function loadPMSearchResults($foundMessages, $search_params)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Prepare the query for the callback!
 	$request = $db->query('', '

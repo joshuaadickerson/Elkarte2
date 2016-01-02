@@ -384,7 +384,7 @@ class Settings_Form
 			}
 		}
 
-		Hooks::get()->hook('prepare_db_settings', array(&$config_vars));
+		$GLOBALS['elk']['hooks']->hook('prepare_db_settings', array(&$config_vars));
 		createToken('Admin-dbsc');
 	}
 

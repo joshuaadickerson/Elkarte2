@@ -269,7 +269,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 {
 	global $scripturl, $txt, $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find all the posts. Newer ones will have higher IDs.
 	$request = $db->query('substring', '
@@ -380,7 +380,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 {
 	global $settings, $scripturl, $txt, $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
 		$exclude_boards = array($modSettings['recycle_board']);
@@ -1031,7 +1031,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	if (empty($boardsAllowed))
 		return array();
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT p.id_poll, p.question, t.id_topic, p.max_votes, p.guest_vote, p.hide_results, p.expire_time
@@ -1529,7 +1529,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 
 	loadLanguage('Stats');
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Must be integers....
 	if ($limit === null)
@@ -1767,7 +1767,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	if (empty($attachments_boards))
 		return array();
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Is it an array?
 	if (!is_array($attachment_ext))

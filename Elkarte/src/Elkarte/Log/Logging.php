@@ -20,6 +20,8 @@
 if (!defined('ELK'))
 	die('No access...');
 
+require_once('Logging.subs.php');
+
 /**
  * Put this user in the online log.
  *
@@ -76,9 +78,7 @@ function writeLog($force = false)
 	$cache = $GLOBALS['elk']['cache'];
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
-	$do_delete = $cache->getVar($do_delete, 'log_online-update', 30) && (int) $do_delete < time() - 30;
-
-	require_once(SUBSDIR . '/Logging.subs.php');
+	$cache->getVar($do_delete, 'log_online-update', 30) && (int) $do_delete < time() - 30;
 
 	// If the last click wasn't a long time ago, and there was a last click...
 	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= time() - $modSettings['lastActive'] * 20)
@@ -214,7 +214,6 @@ function trackStats($stats = array())
 
 	$setStringUpdate = implode(',', $setStringUpdate);
 
-	require_once(SUBSDIR . '/Logging.subs.php');
 	updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date);
 
 	// Don't do this again.
@@ -232,6 +231,7 @@ function trackStats($stats = array())
  * @param string $action The action to log
  * @param string[] $extra = array() An array of extra data
  * @param string $log_type options: 'moderate', 'Admin', ...etc.
+ * @return int
  */
 function logAction($action, $extra = array(), $log_type = 'moderate')
 {
@@ -310,7 +310,6 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			require_once(SUBSDIR . '/Logging.subs.php');
 			if (loadLogReported($msg_id, $topic_id))
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
@@ -355,8 +354,6 @@ function logActions($logs)
 			$board_id, $topic_id, $msg_id, serialize($log['extra']),
 		);
 	}
-
-	require_once(SUBSDIR . '/Logging.subs.php');
 
 	return insertLogActions($inserts);
 }

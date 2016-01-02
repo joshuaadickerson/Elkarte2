@@ -19,7 +19,7 @@
  */
 function clearKarma($karmaWaitTime)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete any older items from the log. (karmaWaitTime is by hour.)
 	$db->query('', '
@@ -41,7 +41,7 @@ function clearKarma($karmaWaitTime)
  */
 function lastActionOn($id_executor, $id_target)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find out if this user has done this recently...
 	$request = $db->query('', '
@@ -55,9 +55,9 @@ function lastActionOn($id_executor, $id_target)
 			'id_target' => $id_target,
 		)
 	);
-	if ($db->num_rows($request) > 0)
-		list ($action) = $db->fetch_row($request);
-	$db->free_result($request);
+	if ($request->numRows() > 0)
+		list ($action) = $request->fetchRow();
+	$request->free();
 
 	return isset($action) ? $action : null;
 }
@@ -72,7 +72,7 @@ function lastActionOn($id_executor, $id_target)
  */
 function addKarma($id_executor, $id_target, $direction)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Put it in the log.
 	$db->insert('replace',
@@ -97,7 +97,7 @@ function addKarma($id_executor, $id_target, $direction)
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// You decided to go back on your previous choice?
 	$db->query('', '

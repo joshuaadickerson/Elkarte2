@@ -28,7 +28,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	global $user_info;
 	static $counts;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$id_member = $id_member === null ? $user_info['id'] : (int) $id_member;
 
 	if (isset($counts[$id_member]))
@@ -49,8 +49,8 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			'is_accessible' => 1,
 		)
 	);
-	list ($counts[$id_member]) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($counts[$id_member]) = $request->fetchRow();
+	$request->free();
 
 	// Counts as maintenance! :P
 	if ($all === false && empty($type))
@@ -77,7 +77,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT
@@ -132,7 +132,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 {
 	$inserts = array();
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// $time is not checked because it's useless
 	$existing = $db->fetchQueryCallback('
@@ -210,7 +210,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
  */
 function rlikeMentions($member_from, $members_to, $target, $newstatus = 1)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If this like is still unread then we mark it as read and decrease the counter
 	$db->query('', '
@@ -253,7 +253,7 @@ function changeMentionStatus($id_mention, $status = 1)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
@@ -285,7 +285,7 @@ function removeMentions($id_mentions)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_mentions
@@ -314,7 +314,7 @@ function removeMentions($id_mentions)
  */
 function toggleMentionsApproval($msgs, $approved)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
@@ -354,7 +354,7 @@ function toggleMentionsApproval($msgs, $approved)
  */
 function toggleMentionsVisibility($type, $enable)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
@@ -392,7 +392,7 @@ function toggleMentionsVisibility($type, $enable)
  */
 function toggleMentionsAccessibility($mentions, $access)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
@@ -444,7 +444,7 @@ function validate_ownmention($field, $input, $validation_parameters = null)
  */
 function findMemberMention($id_mention, $id_member)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_mention
@@ -457,8 +457,8 @@ function findMemberMention($id_mention, $id_member)
 			'id_member' => $id_member,
 		)
 	);
-	$return = $db->num_rows($request);
-	$db->free_result($request);
+	$return = $request->numRows();
+	$request->free();
 
 	return !empty($return);
 }
@@ -494,7 +494,7 @@ function updateMentionMenuCount($status, $member_id)
  */
 function getTimeLastMention($id_member)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	list ($request) = $db->fetchQuery('
 		SELECT log_time
@@ -521,7 +521,7 @@ function getTimeLastMention($id_member)
  */
 function getNewMentions($id_member, $timestamp)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($timestamp))
 	{

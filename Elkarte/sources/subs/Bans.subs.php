@@ -107,7 +107,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($group_id !== false)
 		$group_id = (int) $group_id;
@@ -162,7 +162,7 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  */
 function removeBanGroups($group_ids)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!is_array($group_ids))
 		$group_ids = array($group_ids);
@@ -196,7 +196,7 @@ function removeBanGroups($group_ids)
  */
 function removeBanLogs($ids = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// No specific id's passed, we truncate the entire table
 	if (empty($ids))
@@ -237,7 +237,7 @@ function removeBanLogs($ids = array())
  */
 function validateTriggers(&$triggers)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_errors = Error_Context::context('ban', 1);
 	if (empty($triggers))
@@ -295,9 +295,9 @@ function validateTriggers(&$triggers)
 						'email' => $value,
 					)
 				);
-				if ($db->num_rows($request) != 0)
+				if ($request->numRows() != 0)
 					$ban_errors->addError('no_ban_admin');
-				$db->free_result($request);
+				$request->free();
 
 				$value = substr(strtolower(str_replace('*', '%', $value)), 0, 255);
 
@@ -317,10 +317,10 @@ function validateTriggers(&$triggers)
 						'username' => $user,
 					)
 				);
-				if ($db->num_rows($request) == 0)
+				if ($request->numRows() == 0)
 					$ban_errors->addError('invalid_username');
-				list ($value, $isAdmin) = $db->fetch_row($request);
-				$db->free_result($request);
+				list ($value, $isAdmin) = $request->fetchRow();
+				$request->free();
 
 				if ($isAdmin && strtolower($isAdmin) != 'f')
 				{
@@ -384,7 +384,7 @@ function validateTriggers(&$triggers)
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_errors = Error_Context::context('ban', 1);
 
@@ -478,7 +478,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_errors = Error_Context::context('ban', 1);
 
@@ -585,7 +585,7 @@ function logTriggersUpdates($logs, $new = true)
  */
 function updateBanGroup($ban_info = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Lets check for errors first
 	$ban_errors = Error_Context::context('ban', 1);
@@ -611,9 +611,9 @@ function updateBanGroup($ban_info = array())
 			'new_ban_name' => $ban_info['name'],
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		return insertBanGroup($ban_info);
-	$db->free_result($request);
+	$request->free();
 
 	$db->query('', '
 		UPDATE {db_prefix}ban_groups
@@ -656,7 +656,7 @@ function updateBanGroup($ban_info = array())
  */
 function insertBanGroup($ban_info = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_errors = Error_Context::context('ban', 1);
 
@@ -681,13 +681,13 @@ function insertBanGroup($ban_info = array())
 	);
 
 	// @todo shouldn't be an error here?
-	if ($db->num_rows($request) == 1)
+	if ($request->numRows() == 1)
 	{
-		list ($id_ban) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($id_ban) = $request->fetchRow();
+		$request->free();
 		return $id_ban;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Yes yes, we're ready to add now.
 	$db->insert('',
@@ -784,7 +784,7 @@ function validateIPBan($ip_array, $fullip = '')
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (count($ip_array) == 4 || count($ip_array) == 8)
 		$values = array(
@@ -824,15 +824,15 @@ function validateIPBan($ip_array, $fullip = '')
 		LIMIT 1',
 		$values
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->numRows() != 0)
 	{
-		list ($error_id_ban, $error_ban_name) = $db->fetch_row($request);
+		list ($error_id_ban, $error_ban_name) = $request->fetchRow();
 		$values = array('error' => array('ban_trigger_already_exists', array(
 			$fullip,
 			'<a href="' . $scripturl . '?action=Admin;area=ban;sa=edit;bg=' . $error_id_ban . '">' . $error_ban_name . '</a>',
 		)));
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $values;
 }
@@ -873,7 +873,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
  */
 function updateBanMembers()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$updates = array();
 	$allMembers = array();
@@ -1039,7 +1039,7 @@ function getMemberData($id)
  */
 function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$where = array(
 		'ip' => 'bi.ip_low1 > 0',
@@ -1078,7 +1078,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 {
 	global $memberContext, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$bans = array();
 
 	// This is a valid member id, we at least need that
@@ -1118,7 +1118,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 			$ban_query_vars
 		);
 		$bans = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			// Work out what restrictions we actually have.
 			$ban_restrictions = array();
@@ -1144,7 +1144,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 				'explanation' => $ban_explanation,
 			);
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	return $bans;
@@ -1159,7 +1159,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
  */
 function list_getNumBanTriggers($trigger_type)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$where = array(
 		'ip' => 'bi.ip_low1 > 0',
@@ -1176,8 +1176,8 @@ function list_getNumBanTriggers($trigger_type)
 			'blank_string' => '',
 		)
 	);
-	list ($num_triggers) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_triggers) = $request->fetchRow();
+	$request->free();
 
 	return $num_triggers;
 }
@@ -1194,7 +1194,7 @@ function list_getNumBanTriggers($trigger_type)
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQuery('
 		SELECT lb.id_ban_log, lb.id_member, IFNULL(lb.ip, {string:dash}) AS ip, IFNULL(lb.email, {string:dash}) AS email, lb.log_time, IFNULL(mem.real_name, {string:blank_string}) AS real_name
@@ -1216,7 +1216,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumBanLogEntries()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1224,8 +1224,8 @@ function list_getNumBanLogEntries()
 		array(
 		)
 	);
-	list ($num_entries) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_entries) = $request->fetchRow();
+	$request->free();
 
 	return $num_entries;
 }
@@ -1238,7 +1238,7 @@ function list_getNumBanLogEntries()
  */
 function list_getNumBans()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*) AS num_bans
@@ -1246,8 +1246,8 @@ function list_getNumBans()
 		array(
 		)
 	);
-	list ($numBans) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numBans) = $request->fetchRow();
+	$request->free();
 
 	return $numBans;
 }
@@ -1266,7 +1266,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 {
 	global $context, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_items = array();
 	$request = $db->query('', '
@@ -1287,9 +1287,9 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 			'items_per_page' => $items_per_page,
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('ban_not_found', false);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($context['ban']))
 		{
@@ -1353,7 +1353,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 			}
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $ban_items;
 }
@@ -1369,7 +1369,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  */
 function list_getBans($start, $items_per_page, $sort)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQuery('
 		SELECT bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes, COUNT(bi.id_ban) AS num_triggers
@@ -1396,7 +1396,7 @@ function list_getNumBanItems()
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ban_group_id = isset($context['ban_group_id']) ? (int) $context['ban_group_id'] : 0;
 
@@ -1410,8 +1410,8 @@ function list_getNumBanItems()
 			'current_ban' => $ban_group_id,
 		)
 	);
-	list ($banNumber) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($banNumber) = $request->fetchRow();
+	$request->free();
 
 	return $banNumber;
 }
@@ -1424,7 +1424,7 @@ function list_getNumBanItems()
  */
 function banLoadAdditionalIPsMember($member_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find some additional IP's used by this member.
 	$message_ips = array();
@@ -1439,9 +1439,9 @@ function banLoadAdditionalIPsMember($member_id)
 			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$message_ips[] = $row['poster_ip'];
-	$db->free_result($request);
+	$request->free();
 
 	return $message_ips;
 }
@@ -1454,7 +1454,7 @@ function banLoadAdditionalIPsMember($member_id)
  */
 function banLoadAdditionalIPsError($member_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$error_ips = array();
 	$request = $db->query('ban_suggest_error_ips', '
@@ -1468,9 +1468,9 @@ function banLoadAdditionalIPsError($member_id)
 			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$error_ips[] = $row['ip'];
-	$db->free_result($request);
+	$request->free();
 
 	return $error_ips;
 }
@@ -1488,7 +1488,7 @@ function banLoadAdditionalIPs($member_id)
 	loadLanguage('Profile');
 
 	$search_list = array();
-	Hooks::get()->hook('load_additional_ip_ban', array(&$search_list));
+	$GLOBALS['elk']['hooks']->hook('load_additional_ip_ban', array(&$search_list));
 	$search_list += array('ips_in_messages' => 'banLoadAdditionalIPsMember', 'ips_in_errors' => 'banLoadAdditionalIPsError');
 
 	$return = array();
@@ -1508,7 +1508,7 @@ function banLoadAdditionalIPs($member_id)
  */
 function banDetails($ban_ids, $ban_group = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!is_array($ban_ids))
 		$ban_ids = array($ban_ids);
@@ -1529,9 +1529,9 @@ function banDetails($ban_ids, $ban_group = false)
 		)
 	);
 	$details = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$details[$row['id_ban']] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $details;
 }

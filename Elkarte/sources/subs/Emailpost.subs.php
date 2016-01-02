@@ -332,7 +332,7 @@ function pbe_email_quote_depth(&$string, $update = true)
  */
 function pbe_parse_email_message(&$body)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load up the parsers from the database
 	$request = $db->query('', '
@@ -347,7 +347,7 @@ function pbe_parse_email_message(&$body)
 	);
 	// Build an array of valid expressions
 	$expressions = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -360,7 +360,7 @@ function pbe_parse_email_message(&$body)
 		else
 			$expressions[] = array('type' => 'string', 'parser' => $row['filter_from']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Look for the markers, **stop** after the first successful one, good hunting!
 	$match = false;
@@ -396,7 +396,7 @@ function pbe_parse_email_message(&$body)
  */
 function pbe_filter_email_message($text)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// load up the text filters from the database, regex first and ordered by the filter order ...
 	$request = $db->query('', '
@@ -411,7 +411,7 @@ function pbe_filter_email_message($text)
 	);
 
 	// Remove all the excess things as defined, i.e. sent from my iPhone, I hate those >:D
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['filter_type'] === 'regex')
 		{
@@ -427,7 +427,7 @@ function pbe_filter_email_message($text)
 		else
 			$text = str_replace($row['filter_from'], $row['filter_to'], $text);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $text;
 }
@@ -626,7 +626,7 @@ function pbe_emailError($error, $email_message)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	loadLanguage('EmailTemplates');
 
@@ -733,7 +733,7 @@ function pbe_emailError($error, $email_message)
 	);
 
 	// Flush the moderator error number cache, if we are here it likely just changed.
-	Cache::instance()->remove('num_menu_errors');
+	$GLOBALS['elk']['cache']->remove('num_menu_errors');
 
 	// If not running from the cli, then go back to the form
 	if (isset($_POST['item']))
@@ -932,7 +932,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$message = preg_replace('~\[code(.*?)\](.*?)\[/code\]~is', '`&lt;code\\1>\\2`&lt;/code>', $message);
 
 	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	Hooks::get()->hook('mailist_pre_parsebbc', array(&$message));
+	$GLOBALS['elk']['hooks']->hook('mailist_pre_parsebbc', array(&$message));
 
 	// Convert the remaining bbc to html
 	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
@@ -965,7 +965,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	}
 
 	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
-	Hooks::get()->hook('mailist_pre_markdown', array(&$message));
+	$GLOBALS['elk']['hooks']->hook('mailist_pre_markdown', array(&$message));
 
 	// Convert the protected (hidden) entities back for the final conversion
 	$message = strtr($message, array(
@@ -982,7 +982,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Finally the sig, its goes as just plain text
 	if ($signature !== '')
 	{
-		Hooks::get()->hook('mailist_pre_sig_parsebbc', array(&$signature));
+		$GLOBALS['elk']['hooks']->hook('mailist_pre_sig_parsebbc', array(&$signature));
 
 		$signature = $bbc_wrapper->parseSignature($signature, false);
 		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
@@ -1001,7 +1001,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  */
 function pbe_disable_user_notify($email_message)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$email = $email_message->_dsn['body']['original-recipient']['value'];
 
@@ -1016,10 +1016,10 @@ function pbe_disable_user_notify($email_message)
 		)
 	);
 
-	if ($db->num_rows($request) !== 0)
+	if ($request->numRows() !== 0)
 	{
-		list ($id_member) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($id_member) = $request->fetchRow();
+		$request->free();
 
 		// Once we have the member's ID, we can turn off notifications
 		// by setting notify_regularity->99 ("Never")
@@ -1089,7 +1089,7 @@ function query_load_user_info($email)
 {
 	global $user_profile, $modSettings, $language;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($email))
 		return false;
@@ -1107,8 +1107,8 @@ function query_load_user_info($email)
 			'act' => 1,
 		)
 	);
-	list ($id_member) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($id_member) = $request->fetchRow();
+	$request->free();
 
 	// No user found ... back we go
 	if (empty($id_member))
@@ -1173,7 +1173,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$where_query = ($type === 'board' ? '({array_int:member_groups}) AND id_profile = {int:id_profile}' : '({array_int:member_groups})');
 
@@ -1191,14 +1191,14 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
 	$removals = array();
 	$pbe['user_info']['permissions'] = array();
 	// While we have results, put them in our yeah or nay arrays
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (empty($row['add_deny']))
 			$removals[] = $row['permission'];
 		else
 			$pbe['user_info']['permissions'][] = $row['permission'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Remove all the permissions they shouldn't have ;)
 	if (!empty($modSettings['permission_enable_deny']))
@@ -1216,7 +1216,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  */
 function query_sender_wrapper($from)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// The signature and email visibility details
 	$request = $db->query('', '
@@ -1231,7 +1231,7 @@ function query_sender_wrapper($from)
 			'act' => 1,
 		)
 	);
-	$result = $db->fetch_assoc($request);
+	$result = $request->fetchAssoc();
 
 	// Clean up the signature line
 	if (!empty($result['signature']))
@@ -1240,7 +1240,7 @@ function query_sender_wrapper($from)
 		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr($bbc_wrapper->parseSignature($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	return $result;
 }
@@ -1255,7 +1255,7 @@ function query_sender_wrapper($from)
  */
 function query_user_keys($email)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find all keys sent to this email, sorted by date
 	return $db->fetchQuery('
@@ -1279,7 +1279,7 @@ function query_user_keys($email)
  */
 function query_key_owner($email_message)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($key))
 		return false;
@@ -1299,8 +1299,8 @@ function query_key_owner($email_message)
 			'message' => $email_message->message_id,
 		)
 	);
-	list ($email_to) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($email_to) = $request->fetchRow();
+	$request->free();
 
 	return $email_to;
 }
@@ -1317,7 +1317,7 @@ function query_key_owner($email_message)
  */
 function query_load_subject($message_id, $message_type, $email)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$subject = '';
 
@@ -1365,10 +1365,10 @@ function query_load_subject($message_id, $message_type, $email)
 		);
 
 		// Found them, now we find the PM to them with this ID
-		if ($db->num_rows($request) !== 0)
+		if ($request->numRows() !== 0)
 		{
-			list ($id_member) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($id_member) = $request->fetchRow();
+			$request->free();
 
 			// Now find this PM ID and make sure it was sent to this member
 			$request = $db->query('', '
@@ -1387,12 +1387,12 @@ function query_load_subject($message_id, $message_type, $email)
 	}
 
 	// If we found the message, topic or PM, return the subject
-	if ($db->num_rows($request) != 0)
+	if ($request->numRows() != 0)
 	{
-		list ($subject) = $db->fetch_row($request);
+		list ($subject) = $request->fetchRow();
 		$subject = pbe_clean_email_subject($subject);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $subject;
 }
@@ -1409,7 +1409,7 @@ function query_load_subject($message_id, $message_type, $email)
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load up the topic details
 	if ($message_type === 't')
@@ -1467,9 +1467,9 @@ function query_load_message($message_type, $message_id, $pbe)
 	}
 	$topic_info = array();
 	// Found the information, load the topic_info array with the data for this topic and board
-	if ($db->num_rows($request) !== 0)
-		$topic_info = $db->fetch_assoc($request);
-	$db->free_result($request);
+	if ($request->numRows() !== 0)
+		$topic_info = $request->fetchAssoc();
+	$request->free();
 
 	// Return the results or false
 	return !empty($topic_info) ? $topic_info : false;
@@ -1483,7 +1483,7 @@ function query_load_message($message_type, $message_id, $pbe)
  */
 function query_load_board($message_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -1495,8 +1495,8 @@ function query_load_board($message_id)
 		)
 	);
 
-	list ($board_id) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($board_id) = $request->fetchRow();
+	$request->free();
 
 	return $board_id === '' ? 0 : $board_id;
 }
@@ -1510,7 +1510,7 @@ function query_load_board($message_id)
  */
 function query_load_board_details($board_id, $pbe)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
@@ -1523,8 +1523,8 @@ function query_load_board_details($board_id, $pbe)
 			'query_see_board' => $pbe['user_info']['query_see_board'],
 		)
 	);
-	$board_info = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$board_info = $request->fetchAssoc();
+	$request->free();
 
 	return $board_info;
 }
@@ -1543,7 +1543,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Verify the id_theme...
 	// Allow the board specific theme, if they are overriding.
@@ -1576,10 +1576,10 @@ function query_get_theme($id_member, $id_theme, $board_info)
 
 	// Put everything about this member/theme into a theme setting array
 	$theme_settings = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 		$theme_settings[$row['variable']] = $row['value'];
 
-	$db->free_result($result);
+	$result->free();
 
 	return $theme_settings;
 }
@@ -1596,7 +1596,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// First see if they have a board notification on for this board
 	// so we don't set both board and individual topic notifications
@@ -1612,9 +1612,9 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
 			'board_list' => $id_board,
 		)
 	);
-	if ($db->fetch_row($request))
+	if ($request->fetchRow())
 		$board_notify = true;
-	$db->free_result($request);
+	$request->free();
 
 	// If they have topic notification on and not board notification then
 	// add this post to the notification log
@@ -1655,7 +1655,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  */
 function query_mark_pms($email_message, $pbe)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
@@ -1686,9 +1686,9 @@ function query_mark_pms($email_message, $pbe)
 			)
 		);
 		$total_unread = 0;
-		while ($row = $db->fetch_assoc($result))
+		while ($row = $result->fetchAssoc())
 			$total_unread += $row['num'];
-		$db->free_result($result);
+		$result->free();
 
 		// Update things for when they do come to the site
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1720,7 +1720,7 @@ function query_key_maintenance($email_message)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Olds keys simply expire
 	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
@@ -1769,7 +1769,7 @@ function query_key_maintenance($email_message)
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$last_login = time();
 	$do_delete = false;

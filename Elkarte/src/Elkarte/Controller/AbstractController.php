@@ -319,6 +319,6 @@ abstract class AbstractController
 
 	public function db()
 	{
-		return database();
+		return $GLOBALS['elk']['db'];
 	}
 }

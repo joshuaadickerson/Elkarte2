@@ -36,12 +36,7 @@ class TemplateLayers extends Priority
 	/**
 	 * The layers added when this is true will be used in the error screen
 	 */
-	private static $_error_safe = false;
-
-	/**
-	 * Instance of the class
-	 */
-	private static $_instance = null;
+	private $_error_safe = false;
 
 	/**
 	 * Add a new layer to the pile
@@ -53,7 +48,7 @@ class TemplateLayers extends Priority
 	{
 		parent::add($layer, $priority);
 
-		if (self::$_error_safe)
+		if ($this->_error_safe)
 			$this->_error_safe_layers[] = $layer;
 	}
 
@@ -67,7 +62,7 @@ class TemplateLayers extends Priority
 	{
 		parent::addBefore($layer, $following);
 
-		if (self::$_error_safe)
+		if ($this->_error_safe)
 			$this->_error_safe_layers[] = $layer;
 	}
 
@@ -81,7 +76,7 @@ class TemplateLayers extends Priority
 	{
 		parent::addAfter($layer, $previous);
 
-		if (self::$_error_safe)
+		if ($this->_error_safe)
 			$this->_error_safe_layers[] = $layer;
 	}
 
@@ -95,7 +90,7 @@ class TemplateLayers extends Priority
 	{
 		parent::addEnd($layer, $priority);
 
-		if (self::$_error_safe)
+		if ($this->_error_safe)
 			$this->_error_safe_layers[] = $layer;
 	}
 
@@ -109,7 +104,7 @@ class TemplateLayers extends Priority
 	{
 		parent::addBegin($layer, $priority);
 
-		if (self::$_error_safe)
+		if ($this->_error_safe)
 			$this->_error_safe_layers[] = $layer;
 	}
 
@@ -187,20 +182,9 @@ class TemplateLayers extends Priority
 		$this->_is_error = true;
 	}
 
-	/**
-	 * Find and return Template_Layers instance if it exists,
-	 * or create a new instance if it didn't already exist.
-	 *
-	 * @param boolean $error_safe if error mode is on or off
-	 * @return TemplateLayers instance of the class
-	 */
-	public static function getInstance($error_safe = false)
+	public function setErrorSafe($error_safe)
 	{
-		if (self::$_instance === null)
-			self::$_instance = new TemplateLayers();
-
-		self::$_error_safe = $error_safe;
-
-		return self::$_instance;
+		$this->_error_safe = (bool) $error_safe;
+		return $this;
 	}
 }

@@ -1365,8 +1365,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
-	$detector = new BrowserDetector;
-	$detector->detectBrowser();
+	$GLOBALS['elk']['browser'];
 
 	// Set the top level linktree up.
 	array_unshift($context['linktree'], array(
@@ -1889,7 +1888,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+					$GLOBALS['elk']['debug']->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 			}
 
 			// Save it so we don't have to build this so often
@@ -2008,7 +2007,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Keep track of what we're up to soldier.
 	if ($db_show_debug === true)
-		Debug::get()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
+		$GLOBALS['elk']['debug']->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
 
 	// Remember what we have loaded, and in which language.
 	$already_loaded[$template_name] = $lang;
@@ -2444,7 +2443,7 @@ function doSecurityChecks()
 			$show_warnings = true;
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(ROOTDIR . '/Attachments/Attachments.subs.php');
 		$path = getAttachmentPath();
 		secureDirectory($path, true);
 		secureDirectory(CACHEDIR);

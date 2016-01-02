@@ -31,7 +31,7 @@ function ml_CustomProfile()
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$context['custom_profile_fields'] = array();
 
@@ -49,7 +49,7 @@ function ml_CustomProfile()
 			'private_level' => 2,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Avoid collisions
 		$curField = 'cust_' . $row['col_name'];
@@ -83,7 +83,7 @@ function ml_CustomProfile()
 			$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return !empty($context['custom_profile_fields']);
 }
@@ -98,7 +98,7 @@ function ml_CustomProfile()
 function ml_memberCache($cache_step_size)
 {
 	// Get hold of our database
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get all of the activated members
 	$request = $db->query('', '
@@ -113,21 +113,21 @@ function ml_memberCache($cache_step_size)
 
 	$memberlist_cache = array(
 		'last_update' => time(),
-		'num_members' => $db->num_rows($request),
+		'num_members' => $request->numRows(),
 		'index' => array(),
 	);
 
 	// Get/Set our pointers in this list, used to later help limit our query
-	for ($i = 0, $n = $db->num_rows($request); $i < $n; $i += $cache_step_size)
+	for ($i = 0, $n = $request->numRows(); $i < $n; $i += $cache_step_size)
 	{
 		$db->data_seek($request, $i);
-		list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
+		list ($memberlist_cache['index'][$i]) = $request->fetchRow();
 	}
 
 	// Set the last one
 	$db->data_seek($request, $memberlist_cache['num_members'] - 1);
-	list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($memberlist_cache['index'][$i]) = $request->fetchRow();
+	$request->free();
 
 	// Now we've got the cache...store it.
 	updateSettings(array('memberlist_cache' => serialize($memberlist_cache)));
@@ -140,7 +140,7 @@ function ml_memberCache($cache_step_size)
  */
 function ml_memberCount()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -150,8 +150,8 @@ function ml_memberCount()
 			'is_activated' => 1,
 		)
 	);
-	list ($num_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_members) = $request->fetchRow();
+	$request->free();
 
 	return $num_members;
 }
@@ -163,7 +163,7 @@ function ml_memberCount()
  */
 function ml_alphaStart($start)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('substring', '
 		SELECT COUNT(*)
@@ -175,8 +175,8 @@ function ml_alphaStart($start)
 			'first_letter' => $start,
 		)
 	);
-	list ($start) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($start) = $request->fetchRow();
+	$request->free();
 
 	return $start;
 }
@@ -194,7 +194,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 {
 	global $context, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Select the members from the database.
 	$request = $db->query('', '
@@ -211,7 +211,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	);
 
 	printMemberListRows($request);
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -229,7 +229,7 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the number of results
 	$request = $db->query('', '
@@ -242,8 +242,8 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 			AND mem.is_activated = {int:is_activated}',
 		$query_parameters
 	);
-	list ($numResults) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numResults) = $request->fetchRow();
+	$request->free();
 
 	// Select the members from the database.
 	$request = $db->query('', '
@@ -262,7 +262,7 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 
 	// Place everything context so the template can use it
 	printMemberListRows($request);
-	$db->free_result($request);
+	$request->free();
 
 	return $numResults;
 }
@@ -274,7 +274,7 @@ function ml_findSearchableCustomFields()
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc
@@ -293,13 +293,13 @@ function ml_findSearchableCustomFields()
 		)
 	);
 	$context['custom_search_fields'] = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$context['custom_search_fields'][$row['col_name']] = array(
 			'colname' => $row['col_name'],
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
 		);
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -312,7 +312,7 @@ function printMemberListRows($request)
 {
 	global $txt, $context, $scripturl, $memberContext, $settings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the max post number for the bar graph
 	$result = $db->query('', '
@@ -322,14 +322,14 @@ function printMemberListRows($request)
 		)
 	);
 	list ($most_posts) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	// Avoid division by zero...
 	if ($most_posts == 0)
 		$most_posts = 1;
 
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.

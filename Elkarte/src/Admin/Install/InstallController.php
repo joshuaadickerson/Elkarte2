@@ -539,7 +539,7 @@ class Install_Controller
 
             // Attempt a connection.
             $db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-            $db = database();
+            $db = $GLOBALS['elk']['db'];
 
             // No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
             if ($db_connection == null)

@@ -163,7 +163,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Pass this to the integration before we start modifying the output -- it'll make it easier later.
-	if (in_array(false, Hooks::get()->hook('outgoing_email', array(&$subject, &$message, &$headers)), true))
+	if (in_array(false, $GLOBALS['elk']['hooks']->hook('outgoing_email', array(&$subject, &$message, &$headers)), true))
 		return false;
 
 	// Save the original message...
@@ -326,7 +326,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	static $cur_insert = array();
 	static $cur_insert_len = 0;
@@ -972,7 +972,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT
@@ -1004,7 +1004,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
  */
 function list_getMailQueueSize()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// How many items do we have?
 	$request = $db->query('', '
@@ -1013,8 +1013,8 @@ function list_getMailQueueSize()
 		array(
 		)
 	);
-	list ($mailQueueSize) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($mailQueueSize) = $request->fetchRow();
+	$request->free();
 
 	return $mailQueueSize;
 }
@@ -1027,7 +1027,7 @@ function list_getMailQueueSize()
  */
 function deleteMailQueueItems($items)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}mail_queue
@@ -1045,7 +1045,7 @@ function deleteMailQueueItems($items)
  */
 function list_MailQueueStatus()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$items = array();
 
@@ -1056,8 +1056,8 @@ function list_MailQueueStatus()
 		array(
 		)
 	);
-	list ($items['mailQueueSize'], $items['mailOldest']) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($items['mailQueueSize'], $items['mailOldest']) = $request->fetchRow();
+	$request->free();
 
 	return $items;
 }
@@ -1074,7 +1074,7 @@ function updateFailedQueue($failed_emails)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Update the failed attempts check.
 	$db->insert('replace',
@@ -1116,7 +1116,7 @@ function updateFailedQueue($failed_emails)
  */
 function updateSuccessQueue()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}settings
@@ -1136,7 +1136,7 @@ function resetNextSendTime()
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Update the setting to zero, yay
 	// ...unless someone else did.
@@ -1166,7 +1166,7 @@ function updateNextSendTime()
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Set a delay based on the per minute limit (mail_period_limit)
 	$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_period_limit']) && $modSettings['mail_period_limit'] <= 5 ? 10 : 5);
@@ -1197,7 +1197,7 @@ function updateNextSendTime()
  */
 function emailsInfo($number)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$ids = array();
 	$emails = array();
 
@@ -1436,7 +1436,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  */
 function posterDetails($id_msg, $topic_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
@@ -1451,8 +1451,8 @@ function posterDetails($id_msg, $topic_id)
 		)
 	);
 
-	$message = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$message = $request->fetchAssoc();
+	$request->free();
 
 	return $message;
 }

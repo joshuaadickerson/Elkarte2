@@ -86,7 +86,7 @@ function createMenu($menuData, $menuOptions = array())
 
 	// Allow extend *any* menu with a single hook
 	if (!empty($menuOptions['hook']))
-		Hooks::get()->hook('' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+		$GLOBALS['elk']['hooks']->hook('' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
 
 	// What is the general action of this menu (i.e. $scripturl?action=XXXX.
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
@@ -323,9 +323,9 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['can_toggle_drop_down'] = !empty($menuOptions['can_toggle_drop_down']);
 
 	// Almost there - load the template and add to the template layers.
-	\Templates::getInstance()->load(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
+	$GLOBALS['elk']['templates']->load(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
 	$menu_context['layer_name'] = (isset($menuOptions['layer_name']) ? $menuOptions['layer_name'] : 'generic_menu') . $menuOptions['menu_type'];
-	TemplateLayers::getInstance()->add($menu_context['layer_name']);
+	$GLOBALS['elk']['layers']->add($menu_context['layer_name']);
 
 	// Check we had something - for sanity sake.
 	if (empty($include_data))
@@ -356,7 +356,7 @@ function destroyMenu($menu_id = 'last')
 	if (!isset($context[$menu_name]))
 		return false;
 
-	TemplateLayers::getInstance()->remove($context[$menu_name]['layer_name']);
+	$GLOBALS['elk']['layers']->remove($context[$menu_name]['layer_name']);
 
 	unset($context[$menu_name]);
 }

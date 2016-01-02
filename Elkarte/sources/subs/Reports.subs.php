@@ -28,7 +28,7 @@ function reportsBoardsList()
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Go through each board!
 	$request = $db->query('', '
@@ -45,7 +45,7 @@ function reportsBoardsList()
 		)
 	);
 	$boards = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$boards[] = $row;
 
 	return $boards;
@@ -61,7 +61,7 @@ function allMembergroups($group_clause, $query_groups = array())
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$group_clause = !empty($group_clause) ? $group_clause : '1=1';
 
@@ -82,9 +82,9 @@ function allMembergroups($group_clause, $query_groups = array())
 		)
 	);
 	$member_groups = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$member_groups[$row['id_group']] = $row['group_name'];
-	$db->free_result($request);
+	$request->free();
 
 	return $member_groups;
 }
@@ -100,7 +100,7 @@ function boardPermissions($profiles, $group_clause, $query_groups)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Permissions, last!
 	$board_permissions = array();
@@ -117,10 +117,10 @@ function boardPermissions($profiles, $group_clause, $query_groups)
 			'groups' => $query_groups,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$board_permissions[] = $row;
 
-	$db->free_result($request);
+	$request->free();
 
 	return $board_permissions;
 }
@@ -132,7 +132,7 @@ function allMembergroupsBoardAccess()
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.online_color, mg.min_posts, mg.max_messages, mg.icons,
@@ -167,9 +167,9 @@ function allMembergroupsBoardAccess()
 			'icons' => ''
 		),
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$rows[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $rows;
 }
@@ -184,7 +184,7 @@ function boardPermissionsByGroup($group_clause, $query_groups)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Now the big permission fetch!
 	$request = $db->query('', '
@@ -201,9 +201,9 @@ function boardPermissionsByGroup($group_clause, $query_groups)
 	);
 
 	$perms = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$perms[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $perms;
 }

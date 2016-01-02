@@ -20,7 +20,7 @@
 
 namespace Elkarte\Boards;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -102,6 +102,7 @@ class BoardsList
 	/**
 	 * Initialize the class
 	 *
+	 * @todo add Cache and Text classes to construct
 	 * @param DatabaseInterface $db
 	 * @param mixed[] $options - Available options and corresponding defaults are:
 	 *       'include_categories' => false
@@ -202,10 +203,10 @@ class BoardsList
 			)
 		);
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = $GLOBALS['elk']['bbc'];
 
 		// Run through the categories and boards (or only boards)....
-		while ($row_board = $this->_db->fetch_assoc($result_boards))
+		while ($row_board = $result_boards->fetchAssoc())
 		{
 			// Perhaps we are ignoring this board?
 			$ignoreThisBoard = in_array($row_board['id_board'], $this->_user['ignoreboards']);
@@ -351,7 +352,7 @@ class BoardsList
 
 			// Prepare the subject, and make sure it's not too long.
 			$row_board['subject'] = censor($row_board['subject']);
-			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
+			$row_board['short_subject'] = $GLOBALS['elk']['text']->shorten_text($row_board['subject'], $this->_subject_length);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],
 				'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
@@ -409,7 +410,7 @@ class BoardsList
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
 		}
-		$this->_db->free_result($result_boards);
+		$result_boards->free();
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();

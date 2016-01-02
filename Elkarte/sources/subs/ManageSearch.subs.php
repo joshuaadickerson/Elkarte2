@@ -30,7 +30,7 @@ function detectFulltextIndex()
 {
 	global $context, $db_prefix;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SHOW INDEX
@@ -39,12 +39,12 @@ function detectFulltextIndex()
 		)
 	);
 	$context['fulltext_index'] = '';
-	if ($request !== false || $db->num_rows($request) != 0)
+	if ($request !== false || $request->numRows() != 0)
 	{
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
 				$context['fulltext_index'][] = $row['Key_name'];
-		$db->free_result($request);
+		$request->free();
 
 		if (is_array($context['fulltext_index']))
 			$context['fulltext_index'] = array_unique($context['fulltext_index']);
@@ -71,11 +71,11 @@ function detectFulltextIndex()
 
 	if ($request !== false)
 	{
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
 
-		$db->free_result($request);
+		$request->free();
 	}
 }
 
@@ -250,7 +250,7 @@ searchd
  */
 function alterFullTextIndex($table, $indexes, $add = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$indexes = is_array($indexes) ? $indexes : array($indexes);
 
@@ -290,7 +290,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$db_search = db_search();
 	$step = 1;
 
@@ -323,7 +323,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 			'starting_id' => $start,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
 
 	// Done with indexing the messages, on to the next step
@@ -354,7 +354,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 			);
 			$forced_break = false;
 			$number_processed = 0;
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 				if ($stop < time())
@@ -369,7 +369,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 			}
 			$num_messages['done'] += $number_processed;
 			$num_messages['todo'] -= $number_processed;
-			$db->free_result($request);
+			$request->free();
 
 			$start += $forced_break ? $number_processed : $messages_per_batch;
 
@@ -410,7 +410,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$stop_words = $start === 0 || empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 	$stop = time() + 3;
@@ -431,9 +431,9 @@ function removeCommonWordsFromIndex($start, $column_definition)
 				'minimum_messages' => $max_messages,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$stop_words[] = $row['id_word'];
-		$db->free_result($request);
+		$request->free();
 
 		updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 

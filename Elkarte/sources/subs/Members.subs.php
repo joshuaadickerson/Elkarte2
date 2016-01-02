@@ -46,7 +46,7 @@ function deleteMembers($users, $check_not_admin = false)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Try give us a while to sort this out...
 	setTimeLimit(600);
@@ -98,14 +98,14 @@ function deleteMembers($users, $check_not_admin = false)
 	$admins = array();
 	$emails = array();
 	$user_log_details = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['is_admin'])
 			$admins[] = $row['id_member'];
 		$user_log_details[$row['id_member']] = array($row['id_member'], $row['member_name']);
 		$emails[] = $row['email_address'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (empty($user_log_details))
 		return;
@@ -137,7 +137,7 @@ function deleteMembers($users, $check_not_admin = false)
 		);
 
 		// Remove any cached data if enabled.
-		Cache::instance()->remove('user_settings-' . $user[0]);
+		$GLOBALS['elk']['cache']->remove('user_settings-' . $user[0]);
 	}
 
 	// Make these peoples' posts guest posts.
@@ -438,7 +438,7 @@ function deleteMembers($users, $check_not_admin = false)
 	));
 
 	// Integration rocks!
-	Hooks::get()->hook('delete_members', array($users));
+	$GLOBALS['elk']['hooks']->hook('delete_members', array($users));
 
 	updateMemberStats();
 
@@ -467,7 +467,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 {
 	global $scripturl, $txt, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	loadLanguage('Login');
 
@@ -534,7 +534,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// Perhaps someone else wants to check this user
-	Hooks::get()->hook('register_check', array(&$regOptions, &$reg_errors));
+	$GLOBALS['elk']['hooks']->hook('register_check', array(&$regOptions, &$reg_errors));
 
 	// If there's any errors left return them at once!
 	if ($reg_errors->hasErrors())
@@ -563,7 +563,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('no_theme');
 
-	$tokenizer = new Token_Hash();
+	$tokenizer = new TokenHash();
 
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
@@ -654,7 +654,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	);
 
 	// Call an optional function to validate the users' input.
-	Hooks::get()->hook('register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
+	$GLOBALS['elk']['hooks']->hook('register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
 
 	$column_names = array();
 	$values = array();
@@ -790,7 +790,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// If they are for sure registered, let other people to know about it
-	Hooks::get()->hook('register_after', array($regOptions, $memberID));
+	$GLOBALS['elk']['hooks']->hook('register_after', array($regOptions, $memberID));
 
 	return $memberID;
 }
@@ -812,7 +812,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
 	$checkName = Util::strtolower($name);
@@ -878,9 +878,9 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'check_name' => $checkName,
 		)
 	);
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 	{
-		$db->free_result($request);
+		$request->free();
 		return true;
 	}
 
@@ -895,9 +895,9 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'check_name' => $checkName,
 		)
 	);
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 	{
-		$db->free_result($request);
+		$request->free();
 		return true;
 	}
 
@@ -922,7 +922,7 @@ function groupsAllowedTo($permission, $board_id = null)
 {
 	global $board_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Admins are allowed to do anything.
 	$member_groups = array(
@@ -941,9 +941,9 @@ function groupsAllowedTo($permission, $board_id = null)
 				'permission' => $permission,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Otherwise it's time to look at the board.
@@ -974,9 +974,9 @@ function groupsAllowedTo($permission, $board_id = null)
 				'permission' => $permission,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$member_groups[$row['add_deny'] === '1' ? 'allowed' : 'denied'][] = $row['id_group'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Denied is never allowed.
@@ -1000,7 +1000,7 @@ function groupsAllowedTo($permission, $board_id = null)
  */
 function membersAllowedTo($permission, $board_id = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$member_groups = groupsAllowedTo($permission, $board_id);
 
@@ -1046,7 +1046,7 @@ function membersAllowedTo($permission, $board_id = null)
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Firstly, if email and username aren't passed find out the members email address and name.
 	if ($email === false && $membername === false)
@@ -1078,8 +1078,8 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 				'recycled_icon' => 'recycled',
 			)
 		);
-		list ($messageCount) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($messageCount) = $request->fetchRow();
+		$request->free();
 
 		updateMemberData($memID, array('posts' => 'posts + ' . $messageCount));
 	}
@@ -1115,7 +1115,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	);
 
 	// Allow mods with their own post tables to re-attribute posts as well :)
-	Hooks::get()->hook('reattribute_posts', array($memID, $email, $membername, $post_count));
+	$GLOBALS['elk']['hooks']->hook('reattribute_posts', array($memID, $email, $membername, $post_count));
 }
 
 /**
@@ -1131,7 +1131,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$members = $db->fetchQuery('
 		SELECT
@@ -1167,7 +1167,7 @@ function list_getNumMembers($where, $where_params = array())
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// We know how many members there are in total.
 	if (empty($where) || $where == '1=1')
@@ -1183,8 +1183,8 @@ function list_getNumMembers($where, $where_params = array())
 			array_merge($where_params, array(
 			))
 		);
-		list ($num_members) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($num_members) = $request->fetchRow();
+		$request->free();
 	}
 
 	return $num_members;
@@ -1198,7 +1198,7 @@ function list_getNumMembers($where, $where_params = array())
  */
 function populateDuplicateMembers(&$members)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// This will hold all the ip addresses.
 	$ips = array();
@@ -1259,7 +1259,7 @@ function populateDuplicateMembers(&$members)
 	);
 
 	$had_ips = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Don't collect lots of the same.
 		if (isset($had_ips[$row['poster_ip']]) && in_array($row['id_member'], $had_ips[$row['poster_ip']]))
@@ -1275,7 +1275,7 @@ function populateDuplicateMembers(&$members)
 			'ip2' => $row['poster_ip'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Now we have all the duplicate members, stick them with their respective member in the list.
 	if (!empty($duplicate_members))
@@ -1312,7 +1312,7 @@ function populateDuplicateMembers(&$members)
  */
 function membersByIP($ip1, $match = 'exact', $ip2 = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$ip_params = array('ips' => array());
 	$ip_query = array();
@@ -1367,7 +1367,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
  */
 function isAnotherAdmin($memberID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_member
@@ -1380,8 +1380,8 @@ function isAnotherAdmin($memberID)
 			'selected_member' => $memberID,
 		)
 	);
-	list ($another) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($another) = $request->fetchRow();
+	$request->free();
 
 	return $another;
 }
@@ -1398,7 +1398,7 @@ function isAnotherAdmin($memberID)
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
@@ -1417,16 +1417,16 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 	// Return all the details for each member found
 	if ($details)
 	{
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$members[$row['id_member']] = $row;
 	}
 	// Or just a int[] of found member id's
 	else
 	{
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$members[] = $row['id_member'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $members;
 }
@@ -1441,7 +1441,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  */
 function countMembersBy($query, $query_params, $only_active = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
@@ -1452,8 +1452,8 @@ function countMembersBy($query, $query_params, $only_active = true)
 		$query_params
 	);
 
-	list ($num_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_members) = $request->fetchRow();
+	$request->free();
 
 	return $num_members;
 }
@@ -1559,7 +1559,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
  */
 function admins($id_admin = 0)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Now let's get out and loop through the admins.
 	$request = $db->query('', '
@@ -1575,9 +1575,9 @@ function admins($id_admin = 0)
 	);
 
 	$admins = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$admins[$row['id_member']] = array($row['real_name'], $row['lngfile']);
-	$db->free_result($request);
+	$request->free();
 
 	return $admins;
 }
@@ -1588,7 +1588,7 @@ function admins($id_admin = 0)
  */
 function maxMemberID()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT MAX(id_member)
@@ -1596,8 +1596,8 @@ function maxMemberID()
 		array(
 		)
 	);
-	list ($max_id) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($max_id) = $request->fetchRow();
+	$request->free();
 
 	return $max_id;
 }
@@ -1621,7 +1621,7 @@ function getBasicMemberData($member_ids, $options = array())
 {
 	global $txt, $language;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$members = array();
 
@@ -1663,7 +1663,7 @@ function getBasicMemberData($member_ids, $options = array())
 			'sort' => isset($options['sort']) ? $options['sort'] : '',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (empty($row['lngfile']))
 			$row['lngfile'] = $language;
@@ -1673,7 +1673,7 @@ function getBasicMemberData($member_ids, $options = array())
 		else
 			$members[$row['id_member']] = $row;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $members;
 }
@@ -1686,7 +1686,7 @@ function getBasicMemberData($member_ids, $options = array())
  */
 function countInactiveMembers()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$inactive_members = array();
 
@@ -1700,9 +1700,9 @@ function countInactiveMembers()
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$inactive_members[$row['is_activated']] = $row['total_members'];
-	$db->free_result($request);
+	$request->free();
 
 	return $inactive_members;
 }
@@ -1717,7 +1717,7 @@ function countInactiveMembers()
  */
 function getMemberByName($name, $flexible = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_member, id_group
@@ -1731,10 +1731,10 @@ function getMemberByName($name, $flexible = false)
 			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		return false;
-	$member = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$member = $request->fetchAssoc();
+	$request->free();
 
 	return $member;
 }
@@ -1750,7 +1750,7 @@ function getMemberByName($name, $flexible = false)
  */
 function getMember($search, $buddies = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$xml_data = array(
 		'items' => array(
@@ -1813,7 +1813,7 @@ function retrieveMemberData($conditions)
 	// We badly need this
 	assert(isset($conditions['activated_status']));
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$available_conditions = array(
 		'time_before' => '
@@ -1859,13 +1859,13 @@ function retrieveMemberData($conditions)
 		$conditions
 	);
 
-	$data['member_count'] = $db->num_rows($request);
+	$data['member_count'] = $request->numRows();
 
 	if ($data['member_count'] == 0)
 		return $data;
 
 	// Fill the info array.
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$data['members'][] = $row['id_member'];
 		$data['member_info'][] = array(
@@ -1877,7 +1877,7 @@ function retrieveMemberData($conditions)
 			'code' => $row['validation_code']
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $data;
 }
@@ -1894,7 +1894,7 @@ function retrieveMemberData($conditions)
  */
 function approveMembers($conditions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// This shall be present
 	assert(isset($conditions['activated_status']));
@@ -1942,7 +1942,7 @@ function approveMembers($conditions)
 
 	// Let the integration know that they've been activated!
 	foreach ($members_id as $member_id)
-		Hooks::get()->hook('activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+		$GLOBALS['elk']['hooks']->hook('activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
 
 	return $conditions['is_activated'];
 }
@@ -1961,7 +1961,7 @@ function approveMembers($conditions)
  */
 function enforceReactivation($conditions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// We need all of these
 	assert(isset($conditions['activated_status']));
@@ -2000,7 +2000,7 @@ function enforceReactivation($conditions)
  */
 function countMembersInGroup($id_group = 0)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Determine the number of ungrouped members.
 	$request = $db->query('', '
@@ -2011,8 +2011,8 @@ function countMembersInGroup($id_group = 0)
 			'group' => $id_group,
 		)
 	);
-	list ($num_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_members) = $request->fetchRow();
+	$request->free();
 
 	return $num_members;
 }
@@ -2026,7 +2026,7 @@ function countMembersInGroup($id_group = 0)
  */
 function countMembersOnline($conditions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -2036,8 +2036,8 @@ function countMembersOnline($conditions)
 		array(
 		)
 	);
-	list ($totalMembers) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalMembers) = $request->fetchRow();
+	$request->free();
 
 	return $totalMembers;
 }
@@ -2056,7 +2056,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQuery('
 		SELECT
@@ -2088,7 +2088,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
  */
 function memberExists($url)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT mem.id_member, mem.member_name
@@ -2098,8 +2098,8 @@ function memberExists($url)
 			'openid_uri' => $url,
 		)
 	);
-	$member = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$member = $request->fetchAssoc();
+	$request->free();
 
 	return $member;
 }
@@ -2112,7 +2112,7 @@ function memberExists($url)
  */
 function recentMembers($limit)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the most recent members.
 	return $db->fetchQuery('
@@ -2152,7 +2152,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 {
 	global $modSettings, $language;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 		// Get the details of all the members concerned...
 	$request = $db->query('', '
@@ -2173,7 +2173,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 	$email_details = array();
 	$group_changes = array();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -2216,7 +2216,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 				'language' => $row['lngfile'],
 			);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	$output = array(
 		'email_details' => $email_details,
@@ -2236,7 +2236,7 @@ function canContact($who)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT receive_from, buddy_list, pm_ignore_list
@@ -2246,8 +2246,8 @@ function canContact($who)
 			'member' => $who,
 		)
 	);
-	list ($receive_from, $buddies, $ignore) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($receive_from, $buddies, $ignore) = $request->fetchRow();
+	$request->free();
 
 	$buddy_list = array_map('intval', explode(',', $buddies));
 	$ignore_list = array_map('intval', explode(',', $ignore));
@@ -2281,7 +2281,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$changes = array(
 		'memberlist_updated' => time(),
@@ -2307,8 +2307,8 @@ function updateMemberStats($id_member = null, $real_name = null)
 				'is_activated' => 1,
 			)
 		);
-		list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($changes['totalMembers'], $changes['latestMember']) = $request->fetchRow();
+		$request->free();
 
 		// Get the latest activated member's display name.
 		$request = getBasicMemberData((int) $changes['latestMember']);
@@ -2326,8 +2326,8 @@ function updateMemberStats($id_member = null, $real_name = null)
 					'activation_status' => array(3, 4),
 				)
 			);
-			list ($changes['unapprovedMembers']) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($changes['unapprovedMembers']) = $request->fetchRow();
+			$request->free();
 		}
 	}
 
@@ -2389,7 +2389,7 @@ function updateMemberData($members, $data)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$parameters = array();
 	if (is_array($members))
@@ -2459,7 +2459,7 @@ function updateMemberData($members, $data)
 
 			if (!empty($member_names))
 				foreach ($vars_to_integrate as $var)
-					Hooks::get()->hook('change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
+					$GLOBALS['elk']['hooks']->hook('change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
 		}
 	}
 
@@ -2507,7 +2507,7 @@ function updateMemberData($members, $data)
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 	updatePostGroupStats($members, array_keys($data));
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Clear any caching?
 	if ($cache->checkLevel(2) && !empty($members))
@@ -2539,7 +2539,7 @@ function loadMembersIPs($ip_string, $ip_var)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -2551,9 +2551,9 @@ function loadMembersIPs($ip_string, $ip_var)
 		)
 	);
 	$ips = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$ips[$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
-	$db->free_result($request);
+	$request->free();
 
 	ksort($ips);
 

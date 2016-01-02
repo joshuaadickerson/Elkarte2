@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getUserErrorCount($where, $where_vars = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*) AS error_count
@@ -58,7 +58,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 {
 	global $txt, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get a list of error messages from this ip (range).
 	$request = $db->query('', '
@@ -99,7 +99,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
  */
 function getIPMessageCount($where, $where_vars = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
@@ -128,7 +128,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get all the messages fitting this where clause.
 	// @todo SLOW This query is using a filesort.
@@ -177,7 +177,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
  */
 function getLoginCount($where, $where_vars = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
@@ -207,7 +207,7 @@ function getLoginCount($where, $where_vars = array())
  */
 function getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT time, ip, ip2
@@ -240,7 +240,7 @@ function getLogins($start, $items_per_page, $sort, $where, $where_vars = array()
  */
 function getProfileEditCount($memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*) AS edit_count
@@ -273,7 +273,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 {
 	global $txt, $scripturl, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get a list of error messages from this ip (range).
 	$request = $db->query('', '

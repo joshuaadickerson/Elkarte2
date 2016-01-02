@@ -29,7 +29,7 @@ function deleteLogOnlineInterval($session_id)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('delete_log_online_interval', '
 		DELETE FROM {db_prefix}log_online
@@ -52,9 +52,9 @@ function updateLogOnline($session_id, $serialized)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
-	$db->query('', '
+	$result = $db->query('', '
 		UPDATE {db_prefix}log_online
 		SET
 			log_time = {int:log_time},
@@ -70,7 +70,7 @@ function updateLogOnline($session_id, $serialized)
 	);
 
 	// Guess it got deleted.
-	if ($db->affected_rows() == 0)
+	if ($result->numAffectedRows() == 0)
 		$_SESSION['log_time'] = 0;
 }
 
@@ -85,9 +85,10 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 {
 	global $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($do_delete || !empty($user_info['id']))
+	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
@@ -96,6 +97,7 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 				'log_time' => time() - $modSettings['lastActive'] * 60,
 			)
 		);
+	}
 
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
@@ -124,16 +126,16 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
  */
 function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
-	$db->query('', '
+	$result = $db->query('', '
 		UPDATE {db_prefix}log_activity
 		SET ' . $setStringUpdate . '
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
 
-	if ($db->affected_rows() == 0)
+	if ($result->numAffectedRows() == 0)
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
@@ -155,7 +157,7 @@ function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('insert',
 		'{db_prefix}member_logins',
@@ -179,7 +181,7 @@ function logLoginHistory($id_member, $ip, $ip2)
  */
 function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_report
@@ -193,8 +195,8 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
 			'type' => $type,
 		)
 	);
-	$num = $db->num_rows($request);
-	$db->free_result($request);
+	$num = $request->numRows();
+	$request->free();
 
 	return ($num > 0);
 }
@@ -206,7 +208,7 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
  */
 function insertLogActions($inserts)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}log_actions',
@@ -225,7 +227,7 @@ function deleteMemberLogOnline()
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
@@ -244,7 +246,7 @@ function deleteMemberLogOnline()
  */
 function deleteOnline($session)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
@@ -264,7 +266,7 @@ function deleteOnline($session)
  */
 function logOnline($ids, $on = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!is_array($ids))
 		$ids = array($ids);

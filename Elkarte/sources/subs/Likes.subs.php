@@ -49,7 +49,7 @@ function likePost($id_liker, $liked_message, $direction)
  */
 function loadLikes($messages, $prepare = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$likes = array();
 
 	if (empty($messages))
@@ -70,14 +70,14 @@ function loadLikes($messages, $prepare = true)
 			'id_messages' => $messages,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
 
 	// Total likes for this group
 	foreach ($likes as $msg_id => $like)
 		$likes[$msg_id]['count'] = count($like['member']);
 
-	$db->free_result($request);
+	$request->free();
 
 	if ($prepare)
 		$likes = prepareLikes($likes);
@@ -143,7 +143,7 @@ function prepareLikes($likes)
  */
 function clearLikes($likeWaitTime)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete all older items from the log
 	$db->query('', '
@@ -175,7 +175,7 @@ function lastLikeOn($id_liker)
 		return true;
 
 	// Find out if, and how many, this user has done recently...
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$request = $db->query('', '
 		SELECT action
 		FROM {db_prefix}log_likes
@@ -184,8 +184,8 @@ function lastLikeOn($id_liker)
 			'current_member' => $id_liker,
 		)
 	);
-	$actions = $db->num_rows($request);
-	$db->free_result($request);
+	$actions = $request->numRows();
+	$request->free();
 
 	return $actions < $modSettings['likeWaitCount'];
 }
@@ -200,7 +200,7 @@ function lastLikeOn($id_liker)
  */
 function updateLike($id_liker, $liked_message, $direction)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// See if they already likeyed this message
 	$request = $db->query('', '
@@ -215,8 +215,8 @@ function updateLike($id_liker, $liked_message, $direction)
 			'id_msg' => $liked_message['id_msg'],
 		)
 	);
-	$count = $db->num_rows($request);
-	$db->free_result($request);
+	$count = $request->numRows();
+	$request->free();
 
 	// Not previously liked, and you want to
 	if ($count === 0 && $direction === '+')
@@ -278,7 +278,7 @@ function updateLike($id_liker, $liked_message, $direction)
  */
 function increaseTopicLikes($id_topic, $direction)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}topics
@@ -302,7 +302,7 @@ function likesCount($memberID, $given = true)
 {
 	global $user_profile;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Give is a given, received takes a query so its only the unique messages
 	if ($given === true)
@@ -318,8 +318,8 @@ function likesCount($memberID, $given = true)
 				'id_member' => $memberID,
 			)
 		);
-		$likes = $db->num_rows($request);
-		$db->free_result($request);
+		$likes = $request->numRows();
+		$request->free();
 	}
 
 	return $likes;
@@ -340,7 +340,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl, $context, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load up what the user likes from the db
 	return $db->fetchQueryCallback('
@@ -389,7 +389,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load up what the user likes from the db
 	return $db->fetchQueryCallback('
@@ -438,7 +438,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$likes = array();
 
 	if (empty($messageID))
@@ -489,7 +489,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
  */
 function messageLikeCount($message)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$total = 0;
 
 	if (empty($message))
@@ -504,8 +504,8 @@ function messageLikeCount($message)
 			'id_message' => $message,
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetchRow();
+	$request->free();
 
 	return (int) $total;
 }
@@ -520,7 +520,7 @@ function dbMostLikedMessage($limit = 10)
 {
 	global $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Most liked Message
 	$request = $db->query('', '
@@ -552,7 +552,7 @@ function dbMostLikedMessage($limit = 10)
 	$mostLikedMessages = array();
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Censor it!
 		$row['body'] = censor($row['subject']);
@@ -589,7 +589,7 @@ function dbMostLikedMessage($limit = 10)
 			'member_liked_data' => postLikers(0, 20, 'l.id_member DESC', $row['id_msg'], false),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// No likes in the system?
 	if (empty($mostLikedMessages))
@@ -617,7 +617,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Most liked messages in a given topic
@@ -696,7 +696,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// The most liked topics by sum of likes and distinct likers
 	$request = $db->query('', '
@@ -719,14 +719,14 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		)
 	);
 	$mostLikedTopics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$mostLikedTopics[$row['id_topic']] = $row;
 		$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
 			$row['distinct_likers'] / $row['num_messages_liked'] +
 			min($row['distinct_likers'], 1 / (log($row['like_count'] / ($row['num_replies'] + ($row['like_count'] == $row['num_replies'] ? 1 : 0)))));
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Sort the results from the net we cast, then cut it down to the top X limit
 	uasort($mostLikedTopics, 'sort_by_relevance');
@@ -771,7 +771,7 @@ function dbMostLikedBoard()
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Most liked board
 	$request = $db->query('', '
@@ -798,8 +798,8 @@ function dbMostLikedBoard()
 			'limit' => 1
 		)
 	);
-	$mostLikedBoard = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$mostLikedBoard = $request->fetchAssoc();
+	$request->free();
 
 	if (empty($mostLikedBoard['id_board']))
 	{
@@ -824,7 +824,7 @@ function dbMostLikesReceivedUser($limit = 10)
 {
 	global $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -852,7 +852,7 @@ function dbMostLikesReceivedUser($limit = 10)
 		)
 	);
 	$mostLikedMembers = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$avatar = determineAvatar($row);
 		$mostLikedMembers[] = array(
@@ -868,7 +868,7 @@ function dbMostLikesReceivedUser($limit = 10)
 			'post_data' => dbMostLikedPostsByUser($row['id_poster']),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (empty($mostLikedMembers))
 	{
@@ -890,7 +890,7 @@ function dbMostLikesReceivedUser($limit = 10)
  */
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch highest liked posts by this user
@@ -947,7 +947,7 @@ function dbMostLikesGivenUser($limit = 10)
 {
 	global $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT
@@ -971,7 +971,7 @@ function dbMostLikesGivenUser($limit = 10)
 		)
 	);
 	$mostLikeGivingMembers = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$avatar = determineAvatar($row);
 
@@ -988,7 +988,7 @@ function dbMostLikesGivenUser($limit = 10)
 			'post_data' => dbRecentlyLikedPostsGivenUser($row['id_member'])
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (empty($mostLikeGivingMembers))
 	{
@@ -1009,7 +1009,7 @@ function dbMostLikesGivenUser($limit = 10)
  */
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch the latest liked posts by this user
@@ -1066,7 +1066,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
  */
 function decreaseLikeCounts($messages)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Start off with no changes
 	$update_given = array();
@@ -1088,13 +1088,13 @@ function decreaseLikeCounts($messages)
 	);
 	$posters = array();
 	$likers = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Track how many likes each member gave and how many were received
 		$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
 		$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// No one?
 	if (empty($posters) && empty($likers))
@@ -1114,9 +1114,9 @@ function decreaseLikeCounts($messages)
 			)
 		);
 		// All who liked these messages have their "likes given" reduced
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Count the "likes received" totals for the message posters
@@ -1133,9 +1133,9 @@ function decreaseLikeCounts($messages)
 			)
 		);
 		// The message posters have their "likes received" reduced
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$update_received[$row['id_poster']] = $row['likes'] - $posters[$row['id_poster']];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Update the totals for these members

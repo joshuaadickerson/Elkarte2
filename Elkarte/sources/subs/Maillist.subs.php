@@ -30,7 +30,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 {
 	global $txt, $boardurl, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Init
 	$i = 0;
@@ -69,7 +69,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			'id' => $id,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
@@ -99,7 +99,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 
 		$i++;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $postemail;
 }
@@ -113,7 +113,7 @@ function list_maillist_count_unapproved()
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -137,8 +137,8 @@ function list_maillist_count_unapproved()
 		array(
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetchRow();
+	$request->free();
 
 	return $total;
 }
@@ -151,7 +151,7 @@ function list_maillist_count_unapproved()
  */
 function maillist_delete_error_entry($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// bye bye error log entry
 	$db->query('', '
@@ -178,7 +178,7 @@ function maillist_delete_error_entry($id)
  */
 function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Init
 	if (empty($sort))
@@ -203,7 +203,7 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 			'style' => $style
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
@@ -214,7 +214,7 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 			'filter_order' => $row['filter_order'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $email_filters;
 }
@@ -231,7 +231,7 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
  */
 function list_count_filter_parser($id, $style)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the total filter count, needed for pages
 	$request = $db->query('', '
@@ -245,8 +245,8 @@ function list_count_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetchRow();
+	$request->free();
 
 	return $total;
 }
@@ -263,7 +263,7 @@ function list_count_filter_parser($id, $style)
  */
 function maillist_load_filter_parser($id, $style)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load filter/parser details for editing
 	$request = $db->query('', '
@@ -277,8 +277,8 @@ function maillist_load_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row = $request->fetchAssoc();
+	$request->free();
 
 	// Check that the filter does exist
 	if (empty($row))
@@ -295,7 +295,7 @@ function maillist_load_filter_parser($id, $style)
  */
 function maillist_delete_filter_parser($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete the rows from the database for the filter selected
 	$db->query('', '
@@ -318,7 +318,7 @@ function maillist_delete_filter_parser($id)
  */
 function maillist_board_list()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the board and the id's, we need these for the templates
 	$request = $db->query('', '
@@ -331,9 +331,9 @@ function maillist_board_list()
 	);
 	$result = array();
 	$result[0] = '';
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$result[$row[0]] = $row[1];
-	$db->free_result($request);
+	$request->free();
 
 	return $result;
 }
@@ -346,7 +346,7 @@ function maillist_board_list()
  */
 function enable_maillist_imap_cron($switch)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Enable or disable the fake cron
 	$db->query('', '
@@ -372,7 +372,7 @@ function maillist_templates($template_type, $subject = null)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
@@ -407,7 +407,7 @@ function maillist_templates($template_type, $subject = null)
  */
 function log_email($sent)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
@@ -432,7 +432,7 @@ function log_email($sent)
  */
 function updateParserFilterOrder($replace, $filters)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}postby_emails_filters

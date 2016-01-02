@@ -49,7 +49,7 @@ function database()
 function db_table($db = null)
 {
 	if ($db === null)
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 	require_once(SOURCEDIR . '/database/DbTable.php');
 	require_once(SOURCEDIR . '/database/DbTable-' . strtolower(DB_TYPE) . '.php');

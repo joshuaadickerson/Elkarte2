@@ -267,7 +267,7 @@ class CoreFeaturesController extends AbstractController
 		$this->_getModulesConfig($core_features);
 
 		// Anyone who would like to add a core feature?
-		Hooks::get()->hook('core_features', array(&$core_features));
+		$GLOBALS['elk']['hooks']->hook('core_features', array(&$core_features));
 
 		return $core_features;
 	}
@@ -291,7 +291,7 @@ class CoreFeaturesController extends AbstractController
 				$class::addCoreFeature($core_features);
 		}
 
-		$integrations = Hooks::get()->discoverIntegrations(ADDONSDIR);
+		$integrations = $GLOBALS['elk']['hooks']->discoverIntegrations(ADDONSDIR);
 
 		foreach ($integrations as $integration)
 		{

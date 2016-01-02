@@ -84,7 +84,7 @@ class Query_Analysis
 			return array();
 
 		// db work...
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$result = $db->query('', '
 			EXPLAIN ' . $this->_select,
@@ -96,19 +96,19 @@ class Query_Analysis
 		{
 			$explain = array(
 				'is_error' => true,
-				'error_text' => $db->last_error($db->connection()),
+				'error_text' => $db->lastError($db->connection()),
 			);
 		}
 		else
 		{
-			$row = $db->fetch_assoc($result);
+			$row = $result->fetchAssoc();
 			$explain = array(
 				'headers' => array_keys($row),
 				'body' => array()
 			);
 
 			$db->data_seek($result, 0);
-			while ($row = $db->fetch_assoc($result))
+			while ($row = $result->fetchAssoc())
 				$explain['body'][] = $row;
 		}
 

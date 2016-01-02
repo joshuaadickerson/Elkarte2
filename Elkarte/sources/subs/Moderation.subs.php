@@ -32,7 +32,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -47,8 +47,8 @@ function recountOpenReports($flush = true, $count_pms = false)
 			'rep_type' => $count_pms ? array('pm') : array('msg'),
 		)
 	);
-	list ($open_reports) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($open_reports) = $request->fetchRow();
+	$request->free();
 
 	$_SESSION['rc'] = array(
 		'id' => $user_info['id'],
@@ -58,7 +58,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	$context['open_mod_reports'] = $open_reports;
 	if ($flush)
-		Cache::instance()->remove('num_menu_errors');
+		$GLOBALS['elk']['cache']->remove('num_menu_errors');
 	return $open_reports;
 }
 
@@ -75,7 +75,7 @@ function recountUnapprovedPosts($approve_query = null)
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($approve_query === null)
 		return array('posts' => 0, 'topics' => 0);
@@ -93,8 +93,8 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_posts) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($unapproved_posts) = $request->fetchRow();
+	$request->free();
 
 	// What about topics?
 	$request = $db->query('', '
@@ -108,8 +108,8 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_topics) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($unapproved_topics) = $request->fetchRow();
+	$request->free();
 
 	$context['total_unapproved_topics'] = $unapproved_topics;
 	$context['total_unapproved_posts'] = $unapproved_posts;
@@ -125,7 +125,7 @@ function recountFailedEmails($approve_query = null)
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($approve_query === null)
 		return 0;
@@ -140,8 +140,8 @@ function recountFailedEmails($approve_query = null)
 		array(
 		)
 	);
-	list ($failed_emails) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($failed_emails) = $request->fetchRow();
+	$request->free();
 
 	$context['failed_emails'] = $failed_emails;
 	return $failed_emails;
@@ -156,7 +156,7 @@ function totalReports($status = 0, $show_pms = false)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -169,8 +169,8 @@ function totalReports($status = 0, $show_pms = false)
 			'type' => $show_pms ? array('pm') : array('msg'),
 		)
 	);
-	list ($total_reports) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_reports) = $request->fetchRow();
+	$request->free();
 
 	return $total_reports;
 }
@@ -189,7 +189,7 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 	if (empty($reports_id))
 		return;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$reports_id = is_array($reports_id) ? $reports_id : array($reports_id);
 
@@ -251,7 +251,7 @@ function loadModeratorMenuCounts($brd = null)
 		return $menu_errors[$cache_key];
 
 	// If its been cached, guess what, thats right use it!
-	$temp = Cache::instance()->get('num_menu_errors', 900);
+	$temp = $GLOBALS['elk']['cache']->get('num_menu_errors', 900);
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
 		// Starting out with nothing is a good start
@@ -321,7 +321,7 @@ function loadModeratorMenuCounts($brd = null)
 		$menu_errors = is_array($temp) ? array_merge($temp, $menu_errors) : $menu_errors;
 
 		// Store it away for a while, not like this should change that often
-		Cache::instance()->put('num_menu_errors', $menu_errors, 900);
+		$GLOBALS['elk']['cache']->put('num_menu_errors', $menu_errors, 900);
 	}
 	else
 		$menu_errors = $temp === null ? array() : $temp;
@@ -338,7 +338,7 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Log warning notice.
 	$db->insert('',
@@ -369,7 +369,7 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}log_comments',
@@ -397,7 +397,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Log the actions.
 	$request = $db->query('', '
@@ -413,9 +413,9 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		logAction('delete_warn_template', array('template' => $row['recipient_name']));
-	$db->free_result($request);
+	$request->free();
 
 	// Do the deletes.
 	$db->query('', '
@@ -445,7 +445,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 {
 	global $scripturl, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
@@ -464,7 +464,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 		)
 	);
 	$templates = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$templates[] = array(
 			'id_comment' => $row['id_comment'],
@@ -476,7 +476,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 			'body' => Util::htmlspecialchars($row['body']),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $templates;
 }
@@ -493,7 +493,7 @@ function warningTemplateCount($template_type = 'warntpl')
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -506,8 +506,8 @@ function warningTemplateCount($template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	list ($totalWarns) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalWarns) = $request->fetchRow();
+	$request->free();
 
 	return $totalWarns;
 }
@@ -527,7 +527,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
@@ -545,7 +545,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 		))
 	);
 	$warnings = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$warnings[] = array(
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
@@ -558,7 +558,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $warnings;
 }
@@ -575,7 +575,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
  */
 function warningCount($query_string = '', $query_params = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -588,8 +588,8 @@ function warningCount($query_string = '', $query_params = array())
 			'warning' => 'warning',
 		))
 	);
-	list ($totalWarns) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalWarns) = $request->fetchRow();
+	$request->free();
 
 	return $totalWarns;
 }
@@ -604,7 +604,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
 	global $user_info, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_member, id_recipient, recipient_name AS template_title, body
@@ -619,7 +619,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
@@ -628,7 +628,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -645,7 +645,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($edit)
 	{
@@ -696,7 +696,7 @@ function modReportDetails($id_report, $show_pms = false)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
@@ -715,12 +715,12 @@ function modReportDetails($id_report, $show_pms = false)
 	);
 
 	// So did we find anything?
-	if (!$db->num_rows($request))
+	if (!$request->numRows())
 		$row = false;
 	else
-		$row = $db->fetch_assoc($request);
+		$row = $request->fetchAssoc();
 
-	$db->free_result($request);
+	$request->free();
 
 	return $row;
 }
@@ -738,7 +738,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 		$request = $db->query('', '
 			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
@@ -760,9 +760,9 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 		);
 
 	$reports = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$reports[$row['id_report']] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $reports;
 }
@@ -774,7 +774,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
  */
 function getReportsUserComments($id_reports)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$id_reports = is_array($id_reports) ? $id_reports : array($id_reports);
 
@@ -790,10 +790,10 @@ function getReportsUserComments($id_reports)
 	);
 
 	$comments = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$comments[$row['id_report']][] = $row;
 
-	$db->free_result($request);
+	$request->free();
 
 	return $comments;
 }
@@ -805,7 +805,7 @@ function getReportsUserComments($id_reports)
  */
 function getReportModeratorsComments($id_report)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
@@ -821,10 +821,10 @@ function getReportModeratorsComments($id_report)
 	);
 
 	$comments = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$comments[] = $row;
 
-	$db->free_result($request);
+	$request->free();
 
 	return $comments;
 }
@@ -835,7 +835,7 @@ function getReportModeratorsComments($id_report)
  */
 function approveAllUnapproved()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Start with messages and topics.
 	$request = $db->query('', '
@@ -847,15 +847,15 @@ function approveAllUnapproved()
 		)
 	);
 	$msgs = array();
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$msgs[] = $row[0];
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($msgs))
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
-		Cache::instance()->remove('num_menu_errors');
+		$GLOBALS['elk']['cache']->remove('num_menu_errors');
 	}
 
 	// Now do attachments
@@ -868,15 +868,15 @@ function approveAllUnapproved()
 		)
 	);
 	$attaches = array();
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$attaches[] = $row[0];
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($attaches))
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
-		Cache::instance()->remove('num_menu_errors');
+		$GLOBALS['elk']['cache']->remove('num_menu_errors');
 	}
 }
 
@@ -889,7 +889,7 @@ function approveAllUnapproved()
  */
 function watchedUserCount($warning_watch = 0)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// @todo $approve_query is not used
 
@@ -901,8 +901,8 @@ function watchedUserCount($warning_watch = 0)
 			'warning_watch' => $warning_watch,
 		)
 	);
-	list ($totalMembers) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalMembers) = $request->fetchRow();
+	$request->free();
 
 	return $totalMembers;
 }
@@ -921,7 +921,7 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 {
 	global $txt, $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$request = $db->query('', '
 		SELECT id_member, real_name, last_login, posts, warning
 		FROM {db_prefix}members
@@ -935,7 +935,7 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 	);
 	$watched_users = array();
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$watched_users[$row['id_member']] = array(
 			'id' => $row['id_member'],
@@ -948,7 +948,7 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 		);
 		$members[] = $row['id_member'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($members))
 	{
@@ -966,7 +966,7 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 			)
 		);
 		$latest_posts = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$latest_posts[$row['id_member']] = $row['last_post_id'];
 
 		if (!empty($latest_posts))
@@ -980,13 +980,13 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 					'message_list' => $latest_posts,
 				)
 			);
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$watched_users[$row['id_member']]['last_post'] = standardTime($row['poster_time']);
 				$watched_users[$row['id_member']]['last_post_id'] = $latest_posts[$row['id_member']];
 			}
 
-			$db->free_result($request);
+			$request->free();
 		}
 
 		$request = $db->query('', '
@@ -1001,12 +1001,12 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 				'is_approved' => 1,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$watched_users[$row['id_member']]['last_post'] = standardTime($row['last_post']);
 			$watched_users[$row['id_member']]['last_post_id'] = $row['last_post_id'];
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	return $watched_users;
@@ -1024,7 +1024,7 @@ function watchedUserPostsCount($approve_query, $warning_watch)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// @todo $approve_query is not used in the function
 
@@ -1042,8 +1042,8 @@ function watchedUserPostsCount($approve_query, $warning_watch)
 			'recycle' => $modSettings['recycle_board'],
 		)
 	);
-	list ($totalMemberPosts) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalMemberPosts) = $request->fetchRow();
+	$request->free();
 
 	return $totalMemberPosts;
 }
@@ -1062,7 +1062,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 {
 	global $scripturl, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
@@ -1085,7 +1085,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 	$member_posts = array();
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
@@ -1102,7 +1102,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			'counter' => ++$start,
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $member_posts;
 }
@@ -1115,7 +1115,7 @@ function groupRequests()
 {
 	global $user_info, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$group_requests = array();
 
@@ -1135,7 +1135,7 @@ function groupRequests()
 		array(
 		)
 	);
-	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
+	for ($i = 0; $row = $request->fetchAssoc(); $i++)
 	{
 		$group_requests[] = array(
 			'id' => $row['id_request'],
@@ -1154,7 +1154,7 @@ function groupRequests()
 			'time_submitted' => standardTime($row['time_applied']),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $group_requests;
 }
@@ -1166,9 +1166,9 @@ function basicWatchedUsers()
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
-	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
+	if (!$GLOBALS['elk']['cache']->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
@@ -1182,11 +1182,11 @@ function basicWatchedUsers()
 			)
 		);
 		$watched_users = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$watched_users[] = $row;
-		$db->free_result($request);
+		$request->free();
 
-		Cache::instance()->put('recent_user_watches', $watched_users, 240);
+		$GLOBALS['elk']['cache']->put('recent_user_watches', $watched_users, 240);
 	}
 
 	return $watched_users;
@@ -1201,12 +1201,12 @@ function reportedPosts($show_pms = false)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 
-	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
+	if (!$GLOBALS['elk']['cache']->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
@@ -1228,12 +1228,12 @@ function reportedPosts($show_pms = false)
 			)
 		);
 		$reported_posts = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$reported_posts[] = $row;
-		$db->free_result($request);
+		$request->free();
 
 		// Cache it.
-		Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
+		$GLOBALS['elk']['cache']->put('reported_posts_' . $cachekey, $reported_posts, 90);
 	}
 
 	return $reported_posts;
@@ -1246,7 +1246,7 @@ function reportedPosts($show_pms = false)
  */
 function removeModeratorNote($id_note)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Lets delete it.
 	$db->query('', '
@@ -1267,9 +1267,9 @@ function removeModeratorNote($id_note)
  */
 function countModeratorNotes()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
-	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
+	if (!$GLOBALS['elk']['cache']->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
 			SELECT COUNT(*)
@@ -1280,10 +1280,10 @@ function countModeratorNotes()
 				'modnote' => 'modnote',
 			)
 		);
-		list ($moderator_notes_total) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($moderator_notes_total) = $request->fetchRow();
+		$request->free();
 
-		Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
+		$GLOBALS['elk']['cache']->put('moderator_notes_total', $moderator_notes_total, 240);
 	}
 
 	return $moderator_notes_total;
@@ -1298,7 +1298,7 @@ function countModeratorNotes()
  */
 function addModeratorNote($id_poster, $poster_name, $contents)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Insert it into the database
 	$db->insert('',
@@ -1325,7 +1325,7 @@ function addReportComment($report, $newComment)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Insert it into the database
 	$db->insert('',
@@ -1349,11 +1349,11 @@ function addReportComment($report, $newComment)
  */
 function moderatorNotes($offset)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Grab the current notes.
 	// We can only use the cache for the first page of notes.
-	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
+	if ($offset != 0 || !$GLOBALS['elk']['cache']->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
 			SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
@@ -1369,12 +1369,12 @@ function moderatorNotes($offset)
 			)
 		);
 		$moderator_notes = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$moderator_notes[] = $row;
-		$db->free_result($request);
+		$request->free();
 
 		if ($offset == 0)
-			Cache::instance()->put('moderator_notes', $moderator_notes, 240);
+			$GLOBALS['elk']['cache']->put('moderator_notes', $moderator_notes, 240);
 	}
 
 	return $moderator_notes;
@@ -1387,7 +1387,7 @@ function moderatorNotes($offset)
  */
 function moderatorNotice($id_notice)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the body and subject of this notice
 	$request = $db->query('', '
@@ -1398,10 +1398,10 @@ function moderatorNotice($id_notice)
 			'id_notice' => $id_notice,
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		return array();
-	list ($notice_body, $notice_subject) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($notice_body, $notice_subject) = $request->fetchRow();
+	$request->free();
 
 	// Make it look nice
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
@@ -1419,7 +1419,7 @@ function warningDailyLimit($member)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT SUM(counter)
@@ -1435,8 +1435,8 @@ function warningDailyLimit($member)
 			'warning' => 'warning',
 		)
 	);
-	list ($current_applied) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($current_applied) = $request->fetchRow();
+	$request->free();
 
 	return $current_applied;
 }
@@ -1462,7 +1462,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 {
 	global $context, $scripturl, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
@@ -1488,7 +1488,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 	$unapproved_items = array();
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
-	for ($i = 1; $row = $db->fetch_assoc($request); $i++)
+	for ($i = 1; $row = $request->fetchAssoc(); $i++)
 	{
 		// Can delete is complicated, let's solve it first... is it their own post?
 		if ($row['id_member'] == $user_info['id'] && ($boards_allowed['delete_own_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_boards'])))
@@ -1535,7 +1535,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'can_delete' => $can_delete,
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $unapproved_items;
 }

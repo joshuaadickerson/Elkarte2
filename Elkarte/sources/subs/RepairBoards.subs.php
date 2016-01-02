@@ -112,7 +112,7 @@ function loadForumTests()
 			'fix_processing' => function ($row) {
 				global $salvageBoardID;
 
-				$db = database();
+				$db = $GLOBALS['elk']['db'];
 
 				// Only if we don't have a reasonable idea of where to put it.
 				if ($row['id_board'] == 0)
@@ -198,7 +198,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => function ($topics) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}topics
@@ -234,7 +234,7 @@ function loadForumTests()
 			'fix_processing' => function ($row) {
 				global $salvageBoardID, $txt;
 
-				$db = database();
+				$db = $GLOBALS['elk']['db'];
 
 				// Only if we don't have a reasonable idea of where to put it.
 				if ($row['id_board'] == 0)
@@ -477,7 +477,7 @@ function loadForumTests()
 			'fix_processing' => function ($row) {
 				global $salvageCatID, $txt;
 
-				$db = database();
+				$db = $GLOBALS['elk']['db'];
 				createSalvageArea();
 
 				$row['my_num_topics'] = (int) $row['my_num_topics'];
@@ -525,7 +525,7 @@ function loadForumTests()
 				'process' => function ($cats) {
 					global $salvageCatID;
 
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 					createSalvageArea();
 					$db->query('', '
 						UPDATE {db_prefix}boards
@@ -560,7 +560,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_msg',
 				'process' => function ($msgs) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						UPDATE {db_prefix}messages
@@ -589,7 +589,7 @@ function loadForumTests()
 				'process' => function ($parents) {
 					global $salvageBoardID, $salvageCatID;
 
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 					createSalvageArea();
 					$db->query('', '
 						UPDATE {db_prefix}boards
@@ -622,7 +622,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_poll',
 				'process' => function ($polls) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						UPDATE {db_prefix}topics
@@ -654,7 +654,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => function ($events) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						UPDATE {db_prefix}calendar
@@ -684,7 +684,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => function ($topics) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_topics
@@ -714,7 +714,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_topics
@@ -744,7 +744,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => function ($boards) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_boards
@@ -774,7 +774,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_boards
@@ -804,7 +804,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => function ($boards) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_mark_read
@@ -834,7 +834,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_mark_read
@@ -864,7 +864,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_pm',
 				'process' => function ($pms) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}pm_recipients
@@ -895,7 +895,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}pm_recipients
@@ -925,7 +925,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_pm',
 				'process' => function ($guestMessages) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						UPDATE {db_prefix}personal_messages
@@ -955,7 +955,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_notify
@@ -984,10 +984,10 @@ function loadForumTests()
 					AND lss.id_topic IS NULL',
 			'fix_full_processing' => function ($result) {
 
-				$db = database();
+				$db = $GLOBALS['elk']['db'];
 
 				$inserts = array();
-				while ($row = $db->fetch_assoc($result))
+				while ($row = $result->fetchAssoc())
 				{
 					foreach (text2words($row['subject']) as $word)
 						$inserts[] = array($word, $row['id_topic']);
@@ -1040,7 +1040,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_topic',
 				'process' => function ($deleteTopics) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_search_subjects
@@ -1070,7 +1070,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_polls
@@ -1099,7 +1099,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_poll',
 				'process' => function ($polls) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_polls
@@ -1128,7 +1128,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_report',
 				'process' => function ($reports) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_reported
@@ -1157,7 +1157,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_report',
 				'process' => function ($reports) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_reported_comments
@@ -1187,7 +1187,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_group_requests
@@ -1217,7 +1217,7 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_group',
 				'process' => function ($groups) {
-					$db = database();
+					$db = $GLOBALS['elk']['db'];
 
 					$db->query('', '
 						DELETE FROM {db_prefix}log_group_requests
@@ -1241,7 +1241,7 @@ function createSalvageArea()
 {
 	global $txt, $language, $salvageBoardID, $salvageCatID;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	static $createOnce = false;
 
 	// Have we already created it?
@@ -1265,7 +1265,7 @@ function createSalvageArea()
 	);
 	if ($db->num_rows($result) != 0)
 		list ($salvageCatID) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	if (empty($salvageCatID))
 	{
@@ -1299,7 +1299,7 @@ function createSalvageArea()
 	);
 	if ($db->num_rows($result) != 0)
 		list ($salvageBoardID) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	if (empty($salvageBoardID))
 	{
@@ -1355,7 +1355,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// Restore the query cache if interested.
 	if ($db_show_debug === true)
-		Debug::get()->on();
+		$GLOBALS['elk']['debug']->on();
 
 	$context['continue_get_data'] = '?action=Admin;area=repairboards' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
@@ -1397,7 +1397,7 @@ function findForumErrors($do_fix = false)
 {
 	global $context, $txt, $errorTests, $db_show_debug;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// This may take some time...
 	setTimeLimit(600);
@@ -1410,7 +1410,7 @@ function findForumErrors($do_fix = false)
 
 	// Don't allow the cache to get too full.
 	if ($db_show_debug === true)
-		Debug::get()->off();
+		$GLOBALS['elk']['debug']->off();
 
 	$context['total_steps'] = count($errorTests);
 
@@ -1442,10 +1442,10 @@ function findForumErrors($do_fix = false)
 				array(
 				)
 			);
-			list ($step_max) = $db->fetch_row($request);
+			list ($step_max) = $request->fetchRow();
 
 			$total_queries++;
-			$db->free_result($request);
+			$request->free();
 		}
 
 		// We in theory keep doing this... the substeps.
@@ -1471,9 +1471,9 @@ function findForumErrors($do_fix = false)
 
 			// Does it need a fix?
 			if (!empty($test['check_type']) && $test['check_type'] == 'count')
-				list ($needs_fix) = $db->fetch_row($request);
+				list ($needs_fix) = $request->fetchRow();
 			else
-				$needs_fix = $db->num_rows($request);
+				$needs_fix = $request->numRows();
 
 			$total_queries++;
 
@@ -1491,7 +1491,7 @@ function findForumErrors($do_fix = false)
 					// One per row!
 					elseif (isset($test['messages']))
 					{
-						while ($row = $db->fetch_assoc($request))
+						while ($row = $request->fetchAssoc())
 						{
 							$variables = $test['messages'];
 							foreach ($variables as $k => $v)
@@ -1510,7 +1510,7 @@ function findForumErrors($do_fix = false)
 					{
 						// Find out if there are actually errors.
 						$found_errors = false;
-						while ($row = $db->fetch_assoc($request))
+						while ($row = $request->fetchAssoc())
 							$found_errors |= $test['message_function']($row);
 					}
 
@@ -1526,7 +1526,7 @@ function findForumErrors($do_fix = false)
 					if (isset($test['fix_collect']))
 					{
 						$ids = array();
-						while ($row = $db->fetch_assoc($request))
+						while ($row = $request->fetchAssoc())
 							$ids[] = $row[$test['fix_collect']['index']];
 						if (!empty($ids))
 						{
@@ -1546,7 +1546,7 @@ function findForumErrors($do_fix = false)
 					// Do we have some processing to do?
 					elseif (isset($test['fix_processing']))
 					{
-						while ($row = $db->fetch_assoc($request))
+						while ($row = $request->fetchAssoc())
 							$test['fix_processing']($row);
 					}
 
@@ -1565,7 +1565,7 @@ function findForumErrors($do_fix = false)
 			}
 
 			// Free the result.
-			$db->free_result($request);
+			$request->free();
 
 			// Are we done yet?
 			if (isset($test['substeps']))

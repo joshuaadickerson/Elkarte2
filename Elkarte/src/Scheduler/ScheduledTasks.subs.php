@@ -25,7 +25,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$task_query = '';
 
@@ -173,7 +173,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
  */
 function loadTasks($tasks)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_task, task
@@ -203,7 +203,7 @@ function loadTasks($tasks)
  */
 function logTask($id_log, $task_id, $total_time = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($id_log))
 	{
@@ -241,7 +241,7 @@ function logTask($id_log, $task_id, $total_time = null)
  */
 function updateTaskStatus($enablers)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
@@ -261,7 +261,7 @@ function updateTaskStatus($enablers)
  */
 function toggleTaskStatusByName($enabler, $enable = true)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
@@ -286,7 +286,7 @@ function toggleTaskStatusByName($enabler, $enable = true)
  */
 function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$sets = array(
 		'disabled' => 'disabled = {int:disabled}',
@@ -326,7 +326,7 @@ function loadTaskDetails($id_task)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$task = array();
 
@@ -373,7 +373,7 @@ function scheduledTasks()
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
@@ -420,7 +420,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
@@ -456,7 +456,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
  */
 function countTaskLogEntries()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -475,7 +475,7 @@ function countTaskLogEntries()
  */
 function emptyTaskLog()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('truncate_table', '
 		TRUNCATE {db_prefix}log_scheduled_tasks',
@@ -492,7 +492,7 @@ function emptyTaskLog()
  */
 function processNextTasks($ts = 0)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Select the next task to do.
 	$request = $db->query('', '
@@ -658,7 +658,7 @@ function run_this_task_compat($task_name)
  */
 function nextTime()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// The next stored timestamp, is there any?
 	$request = $db->query('', '

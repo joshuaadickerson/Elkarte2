@@ -38,7 +38,7 @@ class Admin_Controller extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		Hooks::get()->loadIntegrationsSettings();
+		$GLOBALS['elk']['hooks']->loadIntegrationsSettings();
 	}
 
 	/**
@@ -535,7 +535,7 @@ class Admin_Controller extends AbstractController
 		$this->_getModulesMenu($admin_areas);
 
 		// Any files to include for administration?
-		\Hooks::get()->include_hook('admin_include');
+		$GLOBALS['elk']['hooks']->include_hook('admin_include');
 
 		$menuOptions = array('hook' => 'Admin', 'default_include_dir' => ADMINDIR);
 
@@ -864,7 +864,7 @@ class Admin_Controller extends AbstractController
 			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		);
 
-		Hooks::get()->hook('admin_search', array(&$language_files, &$include_files, &$settings_search));
+		$GLOBALS['elk']['hooks']->hook('admin_search', array(&$language_files, &$include_files, &$settings_search));
 
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));

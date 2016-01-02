@@ -2,8 +2,10 @@
 
 namespace Elkarte;
 
+use Elkarte\Elkarte\Util;
 use Elkarte\Elkarte\View\TemplateLayers;
 use Elkarte\Elkarte\View\Templates;
+use Elkarte\Elkarte\Text\BBC\ParserWrapper;
 use \Pimple\Container;
 
 global $elk;
@@ -88,15 +90,17 @@ $elk['db'] = function () use ($elk, $db_persist, $db_server, $db_user, $db_passw
 /**
  * @return BrowserDetector
  */
-$elk['browser'] = function () {
-	return new BrowserDetector;
+$elk['browser'] = function ($elk) {
+	$browser = new Elkarte\Http\BrowserDetector($elk['req']);
+	$browser->detectBrowser();
+	return $browser;
 };
 
 /**
  * @return SiteDispatcher
  */
 $elk['dispatcher'] = function () use ($elk) {
-	return new SiteDispatcher($elk);
+	return new Elkarte\Controller\SiteDispatcher($elk, $elk['hooks']);
 };
 
 /**
@@ -110,7 +114,7 @@ $elk['session'] = function ($elk) {
  * @return Debug
  */
 $elk['debug'] = function () {
-	return Elkarte\Debug\Debug::get();
+	return new Elkarte\Debug\Debug;
 };
 
 /**
@@ -126,7 +130,7 @@ $elk['ban_check'] = function () use ($elk) {
 $elk['bbc'] = function () {
 	global $modSettings;
 
-	$bbc = \BBC\ParserWrapper::getInstance();
+	$bbc = new ParserWrapper;
 
 	// Set the default disabled BBC
 	if (!empty($modSettings['disabledBBC']))
@@ -152,6 +156,12 @@ $elk['censor'] = function () {
  */
 $elk['action'] = function () {
 	return isset($_GET['action']) ? $_GET['action'] : '';
+};
+
+$elk['text'] = function () {
+	global $modSettings;
+
+	return new Util($modSettings);
 };
 
 return $elk;

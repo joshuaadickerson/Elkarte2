@@ -183,7 +183,7 @@ class Cache
 		if ($db_show_debug === true)
 		{
 			$cache_hit['t'] = microtime(true) - $st;
-			Debug::get()->cache($cache_hit);
+			$GLOBALS['elk']['debug']->cache($cache_hit);
 		}
 	}
 
@@ -220,7 +220,7 @@ class Cache
 		{
 			$cache_hit['t'] = microtime(true) - $st;
 			$cache_hit['s'] = isset($value) ? strlen($value) : 0;
-			Debug::get()->cache($cache_hit);
+			$GLOBALS['elk']['debug']->cache($cache_hit);
 		}
 
 		$GLOBALS['elk']['hooks']->hook('cache_get_data', array($key, $ttl, $value));

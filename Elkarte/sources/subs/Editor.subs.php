@@ -35,7 +35,7 @@ function getMessageIcons($board_id)
 {
 	global $modSettings, $txt, $settings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
@@ -66,7 +66,7 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (!Cache::instance()->getVar($temp, 'posting_icons-' . $board_id, 480))
+		if (!$GLOBALS['elk']['cache']->getVar($temp, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
 				SELECT title, filename
@@ -89,7 +89,7 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
+			$GLOBALS['elk']['cache']->put('posting_icons-' . $board_id, $icons, 480);
 		}
 		else
 			$icons = $temp;
@@ -123,7 +123,7 @@ function create_control_richedit($editorOptions)
 	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
 	static $bbc_tags;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
@@ -146,7 +146,7 @@ function create_control_richedit($editorOptions)
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
-		\Templates::getInstance()->load('GenericControls');
+		$GLOBALS['elk']['templates']->load('GenericControls');
 		loadCSSFile('jquery.sceditor.css');
 		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css'))
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
@@ -210,7 +210,7 @@ function create_control_richedit($editorOptions)
 	);
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
-	Hooks::get()->hook('editor_plugins', array($editorOptions['id']));
+	$GLOBALS['elk']['hooks']->hook('editor_plugins', array($editorOptions['id']));
 
 	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
@@ -246,7 +246,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
-		Hooks::get()->hook('bbc_buttons', array(&$bbc_tags));
+		$GLOBALS['elk']['hooks']->hook('bbc_buttons', array(&$bbc_tags));
 
 		// Show the wysiwyg format and toggle buttons?
 		$bbc_tags['row2'][] = array('removeformat', 'source');
@@ -415,7 +415,7 @@ function create_control_richedit($editorOptions)
 		}
 		elseif ($context['smiley_enabled'])
 		{
-			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
+			if (!$GLOBALS['elk']['cache']->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden
@@ -448,7 +448,7 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
 
-				Cache::instance()->put('posting_smileys', $context['smileys'], 480);
+				$GLOBALS['elk']['cache']->put('posting_smileys', $context['smileys'], 480);
 			}
 			else
 				$context['smileys'] = $temp;

@@ -28,7 +28,7 @@ if (!defined('ELK'))
  */
 function deleteBadBehavior($type, $filter)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete all or just some?
 	if ($type === 'delall' && empty($filter))
@@ -79,7 +79,7 @@ function deleteBadBehavior($type, $filter)
  */
 function getBadBehaviorLogEntryCount($filter)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT COUNT(*)
@@ -90,7 +90,7 @@ function getBadBehaviorLogEntryCount($filter)
 		)
 	);
 	list ($entry_count) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $entry_count;
 }
@@ -108,7 +108,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	require_once(EXTDIR . '/bad-behavior/bad-behavior/responses.inc.php');
 
@@ -125,7 +125,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		)
 	);
 
-	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
+	for ($i = 0; $row = $request->fetchAssoc(); $i++)
 	{
 		// Turn the key in to something nice to show
 		$key_response = bb2_get_response($row['valid']);
@@ -173,7 +173,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'id' => $row['id'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $bb_entries;
 }

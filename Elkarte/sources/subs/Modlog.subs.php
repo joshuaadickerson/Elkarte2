@@ -32,7 +32,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$modlog_query = allowedTo('admin_forum') || $user_info['mod_cache']['bq'] == '1=1' ? '1=1' : ($user_info['mod_cache']['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr($user_info['mod_cache']['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr($user_info['mod_cache']['bq'], array('id_board' => 't.id_board'))));
 
@@ -54,7 +54,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 		))
 	);
 	list ($entry_count) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $entry_count;
 }
@@ -74,7 +74,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 {
 	global $context, $scripturl, $txt, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$modlog_query = allowedTo('admin_forum') || $user_info['mod_cache']['bq'] == '1=1' ? '1=1' : ($user_info['mod_cache']['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr($user_info['mod_cache']['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr($user_info['mod_cache']['bq'], array('id_board' => 't.id_board'))));
 
@@ -114,7 +114,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$members = array();
 	$messages = array();
 	$entries = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		$row['extra'] = @unserialize($row['extra']);
 
@@ -207,7 +207,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			'action_text' => isset($row['action_text']) ? $row['action_text'] : '',
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	if (!empty($boards))
 	{
@@ -241,7 +241,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'topic_list' => array_keys($topics),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			foreach ($topics[$row['id_topic']] as $action)
 			{
@@ -262,7 +262,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['new_topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	if (!empty($messages))
@@ -276,7 +276,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'message_list' => array_keys($messages),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			foreach ($messages[$row['id_msg']] as $action)
 			{
@@ -295,7 +295,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 					$this_action['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
 			}
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	if (!empty($members))
@@ -378,7 +378,7 @@ class ModLogEntriesReplacement
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
@@ -401,7 +401,7 @@ function deleteLogAction($id_log, $time, $delete = null)
  */
 function recentlyLogged($action, $time = 60)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -413,8 +413,8 @@ function recentlyLogged($action, $time = 60)
 			'last_logged' => time() - $time,
 		)
 	);
-	list ($present) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($present) = $request->fetchRow();
+	$request->free();
 
 	return !empty($present);
 }

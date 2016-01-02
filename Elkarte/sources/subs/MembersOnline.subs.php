@@ -35,7 +35,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 {
 	global $scripturl, $user_info, $modSettings, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// The list can be sorted in several ways.
 	$allowed_sort_options = array(
@@ -59,7 +59,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
 
 	// Get it from the cache and send it back.
-	if (Cache::instance()->checkLevel(2) && Cache::instance()->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
+	if ($GLOBALS['elk']['cache']->checkLevel(2) && $GLOBALS['elk']['cache']->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 		return $temp;
 
 	// Initialize the array that'll be returned later on.
@@ -92,7 +92,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'reg_mem_group' => 0,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (empty($row['real_name']))
 		{
@@ -152,7 +152,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 				'color' => $row['online_color']
 			);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// If there are spiders only and we're showing the detail, add them to the online list - at the bottom.
 	if (!empty($spider_finds) && $modSettings['show_spider_online'] > 1)
@@ -197,7 +197,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	$GLOBALS['elk']['cache']->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return $membersOnlineStats;
 }
@@ -212,7 +212,7 @@ function trackStatsUsersOnline($total_users_online)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$settingsToUpdate = array();
 
@@ -239,7 +239,7 @@ function trackStatsUsersOnline($total_users_online)
 		);
 
 		// The log_activity hasn't got an entry for today?
-		if ($db->num_rows($request) === 0)
+		if ($request->numRows() === 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_activity',
@@ -251,14 +251,14 @@ function trackStatsUsersOnline($total_users_online)
 		// There's an entry in log_activity on today...
 		else
 		{
-			list ($modSettings['mostOnlineToday']) = $db->fetch_row($request);
+			list ($modSettings['mostOnlineToday']) = $request->fetchRow();
 
 			if ($total_users_online > $modSettings['mostOnlineToday'])
 				trackStats(array('most_on' => $total_users_online));
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
 		}
-		$db->free_result($request);
+		$request->free();
 
 		$settingsToUpdate['mostOnlineUpdated'] = $date;
 		$settingsToUpdate['mostOnlineToday'] = $total_users_online;

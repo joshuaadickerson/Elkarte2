@@ -81,13 +81,6 @@ class Debug
 	private $_system = array();
 
 	/**
-	 * The instance of the class
-	 * @var object
-	 */
-	private static $_instance = null;
-
-
-	/**
 	 * Adds a new generic debug entry
 	 *
 	 * @param string $type the kind of debug entry
@@ -429,17 +422,5 @@ class Debug
 			echo '
 		<br />';
 		}
-	}
-
-	/**
-	 * Return the single instance of this class
-	 * @return Debug
-	 */
-	public static function get()
-	{
-		if (self::$_instance === null)
-			self::$_instance = new Debug();
-
-		return self::$_instance;
 	}
 }

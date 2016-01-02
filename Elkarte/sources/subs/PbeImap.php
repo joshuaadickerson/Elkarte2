@@ -262,7 +262,7 @@ class Pbe_Imap
 		// Known names for the trash bin, I'm sure there are more
 		$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
 
-		Hooks::get()->hook('imap_trash_folders', array(&$trashbox));
+		$GLOBALS['elk']['hooks']->hook('imap_trash_folders', array(&$trashbox));
 
 		// Get all the folders / labels
 		$mailboxes = imap_list($this->_inbox, $this->_imap_server, '*');

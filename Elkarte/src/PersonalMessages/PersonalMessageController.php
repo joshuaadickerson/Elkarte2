@@ -2568,7 +2568,7 @@ class PersonalMessageController extends AbstractController
 	{
 		global $context;
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$labelQuery = '';
 
@@ -2946,7 +2946,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	static $counter = null, $temp_pm_selected = null;
 
 	// We need this
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Count the current message number....
 	if ($counter === null || $reset)

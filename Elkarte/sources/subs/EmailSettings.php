@@ -40,7 +40,7 @@ class Email_Settings extends Settings_Form
 	 */
 	public static function saveTableSettings($config_vars, $tablename, $config_values = null, $index = array(), $editid = -1, $editname = '')
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		if ($config_values === null)
 			$config_values = $_POST;

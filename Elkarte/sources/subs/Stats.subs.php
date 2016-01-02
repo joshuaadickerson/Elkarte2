@@ -31,7 +31,7 @@ if (!defined('ELK'))
  */
 function onlineCount()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT COUNT(*)
@@ -40,7 +40,7 @@ function onlineCount()
 		)
 	);
 	list ($users_online) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $users_online;
 }
@@ -54,7 +54,7 @@ function onlineCount()
  */
 function getAverages()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT
@@ -64,8 +64,8 @@ function getAverages()
 		array(
 		)
 	);
-	$row = $db->fetch_assoc($result);
-	$db->free_result($result);
+	$row = $result->fetchAssoc();
+	$result->free();
 
 	return $row;
 }
@@ -77,7 +77,7 @@ function getAverages()
  */
 function numCategories()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT COUNT(*)
@@ -86,7 +86,7 @@ function numCategories()
 		)
 	);
 	list ($num_categories) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $num_categories;
 }
@@ -99,7 +99,7 @@ function numCategories()
  */
 function mostOnline($date)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT most_on
@@ -111,7 +111,7 @@ function mostOnline($date)
 		)
 	);
 	list ($online) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return (int) $online;
 }
@@ -128,7 +128,7 @@ function topPosters($limit = null)
 {
 	global $scripturl, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
@@ -189,7 +189,7 @@ function topBoards($limit = null, $read_status = false)
 {
 	global $modSettings, $scripturl, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
@@ -259,7 +259,7 @@ function topTopicReplies($limit = null)
 {
 	global $modSettings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
@@ -284,9 +284,9 @@ function topTopicReplies($limit = null)
 			)
 		);
 		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
+		$request->free();
 	}
 	else
 		$topic_ids = array();
@@ -358,7 +358,7 @@ function topTopicViews($limit = null)
 {
 	global $modSettings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
@@ -381,9 +381,9 @@ function topTopicViews($limit = null)
 			)
 		);
 		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
+		$request->free();
 	}
 	else
 		$topic_ids = array();
@@ -453,10 +453,10 @@ function topTopicStarter()
 {
 	global $modSettings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || !$members)
+	if (!$GLOBALS['elk']['cache']->getVar($members, 'stats_top_starters', 360) || !$members)
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -470,11 +470,11 @@ function topTopicStarter()
 			)
 		);
 		$members = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$members[$row['id_member_started']] = $row['hits'];
-		$db->free_result($request);
+		$request->free();
 
-		Cache::instance()->put('stats_top_starters', $members, 360);
+		$GLOBALS['elk']['cache']->put('stats_top_starters', $members, 360);
 	}
 
 	if (empty($members))
@@ -532,12 +532,12 @@ function topTimeOnline()
 {
 	global $modSettings, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
 
 	// Do we have something cached that will help speed this up?
-	$temp = Cache::instance()->get('stats_total_time_members', 600);
+	$temp = $GLOBALS['elk']['cache']->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
 	$members_result = $db->query('', '
@@ -595,7 +595,7 @@ function topTimeOnline()
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		Cache::instance()->put('stats_total_time_members', $temp2, 600);
+		$GLOBALS['elk']['cache']->put('stats_total_time_members', $temp2, 600);
 
 	return $top_time_online;
 }
@@ -610,7 +610,7 @@ function monthlyActivity()
 {
 	global $context, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$months_result = $db->query('', '
 		SELECT
@@ -682,7 +682,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Activity by day.
 	$days_result = $db->query('', '
@@ -718,7 +718,7 @@ function UserStatsTopicsStarted($memID)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Number of topics started.
 	$result = $db->query('', '
@@ -732,7 +732,7 @@ function UserStatsTopicsStarted($memID)
 		)
 	);
 	list ($num_topics) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $num_topics;
 }
@@ -749,7 +749,7 @@ function UserStatsPollsStarted($memID)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Number polls started.
 	$result = $db->query('', '
@@ -765,7 +765,7 @@ function UserStatsPollsStarted($memID)
 		)
 	);
 	list ($num_polls) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $num_polls;
 }
@@ -778,7 +778,7 @@ function UserStatsPollsStarted($memID)
  */
 function UserStatsPollsVoted($memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Number polls voted in.
 	$result = $db->query('distinct_poll_votes', '
@@ -790,7 +790,7 @@ function UserStatsPollsVoted($memID)
 		)
 	);
 	list ($num_votes) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $num_votes;
 }
@@ -807,7 +807,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 {
 	global $scripturl, $user_profile;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the board this member spammed most often.
 	$result = $db->query('', '
@@ -828,7 +828,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 		)
 	);
 	$popular_boards = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		// Build the board details that this member is responsible for
 		$popular_boards[$row['id_board']] = array(
@@ -841,7 +841,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 			'total_posts_member' => $user_profile[$memID]['posts'],
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	return $popular_boards;
 }
@@ -858,7 +858,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the board this member spammed most often.
 	$result = $db->query('profile_board_stats', '
@@ -878,7 +878,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 		)
 	);
 	$board_activity = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		// What have they been doing in this board
 		$board_activity[$row['id_board']] = array(
@@ -891,7 +891,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 			'total_posts' => $row['num_posts'],
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	return $board_activity;
 }
@@ -907,7 +907,7 @@ function UserStatsPostingTime($memID)
 {
 	global $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the times when the users posts
 	$result = $db->query('user_activity_by_time', '
@@ -927,7 +927,7 @@ function UserStatsPostingTime($memID)
 	$maxPosts = 0;
 	$realPosts = 0;
 	$posts_by_time = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		// Cast as an integer to remove the leading 0.
 		$row['hour'] = (int) $row['hour'];
@@ -944,7 +944,7 @@ function UserStatsPostingTime($memID)
 			'is_last' => $row['hour'] == 23,
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	// Clean it up some more
 	if ($maxPosts > 0)

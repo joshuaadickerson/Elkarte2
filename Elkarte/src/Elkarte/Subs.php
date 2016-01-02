@@ -40,7 +40,7 @@ function updateSettings($changeArray, $update = false, $group = null)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$cache = $GLOBALS['elk']['cache'];
 
 	if (empty($changeArray) || !is_array($changeArray))
@@ -577,7 +577,7 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	// Debugging.
 	if ($db_show_debug === true)
-		$_SESSION['debug_redirect'] = Debug::get()->get_db();
+		$_SESSION['debug_redirect'] = $GLOBALS['elk']['debug']->get_db();
 
 	obExit(false);
 }
@@ -646,7 +646,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = Elkarte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -673,7 +673,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if ($db_show_debug === true)
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
-					Debug::get()->display();
+					$GLOBALS['elk']['debug']->display();
 		}
 	}
 
@@ -1234,7 +1234,7 @@ function prepareSearchEngines()
 function currentContext($messages_request, $reset = false)
 {
 	// Can't work with a database without a database :P
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Start from the beginning...
 	if ($reset)
@@ -1538,7 +1538,7 @@ function censor($text, $force = false)
 
 	if ($censor === null)
 	{
-		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+		$censor = new \Elkarte\Elkarte\Text\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
 	return $censor->censor($text, $force);

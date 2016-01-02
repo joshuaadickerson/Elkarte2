@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getSignatureFromMembers($start_member)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$members = array();
 
@@ -44,7 +44,7 @@ function getSignatureFromMembers($start_member)
 			'admin_group' => 11,
 		)
 	);
-	while ($result = $db->fetch_assoc($request))
+	while ($result = $request->fetchAssoc())
 	{
 		$members[$result['id_member']]['id_member'] = $result['id_member'];
 		$members[$result['id_member']]['signature'] = $result['signature'];
@@ -292,7 +292,7 @@ function updateAllSignatures($applied_sigs)
 			}
 
 			$sig = strtr($sig, array("\n" => '<br />'));
-			Hooks::get()->hook('apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
+			$GLOBALS['elk']['hooks']->hook('apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
 			if ($sig != $row['signature'])
 				$changes[$row['id_member']] = $sig;
 		}
@@ -323,7 +323,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
 	global $txt, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$list = array();
 
@@ -357,9 +357,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'items_per_page' => $items_per_page,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$list[$row['id_field']] = $row;
-		$db->free_result($request);
+		$request->free();
 	}
 
 	return $list;
@@ -370,7 +370,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
  */
 function list_getProfileFieldSize()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -379,8 +379,8 @@ function list_getProfileFieldSize()
 		)
 	);
 
-	list ($numProfileFields) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numProfileFields) = $request->fetchRow();
+	$request->free();
 
 	return $numProfileFields;
 }
@@ -393,7 +393,7 @@ function list_getProfileFieldSize()
  */
 function getProfileField($id_field)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$field = array();
 
@@ -408,7 +408,7 @@ function getProfileField($id_field)
 			'current_field' => $id_field,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['field_type'] == 'textarea')
 			@list ($rows, $cols) = explode(',', $row['default_value']);
@@ -444,7 +444,7 @@ function getProfileField($id_field)
 			'placement' => $row['placement'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return($field);
 }
@@ -459,7 +459,7 @@ function getProfileField($id_field)
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
 	for ($i = 0; !$unique && $i < 9; $i++)
@@ -472,11 +472,11 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 				'current_column' => $colname,
 			)
 		);
-		if ($db->num_rows($request) == 0)
+		if ($request->numRows() == 0)
 			$unique = true;
 		else
 			$colname = $initial_colname . $i;
-			$db->free_result($request);
+			$request->free();
 	}
 
 	return $unique;
@@ -492,7 +492,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields_data
@@ -516,7 +516,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  */
 function updateRenamedProfileStatus($enabled)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Do the updates
 	$db->query('', '
@@ -535,7 +535,7 @@ function updateRenamedProfileStatus($enabled)
  */
 function updateProfileField($field_data)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
@@ -580,7 +580,7 @@ function updateProfileField($field_data)
  */
 function updateProfileFieldOrder($replace)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
@@ -597,7 +597,7 @@ function updateProfileFieldOrder($replace)
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields_data
@@ -619,7 +619,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  */
 function addProfileField($field)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}custom_fields',
@@ -648,7 +648,7 @@ function addProfileField($field)
  */
 function deleteProfileFieldUserData($name)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Delete the user data first.
 	$db->query('', '
@@ -669,7 +669,7 @@ function deleteProfileFieldUserData($name)
  */
 function deleteProfileField($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}custom_fields
@@ -685,7 +685,7 @@ function deleteProfileField($id)
  */
 function updateDisplayCache()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$fields = $db->fetchQueryCallback('
 		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
@@ -722,7 +722,7 @@ function updateDisplayCache()
  */
 function loadAllCustomFields()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the names of any custom fields.
 	$request = $db->query('', '
@@ -733,14 +733,14 @@ function loadAllCustomFields()
 		)
 	);
 	$custom_field_titles = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$custom_field_titles['customfield_' . $row['col_name']] = array(
 			'title' => $row['field_name'],
 			'parse_bbc' => $row['bbc'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $custom_field_titles;
 }

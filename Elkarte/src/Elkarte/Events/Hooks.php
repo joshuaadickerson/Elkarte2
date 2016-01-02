@@ -545,7 +545,7 @@ class Hooks
 		//	$db = \database();
 
 		if ($debug === null)
-			$debug = Debug::get();
+			$debug = $GLOBALS['elk']['debug'];
 
 		self::$_instance = new Hooks($db, $debug, $paths);
 	}

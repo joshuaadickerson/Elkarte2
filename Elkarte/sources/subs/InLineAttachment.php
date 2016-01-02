@@ -703,7 +703,7 @@ class In_Line_Attachment
 	 */
 	private function _ila_get_topic($msg_id)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// Init
 		$topic = -1;
@@ -722,9 +722,9 @@ class In_Line_Attachment
 					'msg' => $msg_id,
 				)
 			);
-			if ($db->num_rows($request) == 1)
-				list($topic, $board) = $db->fetch_row($request);
-			$db->free_result($request);
+			if ($request->numRows() == 1)
+				list($topic, $board) = $request->fetchRow();
+			$request->free();
 		}
 
 		return array($topic, $board);

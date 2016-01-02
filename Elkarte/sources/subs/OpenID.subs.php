@@ -144,7 +144,7 @@ class OpenID
 	 */
 	public function getAssociation($server, $handle = null, $no_delete = false)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		if (!$no_delete)
 		{
@@ -173,12 +173,12 @@ class OpenID
 			)
 		);
 
-		if ($db->num_rows($request) == 0)
+		if ($request->numRows() == 0)
 			return null;
 
-		$return = $db->fetch_assoc($request);
+		$return = $request->fetchAssoc();
 		$return['server_url'] = $server;
-		$db->free_result($request);
+		$request->free();
 
 		return $return;
 	}
@@ -193,7 +193,7 @@ class OpenID
 	{
 		global $p;
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$parameters = array(
 			'openid.mode=associate',
@@ -272,7 +272,7 @@ class OpenID
 	 */
 	public function removeAssociation($handle)
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		$db->query('openid_remove_association', '
 			DELETE FROM {db_prefix}openid_assoc
@@ -539,7 +539,7 @@ function binary_xor($num1, $num2)
  */
 function memberByOpenID($claimed_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
@@ -551,8 +551,8 @@ function memberByOpenID($claimed_id)
 		)
 	);
 
-	$member_found = $db->fetch_assoc($result);
-	$db->free_result($result);
+	$member_found = $result->fetchAssoc();
+	$result->free();
 
 	return $member_found;
 }

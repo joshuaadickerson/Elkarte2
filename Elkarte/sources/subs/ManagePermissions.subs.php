@@ -32,7 +32,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// we'll need to init illegal permissions.
 	require_once(SUBSDIR . '/Permission.subs.php');
@@ -356,7 +356,7 @@ function loadPermissionProfiles()
 {
 	global $context, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_profile, profile_name
@@ -366,7 +366,7 @@ function loadPermissionProfiles()
 		)
 	);
 	$context['profiles'] = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Format the label nicely.
 		if (isset($txt['permissions_profile_' . $row['profile_name']]))
@@ -381,7 +381,7 @@ function loadPermissionProfiles()
 			'unformatted_name' => $row['profile_name'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -564,7 +564,7 @@ function loadAllPermissions()
 	}
 
 	// Provide a practical way to modify permissions.
-	Hooks::get()->hook('load_permissions', array(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions));
+	$GLOBALS['elk']['hooks']->hook('load_permissions', array(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions));
 
 	$context['permissions'] = array();
 	$context['hidden_permissions'] = array();
@@ -698,7 +698,7 @@ function loadAllPermissions()
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_group, COUNT(*) AS num_permissions, add_deny
@@ -709,14 +709,14 @@ function countPermissions($groups, $hidden_permissions = null)
 			'hidden_permissions' => !isset($hidden_permissions) ? $hidden_permissions : array(),
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
 		{
 			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] = $row['num_permissions'];
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -733,7 +733,7 @@ function countPermissions($groups, $hidden_permissions = null)
  */
 function countBoardPermissions($groups, $hidden_permissions = null, $profile_id = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_profile, id_group, COUNT(*) AS num_permissions, add_deny
@@ -747,10 +747,10 @@ function countBoardPermissions($groups, $hidden_permissions = null, $profile_id 
 			'current_profile' => $profile_id,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
 			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] += $row['num_permissions'];
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -764,7 +764,7 @@ function countBoardPermissions($groups, $hidden_permissions = null, $profile_id 
  */
 function assignPermissionProfileToBoard($profile, $board)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
@@ -789,7 +789,7 @@ function assignPermissionProfileToBoard($profile, $board)
  */
 function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_permissions = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Retrieve current permissions of group.
 	$request = $db->query('', '
@@ -801,9 +801,9 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 		)
 	);
 	$target_perm = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$target_perm[$row['permission']] = $row['add_deny'];
-	$db->free_result($request);
+	$request->free();
 
 	$inserts = array();
 	foreach ($groups as $group_id)
@@ -855,7 +855,7 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
  */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Now do the same for the board permissions.
 	$request = $db->query('', '
@@ -869,9 +869,9 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 		)
 	);
 	$target_perm = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$target_perm[$row['permission']] = $row['add_deny'];
-	$db->free_result($request);
+	$request->free();
 
 	$inserts = array();
 	foreach ($groups as $group_id)
@@ -920,7 +920,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
  */
 function deletePermission($groups, $permission, $illegal_permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
@@ -945,7 +945,7 @@ function deletePermission($groups, $permission, $illegal_permissions)
  */
 function deleteBoardPermission($group, $profile_id, $permission)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}board_permissions
@@ -968,7 +968,7 @@ function deleteBoardPermission($group, $profile_id, $permission)
  */
 function replacePermission($permChange)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('replace',
 		'{db_prefix}permissions',
@@ -986,7 +986,7 @@ function replacePermission($permChange)
  */
 function replaceBoardPermission($permChange)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('replace',
 		'{db_prefix}board_permissions',
@@ -1003,7 +1003,7 @@ function replaceBoardPermission($permChange)
  */
 function removeModeratorPermissions()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
@@ -1023,7 +1023,7 @@ function removeModeratorPermissions()
  */
 function fetchPermissions($id_group)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$permissions = array(
 		'allowed' => array(),
@@ -1038,9 +1038,9 @@ function fetchPermissions($id_group)
 			'current_group' => $id_group,
 		)
 	);
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
-	$db->free_result($result);
+	$result->free();
 
 	return $permissions;
 }
@@ -1055,7 +1055,7 @@ function fetchPermissions($id_group)
  */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$permissions = array(
 		'allowed' => array(),
@@ -1072,9 +1072,9 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 			'current_profile' => $permission_type == 'membergroup' ? 1 : $profile_id,
 		)
 	);
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 		$permissions[empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['permission'];
-	$db->free_result($result);
+	$result->free();
 
 	return $permissions;
 }
@@ -1088,7 +1088,7 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
  */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
@@ -1110,7 +1110,7 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  */
 function deleteAllBoardPermissions($id_group, $id_profile)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}board_permissions
@@ -1130,7 +1130,7 @@ function deleteAllBoardPermissions($id_group, $id_profile)
  */
 function clearDenyPermissions()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
@@ -1156,7 +1156,7 @@ function clearDenyPermissions()
  */
 function clearPostgroupPermissions()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$post_groups = $db->fetchQueryCallback('
 		SELECT id_group
@@ -1206,7 +1206,7 @@ function clearPostgroupPermissions()
  */
 function copyPermissionProfile($profile_name, $copy_from)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$profile_name = Util::htmlspecialchars($profile_name);
 	// Insert the profile itself.
@@ -1256,7 +1256,7 @@ function copyPermissionProfile($profile_name, $copy_from)
  */
 function renamePermissionProfile($id_profile, $name)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$name = Util::htmlspecialchars($name);
 
@@ -1279,7 +1279,7 @@ function renamePermissionProfile($id_profile, $name)
  */
 function deletePermissionProfiles($profiles)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Verify it's not in use...
 	$request = $db->query('', '
@@ -1291,9 +1291,9 @@ function deletePermissionProfiles($profiles)
 			'profile_list' => $profiles,
 		)
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->numRows() != 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
-	$db->free_result($request);
+	$request->free();
 
 	// Oh well, delete.
 	$db->query('', '
@@ -1317,7 +1317,7 @@ function permProfilesInUse($profiles)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_profile, COUNT(id_board) AS board_count
@@ -1326,14 +1326,14 @@ function permProfilesInUse($profiles)
 		array(
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		if (isset($profiles[$row['id_profile']]))
 		{
 			$profiles[$row['id_profile']]['in_use'] = true;
 			$profiles[$row['id_profile']]['boards'] = $row['board_count'];
 			$profiles[$row['id_profile']]['boards_text'] = $row['board_count'] > 1 ? sprintf($txt['permissions_profile_used_by_many'], $row['board_count']) : $txt['permissions_profile_used_by_' . ($row['board_count'] ? 'one' : 'none')];
 		}
-	$db->free_result($request);
+	$request->free();
 
 	return $profiles;
 }
@@ -1348,7 +1348,7 @@ function permProfilesInUse($profiles)
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Start by deleting all the permissions relevant.
 	$db->query('', '
@@ -1372,7 +1372,7 @@ function deleteBoardPermissions($groups, $profile, $permissions)
  */
 function insertBoardPermission($new_permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}board_permissions',
@@ -1393,7 +1393,7 @@ function insertBoardPermission($new_permissions)
  */
 function getPermission($group, $profile, $permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$groups = array();
 
@@ -1409,10 +1409,10 @@ function getPermission($group, $profile, $permissions)
 			'permissions' => $permissions,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$groups[$row['id_group']][$row['add_deny'] ? 'add' : 'deny'][] = $row['permission'];
 
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }

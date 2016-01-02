@@ -175,7 +175,7 @@ class BadBehaviorController extends AbstractController
 	{
 		global $txt;
 
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// You can filter by any of the following columns:
 		$filters = array(

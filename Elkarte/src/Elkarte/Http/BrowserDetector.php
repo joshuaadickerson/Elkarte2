@@ -17,7 +17,7 @@
  *
  */
 
-namespace Elkarte\Elkarate\Http;
+namespace Elkarte\Elkarte\Http;
 
 /**
  * This class is an experiment for the job of correctly detecting browsers and
@@ -92,8 +92,7 @@ class BrowserDetector
 		$this->_is_tablet = false;
 
 		// Saves us many many calls
-		$req = Request::instance();
-		$this->_ua = empty($this->_ua) ? $req->user_agent() : $this->_ua;
+		$this->_ua = empty($this->_ua) ? $this->req->user_agent() : $this->_ua;
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())

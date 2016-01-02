@@ -10,7 +10,7 @@ function textfield_alter($change, $substep)
 {
 	global $db_prefix;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SHOW FULL COLUMNS
@@ -89,7 +89,7 @@ function checkChange(&$change)
 	global $db_type, $databases, $db_connection;
 	static $database_version, $where_field_support;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Attempt to find a database_version.
 	if (empty($database_version))

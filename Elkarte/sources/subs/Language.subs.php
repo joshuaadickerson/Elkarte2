@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 function removeLanguageFromMember($lang_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}members
@@ -61,7 +61,7 @@ function list_getLanguages()
 {
 	global $settings, $language, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$languages = array();
 	// Keep our old entries.
@@ -104,7 +104,7 @@ function list_getLanguages()
 		array(
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Default?
 		if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
@@ -115,7 +115,7 @@ function list_getLanguages()
 		elseif (isset($languages[$row['lngfile']]))
 			$languages[$row['lngfile']]['count'] += $row['num_users'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Restore the current users language.
 	$txt = $old_txt;
@@ -387,7 +387,7 @@ function list_getLanguagesList()
 
 function findPossiblePackages($lang)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_install, filename
@@ -400,11 +400,11 @@ function findPossiblePackages($lang)
 		)
 	);
 
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 	{
-		list ($pid, $file_name) = $db->fetch_row($request);
+		list ($pid, $file_name) = $request->fetchRow();
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($pid))
 		return array($pid, $file_name);

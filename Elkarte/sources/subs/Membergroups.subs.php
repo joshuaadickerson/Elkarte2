@@ -37,7 +37,7 @@ function deleteMembergroups($groups)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make sure it's an array.
 	if (!is_array($groups))
@@ -65,9 +65,9 @@ function deleteMembergroups($groups)
 				'is_protected' => 1,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$protected_groups[] = $row['id_group'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Make sure they don't delete protected groups!
@@ -80,7 +80,7 @@ function deleteMembergroups($groups)
 	foreach ($groups_to_log as $key => $row)
 		logAction('delete_group', array('group' => $row['group_name']), 'Admin');
 
-	Hooks::get()->hook('delete_membergroups', array($groups));
+	$GLOBALS['elk']['hooks']->hook('delete_membergroups', array($groups));
 
 	// Remove the membergroups themselves.
 	$db->query('', '
@@ -157,9 +157,9 @@ function deleteMembergroups($groups)
 
 	// Update each member information.
 	$updates = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$updates[$row['additional_groups']][] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
@@ -175,9 +175,9 @@ function deleteMembergroups($groups)
 		)
 	);
 	$updates = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$updates[$row['member_groups']][] = $row['id_board'];
-	$db->free_result($request);
+	$request->free();
 
 	foreach ($updates as $member_groups => $boardArray)
 		$db->query('', '
@@ -226,7 +226,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// You're getting nowhere without this permission, unless of course you are the group's moderator.
 	if (!$permissionCheckDone)
@@ -324,9 +324,9 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			)
 		);
 		$protected_groups = array(1);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$protected_groups[] = $row['id_group'];
-		$db->free_result($request);
+		$request->free();
 
 		// If you're not an Admin yourself, you can't touch protected groups!
 		$groups = array_diff($groups, array_unique($protected_groups));
@@ -377,7 +377,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		)
 	);
 	$updates = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// What log entries must we make for this one, eh?
 		foreach (explode(',', $row['additional_groups']) as $group)
@@ -386,7 +386,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 
 		$updates[$row['additional_groups']][] = $row['id_member'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
@@ -430,7 +430,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Show your licence, but only if it hasn't been done yet.
 	if (!$permissionCheckDone)
@@ -520,7 +520,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	else
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 
-	Hooks::get()->hook('add_members_to_group', array($members, $group_details, &$group_names));
+	$GLOBALS['elk']['hooks']->hook('add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
 	updatePostgroupStats($members);
@@ -541,7 +541,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  */
 function getMembersByGroups(array $groups)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT m.id_member, m.real_name,
@@ -555,7 +555,7 @@ function getMembersByGroups(array $groups)
 	);
 
 	$return = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$id = (int) $row['id_group'];
 		$mem_id = (int) $row['id_member'];
@@ -597,7 +597,7 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_member, real_name
@@ -609,9 +609,9 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 		)
 	);
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$members[$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-	$db->free_result($request);
+	$request->free();
 
 	// If there are more than $limit members, add a 'more' link.
 	if ($limit !== null && count($members) > $limit)
@@ -632,7 +632,7 @@ function cache_getMembergroupList()
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$groupCache = $db->fetchQueryCallback('
 		SELECT id_group, group_name, online_color
@@ -680,7 +680,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 {
 	global $scripturl, $txt, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	loadLanguage('Admin');
 
 	$request = $db->query('', '
@@ -746,7 +746,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		);
 	}
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// We only list the groups they can see.
 		if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
@@ -789,7 +789,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		$include_hidden |= $row['can_moderate'];
 		$group_ids[] = $row['id_group'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// If we found any membergroups, get the amount of members in them.
 	if (!empty($group_ids))
@@ -831,7 +831,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'groups' => $parent_groups,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$all_group_names[$row['id_group']] = $row['group_name'];
 	}
 	foreach ($groups as $key => $group)
@@ -886,7 +886,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false, $include_non_active = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$groups = array();
 
@@ -967,8 +967,8 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 			array(
 			)
 		);
-		list ($groups[3]) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($groups[3]) = $request->fetchRow();
+		$request->free();
 	}
 
 	return $groups;
@@ -988,7 +988,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  */
 function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (empty($group_ids))
 		return false;
@@ -1013,9 +1013,9 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$groups[$row['id_group']] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1069,7 +1069,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 {
 	global $txt, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// No $includes parameters given? Let's set some default values
 	if (empty($includes))
@@ -1150,7 +1150,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 				'member_count' => 0,
 			);
 		}
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$groups['groups'][$row['id_group']] = array(
 				'id' => $row['id_group'],
@@ -1172,7 +1172,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 		}
 	}
 	else
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$groups[] = array(
 				'id' => $row['id_group'],
@@ -1181,7 +1181,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			);
 		}
 
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1197,7 +1197,7 @@ function getGroups($groupList)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$groups = array();
 	if (in_array(0, $groupList))
@@ -1220,7 +1220,7 @@ function getGroups($groupList)
 			'group_list' => $groupList,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$groups[$row['id_group']] = array(
 			'id' => $row['id_group'],
@@ -1228,7 +1228,7 @@ function getGroups($groupList)
 			'member_count' => $row['num_members'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1241,7 +1241,7 @@ function getGroups($groupList)
  */
 function getMaxGroupID()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT MAX(id_group)
@@ -1249,7 +1249,7 @@ function getMaxGroupID()
 		array(
 		)
 	);
-	list ($id_group) = $db->fetch_row($request);
+	list ($id_group) = $request->fetchRow();
 
 	return $id_group;
 }
@@ -1265,7 +1265,7 @@ function getMaxGroupID()
  */
 function addMembergroup($id_group, $groupname, $minposts, $type)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('',
 		'{db_prefix}membergroups',
@@ -1292,7 +1292,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$inserts = array();
 
@@ -1305,12 +1305,12 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (empty($illegal_permissions) || !in_array($row['permission'], $illegal_permissions))
 			$inserts[] = array($id_group, $row['permission'], $row['add_deny']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($inserts))
 		$db->insert('insert',
@@ -1330,7 +1330,7 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  */
 function copyBoardPermissions($id_group, $copy_from)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$inserts = $db->fetchQueryCallback('
 		SELECT id_profile, permission, add_deny
@@ -1365,7 +1365,7 @@ function copyBoardPermissions($id_group, $copy_from)
  */
 function updateCopiedGroup($id_group, $copy_from)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 	$group_info = membergroupById($copy_from, true);
@@ -1396,7 +1396,7 @@ function updateCopiedGroup($id_group, $copy_from)
  */
 function updateInheritedGroup($id_group, $copy_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}membergroups
@@ -1420,7 +1420,7 @@ function updateInheritedGroup($id_group, $copy_id)
  */
 function updateMembergroupProperties($properties)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$known_properties = array(
 		'max_messages' => array('type' => 'int'),
@@ -1473,7 +1473,7 @@ function updateMembergroupProperties($properties)
  */
 function detachGroupFromBoards($id_group, $boards, $access_list)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find all boards in whose access list this group is in, but shouldn't be.
 	$db->fetchQueryCallback('
@@ -1513,7 +1513,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
  */
 function assignGroupToBoards($id_group, $boards, $access_list)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
@@ -1539,7 +1539,7 @@ function assignGroupToBoards($id_group, $boards, $access_list)
  */
 function detachDeletedGroupFromMembers($id_group)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$updates = array();
 
@@ -1562,9 +1562,9 @@ function detachDeletedGroupFromMembers($id_group)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$updates[$row['additional_groups']][] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
@@ -1580,7 +1580,7 @@ function detachDeletedGroupFromMembers($id_group)
  */
 function setGroupToHidden($id_group)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$updates = array();
 
@@ -1594,9 +1594,9 @@ function setGroupToHidden($id_group)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$updates[$row['additional_groups']][] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
@@ -1623,7 +1623,7 @@ function validateShowGroupMembership()
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1633,8 +1633,8 @@ function validateShowGroupMembership()
 			'non_joinable' => 1,
 		)
 	);
-	list ($have_joinable) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($have_joinable) = $request->fetchRow();
+	$request->free();
 
 	// Do we need to update the setting?
 	if ((empty($modSettings['show_group_membership']) && $have_joinable) || (!empty($modSettings['show_group_membership']) && !$have_joinable))
@@ -1649,7 +1649,7 @@ function validateShowGroupMembership()
  */
 function detachGroupModerators($id_group)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}group_moderators
@@ -1670,7 +1670,7 @@ function detachGroupModerators($id_group)
  */
 function getIDMemberFromGroupModerators($moderators)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT id_member
@@ -1696,7 +1696,7 @@ function getIDMemberFromGroupModerators($moderators)
  */
 function assignGroupModerators($id_group, $group_moderators)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$mod_insert = array();
 		foreach ($group_moderators as $moderator)
@@ -1719,7 +1719,7 @@ function assignGroupModerators($id_group, $group_moderators)
  */
 function getGroupModerators($id_group)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$moderators = array();
 
@@ -1732,9 +1732,9 @@ function getGroupModerators($id_group)
 			'current_group' => $id_group,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$moderators[$row['id_member']] = $row['real_name'];
-	$db->free_result($request);
+	$request->free();
 
 	return $moderators;
 }
@@ -1752,7 +1752,7 @@ function getInheritableGroups($id_group = false)
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$inheritable_groups = array();
 
@@ -1773,9 +1773,9 @@ function getInheritableGroups($id_group = false)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$inheritable_groups[$row['id_group']] = $row['group_name'];
-	$db->free_result($request);
+	$request->free();
 
 	return $inheritable_groups;
 }
@@ -1790,7 +1790,7 @@ function prepareMembergroupPermissions()
 {
 	global $modSettings, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Start this with the guests/members.
 	$profile_groups = array(
@@ -1827,7 +1827,7 @@ function prepareMembergroupPermissions()
 			'min_posts' => -1,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['id_parent'] == -2)
 		{
@@ -1845,7 +1845,7 @@ function prepareMembergroupPermissions()
 		elseif (isset($profile_groups[$row['id_parent']]))
 			$profile_groups[$row['id_parent']]['children'][] = $row['group_name'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $profile_groups;
 }
@@ -1864,7 +1864,7 @@ function prepareMembergroupPermissions()
  */
 function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
@@ -1882,7 +1882,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 		)
 	);
 	$groups = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Hide hidden groups!
 		if ($show_hidden && $row['hidden'] && !$row['can_moderate'])
@@ -1891,7 +1891,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 		$groups[$row['id_group']] = $row['group_name'];
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1909,7 +1909,7 @@ function accessibleGroups()
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
@@ -1925,7 +1925,7 @@ function accessibleGroups()
 		)
 	);
 	$groups = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Hide hidden groups!
 		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
@@ -1934,7 +1934,7 @@ function accessibleGroups()
 		$groups[$row['id_group']] = $row['group_name'];
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1951,7 +1951,7 @@ function accessibleGroups()
  */
 function list_getGroupRequestCount($where, $where_parameters)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1960,8 +1960,8 @@ function list_getGroupRequestCount($where, $where_parameters)
 		array_merge($where_parameters, array(
 		))
 	);
-	list ($totalRequests) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalRequests) = $request->fetchRow();
+	$request->free();
 
 	return $totalRequests;
 }
@@ -1989,7 +1989,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
@@ -2024,7 +2024,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
  */
 function deleteGroupRequests($groups)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Remove the evidence...
 	$db->query('', '
@@ -2048,13 +2048,13 @@ function deleteGroupRequests($groups)
  */
 function updatePostGroupStats($members = null, $parameter2 = null)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Parameter two is the updated columns: we should check to see if we base groups off any of these.
 	if ($parameter2 !== null && !in_array('posts', $parameter2))
 		return;
 
-	$postgroups = Cache::instance()->get('updatePostGroupStats', 360);
+	$postgroups = $GLOBALS['elk']['cache']->get('updatePostGroupStats', 360);
 	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
@@ -2067,14 +2067,14 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 			)
 		);
 		$postgroups = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$postgroups[$row['id_group']] = $row['min_posts'];
-		$db->free_result($request);
+		$request->free();
 
 		// Sort them this way because if it's done with MySQL it causes a filesort :(.
 		arsort($postgroups);
 
-		Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
+		$GLOBALS['elk']['cache']->put('updatePostGroupStats', $postgroups, 360);
 	}
 
 	// Oh great, they've screwed their post groups.
@@ -2112,7 +2112,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
  */
 function getUnassignableGroups($ignore_protected)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->fetchQueryCallback('
 		SELECT id_group
@@ -2137,7 +2137,7 @@ function getGroupsList()
 
 	loadLanguage('Profile');
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	$member_groups = array(
 		0 => array(
 			'id' => 0,
@@ -2164,7 +2164,7 @@ function getGroupsList()
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// We should skip the administrator group if they don't have the admin_forum permission!
 		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
@@ -2178,7 +2178,7 @@ function getGroupsList()
 			'can_be_primary' => $row['hidden'] != 2,
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $member_groups;
 }

@@ -39,7 +39,7 @@ function bb2_db_date()
  */
 function bb2_db_affected_rows()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->affected_rows();
 }
@@ -52,9 +52,9 @@ function bb2_db_affected_rows()
  */
 function bb2_db_escape($string)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
-	return $db->escape_string($string);
+	return $db->escapeString($string);
 }
 
 /**
@@ -65,7 +65,7 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	return $db->num_rows($result);
 }
@@ -80,7 +80,7 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
@@ -114,12 +114,12 @@ function bb2_db_query($query)
  */
 function bb2_db_rows($result)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$temp = array();
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 		$temp[] = $row;
-	$db->free_result($result);
+	$result->free();
 
 	return $temp;
 }
@@ -344,10 +344,10 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
+		if (!$GLOBALS['elk']['cache']->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
-			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
+			$GLOBALS['elk']['cache']->put('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)

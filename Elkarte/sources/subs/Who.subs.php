@@ -24,7 +24,7 @@ if (!defined('ELK'))
  */
 function viewers($id, $session, $type = 'topic')
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make sure we have a default value
 	if (!in_array($type, array('topic', 'board')))
@@ -45,11 +45,11 @@ function viewers($id, $session, $type = 'topic')
 			'session' => $session
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$viewers[] = $row;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $viewers;
 }
@@ -139,7 +139,7 @@ function determineActions($urls, $preferred_prefix = false)
 {
 	global $txt, $user_info, $modSettings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (!allowedTo('who_view'))
 		return array();
@@ -170,7 +170,7 @@ function determineActions($urls, $preferred_prefix = false)
 	);
 
 	// Provide integration a way to add to the allowed action array
-	\Hooks::get()->hook('whos_online_allowed', array(&$allowedActions));
+	$GLOBALS['elk']['hooks']->hook('whos_online_allowed', array(&$allowedActions));
 
 	if (!is_array($urls))
 		$url_list = array(array($urls, $user_info['id']));
@@ -293,7 +293,7 @@ function determineActions($urls, $preferred_prefix = false)
 				);
 				list ($id_topic, $subject) = $db->fetch_row($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $scripturl . '?topic=' . $id_topic . '.0', $subject);
-				$db->free_result($result);
+				$result->free();
 
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
@@ -327,7 +327,7 @@ function determineActions($urls, $preferred_prefix = false)
 		}
 
 		// Maybe the action is integrated into another system?
-		if (count($integrate_actions = \Hooks::get()->hook('integrate_whos_online', array($actions))) > 0)
+		if (count($integrate_actions = $GLOBALS['elk']['hooks']->hook('integrate_whos_online', array($actions))) > 0)
 		{
 			// Try each integration hook with this url and see if they can fill in the details
 			foreach ($integrate_actions as $integrate_action)

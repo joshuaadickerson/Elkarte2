@@ -71,7 +71,7 @@ class Generic_List
 		loadLanguage('Errors');
 
 		// Load the template
-		\Templates::getInstance()->load('GenericList');
+		$GLOBALS['elk']['templates']->load('GenericList');
 	}
 
 	/**

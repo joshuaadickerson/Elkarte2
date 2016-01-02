@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 function installedThemes()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_theme, variable, value
@@ -40,7 +40,7 @@ function installedThemes()
 		)
 	);
 	$themes = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($themes[$row['id_theme']]))
 			$themes[$row['id_theme']] = array(
@@ -50,7 +50,7 @@ function installedThemes()
 			);
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -63,7 +63,7 @@ function installedThemes()
  */
 function themeDirectory($id_theme)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT value
@@ -76,8 +76,8 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list ($themeDirectory) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($themeDirectory) = $request->fetchRow();
+	$request->free();
 
 	return $themeDirectory;
 }
@@ -89,7 +89,7 @@ function themeDirectory($id_theme)
  */
 function themeUrl($id_theme)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT value
@@ -103,8 +103,8 @@ function themeUrl($id_theme)
 			)
 		);
 
-	list ($theme_url) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($theme_url) = $request->fetchRow();
+	$request->free();
 
 	return $theme_url;
 }
@@ -117,7 +117,7 @@ function themeUrl($id_theme)
  */
 function validateThemeName($indexes, $value_data)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_theme, value
@@ -132,14 +132,14 @@ function validateThemeName($indexes, $value_data)
 		))
 	);
 	$themes = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Find the right one.
 		foreach ($indexes as $index)
 			if (strpos($row['value'], $index) !== false)
 				$themes[$row['id_theme']] = $index;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -152,7 +152,7 @@ function validateThemeName($indexes, $value_data)
  */
 function getBasicThemeInfos($themes)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$themelist = array();
 
@@ -168,10 +168,10 @@ function getBasicThemeInfos($themes)
 			'name' => 'name',
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$themelist[$row['id_theme']] = $row['value'];
 
-	$db->free_result($request);
+	$request->free();
 
 	return $themelist;
 }
@@ -185,7 +185,7 @@ function getCustomThemes()
 {
 	global $settings, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_theme, variable, value
@@ -207,9 +207,9 @@ function getCustomThemes()
 			'theme_dir' => $settings['default_theme_dir'],
 		),
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -223,7 +223,7 @@ function getThemesPathbyID($theme_list = array())
 {
 	global $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Nothing passed then we use the defaults
 	if (empty($theme_list))
@@ -246,9 +246,9 @@ function getThemesPathbyID($theme_list = array())
 		)
 	);
 	$theme_paths = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-	$db->free_result($request);
+	$request->free();
 
 	return $theme_paths;
 }
@@ -261,7 +261,7 @@ function getThemesPathbyID($theme_list = array())
  */
 function loadThemes($knownThemes)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Load up all the themes.
 	$request = $db->query('', '
@@ -276,13 +276,13 @@ function loadThemes($knownThemes)
 		)
 	);
 	$themes = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$themes[] = array(
 			'id' => $row['id_theme'],
 			'name' => $row['name'],
 			'known' => in_array($row['id_theme'], $knownThemes),
 		);
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -294,7 +294,7 @@ function loadThemes($knownThemes)
  */
 function loadThemesAffected($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT themes_installed
@@ -306,9 +306,9 @@ function loadThemesAffected($id)
 		)
 	);
 	$themes = array();
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$themes = explode(',', $row[0]);
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -395,7 +395,7 @@ function get_file_listing($path, $relative)
  */
 function countConfiguredGuestOptions()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$themes = array();
 
@@ -408,9 +408,9 @@ function countConfiguredGuestOptions()
 			'guest_member' => -1,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$themes[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return($themes);
 }
@@ -425,7 +425,7 @@ function availableThemes($current_theme, $current_member)
 {
 	global $modSettings, $settings, $user_info, $txt, $language;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$available_themes = array();
 	if (!empty($modSettings['knownThemes']))
@@ -448,7 +448,7 @@ function availableThemes($current_theme, $current_member)
 				'known_themes' => !empty($modSettings['theme_allow']) || allowedTo('admin_forum') ? explode(',', $modSettings['knownThemes']) : array($modSettings['theme_guests']),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if (!isset($available_themes[$row['id_theme']]))
 				$available_themes[$row['id_theme']] = array(
@@ -458,7 +458,7 @@ function availableThemes($current_theme, $current_member)
 				);
 			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
@@ -480,7 +480,7 @@ function availableThemes($current_theme, $current_member)
 		array(
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Figure out which theme it is they are REALLY using.
 		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
@@ -493,7 +493,7 @@ function availableThemes($current_theme, $current_member)
 		else
 			$available_themes[$guest_theme]['num_users'] += $row['the_count'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Get any member variant preferences.
 	$variant_preferences = array();
@@ -510,9 +510,9 @@ function availableThemes($current_theme, $current_member)
 				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $current_member) : array(-1),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$variant_preferences[$row['id_theme']] = $row['value'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Save the setting first.
@@ -552,7 +552,7 @@ function availableThemes($current_theme, $current_member)
 				// Fill settings up.
 				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
 
-				Hooks::get()->hook('init_theme', array($id_theme, &$settings));
+				$GLOBALS['elk']['hooks']->hook('init_theme', array($id_theme, &$settings));
 
 				if (!empty($settings['theme_variants']))
 				{
@@ -591,7 +591,7 @@ function availableThemes($current_theme, $current_member)
  */
 function countConfiguredMemberOptions()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$themes = array();
 
@@ -604,9 +604,9 @@ function countConfiguredMemberOptions()
 			'no_member' => 0,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$themes[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $themes;
 }
@@ -629,7 +629,7 @@ function countConfiguredMemberOptions()
  */
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$query_param = array();
 
@@ -690,7 +690,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
  */
 function updateThemeOptions($setValues)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('replace',
 		'{db_prefix}themes',
@@ -709,7 +709,7 @@ function updateThemeOptions($setValues)
  */
 function addThemeOptions($id_theme, $options, $value)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('substring', '
 		INSERT INTO {db_prefix}themes
@@ -731,7 +731,7 @@ function addThemeOptions($id_theme, $options, $value)
  */
 function deleteTheme($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
@@ -775,7 +775,7 @@ function deleteTheme($id)
  */
 function nextTheme()
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the newest id_theme.
 	$result = $db->query('', '
@@ -785,7 +785,7 @@ function nextTheme()
 		)
 	);
 	list ($id_theme) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	// This will be theme number...
 	$id_theme++;
@@ -800,7 +800,7 @@ function nextTheme()
  */
 function addTheme($details)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->insert('insert',
 		'{db_prefix}themes',
@@ -818,7 +818,7 @@ function addTheme($details)
  */
 function getThemeName($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$result = $db->query('', '
 		SELECT value
@@ -834,7 +834,7 @@ function getThemeName($id)
 		)
 	);
 	list ($theme_name) = $db->fetch_row($result);
-	$db->free_result($result);
+	$result->free();
 
 	return $theme_name;
 }
@@ -846,7 +846,7 @@ function getThemeName($id)
  */
 function deleteVariants($id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -870,7 +870,7 @@ function deleteVariants($id)
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$variables = is_array($variables) ? $variables : array($variables);
 
@@ -892,9 +892,9 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 			'variables' => $variables,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$options[$row['variable']] = $row['value'];
-	$db->free_result($request);
+	$request->free();
 
 	return $options;
 }
@@ -909,7 +909,7 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
@@ -933,8 +933,8 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 			'based_on_path' => '%' . "\\" . $based_on,
 		)
 	);
-	$temp = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$temp = $request->fetchAssoc();
+	$request->free();
 
 	return $temp;
 }

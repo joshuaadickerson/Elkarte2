@@ -33,7 +33,7 @@ function getBuddiesID($buddies, $adding = true)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Find the id_member of the buddy(s).
 	$request = $db->query('', '
@@ -85,7 +85,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 {
 	global $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get all the membergroups they can join.
 	$request = $db->query('', '
@@ -147,7 +147,7 @@ function loadMembergroupsJoin($current_groups, $memID)
  */
 function checkMembergroupChange($group_id)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Check if non Admin users are trying to promote themselves to Admin.
 	$request = $db->query('', '
@@ -176,7 +176,7 @@ function checkMembergroupChange($group_id)
  */
 function logMembergroupRequest($group_id, $memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT id_member

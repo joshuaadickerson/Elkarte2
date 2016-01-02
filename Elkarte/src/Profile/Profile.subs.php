@@ -167,7 +167,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 {
 	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the right restrictions in place...
 	$where = 'active = 1';
@@ -512,7 +512,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context, $cur_profile, $txt;
 
-				$db = database();
+				$db = $GLOBALS['elk']['db'];
 
 				$request = $db->query('', '
 					SELECT value
@@ -1168,7 +1168,7 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Check the name and email for validity.
 	$check['email'] = strtr($email, array('&#039;' => '\''));
@@ -1291,7 +1291,7 @@ function makeThemeChanges($memID, $id_theme)
 {
 	global $modSettings, $context, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$reservedVars = array(
 		'actual_theme_url',
@@ -1393,7 +1393,7 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if (isset($_POST['notify_submit']))
 	{
@@ -1499,7 +1499,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
 	global $context, $user_profile, $user_info, $modSettings;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($sanitize && isset($_POST['customfield']))
 		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
@@ -2126,7 +2126,7 @@ function profileSaveAvatarData(&$value)
 {
 	global $modSettings, $profile_vars, $cur_profile, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -2421,7 +2421,7 @@ function profileSaveGroups(&$value)
 {
 	global $profile_vars, $old_profile, $context, $cur_profile;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
@@ -2527,7 +2527,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
 	global $scripturl;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
@@ -2572,7 +2572,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  */
 function list_getUserWarningCount($memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -2605,7 +2605,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 {
 	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
 		$exclude_boards = array($modSettings['recycle_board']);
@@ -2684,7 +2684,7 @@ function getNumAttachments($boardsAllowed, $memID)
 {
 	global $board, $modSettings, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
@@ -2724,7 +2724,7 @@ function getNumAttachments($boardsAllowed, $memID)
  */
 function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the list of topics we can see
 	$request = $db->query('', '
@@ -2782,7 +2782,7 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
  */
 function getNumUnwatchedBy($memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
@@ -2816,7 +2816,7 @@ function count_user_posts($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 
@@ -2853,7 +2853,7 @@ function count_user_topics($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 
@@ -2890,7 +2890,7 @@ function findMinMaxUserMessage($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 
@@ -2925,7 +2925,7 @@ function findMinMaxUserTopic($memID, $board = null)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 
@@ -2965,7 +2965,7 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 	$user_posts = array();
@@ -3030,7 +3030,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$is_owner = $memID == $user_info['id'];
 	$user_topics = array();
@@ -3086,7 +3086,7 @@ function getMemberGeneralPermissions($curGroups)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	loadLanguage('ManagePermissions');
 
 	// Get all general permissions.
@@ -3152,7 +3152,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
 	global $txt;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 	loadLanguage('ManagePermissions');
 
 	$request = $db->query('', '
@@ -3217,7 +3217,7 @@ function getMembersIPs($memID)
 {
 	global $modSettings, $user_profile;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// @todo cache this
 	// If this is a big forum, or a large posting user, let's limit the search.
@@ -3294,7 +3294,7 @@ function getMembersIPs($memID)
  */
 function getMembersInRange($ips, $memID)
 {
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	$message_members = array();
 	$members_in_range = array();

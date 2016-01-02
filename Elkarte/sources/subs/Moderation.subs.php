@@ -347,7 +347,7 @@ function logWarningNotice($subject, $body)
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			Util::htmlspecialchars($subject), Util::htmlspecialchars($body),
+			$GLOBALS['elk']['text']->htmlspecialchars($subject), $GLOBALS['elk']['text']->htmlspecialchars($body),
 		),
 		array('id_notice')
 	);
@@ -473,7 +473,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 			'title' => $row['template_title'],
-			'body' => Util::htmlspecialchars($row['body']),
+			'body' => $GLOBALS['elk']['text']->htmlspecialchars($row['body']),
 		);
 	}
 	$request->free();
@@ -623,7 +623,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
-			'body' => Util::htmlspecialchars($row['body']),
+			'body' => $GLOBALS['elk']['text']->htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);
@@ -1083,7 +1083,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 	);
 
 	$member_posts = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	while ($row = $request->fetchAssoc())
 	{
@@ -1404,7 +1404,7 @@ function moderatorNotice($id_notice)
 	$request->free();
 
 	// Make it look nice
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 	$notice_body = $bbc_parser->parseNotice($notice_body);
 
 	return array($notice_body, $notice_subject);
@@ -1486,7 +1486,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 	);
 
 	$unapproved_items = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	for ($i = 1; $row = $request->fetchAssoc(); $i++)
 	{

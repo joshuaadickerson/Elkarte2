@@ -295,7 +295,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		))
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	$posts = array();
 	while ($row = $request->fetchAssoc())
@@ -325,8 +325,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
-			'preview' => Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
+			'short_subject' => $GLOBALS['elk']['text']->shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => $GLOBALS['elk']['text']->shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -452,13 +452,13 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		)
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 	$posts = array();
 	while ($row = $request->fetchAssoc())
 	{
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br>' => '&#10;')));
-		if (Util::strlen($row['body']) > 128)
-			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
+		if ($GLOBALS['elk']['text']->strlen($row['body']) > 128)
+			$row['body'] = $GLOBALS['elk']['text']->substr($row['body'], 0, 128) . '...';
 
 		// Censor the subject.
 		$row['subject'] = censor($row['subject']);
@@ -485,7 +485,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => Util::shorten_text($row['subject'], 25),
+			'short_subject' => $GLOBALS['elk']['text']->shorten_text($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -1114,7 +1114,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		'options' => array()
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	// Calculate the percentages and bar lengths...
 	$divisor = $return['total_votes'] == 0 ? 1 : $return['total_votes'];
@@ -1593,7 +1593,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	if (empty($request))
 		return false;
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	$return = array();
 	foreach ($request as $row)

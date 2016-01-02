@@ -815,7 +815,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$db = $GLOBALS['elk']['db'];
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
-	$checkName = Util::strtolower($name);
+	$checkName = $GLOBALS['elk']['text']->strtolower($name);
 
 	// Administrators are never restricted ;).
 	if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
@@ -835,10 +835,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 
 			// Case sensitive name?
 			if (empty($modSettings['reserveCase']))
-				$reservedCheck = Util::strtolower($reservedCheck);
+				$reservedCheck = $GLOBALS['elk']['text']->strtolower($reservedCheck);
 
 			// If it's not just entire word, check for it in there somewhere...
-			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
+			if ($checkMe == $reservedCheck || ($GLOBALS['elk']['text']->strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
 					$GLOBALS['elk']['errors']->fatal_lang_error('username_reserved', 'password', array($reserved));
 				else
@@ -1726,7 +1726,7 @@ function getMemberByName($name, $flexible = false)
 			OR {raw:member_name} LIKE {string:name}' : '') . '
 		LIMIT 1',
 		array(
-			'name' => Util::strtolower($name),
+			'name' => $GLOBALS['elk']['text']->strtolower($name),
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 		)
@@ -1770,9 +1770,9 @@ function getMember($search, $buddies = array())
 		array(
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
-			'search' => Util::strtolower($search),
+			'search' => $GLOBALS['elk']['text']->strtolower($search),
 			'activation_status' => array(1, 12),
-			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
+			'limit' => $GLOBALS['elk']['text']->strlen($search) <= 2 ? 100 : 200,
 		),
 		function($row)
 		{

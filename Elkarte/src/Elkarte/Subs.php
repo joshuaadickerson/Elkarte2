@@ -387,7 +387,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? $GLOBALS['elk']['text']->ucwords(strftime($token, $time)) : strftime($token, $time), $str);
 	}
 	else
 	{
@@ -998,7 +998,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars(Util::strtolower($words));
+	$words = un_htmlspecialchars($GLOBALS['elk']['text']->strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -1429,7 +1429,7 @@ function response_prefix()
 function isValidEmail($value)
 {
 	$value = trim($value);
-	if (filter_var($value, FILTER_VALIDATE_EMAIL) && Util::strlen($value) < 255)
+	if (filter_var($value, FILTER_VALIDATE_EMAIL) && $GLOBALS['elk']['text']->strlen($value) < 255)
 		return $value;
 	else
 		return false;
@@ -1691,7 +1691,7 @@ function expandIPv6($addr, $strict_check = true)
 function htmlspecialchars__recursive($var, $level = 0)
 {
 	if (!is_array($var))
-		return Util::htmlspecialchars($var, ENT_QUOTES);
+		return $GLOBALS['elk']['text']->htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
@@ -1718,7 +1718,7 @@ function htmltrim__recursive($var, $level = 0)
 {
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return Util::htmltrim($var);
+		return $GLOBALS['elk']['text']->htmltrim($var);
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)

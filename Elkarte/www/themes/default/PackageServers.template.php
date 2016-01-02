@@ -188,7 +188,7 @@ function template_package_list()
 				// Show the addon type?
 				if ($package['type'] != '')
 					echo '
-								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
+								<li>', $txt['package_type'], ':&nbsp; ', $GLOBALS['elk']['text']->ucwords($GLOBALS['elk']['text']->strtolower($package['type'])), '</li>';
 
 				// Show the version number?
 				if ($package['version'] != '')

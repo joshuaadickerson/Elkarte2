@@ -343,7 +343,7 @@ class Settings_Form
 		if (!empty($bbcChoice))
 		{
 			// What are the options, eh?
-			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+			$codes = $GLOBALS['elk']['bbc']->getCodes();
 			$bbcTags = $codes->getTags();
 
 			$bbcTags = array_unique($bbcTags);
@@ -462,7 +462,7 @@ class Settings_Form
 			if (isset($_POST[$config_var]))
 			{
 				if (in_array($config_var, $safe_strings))
-					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
+					$new_settings[$config_var] = '\'' . addcslashes($GLOBALS['elk']['text']->htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
 				else
 					$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
 			}
@@ -522,7 +522,7 @@ class Settings_Form
 
 		if ($known_rules === null)
 			$known_rules = array(
-				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
+				'nohtml' => '$GLOBALS['elk']['text']->htmlspecialchars[' . ENT_QUOTES . ']',
 				'email' => 'valid_email',
 				'url' => 'valid_url',
 			);
@@ -597,7 +597,7 @@ class Settings_Form
 			// BBC.
 			elseif ($var[0] == 'bbc')
 			{
-				$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+				$codes = $GLOBALS['elk']['bbc']->getCodes();
 				$bbcTags = $codes->getTags();
 
 				if (!isset($_POST[$var[1] . '_enabledTags']))

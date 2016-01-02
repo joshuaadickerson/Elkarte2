@@ -335,7 +335,7 @@ function printMemberListRows($request)
 	// Load all the members for display.
 	loadMemberData($members);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	$context['members'] = array();
 	foreach ($members as $member)

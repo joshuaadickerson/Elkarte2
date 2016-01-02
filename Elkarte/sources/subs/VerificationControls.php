@@ -361,7 +361,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 				$_SESSION[$this->_options['id'] . '_vv']['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
-			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? $GLOBALS['elk']['text']->htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
 	}
 
 	/**
@@ -622,7 +622,7 @@ class Verification_Controls_Questions implements Verification_Controls
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
 		$asked_questions = array();
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = $GLOBALS['elk']['bbc'];
 
 		foreach ($questions as $row)
 		{
@@ -631,7 +631,7 @@ class Verification_Controls_Questions implements Verification_Controls
 				'q' => $parser->parseVerificationControls($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
+				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? $GLOBALS['elk']['text']->htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
 			$_SESSION[$this->_options['id'] . '_vv']['q'][] = $row['id_question'];
 		}
@@ -707,13 +707,13 @@ class Verification_Controls_Questions implements Verification_Controls
 
 			foreach ($_POST['question'] as $id => $question)
 			{
-				$question = trim(Util::htmlspecialchars($question, ENT_COMPAT));
+				$question = trim($GLOBALS['elk']['text']->htmlspecialchars($question, ENT_COMPAT));
 				$answers = array();
 				$question_lang = isset($_POST['language'][$id]) && isset($languages[$_POST['language'][$id]]) ? $_POST['language'][$id] : $language;
 				if (!empty($_POST['answer'][$id]))
 					foreach ($_POST['answer'][$id] as $answer)
 					{
-						$answer = trim(Util::strtolower(Util::htmlspecialchars($answer, ENT_COMPAT)));
+						$answer = trim($GLOBALS['elk']['text']->strtolower($GLOBALS['elk']['text']->htmlspecialchars($answer, ENT_COMPAT)));
 						if ($answer != '')
 							$answers[] = $answer;
 					}
@@ -778,9 +778,9 @@ class Verification_Controls_Questions implements Verification_Controls
 			// Everything lowercase
 			$answers = array();
 			foreach ($row['answer'] as $answer)
-				$answers[] = Util::strtolower($answer);
+				$answers[] = $GLOBALS['elk']['text']->strtolower($answer);
 
-			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(Util::htmlspecialchars(Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim($GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
 				$this->_incorrectQuestions[] = $row['id_question'];
 		}
 

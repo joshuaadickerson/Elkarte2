@@ -1274,7 +1274,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
 		),
 		array(
-			$id_group, '', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
+			$id_group, '', $GLOBALS['elk']['text']->htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
 		),
 		array('id_group')
@@ -1444,7 +1444,7 @@ function updateMembergroupProperties($properties)
 			switch ($known_properties[$name]['type'])
 			{
 				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
+					$values['subs_' . $name] = $GLOBALS['elk']['text']->htmlspecialchars((string) $value);
 					break;
 				default:
 					$values['subs_' . $name] = (int) $value;

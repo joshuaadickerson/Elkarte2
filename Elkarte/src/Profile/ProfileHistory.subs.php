@@ -291,7 +291,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 	while ($row = $request->fetchAssoc())
 	{
 		$extra = @unserialize($row['extra']);

@@ -11,10 +11,7 @@
  *
  */
 
-namespace ElkArte;
-
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte;
 
 class ValuesContainer implements \ArrayAccess
 {

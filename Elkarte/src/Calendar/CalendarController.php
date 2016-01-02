@@ -368,7 +368,7 @@ class CalendarController extends AbstractController
 		header('Connection: close');
 		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
-			header('Content-Length: ' . Util::strlen($filecontents));
+			header('Content-Length: ' . $GLOBALS['elk']['text']->strlen($filecontents));
 
 		// This is a calendar item!
 		header('Content-Type: text/calendar');

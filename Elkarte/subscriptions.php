@@ -266,7 +266,7 @@ function generateSubscriptionError($text)
 	if (!empty($_POST))
 	{
 		foreach ($_POST as $key => $val)
-			$text .= '<br />' . Util::htmlspecialchars($key) . ': ' . Util::htmlspecialchars($val);
+			$text .= '<br />' . $GLOBALS['elk']['text']->htmlspecialchars($key) . ': ' . $GLOBALS['elk']['text']->htmlspecialchars($val);
 	}
 
 	// Then just log and die.

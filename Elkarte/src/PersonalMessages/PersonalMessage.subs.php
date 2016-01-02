@@ -536,11 +536,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$user_info['name'] = $from['name'];
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+	$htmlmessage = $GLOBALS['elk']['text']->htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if (Util::strlen($htmlsubject) > 100)
-		$htmlsubject = Util::substr($htmlsubject, 0, 100);
+	$htmlsubject = strtr($GLOBALS['elk']['text']->htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if ($GLOBALS['elk']['text']->strlen($htmlsubject) > 100)
+		$htmlsubject = $GLOBALS['elk']['text']->substr($htmlsubject, 0, 100);
 
 	// Make sure is an array
 	if (!is_array($recipients))
@@ -557,7 +557,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = $GLOBALS['elk']['text']->strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -575,8 +575,8 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			)
 		);
 		while ($row = $request->fetchAssoc())
-			if (isset($usernames[Util::strtolower($row['member_name'])]))
-				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
+			if (isset($usernames[$GLOBALS['elk']['text']->strtolower($row['member_name'])]))
+				$usernames[$GLOBALS['elk']['text']->strtolower($row['member_name'])] = $row['id_member'];
 		$request->free();
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.

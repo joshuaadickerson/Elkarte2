@@ -550,7 +550,7 @@ function dbMostLikedMessage($limit = 10)
 	);
 
 	$mostLikedMessages = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	while ($row = $request->fetchAssoc())
 	{
@@ -561,8 +561,8 @@ function dbMostLikedMessage($limit = 10)
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Something short and sweet
-		$msgString = Util::shorten_html($row['body'], 255);
-		$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+		$msgString = $GLOBALS['elk']['text']->shorten_html($row['body'], 255);
+		$preview = $GLOBALS['elk']['text']->htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 		// Love those avatars
 		$avatar = determineAvatar($row);
@@ -618,7 +618,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	global $scripturl;
 
 	$db = $GLOBALS['elk']['db'];
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
@@ -655,8 +655,8 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = $GLOBALS['elk']['text']->shorten_html($row['body'], 255);
+			$preview = $GLOBALS['elk']['text']->htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			$avatar = determineAvatar($row);
 
@@ -891,7 +891,7 @@ function dbMostLikesReceivedUser($limit = 10)
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
 	$db = $GLOBALS['elk']['db'];
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	// Lets fetch highest liked posts by this user
 	return $db->fetchQueryCallback('
@@ -919,8 +919,8 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = $GLOBALS['elk']['text']->shorten_html($row['body'], 255);
+			$preview = $GLOBALS['elk']['text']->htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
 				'id_topic' => $row['id_topic'],
@@ -1010,7 +1010,7 @@ function dbMostLikesGivenUser($limit = 10)
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
 	$db = $GLOBALS['elk']['db'];
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	// Lets fetch the latest liked posts by this user
 	return $db->fetchQueryCallback('
@@ -1036,8 +1036,8 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's required
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = $GLOBALS['elk']['text']->shorten_html($row['body'], 255);
+			$preview = $GLOBALS['elk']['text']->htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
 				'id_msg' => $row['id_msg'],

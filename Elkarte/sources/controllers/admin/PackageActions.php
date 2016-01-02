@@ -264,7 +264,7 @@ class PackageActions extends AbstractController
 		// Fancy or plain
 		if (!empty($this->_action['parse_bbc']))
 		{
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = $GLOBALS['elk']['bbc'];
 
 			require_once(SUBSDIR . '/Post.subs.php');
 			preparsecode($context[$type]);
@@ -322,7 +322,7 @@ class PackageActions extends AbstractController
 			$this->has_failure = true;
 			$this->ourActions[] = array(
 				'type' => $txt['execute_modification'],
-				'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.'))),
+				'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.'))),
 				'description' => $txt['package_action_error'],
 				'failed' => true,
 			);
@@ -350,7 +350,7 @@ class PackageActions extends AbstractController
 				{
 					$summary = array(
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'position' => $mod_action['position'],
 						'operation_key' => $operation_key,
@@ -424,7 +424,7 @@ class PackageActions extends AbstractController
 
 					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
 					);
@@ -433,7 +433,7 @@ class PackageActions extends AbstractController
 				{
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
 					);
@@ -447,7 +447,7 @@ class PackageActions extends AbstractController
 			case 'skipping':
 				$this->ourActions[$this->_actual_filename] = array(
 					'type' => $txt['execute_modification'],
-					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 					'description' => $txt['package_action_skipping']
 				);
 				break;
@@ -457,7 +457,7 @@ class PackageActions extends AbstractController
 					$this->has_failure = true;
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $txt['package_action_missing'],
 						'failed' => true,
 					);
@@ -466,7 +466,7 @@ class PackageActions extends AbstractController
 			case 'error':
 				$this->ourActions[$this->_actual_filename] = array(
 					'type' => $txt['execute_modification'],
-					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 					'description' => $txt['package_action_error'],
 					'failed' => true,
 				);
@@ -486,7 +486,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_code'],
-			'action' => Util::htmlspecialchars($this->_action['filename']),
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars($this->_action['filename']),
 		);
 	}
 
@@ -502,7 +502,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_database_changes'],
-			'action' => Util::htmlspecialchars($this->_action['filename']),
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars($this->_action['filename']),
 		);
 	}
 
@@ -516,7 +516,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] === 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 	}
 
@@ -534,7 +534,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $this->_action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-			'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($this->_action['hook'])),
+			'action' => sprintf($txt['execute_hook_action'], $GLOBALS['elk']['text']->htmlspecialchars($this->_action['hook'])),
 		);
 	}
 
@@ -547,7 +547,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_credits_add'],
-			'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($this->_action['title'])),
+			'action' => sprintf($txt['execute_credits_action'], $GLOBALS['elk']['text']->htmlspecialchars($this->_action['title'])),
 		);
 	}
 
@@ -594,7 +594,7 @@ class PackageActions extends AbstractController
 		// Do this one...
 		$this->thisAction = array(
 			'type' => $txt['package_extract'] . ' ' . ($this->_action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 
 		// Could this be theme related?
@@ -613,7 +613,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] === 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 	}
 
@@ -628,7 +628,7 @@ class PackageActions extends AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] === 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
+			'action' => $GLOBALS['elk']['text']->htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
 		);
 
 		// Could this be theme related?

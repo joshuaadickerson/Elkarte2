@@ -59,7 +59,7 @@ function getLastPosts($latestPostOptions)
 	);
 
 	$posts = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 
 	while ($row = $request->fetchAssoc())
 	{
@@ -68,7 +68,7 @@ function getLastPosts($latestPostOptions)
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+		$row['body'] = $GLOBALS['elk']['text']->shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		// Build the array.
 		$posts[] = array(
@@ -86,7 +86,7 @@ function getLastPosts($latestPostOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+			'short_subject' => $GLOBALS['elk']['text']->shorten_text($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -136,7 +136,7 @@ function prepareRecentPosts($messages, $start)
 	$counter = $start + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = $GLOBALS['elk']['bbc'];
 	foreach ($messages as $row)
 	{
 		// Censor everything.

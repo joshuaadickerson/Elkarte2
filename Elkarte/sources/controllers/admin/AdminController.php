@@ -776,7 +776,7 @@ class Admin_Controller extends AbstractController
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = $this->_req->getPost('search_term', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
+		$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 

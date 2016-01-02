@@ -193,7 +193,7 @@ class Session
 			{
 				$error = 'verify_url_fail';
 				$log_error = true;
-				$sprintf = array(Util::htmlspecialchars($referrer_url));
+				$sprintf = array($GLOBALS['elk']['text']->htmlspecialchars($referrer_url));
 			}
 		}
 
@@ -202,7 +202,7 @@ class Session
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
-			$sprintf = array(Util::htmlspecialchars($referrer_url));
+			$sprintf = array($GLOBALS['elk']['text']->htmlspecialchars($referrer_url));
 		}
 
 		// Everything is ok, return an empty string.

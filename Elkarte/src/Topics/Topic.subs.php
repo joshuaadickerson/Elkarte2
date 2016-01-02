@@ -1610,7 +1610,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 	);
 
 	$messages = array();
-	$parser = \BBC\ParserWrapper::getInstance();
+	$parser = $GLOBALS['elk']['bbc'];
 
 	for ($counter = 0; $row = $request->fetchAssoc(); $counter++)
 	{
@@ -1664,7 +1664,7 @@ function topicMessages($topic, $render = 'print')
 	);
 
 	$posts = array();
-	$parser = \BBC\ParserWrapper::getInstance();
+	$parser = $GLOBALS['elk']['bbc'];
 
 	if ($render === 'print')
 	{
@@ -2334,7 +2334,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['split'] . ': ' . strtr(Util::htmltrim(Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['split'] . ': ' . strtr($GLOBALS['elk']['text']->htmltrim($GLOBALS['elk']['text']->htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -2519,11 +2519,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		$GLOBALS['elk']['errors']->fatal_lang_error('cant_insert_topic');
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr($GLOBALS['elk']['text']->htmltrim($GLOBALS['elk']['text']->htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Check the subject length.
-	if (Util::strlen($new_subject) > 100)
-		$new_subject = Util::substr($new_subject, 0, 100);
+	if ($GLOBALS['elk']['text']->strlen($new_subject) > 100)
+		$new_subject = $GLOBALS['elk']['text']->substr($new_subject, 0, 100);
 
 	// Valid subject?
 	if ($new_subject != '')

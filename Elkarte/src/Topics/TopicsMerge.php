@@ -226,11 +226,11 @@ class TopicsMerge
 		// Determine the subject of the newly merged topic - was a custom subject specified?
 		if (empty($details['subject']) && $details['custom_subject'] != '')
 		{
-			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($details['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$target_subject = strtr($GLOBALS['elk']['text']->htmltrim($GLOBALS['elk']['text']->htmlspecialchars($details['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if (Util::strlen($target_subject) > 100)
-				$target_subject = Util::substr($target_subject, 0, 100);
+			if ($GLOBALS['elk']['text']->strlen($target_subject) > 100)
+				$target_subject = $GLOBALS['elk']['text']->substr($target_subject, 0, 100);
 
 			// Nothing left - odd but pick the first topics subject.
 			if ($target_subject == '')
@@ -336,7 +336,7 @@ class TopicsMerge
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($this->_topics);
 
-		$enforce_subject = Util::htmlspecialchars(trim($details['enforce_subject']));
+		$enforce_subject = $GLOBALS['elk']['text']->htmlspecialchars(trim($details['enforce_subject']));
 
 		// Merge topic notifications.
 		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : array();

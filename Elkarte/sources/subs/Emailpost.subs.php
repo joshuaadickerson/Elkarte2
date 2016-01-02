@@ -935,7 +935,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$GLOBALS['elk']['hooks']->hook('mailist_pre_parsebbc', array(&$message));
 
 	// Convert the remaining bbc to html
-	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+	$bbc_wrapper = $GLOBALS['elk']['bbc'];
 	$message = $bbc_wrapper->parseMessage($message, false);
 
 	// Change list style to something standard to make text conversion easier
@@ -1236,7 +1236,7 @@ function query_sender_wrapper($from)
 	// Clean up the signature line
 	if (!empty($result['signature']))
 	{
-		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+		$bbc_wrapper = $GLOBALS['elk']['bbc'];
 		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr($bbc_wrapper->parseSignature($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 

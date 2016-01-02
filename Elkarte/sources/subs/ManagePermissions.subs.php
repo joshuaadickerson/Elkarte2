@@ -1208,7 +1208,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 {
 	$db = $GLOBALS['elk']['db'];
 
-	$profile_name = Util::htmlspecialchars($profile_name);
+	$profile_name = $GLOBALS['elk']['text']->htmlspecialchars($profile_name);
 	// Insert the profile itself.
 	$db->insert('',
 		'{db_prefix}permission_profiles',
@@ -1258,7 +1258,7 @@ function renamePermissionProfile($id_profile, $name)
 {
 	$db = $GLOBALS['elk']['db'];
 
-	$name = Util::htmlspecialchars($name);
+	$name = $GLOBALS['elk']['text']->htmlspecialchars($name);
 
 	$db->query('', '
 		UPDATE {db_prefix}permission_profiles

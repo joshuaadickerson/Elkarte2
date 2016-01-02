@@ -424,7 +424,7 @@ class Html_2_Md
 			$markdown = '[' . $value . '](' . $href . ')';
 
 		// Some links can be very long and if we wrap them they break
-		$line_strlen = Util::strlen($markdown);
+		$line_strlen = $GLOBALS['elk']['text']->strlen($markdown);
 		if ($line_strlen > $this->body_width)
 			$this->body_width = $line_strlen;
 
@@ -553,7 +553,7 @@ class Html_2_Md
 
 		if ($level < 3)
 		{
-			$length = Util::strlen($content);
+			$length = $GLOBALS['elk']['text']->strlen($content);
 			$underline = ($level === 1) ? '=' : '-';
 			$markdown = $content . $this->line_end . str_repeat($underline, $length) . $this->line_break;
 		}
@@ -650,7 +650,7 @@ class Html_2_Md
 				$align_value = ($th !== null) ? strtolower($th->getAttribute('align')) : false;
 				$align[0][$col] = $align_value === false ? 'left' : $align_value;
 				$value[0][$col] = $this->_get_value($th);
-				$width[0][$col] = Util::strlen($this->_get_value($th));
+				$width[0][$col] = $GLOBALS['elk']['text']->strlen($this->_get_value($th));
 
 				// Seed the max col width
 				$max[$col] = $width[0][$col];
@@ -672,7 +672,7 @@ class Html_2_Md
 					$align_value = ($td !== null) ? strtolower($td->getAttribute('align')) : false;
 					$align[$row][$col] = $align_value === false ? 'left' : $align_value;
 					$value[$row][$col] = $this->_get_value($td);
-					$width[$row][$col] = Util::strlen($this->_get_value($td));
+					$width[$row][$col] = $GLOBALS['elk']['text']->strlen($this->_get_value($td));
 
 					// Keep track of the longest col cell as we go
 					if ($width[$row][$col] > $max[$col])
@@ -961,13 +961,13 @@ class Html_2_Md
 				{
 					// Add the #width to the output and set up for the next pass
 					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . $matches[1];
-					$string = Util::substr($string, Util::strlen($matches[1]));
+					$string = $GLOBALS['elk']['text']->substr($string, $GLOBALS['elk']['text']->strlen($matches[1]));
 				}
 				// Humm just a long word with no place to break so we simply cut it after width characters
 				else
 				{
-					$lines[] = ($in_quote && $string[0] !== '>' ? '> ' : '') . Util::substr($string, 0, $width);
-					$string = Util::substr($string, $width);
+					$lines[] = ($in_quote && $string[0] !== '>' ? '> ' : '') . $GLOBALS['elk']['text']->substr($string, 0, $width);
+					$string = $GLOBALS['elk']['text']->substr($string, $width);
 				}
 			}
 		}

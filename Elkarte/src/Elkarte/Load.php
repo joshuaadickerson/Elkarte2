@@ -992,7 +992,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		return false;
 	}
 
-	$parsers = \BBC\ParserWrapper::getInstance();
+	$parsers = $GLOBALS['elk']['bbc'];
 
 	// Well, it's loaded now anyhow.
 	$dataLoaded[$user] = true;
@@ -1069,14 +1069,14 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
+				'text' => $GLOBALS['elk']['text']->htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $GLOBALS['elk']['text']->htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => $GLOBALS['elk']['text']->ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1419,7 +1419,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : $GLOBALS['elk']['text']->htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -2214,7 +2214,7 @@ function getLanguages($use_cache = true)
 						continue;
 
 					$languages[$matches[1]] = array(
-						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
+						'name' => $GLOBALS['elk']['text']->ucwords(strtr($matches[1], array('_' => ' '))),
 						'selected' => false,
 						'filename' => $matches[1],
 						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
@@ -2479,13 +2479,13 @@ function doSecurityChecks()
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . $GLOBALS['elk']['text']->htmlspecialchars($error) . '</pre>';
 		}
 		else
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], $GLOBALS['elk']['text']->htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
@@ -2528,7 +2528,7 @@ function loadBBCParsers()
 	// Set the default disabled BBC
 	if (!empty($modSettings['disabledBBC']))
 	{
-		\BBC\ParserWrapper::getInstance()->setDisabled($modSettings['disabledBBC']);
+		$GLOBALS['elk']['bbc']->setDisabled($modSettings['disabledBBC']);
 	}
 }
 

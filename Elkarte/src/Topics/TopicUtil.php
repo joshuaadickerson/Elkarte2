@@ -19,8 +19,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Topics;
 
 /**
  * Class Topic_Util
@@ -28,7 +27,7 @@ if (!defined('ELK'))
  * Methods for dealing with topics presentation.
  * Converts queries results into data usable in the templates.
  */
-class Topic_Util
+class TopicUtil
 {
 	/**
 	 * This function takes an array of data coming from the database and related
@@ -40,7 +39,7 @@ class Topic_Util
 	 * @param int|null $preview_length - length of the preview
 	 * @return mixed[] - array of data related to topics
 	 */
-	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
+	public function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
 		global $modSettings, $options, $scripturl, $txt, $user_info;
 
@@ -54,7 +53,7 @@ class Topic_Util
 
 		$icon_sources = new MessageTopicIcons();
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = $GLOBALS['elk']['bbc'];
 
 		foreach ($topics_info as $row)
 		{
@@ -63,7 +62,7 @@ class Topic_Util
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
 				$row['first_body'] = strtr($parser->parseMessage($row['first_body'], $row['first_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
-				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length));
+				$row['first_body'] = $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->shorten_html($row['first_body'], $preview_length));
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
@@ -71,7 +70,7 @@ class Topic_Util
 				else
 				{
 					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
-					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length));
+					$row['last_body'] = $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->shorten_html($row['last_body'], $preview_length));
 				}
 
 				// Censor the subject and message preview.

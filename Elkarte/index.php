@@ -86,6 +86,7 @@ if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir
 
 // Time to forget about variables and go with constants!
 DEFINE('ROOTDIR', __DIR__ . '/src');
+DEFINE('ELKDIR', ROOTDIR . '/Elkarte');
 DEFINE('BOARDDIR', $boarddir);
 DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);

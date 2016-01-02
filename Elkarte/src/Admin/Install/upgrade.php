@@ -729,7 +729,7 @@ function checkLogin()
 				if ($valid_password === false && !empty($_POST['passwrd']))
 				{
 					// SHA-1 from SMF?
-					$sha_passwd = sha1(Util::strtolower($_POST['user']) . $_POST['passwrd']);
+					$sha_passwd = sha1($GLOBALS['elk']['text']->strtolower($_POST['user']) . $_POST['passwrd']);
 					$valid_password = $sha_passwd === $password;
 
 					// Lets upgrade this to our new password
@@ -1758,7 +1758,7 @@ function loadEssentialFunctions()
 			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
-			$words = un_htmlspecialchars(Util::strtolower($words));
+			$words = un_htmlspecialchars($GLOBALS['elk']['text']->strtolower($words));
 
 			// Step 3: Ready to split apart and index!
 			$words = explode(' ', $words);

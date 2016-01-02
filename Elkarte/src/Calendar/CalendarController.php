@@ -169,7 +169,7 @@ class CalendarController extends AbstractController
 		);
 
 		// Allow mods to add additional buttons here
-		Hooks::get()->hook('calendar_buttons');
+		$GLOBALS['elk']['hooks']->hook('calendar_buttons');
 	}
 
 	/**

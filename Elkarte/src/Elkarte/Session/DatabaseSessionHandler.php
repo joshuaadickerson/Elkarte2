@@ -1,8 +1,8 @@
 <?php
 
-namespace Elkarte\Session;
+namespace Elkarte\Elkarte\Session;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 
 /**
  * Class DatabaseSessionHandler
@@ -53,18 +53,18 @@ class DatabaseSessionHandler extends \SessionHandler
 
 		// Look for it in the database.
 		$result = $this->db->query('', '
-		SELECT data
-		FROM {db_prefix}sessions
-		WHERE session_id = {string:session_id}
-		LIMIT 1',
+			SELECT data
+			FROM {db_prefix}sessions
+			WHERE session_id = {string:session_id}
+			LIMIT 1',
 			array(
 				'session_id' => $session_id,
 			)
 		);
-		list ($sess_data) = $this->db->fetch_row($result);
-		$this->db->free_result($result);
+		list ($sess_data) = $result->fetchRow();
+		$result->free();
 
-		return $sess_data;
+		return empty($sess_data) ? '' : $sess_data;
 	}
 
 	/**
@@ -76,31 +76,32 @@ class DatabaseSessionHandler extends \SessionHandler
 			return false;
 
 		// First try to update an existing row...
-		$this->db->query('', '
-		UPDATE {db_prefix}sessions
-		SET data = {string:data}, last_update = {int:last_update}
-		WHERE session_id = {string:session_id}',
+		$result = $this->db->query('', '
+			UPDATE {db_prefix}sessions
+			SET data = {string:data}, last_update = {int:last_update}
+			WHERE session_id = {string:session_id}',
 			array(
 				'last_update' => time(),
 				'data' => $session_data,
 				'session_id' => $session_id,
 			)
 		);
-		$result = $this->db->affected_rows();
+		$num_rows = $result->numAffectedRows();
 
 		// If that didn't work, try inserting a new one.
-		if (empty($result))
+		if (empty($num_rows))
 		{
-			$this->db->insert('ignore',
+			$result = $this->db->insert('ignore',
 				'{db_prefix}sessions',
 				array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 				array($session_id, $session_data, time()),
 				array('session_id')
 			);
-			$result = $this->db->affected_rows();
+
+			$num_rows = $result->numAffectedRows();
 		}
 
-		return !empty($result);
+		return !empty($num_rows);
 	}
 
 	/**
@@ -112,13 +113,15 @@ class DatabaseSessionHandler extends \SessionHandler
 			return false;
 
 		// Just delete the row...
-		return $this->db->delete('', '
+		$result = $this->db->delete('', '
 		FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 			array(
 				'session_id' => $session_id,
 			)
 		);
+
+		return $result->numAffectedRows() != 0;
 	}
 
 	/**
@@ -130,15 +133,17 @@ class DatabaseSessionHandler extends \SessionHandler
 
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 		if (!empty($modSettings['databaseSession_lifetime']) && ($maxlifetime <= 1440 || $modSettings['databaseSession_lifetime'] > $maxlifetime))
-			$max_lifetime = max($modSettings['databaseSession_lifetime'], 60);
+			$maxlifetime = max($modSettings['databaseSession_lifetime'], 60);
 
 		// Clean up after yerself ;).
-		return $this->db->delete('', '
+		$result = $this->db->delete('', '
 		FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 			array(
 				'last_update' => time() - $maxlifetime,
 			)
 		);
+
+		return $result->numAffectedRows() != 0;
 	}
 }

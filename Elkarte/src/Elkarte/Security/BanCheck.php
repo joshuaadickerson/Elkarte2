@@ -2,7 +2,11 @@
 
 namespace Elkarte\Elkarte\Security;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Http\HttpReq;
+use Elkarte\Elkarte\Errors\Errors;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\View\TemplateLayers;
 
 class BanCheck
 {
@@ -24,7 +28,7 @@ class BanCheck
 		$this->hooks = $hooks;
 
 		// @todo I really don't think this class should be adding/removing layers. Let the theme do that
-		$this->layers = TemplateLayers::getInstance();
+		$this->layers = $GLOBALS['elk']['layers'];
 	}
 
 	/**
@@ -379,7 +383,7 @@ class BanCheck
 				'now' => time(),
 			)
 		);
-		while ($row = $this->db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if (!empty($row[self::CANNOT_ACCESS]))
 			{

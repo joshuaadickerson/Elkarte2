@@ -142,7 +142,7 @@ class Filebased extends AbstractCacheMethod
 	public static function title()
 	{
 		if (self::available())
-			\Hooks::get()->add('integrate_modify_cache_settings', 'Filebased_Cache::settings', '', false);
+			$GLOBALS['elk']['hooks']->add('integrate_modify_cache_settings', 'Filebased_Cache::settings', '', false);
 
 		return 'File-based caching';
 	}

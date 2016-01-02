@@ -20,7 +20,7 @@
  */
 function template_Post_init()
 {
-	\Templates::getInstance()->load('GenericHelpers');
+	$GLOBALS['elk']['templates']->load('GenericHelpers');
 }
 
 /**

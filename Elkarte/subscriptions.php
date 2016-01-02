@@ -102,11 +102,11 @@ $request = $db->query('', '
 );
 
 // Didn't find it?
-if ($db->num_rows($request) === 0)
+if ($request->numRows() === 0)
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription'], $member_id, $subscription_id));
 
-$subscription_info = $db->fetch_assoc($request);
-$db->free_result($request);
+$subscription_info = $request->fetchAssoc();
+$request->free();
 
 // We wish to check the pending payments to make sure we are expecting this.
 $request = $db->query('', '
@@ -120,10 +120,10 @@ $request = $db->query('', '
 		'current_member' => $member_id,
 	)
 );
-if ($db->num_rows($request) == 0)
+if ($request->numRows() == 0)
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id));
-$subscription_info += $db->fetch_assoc($request);
-$db->free_result($request);
+$subscription_info += $request->fetchAssoc();
+$request->free();
 
 // Is this a refund?
 if ($gatewayClass->isRefund())

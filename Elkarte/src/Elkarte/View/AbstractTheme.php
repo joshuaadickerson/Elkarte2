@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-    die('No access...');
+namespace ElkArte\ElkArte\View;
 
 abstract class AbstractTheme
 {
@@ -48,8 +47,8 @@ abstract class AbstractTheme
      */
     public function __construct($id)
     {
-        $this->layers = \TemplateLayers::getInstance();
-        $this->templates = \Templates::getInstance();
+        $this->layers = $GLOBALS['elk']['layers'];
+        $this->templates = $GLOBALS['elk']['templates'];
 
         $this->css_files = &$GLOBALS['context']['css_files'];
         $this->js_files = &$GLOBALS['context']['js_files'];
@@ -78,7 +77,8 @@ abstract class AbstractTheme
     /**
      * @param int|self::ALL $type One of ALL, SELF, DEFERRED class constants
      * @return array
-     * @throws Exception if the type is not known
+     * @throws \Exception if the type is not known
+	 * @return string[]
      */
     public function getInlineJavascript($type = self::ALL)
     {
@@ -112,6 +112,10 @@ abstract class AbstractTheme
             $this->js_inline[(!empty($defer) ? self::DEFERRED : self::STANDARD)][] = $javascript;
     }
 
+	/**
+	 * @param bool $toggle
+	 * @return $this
+	 */
     public function setRTL($toggle)
     {
         $this->rtl = (bool) $toggle;

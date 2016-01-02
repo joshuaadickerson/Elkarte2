@@ -17,7 +17,7 @@
 
 function template_MergeTopics_init()
 {
-	\Templates::getInstance()->load('GenericHelpers');
+	$GLOBALS['elk']['templates']->load('GenericHelpers');
 }
 
 /**

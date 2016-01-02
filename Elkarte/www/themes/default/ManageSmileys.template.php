@@ -20,7 +20,7 @@
  */
 function template_ManageSmileys_init()
 {
-	\Templates::getInstance()->load('GenericHelpers');
+	$GLOBALS['elk']['templates']->load('GenericHelpers');
 }
 
 /**

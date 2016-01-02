@@ -45,14 +45,14 @@ function protected_alter($change, $substep, $is_test = false)
 		{
 			$cur_index = array();
 
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 				if ($row['Key_name'] === $change['name'])
 					$cur_index[(int) $row['Seq_in_index']] = $row['Column_name'];
 
 			ksort($cur_index, SORT_NUMERIC);
 			$found = array_values($cur_index) === $change['target_columns'];
 
-			$db->free_result($request);
+			$request->free();
 		}
 	}
 
@@ -73,7 +73,7 @@ function protected_alter($change, $substep, $is_test = false)
 	{
 		$request = upgrade_query('
 			SHOW FULL PROCESSLIST');
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if (strpos($row['Info'], 'ALTER TABLE ' . $db_prefix . $change['table']) !== false && strpos($row['Info'], $change['text']) !== false)
 				$found = true;
@@ -82,7 +82,7 @@ function protected_alter($change, $substep, $is_test = false)
 		// Can't find it? Then we need to run it fools!
 		if (!$found && !$running)
 		{
-			$db->free_result($request);
+			$request->free();
 
 			$success = upgrade_query('
 				ALTER TABLE ' . $db_prefix . $change['table'] . '
@@ -97,7 +97,7 @@ function protected_alter($change, $substep, $is_test = false)
 		// What if we've not found it, but we'd ran it already? Must of completed.
 		elseif (!$found)
 		{
-			$db->free_result($request);
+			$request->free();
 			return true;
 		}
 
@@ -138,7 +138,7 @@ function upgrade_query($string, $unbuffered = false)
 		return $result;
 
 	// Grab the error message and see if its failure worthy
-	$db_error_message = $db->last_error($db_connection);
+	$db_error_message = $db->lastError($db_connection);
 
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')

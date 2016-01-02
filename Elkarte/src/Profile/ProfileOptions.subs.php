@@ -55,7 +55,7 @@ function getBuddiesID($buddies, $adding = true)
 
 	// Add the new member(s) to the buddies array.
 	$buddiesArray = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$buddiesArray[] = (int) $row['id_member'];
 
@@ -70,7 +70,7 @@ function getBuddiesID($buddies, $adding = true)
 			));
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $buddiesArray;
 }
@@ -110,7 +110,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 		'member' => array(),
 		'available' => array()
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Can they edit their primary group?
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1)
@@ -134,7 +134,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 			'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -162,8 +162,8 @@ function checkMembergroupChange($group_id)
 			'not_denied' => 1,
 		)
 	);
-	list ($disallow) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($disallow) = $request->fetchRow();
+	$request->free();
 
 	return $disallow;
 }
@@ -188,8 +188,8 @@ function logMembergroupRequest($group_id, $memID)
 			'selected_group' => $group_id,
 		)
 	);
-	$num = $db->num_rows($request);
-	$db->free_result($request);
+	$num = $request->numRows();
+	$request->free();
 
 	// Log the request.
 	if ($num == 0)

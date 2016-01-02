@@ -281,7 +281,7 @@ function parse_sqlLines($sql_file, $replaces)
 
 		if ($result === false)
 		{
-			$incontext['failures'][$table_method] = $db->last_error();
+			$incontext['failures'][$table_method] = $db->lastError();
 		}
 	}
 
@@ -302,7 +302,7 @@ function parse_sqlLines($sql_file, $replaces)
 
 		if ($result === false)
 		{
-			$incontext['failures'][] = $db->last_error();
+			$incontext['failures'][] = $db->lastError();
 		}
 		else
 			$incontext['sql_results']['inserts'] += $result;

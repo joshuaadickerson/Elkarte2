@@ -544,7 +544,7 @@ class Install_Controller
             // No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
             if ($db_connection == null)
             {
-                $db_error = $db->last_error();
+                $db_error = $db->lastError();
 
                 $db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
                 if ($db_connection != null)
@@ -582,7 +582,7 @@ class Install_Controller
                 );
 
                 // Okay, let's try the prefix if it didn't work...
-                if (!$db->select_db($db_name, $db_connection) && $db_name != '')
+                if (!$db->changeSchema($db_name, $db_connection) && $db_name != '')
                 {
                     $db->query('', "
 						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
@@ -593,7 +593,7 @@ class Install_Controller
                         $db_connection
                     );
 
-                    if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
+                    if ($db->changeSchema($_POST['db_prefix'] . $db_name, $db_connection))
                     {
                         $db_name = $_POST['db_prefix'] . $db_name;
                         updateSettingsFile(array('db_name' => $db_name));
@@ -601,7 +601,7 @@ class Install_Controller
                 }
 
                 // Okay, now let's try to connect...
-                if (!$db->select_db($db_name, $db_connection))
+                if (!$db->changeSchema($db_name, $db_connection))
                 {
                     $incontext['error'] = sprintf($txt['error_db_database'], $db_name);
                     return false;
@@ -729,9 +729,9 @@ class Install_Controller
         $modSettings = array();
         if ($result !== false)
         {
-            while ($row = $db->fetch_assoc($result))
+            while ($row = $result->fetchAssoc())
                 $modSettings[$row['variable']] = $row['value'];
-            $db->free_result($result);
+            $result->free();
 
             // Do they match?  If so, this is just a refresh so charge on!
             if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
@@ -860,7 +860,7 @@ class Install_Controller
         {
             if ($db_table->optimize($table) == -1)
             {
-                $incontext['failures'][-1] = $db->last_error();
+                $incontext['failures'][-1] = $db->lastError();
                 break;
             }
         }
@@ -926,9 +926,9 @@ class Install_Controller
             )
         );
         // Skip the step if an Admin already exists
-        if ($db->num_rows($request) != 0)
+        if ($request->numRows() != 0)
             return true;
-        $db->free_result($request);
+        $request->free();
 
         // Trying to create an account?
         if (isset($_POST['password1']) && !empty($_POST['contbutt']))
@@ -983,7 +983,7 @@ class Install_Controller
             if ($db->num_rows($result) != 0)
             {
                 list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
-                $db->free_result($result);
+                $result->free();
 
                 $incontext['account_existed'] = $txt['error_user_settings_taken'];
             }
@@ -1046,7 +1046,7 @@ class Install_Controller
                 if ($request === false)
                 {
                     $incontext['error'] = $txt['error_user_settings_query'] . '<br />
-					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
+					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->lastError($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
                     return false;
                 }
 
@@ -1129,9 +1129,9 @@ class Install_Controller
         // Only proceed if we can load the data.
         if ($request)
         {
-            while ($row = $db->fetch_row($request))
+            while ($row = $request->fetchRow())
                 $modSettings[$row[0]] = $row[1];
-            $db->free_result($request);
+            $request->free();
         }
 
         // Automatically log them in ;)
@@ -1149,7 +1149,7 @@ class Install_Controller
         );
         if ($db->num_rows($result) != 0)
             list ($db_sessions) = $db->fetch_row($result);
-        $db->free_result($result);
+        $result->free();
 
         if (empty($db_sessions))
             $_SESSION['admin_time'] = time();
@@ -1186,9 +1186,9 @@ class Install_Controller
                 'db_error_skip' => true,
             )
         );
-        if ($db->num_rows($request) > 0)
+        if ($request->numRows() > 0)
             updateSubjectStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
-        $db->free_result($request);
+        $request->free();
 
         // Sanity check that they loaded earlier!
         if (isset($modSettings['recycle_board']))

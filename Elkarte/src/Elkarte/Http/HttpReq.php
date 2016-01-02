@@ -12,7 +12,9 @@
  *
  */
 
-namespace Elkarte\Elkarate\Http;
+namespace Elkarte\Elkarte\Http;
+
+use Elkarte\Elkarte\DataValidator;
 
 /**
  * Class used to interact with super globals, POST, GET, SERVER, COOKIES, SESSION
@@ -63,12 +65,6 @@ class HttpReq
 	public $server;
 
 	/**
-	 * Sole private HttpReq instance
-	 * @var HttpReq
-	 */
-	private static $_req = null;
-
-	/**
 	 * Used to hold processed (sanitised) values
 	 * @var array
 	 */
@@ -91,9 +87,9 @@ class HttpReq
 		$this->_dataValidator = $dataValidator === null ? new DataValidator : $dataValidator;
 
 		// Make the superglobals available as R/W properties
-		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
-		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
-		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
+		$this->cookie = new \ArrayObject($_COOKIE, \ArrayObject::ARRAY_AS_PROPS);
+		$this->session = new \ArrayObject($_SESSION, \ArrayObject::ARRAY_AS_PROPS);
+		$this->server = new \ArrayObject($_SERVER, \ArrayObject::ARRAY_AS_PROPS);
 
 		$this->_loadParsed();
 	}
@@ -127,8 +123,8 @@ class HttpReq
 		$this->_loadJson();
 
 		// Make the $_GET $_POST super globals available as R/W properties
-		$this->post = new ArrayObject($this->_derived_post, ArrayObject::ARRAY_AS_PROPS);
-		$this->query = new ArrayObject($derived_get, ArrayObject::ARRAY_AS_PROPS);
+		$this->post = new \ArrayObject($this->_derived_post, \ArrayObject::ARRAY_AS_PROPS);
+		$this->query = new \ArrayObject($derived_get, \ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
@@ -344,18 +340,5 @@ class HttpReq
 
 		// Return the clean value
 		return $this->_dataValidator->validation_data($name);
-	}
-
-	/**
-	 * Retrieve the sole instance of this class.
-	 *
-	 * @return HttpReq
-	 */
-	public static function instance()
-	{
-		if (self::$_req === null)
-			self::$_req = new HttpReq();
-
-		return self::$_req;
 	}
 }

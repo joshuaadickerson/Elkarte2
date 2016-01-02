@@ -104,12 +104,6 @@ require_once(__DIR__ . '/src/Elkarte/Load.php');
 require_once(__DIR__ . '/src/Elkarte/Security/Security.php');
 require_once(__DIR__ . '/src/Elkarte/Cache/Cache.subs.php');
 
-// Initialize the class Autoloader
-//require(SOURCEDIR . '/Autoloader.class.php');
-//$autoloder = Elk_Autoloader::getInstance();
-//$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-//$autoloder->register(SOURCEDIR, '\\ElkArte');
-
 require_once(VENDORDIR . '/autoload.php');
 require_once(__DIR__ . '/src/Elkarte/Services.php');
 

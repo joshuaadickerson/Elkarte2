@@ -59,7 +59,7 @@ $ssi_on_error_method = false;
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
 // Have the ability to easily add functions to SSI.
-Hooks::get()->hook('SSI');
+$GLOBALS['elk']['hooks']->hook('SSI');
 
 // Call a function passed by GET.
 if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function']) && (!empty($modSettings['allow_guestAccess']) || !$user_info['is_guest']))
@@ -298,7 +298,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	$posts = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -338,7 +338,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			'new_from' => $row['new_from'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Just return it.
 	if ($output_method != 'echo' || empty($posts))
@@ -422,9 +422,9 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		)
 	);
 	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$topics[$row['id_topic']] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	// Did we find anything? If not, bail.
 	if (empty($topics))
@@ -454,7 +454,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 	$posts = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br>' => '&#10;')));
 		if (Util::strlen($row['body']) > 128)
@@ -499,7 +499,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="centericon" alt="' . $row['icon'] . '" />',
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Just return it.
 	if ($output_method != 'echo' || empty($posts))
@@ -1060,8 +1060,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			'recycle_enable' => $modSettings['recycle_board'],
 		)
 	);
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row = $request->fetchAssoc();
+	$request->free();
 
 	// This user has voted on all the polls.
 	if ($row == false)
@@ -1079,8 +1079,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			'current_poll' => $row['id_poll'],
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetchRow();
+	$request->free();
 
 	$request = $db->query('', '
 		SELECT id_choice, label, votes
@@ -1091,13 +1091,13 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		)
 	);
 	$options = array();
-	while ($rowChoice = $db->fetch_assoc($request))
+	while ($rowChoice = $request->fetchAssoc())
 	{
 		$rowChoice['label'] = censor($rowChoice['label']);
 
 		$options[$rowChoice['id_choice']] = array($rowChoice['label'], $rowChoice['votes']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Can they view it?
 	$is_expired = !empty($row['expire_time']) && $row['expire_time'] < time();
@@ -1566,15 +1566,15 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'current_board' => $board,
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 	{
 		if ($output_method == 'echo')
 			die($txt['ssi_no_guests']);
 		else
 			return array();
 	}
-	list ($board) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($board) = $request->fetchRow();
+	$request->free();
 
 	// Load the message icons - the usual suspects.
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
@@ -1803,7 +1803,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 
 	// We have something.
 	$attachments = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'));
 
@@ -1848,7 +1848,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 			);
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// So you just want an array?  Here you can have it.
 	if ($output_method == 'array' || empty($attachments))

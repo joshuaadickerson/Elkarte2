@@ -72,7 +72,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		return;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Only a single topic.
 	if (!is_array($topics))
@@ -199,7 +199,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			'topics' => $topics,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
@@ -223,7 +223,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		else
 			$adjustBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Decrease number of posts and topics for each board.
 	setTimeLimit(300);
@@ -304,14 +304,14 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 		$words = array();
 		$messages = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			setTimeLimit(300);
 
 			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
 			$messages[] = $row['id_msg'];
 		}
-		$db->free_result($request);
+		$request->free();
 		$words = array_unique($words);
 
 		if (!empty($words) && !empty($messages))
@@ -419,7 +419,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$cache->remove('topic_board-' . $topic_id);
 
 	// Maybe there's an addon that wants to delete topic related data of its own
-	Hooks::get()->hook('remove_topics', array($topics));
+	$GLOBALS['elk']['hooks']->hook('remove_topics', array($topics));
 
 	// Update the totals...
 	require_once(SUBSDIR . '/Messages.subs.php');
@@ -463,7 +463,7 @@ function moveTopicsPermissions($moveCache)
 	$moveTos = array();
 	$moveCache2 = array();
 	$countPosts = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$to = $moveCache[1][$row['id_topic']];
 
@@ -481,7 +481,7 @@ function moveTopicsPermissions($moveCache)
 		// For reporting...
 		$moveCache2[] = array($row['id_topic'], $row['id_board'], $to);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Do the actual moves...
 	foreach ($moveTos as $to => $topics)
@@ -575,10 +575,10 @@ function moveTopics($topics, $toBoard, $log = false)
 		)
 	);
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		return;
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$fromCacheBoards[$row['id_topic']] = $row['id_board'];
 		if (!isset($fromBoards[$row['id_board']]['num_posts']))
@@ -601,7 +601,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		else
 			$fromBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Move over the mark_read data. (because it may be read and now not by some!)
 	$SaveAServer = max(0, $modSettings['maxMsgID'] - 50000);
@@ -619,7 +619,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		)
 	);
 	$log_topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg'], $row['unwatched']);
 
@@ -630,7 +630,7 @@ function moveTopics($topics, $toBoard, $log = false)
 			$log_topics = array();
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Now that we have all the topics that *should* be marked read, and by which members...
 	if (!empty($log_topics))
@@ -716,9 +716,9 @@ function moveTopics($topics, $toBoard, $log = false)
 			)
 		);
 		$approval_msgs = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$approval_msgs[] = $row['id_msg'];
-		$db->free_result($request);
+		$request->free();
 
 		// Empty the approval queue for these, as we're going to approve them next.
 		if (!empty($approval_msgs))
@@ -753,7 +753,7 @@ function moveTopics($topics, $toBoard, $log = false)
 				'topics' => $topics,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			// If not, update.
 			if ($row['first_msg'] != $topicMaxMin[$row['id_topic']]['min'] || $row['last_msg'] != $topicMaxMin[$row['id_topic']]['max'])
@@ -762,7 +762,7 @@ function moveTopics($topics, $toBoard, $log = false)
 					'id_last_msg' => $row['last_msg'],
 				));
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	$db->query('', '
@@ -805,8 +805,8 @@ function moveTopics($topics, $toBoard, $log = false)
 			'id_board' => $toBoard,
 		)
 	);
-	list ($isSeen) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($isSeen) = $request->fetchRow();
+	$request->free();
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
@@ -814,7 +814,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		markBoardsRead($toBoard);
 	}
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 	// Update the cache?
 	foreach ($topics as $topic_id)
 		$cache->remove('topic_board-' . $topic_id);
@@ -886,8 +886,8 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 				'topic_id' => $id_topic,
 			)
 		);
-		list ($topic_subject, $board_name) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($topic_subject, $board_name) = $request->fetchRow();
+		$request->free();
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
 		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
@@ -997,7 +997,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Find if this topic is marked for notification...
 		if (!empty($row['id_topic']))
@@ -1021,7 +1021,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 			break;
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -1053,8 +1053,8 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 			'id_msg_last_visit' => (int) $id_msg_last_visit,
 		)
 	);
-	list ($unread) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($unread) = $request->fetchRow();
+	$request->free();
 
 	return $unread;
 }
@@ -1082,8 +1082,8 @@ function hasTopicNotification($id_member, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	$hasNotification = $db->num_rows($request) != 0;
-	$db->free_result($request);
+	$hasNotification = $request->numRows() != 0;
+	$request->free();
 
 	return $hasNotification;
 }
@@ -1201,9 +1201,9 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 	);
 
 	// Was there any?
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 	{
-		$db->free_result($request);
+		$request->free();
 
 		// Roll over - if we're going prev, get the last - otherwise the first.
 		$request = $db->query('', '
@@ -1226,8 +1226,8 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		);
 	}
 	// Now you can be sure $topic is the id_topic to view.
-	list ($topic) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($topic) = $request->fetchRow();
+	$request->free();
 
 	return $topic;
 }
@@ -1319,8 +1319,8 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	);
 	$topic_info = array();
 	if ($request !== false)
-		$topic_info = $db->fetch_assoc($request);
-	$db->free_result($request);
+		$topic_info = $request->fetchAssoc();
+	$request->free();
 
 	return $topic_info;
 }
@@ -1364,8 +1364,8 @@ function getTopicInfoByMsg($topic, $msg = null)
 
 	$topic_info = array();
 	if ($request !== false)
-		$topic_info = $db->fetch_assoc($request);
-	$db->free_result($request);
+		$topic_info = $request->fetchAssoc();
+	$request->free();
 
 	return $topic_info;
 }
@@ -1426,9 +1426,9 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
 		$condition_params
 	);
 	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$topics[] = $row['id_topic'];
-	$db->free_result($request);
+	$request->free();
 
 	removeTopics($topics, false, true);
 }
@@ -1452,9 +1452,9 @@ function topicsStartedBy($memberID)
 			)
 		);
 	$topicIDs = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$topicIDs[] = $row['id_topic'];
-	$db->free_result($request);
+	$request->free();
 
 	return $topicIDs;
 }
@@ -1489,9 +1489,9 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
 		)
 	);
 	$messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$messages[] = $row['id_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	return $messages;
 }
@@ -1528,8 +1528,8 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 			'approved' => 1,
 		)
 	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -1565,8 +1565,8 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 			'is_approved' => 1,
 		)
 	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -1612,7 +1612,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 	$messages = array();
 	$parser = \BBC\ParserWrapper::getInstance();
 
-	for ($counter = 0; $row = $db->fetch_assoc($request); $counter++)
+	for ($counter = 0; $row = $request->fetchAssoc(); $counter++)
 	{
 		$row['body'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
@@ -1631,7 +1631,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 			'id_poster' => $row['id_member'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $messages;
 }
@@ -1671,7 +1671,7 @@ function topicMessages($topic, $render = 'print')
 		$parser->getCodes()->setForPrinting();
 	}
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Censor the subject and message.
 		$row['body'] = censor($row['subject']);
@@ -1687,7 +1687,7 @@ function topicMessages($topic, $render = 'print')
 			'id_msg' => $row['id_msg'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $posts;
 }
@@ -1721,13 +1721,13 @@ function messagesAttachments($id_messages)
 	);
 	$temp = array();
 	$printattach = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$temp[$row['id_attach']] = $row;
 		if (!isset($printattach[$row['id_msg']]))
 			$printattach[$row['id_msg']] = array();
 	}
-	$db->free_result($request);
+	$request->free();
 	ksort($temp);
 
 	// Load them into $context so the template can use them
@@ -1788,8 +1788,8 @@ function unapprovedPosts($id_topic, $id_member)
 				'current_member' => $id_member,
 			)
 		);
-	list ($myUnapprovedPosts) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($myUnapprovedPosts) = $request->fetchRow();
+	$request->free();
 
 	return $myUnapprovedPosts;
 }
@@ -1951,14 +1951,14 @@ function topicAttribute($id_topic, $attributes)
 	if (is_array($id_topic))
 	{
 		$status = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$status[] = $row;
 	}
 	else
 	{
-		$status = $db->fetch_assoc($request);
+		$status = $request->fetchAssoc();
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $status;
 }
@@ -2000,8 +2000,8 @@ function topicUserAttributes($id_topic, $user)
 			'current_topic' => $id_topic,
 		)
 	);
-	$return = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$return = $request->fetchAssoc();
+	$request->free();
 
 	return $return;
 }
@@ -2088,9 +2088,9 @@ function getLoggedTopics($member, $topics)
 		)
 	);
 	$logged_topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$logged_topics[$row['id_topic']] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $logged_topics;
 }
@@ -2127,14 +2127,14 @@ function topicsList($topic_ids)
 			'limit' => count($topic_ids),
 		)
 	);
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		$topics[$row['id_topic']] = array(
 			'id_topic' => $row['id_topic'],
 			'subject' => censor($row['subject']),
 		);
 	}
-	$db->free_result($result);
+	$result->free();
 
 	return $topics;
 }
@@ -2174,13 +2174,13 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 			'blank_id_member' => 0,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!empty($row['id_member']))
 			$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
 			$topic_details['messages'][] = $row['id_msg'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $topic_details;
 }
@@ -2282,11 +2282,11 @@ function approveTopics($topics, $approve = true, $log = false)
 				'approve_type' => $approve_type,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			logAction($log_action, array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member_started'], 'board' => $board));
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Just get the messages to be approved and pass through...
@@ -2301,9 +2301,9 @@ function approveTopics($topics, $approve = true, $log = false)
 		)
 	);
 	$msgs = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$msgs[] = $row['id_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	return approvePosts($msgs, $approve);
@@ -2401,13 +2401,13 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		)
 	);
 	// You can't select ALL the messages!
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Get the right first and last message dependant on approved state...
 		if (empty($split1_first_msg) || $row['myid_first_msg'] < $split1_first_msg)
@@ -2433,7 +2433,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split1_unapprovedposts = $row['message_count'];
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 	$split1_firstMem = getMsgMemberID($split1_first_msg);
 	$split1_lastMem = getMsgMemberID($split1_last_msg);
 
@@ -2451,7 +2451,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => $split1_ID_TOPIC,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// As before get the right first and last message dependant on approved state...
 		if (empty($split2_first_msg) || $row['myid_first_msg'] < $split2_first_msg)
@@ -2482,7 +2482,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split2_unapprovedposts = $row['message_count'];
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 	$split2_firstMem = getMsgMemberID($split2_first_msg);
 	$split2_lastMem = getMsgMemberID($split2_last_msg);
 
@@ -2581,17 +2581,17 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => (int) $split1_ID_TOPIC,
 		)
 	);
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 	{
 		$replaceEntries = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['unwatched']);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Housekeeping.
 	updateTopicStats();
@@ -2656,14 +2656,14 @@ function splitAttemptMove($boards, $totopic)
 					)
 				);
 				$posters = array();
-				while ($row = $db->fetch_assoc($request))
+				while ($row = $request->fetchAssoc())
 				{
 					if (!isset($posters[$row['id_member']]))
 						$posters[$row['id_member']] = 0;
 
 					$posters[$row['id_member']]++;
 				}
-				$db->free_result($request);
+				$request->free();
 
 				require_once(SUBSDIR . '/Members.subs.php');
 				foreach ($posters as $id_member => $posts)
@@ -2739,8 +2739,8 @@ function topicNotificationCount($memID)
 			'is_approved' => 1,
 		)
 	);
-	list ($totalNotifications) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalNotifications) = $request->fetchRow();
+	$request->free();
 
 	return (int) $totalNotifications;
 }
@@ -2790,7 +2790,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$notification_topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['body'] = censor($row['subject']);
 
@@ -2809,7 +2809,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $notification_topics;
 }
@@ -2836,14 +2836,14 @@ function postersCount($id_topic)
 		)
 	);
 	$posters = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($posters[$row['id_member']]))
 			$posters[$row['id_member']] = 0;
 
 		$posters[$row['id_member']]++;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $posters;
 }
@@ -2870,8 +2870,8 @@ function countTopicsByBoard($board, $approved = false)
 			'is_approved' => 1,
 		)
 	);
-	list ($topics) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($topics) = $request->fetchRow();
+	$request->free();
 
 	return $topics;
 }
@@ -2911,7 +2911,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 		)
 	);
 	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$row['body'] = censor($row['subject']);
 
@@ -2927,7 +2927,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 			'js_subject' => addcslashes(addslashes($row['subject']), '/')
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $topics;
 }
@@ -2951,9 +2951,9 @@ function messagesInTopics($topics)
 			'topic_list' => $topics,
 	));
 	$messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$messages[] = $row['id_msg'];
-	$db->free_result($request);
+	$request->free();
 
 	return $messages;
 }
@@ -2977,9 +2977,9 @@ function topicsPosters($topics)
 		array(
 			'topic_list' => $topics,
 	));
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$members[$row['id_member']][] = $row['id_topic'];
-	$db->free_result($request);
+	$request->free();
 
 	return $members;
 }
@@ -3084,10 +3084,10 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 		)
 	);
 
-	if ($db->num_rows($request) > 0)
+	if ($request->numRows() > 0)
 	{
 		$replaceEntries = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['unwatched']);
 
 		markTopicsRead($replaceEntries, true);
@@ -3102,7 +3102,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 			)
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($notifications))
 	{
@@ -3115,10 +3115,10 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 				'topics_list' => $notifications,
 			)
 		);
-		if ($db->num_rows($request) > 0)
+		if ($request->numRows() > 0)
 		{
 			$replaceEntries = array();
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 				$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
 
 			$db->insert('replace',
@@ -3137,7 +3137,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 				)
 			);
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 }
 
@@ -3168,11 +3168,11 @@ function getSubject($id_topic)
 		)
 	);
 
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('topic_gone', false);
 
-	list ($subject) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($subject) = $request->fetchRow();
+	$request->free();
 
 	return $subject;
 }
@@ -3203,8 +3203,8 @@ function updateTopicStats($increment = null)
 				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 			)
 		);
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
+		$row = $request->fetchAssoc();
+		$request->free();
 
 		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 	}

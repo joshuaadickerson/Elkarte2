@@ -11,8 +11,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte\View;
+
+use Elkarte\Elkarte\Priority;
 
 /**
  * Class used to manage template layers

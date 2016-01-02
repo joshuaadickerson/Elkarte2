@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+use Elkarte\Elkarte\Events\Hooks;
 
 /**
  * Load the $modSettings array and many necessary forum settings.
@@ -40,7 +39,7 @@ function reloadSettings()
 	$db = $elk['db'];
 	$cache = $elk['cache'];
 	$hooks = $elk['hooks'];
-var_dump($db);
+
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
 	{
@@ -55,9 +54,11 @@ var_dump($db);
 		$modSettings = array();
 		if (!$request)
 			$GLOBALS['elk']['errors']->display_db_error();
-		while ($row = $db->fetch_row($request))
+
+		while ($row = $request->fetchRow())
 			$modSettings[$row[0]] = $row[1];
-		$db->free_result($request);
+
+		$request->free();
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
@@ -107,14 +108,14 @@ var_dump($db);
 	{
 		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
-			Hooks::get()->add($hook, $function);
+			$GLOBALS['elk']['hooks']->add($hook, $function);
 	}
 
 	// Any files to pre include?
-	\Hooks::get()->include_hook('pre_include');
+	$GLOBALS['elk']['hooks']->include_hook('pre_include');
 
 	// Call pre load integration functions.
-	Hooks::get()->hook('pre_load');
+	$GLOBALS['elk']['hooks']->hook('pre_load');
 }
 
 /**
@@ -133,11 +134,13 @@ function loadUserSettings()
 {
 	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
-	$db = database();
-	$cache = Cache::instance();
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
+	$hooks = $GLOBALS['elk']['hooks'];
+	$req = $GLOBALS['elk']['req'];
 
 	// Check first the integration, then the cookie, and last the session.
-	if (count($integration_ids = Hooks::get()->hook('verify_user')) > 0)
+	if (count($integration_ids = $hooks->hook('verify_user')) > 0)
 	{
 		$id_member = 0;
 		foreach ($integration_ids as $integration_id)
@@ -153,9 +156,6 @@ function loadUserSettings()
 	}
 	else
 		$id_member = 0;
-
-	// We'll need IPs and user agent and stuff, they came to visit us with!
-	$req = \Request::instance();
 
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
@@ -378,7 +378,7 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
-	Hooks::get()->hook('user_info');
+	$GLOBALS['elk']['hooks']->hook('user_info');
 }
 
 /**
@@ -398,8 +398,9 @@ function loadBoard()
 	global $txt, $scripturl, $context, $modSettings;
 	global $board_info, $board, $topic, $user_info;
 
-	$db = database();
-	$cache = Cache::instance();
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
+	$hooks = $GLOBALS['elk']['hooks'];
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -471,7 +472,7 @@ function loadBoard()
 		$select_tables = array();
 
 		// Wanna grab something more from the boards table or another table at all?
-		Hooks::get()->hook('load_board_query', array(&$select_columns, &$select_tables));
+		$hooks->hook('load_board_query', array(&$select_columns, &$select_tables));
 
 		$request = $db->select('', '
 			SELECT
@@ -493,9 +494,9 @@ function loadBoard()
 			)
 		);
 		// If there aren't any, skip.
-		if ($db->num_rows($request) > 0)
+		if ($request->numRows() > 0)
 		{
-			$row = $db->fetch_assoc($request);
+			$row = $request->fetchAssoc();
 
 			// Set the current board.
 			if (!empty($row['id_board']))
@@ -542,14 +543,14 @@ function loadBoard()
 						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
 			}
-			while ($row = $db->fetch_assoc($request));
+			while ($row = $request->fetchAssoc());
 
 			// If the board only contains unapproved posts and the user can't approve then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
 			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
 				// Free the previous result
-				$db->free_result($request);
+				$request->free();
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
@@ -566,10 +567,10 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
+				list ($board_info['unapproved_user_topics']) = $request->fetchRow();
 			}
 
-			Hooks::get()->hook('loaded_board', array(&$board_info, &$row));
+			$GLOBALS['elk']['hooks']->hook('loaded_board', array(&$board_info, &$row));
 
 			if ($cache->isEnabled() && (empty($topic) || $cache->checkLevel(3)))
 			{
@@ -589,7 +590,7 @@ function loadBoard()
 			$topic = null;
 			$board = 0;
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	if (!empty($topic))
@@ -683,7 +684,7 @@ function loadPermissions()
 {
 	global $user_info, $board, $board_info, $modSettings, $elk;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	if ($user_info['is_admin'])
 	{
@@ -693,7 +694,7 @@ function loadPermissions()
 
 	$removals = array();
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if ($cache->isEnabled())
 	{
@@ -732,14 +733,14 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$db->free_result($request);
+		$request->free();
 
 		if (isset($cache_groups))
 			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
@@ -764,14 +765,14 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Remove all the permissions they shouldn't have ;).
@@ -809,8 +810,8 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 {
 	global $user_profile, $modSettings, $board_info, $context;
 
-	$db = database();
-	$cache = Cache::instance();
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -878,7 +879,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Allow addons to easily add to the selected member data
-	Hooks::get()->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
+	$GLOBALS['elk']['hooks']->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
 
 	if (!empty($users))
 	{
@@ -893,14 +894,14 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			)
 		);
 		$new_loaded_ids = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			$new_loaded_ids[] = $row['id_member'];
 			$loaded_ids[] = $row['id_member'];
 			$row['options'] = array();
 			$user_profile[$row['id_member']] = $row;
 		}
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Custom profile fields as well
@@ -914,14 +915,14 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Anything else integration may want to add to the user_profile array
 	if (!empty($new_loaded_ids))
-		Hooks::get()->hook('add_member_data', array($new_loaded_ids, $set));
+		$GLOBALS['elk']['hooks']->hook('add_member_data', array($new_loaded_ids, $set));
 
 	if (!empty($new_loaded_ids) && $cache->checkLevel(3))
 	{
@@ -1131,7 +1132,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		}
 	}
 
-	Hooks::get()->hook('member_context', array($user, $display_custom_fields));
+	$GLOBALS['elk']['hooks']->hook('member_context', array($user, $display_custom_fields));
 	return true;
 }
 
@@ -1190,7 +1191,7 @@ function getThemeData($id_theme, $member)
 {
 	global $modSettings;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 	if ($cache->checkLevel(2) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
@@ -1207,7 +1208,7 @@ function getThemeData($id_theme, $member)
 
 	if (empty($flag))
 	{
-		$db = database();
+		$db = $GLOBALS['elk']['db'];
 
 		// Load variables from the current or default theme, global or this user's.
 		$result = $db->select('', '
@@ -1224,7 +1225,7 @@ function getThemeData($id_theme, $member)
 		$immutable_theme_data = array('actual_theme_url', 'actual_images_url', 'base_theme_dir', 'base_theme_url', 'default_images_url', 'default_theme_dir', 'default_theme_url', 'default_template', 'images_url', 'number_recent_posts', 'smiley_sets_default', 'theme_dir', 'theme_id', 'theme_layers', 'theme_templates', 'theme_url');
 
 		// Pick between $settings and $options depending on whose data it is.
-		while ($row = $db->fetch_assoc($result))
+		while ($row = $result->fetchAssoc())
 		{
 			// There are just things we shouldn't be able to change as members.
 			if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
@@ -1238,7 +1239,7 @@ function getThemeData($id_theme, $member)
 			if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != '1')
 				$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == '1' : $row['value'];
 		}
-		$db->free_result($result);
+		$result->free();
 
 		// Set the defaults if the user has not chosen on their own
 		if (!empty($themeData[-1]))
@@ -1280,7 +1281,7 @@ function initTheme($id_theme = 0)
 	$settings['actual_theme_dir'] = $settings['theme_dir'];
 
 	// Reload the templates
-	Templates::getInstance()->reloadDirectories($settings);
+	$GLOBALS['elk']['templates']->reloadDirectories($settings);
 
 	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
 	require_once($settings['default_theme_dir'] . '/Theme.php');
@@ -1399,7 +1400,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$settings = array_merge($settings, template_init());
 
 	// Call initialization theme integration functions.
-	Hooks::get()->hook('init_theme', array($id_theme, &$settings));
+	$GLOBALS['elk']['hooks']->hook('init_theme', array($id_theme, &$settings));
 
 	// Guests may still need a name.
 	if ($context['user']['is_guest'] && empty($context['user']['name']))
@@ -1453,7 +1454,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	theme()->loadThemeJavascript();
 
-	$hooks = Hooks::get();
+	$hooks = $GLOBALS['elk']['hooks'];
 	$hooks->newPath(array('$themedir' => $settings['theme_dir']));
 
 	// Any files to include at this point?
@@ -1658,7 +1659,7 @@ function loadEssentialThemeData()
 {
 	global $settings, $modSettings, $mbname, $context;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Get all the default theme variables.
 	$db->fetchQueryCallback('
@@ -1683,9 +1684,9 @@ function loadEssentialThemeData()
 	);
 
 	// Check we have some directories setup.
-	if (!Templates::getInstance()->hasDirectories())
+	if (!$GLOBALS['elk']['templates']->hasDirectories())
 	{
-		Templates::getInstance()->reloadDirectories($settings);
+		$GLOBALS['elk']['templates']->reloadDirectories($settings);
 	}
 
 	// Assume we want this.
@@ -1804,7 +1805,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if (empty($filenames))
 		return;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if (!is_array($filenames))
 		$filenames = array($filenames);
@@ -1965,7 +1966,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			$attempts[] = array($settings['default_theme_dir'], $template, 'english', $settings['default_theme_url']);
 		}
 
-		$templates = Templates::getInstance();
+		$templates = $GLOBALS['elk']['templates'];
 
 		// Try to find the language file.
 		$found = false;
@@ -2099,8 +2100,8 @@ function getBoardParents($id_parent)
 {
 	global $scripturl;
 
-	$db = database();
-	$cache = Cache::instance();
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
 
 	// First check if we have this cached already.
 	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
@@ -2126,7 +2127,7 @@ function getBoardParents($id_parent)
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
 				$GLOBALS['elk']['errors']->fatal_lang_error('parent_not_found', 'critical');
-			while ($row = $db->fetch_assoc($result))
+			while ($row = $result->fetchAssoc())
 			{
 				if (!isset($boards[$row['id_board']]))
 				{
@@ -2150,7 +2151,7 @@ function getBoardParents($id_parent)
 						);
 					}
 			}
-			$db->free_result($result);
+			$result->free();
 		}
 
 		$cache->put('board_parents-' . $original_parent, $boards, 480);
@@ -2168,7 +2169,7 @@ function getLanguages($use_cache = true)
 {
 	global $settings, $modSettings;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Either we don't use the cache, or its expired.
 	$languages = '';
@@ -2226,7 +2227,7 @@ function getLanguages($use_cache = true)
 		}
 
 		// Lets cash in on this deal.
-		$cache->put('known_languages', $languages, $cache->isEnabled() && !Cache::instance()->checkLevel(1) ? 86400 : 3600);
+		$cache->put('known_languages', $languages, $cache->isEnabled() && !$GLOBALS['elk']['cache']->checkLevel(1) ? 86400 : 3600);
 	}
 
 	return $languages;
@@ -2249,21 +2250,11 @@ function loadDatabase($db_persist, $db_server, $db_user, $db_passwd, $db_port, $
 	$options = array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port);
 
 	// Either we aren't in SSI mode, or it failed.
-	if (empty($connection))
-		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $options, $db_type);
+	$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $options, $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$connection)
 		$GLOBALS['elk']['errors']->display_db_error();
-
-	// If in SSI mode fix up the prefix.
-	$db = database();
-	if (ELK === 'SSI')
-		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
-
-	// Case sensitive database? Let's define a constant.
-	if ($db->db_case_sensitive() && !defined('DB_CASE_SENSITIVE'))
-		DEFINE('DB_CASE_SENSITIVE', '1');
 }
 
 /**
@@ -2383,7 +2374,7 @@ function determineAvatar($profile)
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
-	Hooks::get()->hook('avatar', array(&$avatar));
+	$GLOBALS['elk']['hooks']->hook('avatar', array(&$avatar));
 
 	return $avatar;
 }
@@ -2429,7 +2420,7 @@ function doSecurityChecks()
 
 	$show_warnings = false;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
@@ -2525,7 +2516,7 @@ function doSecurityChecks()
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		\TemplateLayers::getInstance()->addAfter('admin_warning', 'body');
+		$GLOBALS['elk']['layers']->addAfter('admin_warning', 'body');
 }
 
 /**
@@ -2546,7 +2537,7 @@ function loadLoadAverage()
 {
 	global $modSettings, $context;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if (($context['load_average'] = $cache->get('loadavg', 90)) == null)
 	{
@@ -2557,7 +2548,7 @@ function loadLoadAverage()
 	}
 
 	if ($context['load_average'] !== false)
-		Hooks::get()->hook('load_average', array($context['load_average']));
+		$GLOBALS['elk']['hooks']->hook('load_average', array($context['load_average']));
 
 	// Let's have at least a zero
 	if (empty($modSettings['loadavg_forum']) || $context['load_average'] === false)

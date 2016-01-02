@@ -168,7 +168,7 @@ else
 
 	if (!isset($_SESSION['session_value']))
 	{
-		$tokenizer = new Token_Hash();
+		$tokenizer = new TokenHash();
 		$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 	}
@@ -213,7 +213,7 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
-	$template_layers = TemplateLayers::getInstance();
+	$template_layers = $GLOBALS['elk']['layers'];
 	$template_layers->removeAll();
 	foreach ($ssi_layers as $layer)
 		$template_layers->addBegin($layer);
@@ -223,7 +223,7 @@ else
 	setupThemeContext();
 
 // We need to set up user agent, and make more checks on the request
-$req = \Request::instance();
+$req = $GLOBALS['elk']['req'];
 
 // Make sure they didn't muss around with the settings... but only if it's not cli.
 if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')

@@ -97,7 +97,7 @@ class Action
 	public function initialize(&$subactions, $default = '', $requestParam = 'sa')
 	{
 		if ($this->_name !== null)
-			Hooks::get()->hook('sa_' . $this->_name, array(&$subactions));
+			$GLOBALS['elk']['hooks']->hook('sa_' . $this->_name, array(&$subactions));
 
 		$this->_subActions = array();
 

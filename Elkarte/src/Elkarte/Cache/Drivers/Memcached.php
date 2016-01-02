@@ -85,7 +85,7 @@ class Memcached extends AbstractCacheMethod
 	/**
 	 * Get memcache servers.
 	 *
-	 * - This function is used by Cache::instance() and Cache::put().
+	 * - This function is used by $GLOBALS['elk']['cache'] and Cache::put().
 	 * - It attempts to connect to a random server in the cache_memcached setting.
 	 * - It recursively calls itself up to $level times.
 	 *
@@ -150,7 +150,7 @@ class Memcached extends AbstractCacheMethod
 	public static function title()
 	{
 		if (self::available())
-			\Hooks::get()->add('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
+			$GLOBALS['elk']['hooks']->add('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
 
 		return 'Memcached';
 	}

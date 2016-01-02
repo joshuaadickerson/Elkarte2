@@ -817,9 +817,9 @@ class PackageActions extends AbstractController
 		if (isset($this->_action['hook'], $this->_action['function']))
 		{
 			if ($this->_action['reverse'])
-				\Hooks::get()->remove($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+				$GLOBALS['elk']['hooks']->remove($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
 			else
-				\Hooks::get()->add($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+				$GLOBALS['elk']['hooks']->add($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
 		}
 	}
 

@@ -111,7 +111,7 @@ class Cache
 		if (!$this->isEnabled())
 			return;
 
-		\Hooks::get()->hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
+		$GLOBALS['elk']['hooks']->hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 		/* Refresh the cache if either:
 			1. Caching is disabled.
@@ -133,7 +133,7 @@ class Cache
 		if (!empty($cache_block['post_retri_eval']))
 			eval($cache_block['post_retri_eval']);
 
-		\Hooks::get()->hook('post_cache_quick_get', array($cache_block));
+		$GLOBALS['elk']['hooks']->hook('post_cache_quick_get', array($cache_block));
 
 		return $cache_block['data'];
 	}
@@ -178,7 +178,7 @@ class Cache
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
-		\Hooks::get()->hook('cache_put_data', array($key, $value, $ttl));
+		$GLOBALS['elk']['hooks']->hook('cache_put_data', array($key, $value, $ttl));
 
 		if ($db_show_debug === true)
 		{
@@ -223,7 +223,7 @@ class Cache
 			Debug::get()->cache($cache_hit);
 		}
 
-		\Hooks::get()->hook('cache_get_data', array($key, $ttl, $value));
+		$GLOBALS['elk']['hooks']->hook('cache_get_data', array($key, $ttl, $value));
 
 		return empty($value) ? null : @unserialize($value);
 	}
@@ -266,7 +266,7 @@ class Cache
 		@touch(CACHEDIR . '/index.php');
 
 		// Give addons a way to trigger cache cleaning.
-		\Hooks::get()->hook('clean_cache');
+		$GLOBALS['elk']['hooks']->hook('clean_cache');
 
 		clearstatcache();
 	}

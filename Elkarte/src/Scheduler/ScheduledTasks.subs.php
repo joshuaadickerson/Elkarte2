@@ -55,7 +55,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
 		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
@@ -74,7 +74,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		if ($next_time < $nextTaskTime)
 			$nextTaskTime = $next_time;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Now make the changes!
 	foreach ($tasks as $id => $time)
@@ -185,9 +185,9 @@ function loadTasks($tasks)
 		)
 	);
 	$task = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$task[$row['id_task']] = $row['task'];
-	$db->free_result($request);
+	$request->free();
 
 	return $task;
 }
@@ -339,9 +339,9 @@ function loadTaskDetails($id_task)
 		)
 	);
 	// Should never, ever, happen!
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$task = array(
 			'id' => $row['id_task'],
@@ -356,7 +356,7 @@ function loadTaskDetails($id_task)
 			'unit' => $row['time_unit'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $task;
 }
@@ -382,7 +382,7 @@ function scheduledTasks()
 		)
 	);
 	$known_tasks = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Find the next for regularity - don't offset as it's always server time!
 		$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
@@ -399,7 +399,7 @@ function scheduledTasks()
 			'regularity' => $offset . ', ' . $repeating,
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $known_tasks;
 }
@@ -432,7 +432,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 		)
 	);
 	$log_entries = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$log_entries[] = array(
 			'id' => $row['id_log'],
 			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
@@ -441,7 +441,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 			'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],
 			'task_completed' => $row['time_taken'] != -1,
 		);
-	$db->free_result($request);
+	$request->free();
 
 	return $log_entries;
 }
@@ -464,8 +464,8 @@ function countTaskLogEntries()
 		array(
 		)
 	);
-	list ($num_entries) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_entries) = $request->fetchRow();
+	$request->free();
 
 	return $num_entries;
 }
@@ -507,10 +507,10 @@ function processNextTasks($ts = 0)
 			'current_time' => time(),
 		)
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->numRows() != 0)
 	{
 		// The two important things really...
-		$row = $db->fetch_assoc($request);
+		$row = $request->fetchAssoc();
 
 		// When should this next be run?
 		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
@@ -553,7 +553,7 @@ function processNextTasks($ts = 0)
 		}
 
 	}
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -672,12 +672,12 @@ function nextTime()
 		)
 	);
 	// No new task scheduled?
-	if ($db->num_rows($request) === 0)
+	if ($request->numRows() === 0)
 		$result = false;
 	else
-		list ($result) = $db->fetch_row($request);
+		list ($result) = $request->fetchRow();
 
-	$db->free_result($request);
+	$request->free();
 
 	return $result;
 }

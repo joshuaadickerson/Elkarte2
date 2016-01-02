@@ -1,19 +1,23 @@
 <?php
 
-namespace Elkarte\Session;
+namespace Elkarte\Elkarte\Session;
+
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Http\Request;
+use Util;
 
 class Session
 {
-	protected static $instance;
+	protected $request;
+	protected $hooks;
+	protected $db;
 
-	public static function getInstance()
+	public function __construct(Request $request, Hooks $hooks, DatabaseInterface $db)
 	{
-		if (self::$instance === null)
-		{
-			self::$instance = new Session;
-		}
-
-		return self::$instance;
+		$this->request = $request;
+		$this->hooks = $hooks;
+		$this->db = $db;
 	}
 
 	/**
@@ -50,7 +54,7 @@ class Session
 			// This is here to stop people from using bad junky PHPSESSIDs.
 			if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) == 0 && !isset($_COOKIE[session_name()]))
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new TokenHash();
 				$session_id = hash('md5', hash('md5', 'elk_sess_' . time()) . $tokenizer->generate_hash(8));
 				$_REQUEST[session_name()] = $session_id;
 				$_GET[session_name()] = $session_id;
@@ -60,8 +64,7 @@ class Session
 			// Use database sessions?
 			if (!empty($modSettings['databaseSession_enable']))
 			{
-				require_once(SOURCEDIR . '/DatabaseSessionHandler.php');
-				$handler = new Elkarte\DatabaseSessionHandler(database());
+				$handler = new DatabaseSessionHandler($this->db);
 				session_set_save_handler($handler, true);
 			}
 			elseif (ini_get('session.gc_maxlifetime') <= 1440 && !empty($modSettings['databaseSession_lifetime']))
@@ -70,7 +73,7 @@ class Session
 			// Use cache setting sessions?
 			if (empty($modSettings['databaseSession_enable']) && !empty($modSettings['cache_enable']) && php_sapi_name() != 'cli')
 			{
-				\Hooks::get()->hook('session_handlers');
+				$this->hooks->hook('session_handlers');
 
 				// @todo move these to a plugin.
 				if (function_exists('mmcache_set_session_handlers'))
@@ -95,7 +98,7 @@ class Session
 		// Set the randomly generated code.
 		if (!isset($_SESSION['session_var']))
 		{
-			$tokenizer = new Token_Hash();
+			$tokenizer = new TokenHash();
 			$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 			$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 		}
@@ -123,7 +126,7 @@ class Session
 		global $sc, $modSettings, $boardurl;
 
 		// We'll work out user agent checks
-		$req = \Request::instance();
+		$req = $this->request;
 
 		// Is it in as $_POST['sc']?
 		if ($type == 'post')
@@ -246,7 +249,7 @@ class Session
 
 		// Validate what type of session check this is.
 		$types = array();
-		Hooks::get()->hook('validateSession', array(&$types));
+		$GLOBALS['elk']['hooks']->hook('validateSession', array(&$types));
 		$type = in_array($type, $types) || $type == 'moderate' ? $type : 'Admin';
 
 		// Set the lifetime for our Admin session. Default is ten minutes.
@@ -294,7 +297,7 @@ class Session
 			if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
 			{
 				// Allow integration to verify the password
-				$good_password = in_array(true, Hooks::get()->hook('verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
+				$good_password = in_array(true, $GLOBALS['elk']['hooks']->hook('verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
 
 				$password = $_POST[$type . '_hash_pass'];
 				if ($good_password || validateLoginPassword($password, $user_info['passwd']))
@@ -310,7 +313,7 @@ class Session
 			if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
 			{
 				// Give integrated systems a chance to verify this password
-				$good_password = in_array(true, Hooks::get()->hook('verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
+				$good_password = in_array(true, $GLOBALS['elk']['hooks']->hook('verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
 
 				// Password correct?
 				$password = $_POST[$type . '_pass'];

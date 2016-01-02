@@ -57,7 +57,7 @@ function writeLog($force = false)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		$req = \Request::instance();
+		$req = $GLOBALS['elk']['req'];
 		$serialized = $_GET + array('USER_AGENT' => $req->user_agent());
 
 		// In the case of a dlattach action, session_var may not be set.
@@ -73,7 +73,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = $cache->getVar($do_delete, 'log_online-update', 30) && (int) $do_delete < time() - 30;
@@ -111,7 +111,7 @@ function writeLog($force = false)
 	if (ELK != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
 	{
 		// We log IPs the request came with, around here
-		$req = \Request::instance();
+		$req = $GLOBALS['elk']['req'];
 
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
@@ -269,7 +269,7 @@ function logActions($logs)
 		'Admin' => 3,
 	);
 
-	Hooks::get()->hook('log_types', array(&$log_types));
+	$GLOBALS['elk']['hooks']->hook('log_types', array(&$log_types));
 
 	// No point in doing anything, if the log isn't even enabled.
 	if (empty($modSettings['modlog_enabled']))

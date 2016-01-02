@@ -37,7 +37,7 @@ function loadMessageLimit()
 
 	if ($user_info['is_admin'])
 		$message_limit = 0;
-	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
+	elseif (!$GLOBALS['elk']['cache']->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -48,13 +48,13 @@ function loadMessageLimit()
 				'users_groups' => $user_info['groups'],
 			)
 		);
-		list ($maxMessage, $minMessage) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($maxMessage, $minMessage) = $request->fetchRow();
+		$request->free();
 
 		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		Cache::instance()->put('msgLimit:' . $user_info['id'], $message_limit, 360);
+		$GLOBALS['elk']['cache']->put('msgLimit:' . $user_info['id'], $message_limit, 360);
 	}
 
 	return $message_limit;
@@ -85,7 +85,7 @@ function loadPMLabels($labels)
 			'not_deleted' => 0,
 		)
 	);
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
@@ -98,10 +98,10 @@ function loadPMLabels($labels)
 			}
 		}
 	}
-	$db->free_result($result);
+	$result->free();
 
 	// Store it please!
-	Cache::instance()->put('labelCounts:' . $user_info['id'], $labels, 720);
+	$GLOBALS['elk']['cache']->put('labelCounts:' . $user_info['id'], $labels, 720);
 
 	return $labels;
 }
@@ -156,8 +156,8 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 		);
 	}
 
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -230,7 +230,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		);
 		require_once(SUBSDIR . '/Members.subs.php');
 		// ...And update the statistics accordingly - now including unread messages!.
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if ($row['is_read'])
 				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages']));
@@ -245,7 +245,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 					$user_info['unread_messages'] -= $row['num_deleted_messages'];
 			}
 		}
-		$db->free_result($request);
+		$request->free();
 
 		// Do the actual deletion.
 		$db->query('', '
@@ -279,9 +279,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		)
 	);
 	$remove_pms = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$remove_pms[] = $row['sender'];
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($remove_pms))
 	{
@@ -303,7 +303,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
+	$GLOBALS['elk']['cache']->put('labelCounts:' . $user_info['id'], null, 720);
 }
 
 /**
@@ -417,7 +417,7 @@ function updatePMMenuCounts($owner)
 		)
 	);
 	$total_unread = 0;
-	while ($row = $db->fetch_assoc($result))
+	while ($row = $result->fetchAssoc())
 	{
 		$total_unread += $row['num'];
 
@@ -428,10 +428,10 @@ function updatePMMenuCounts($owner)
 		foreach ($this_labels as $this_label)
 			$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
 	}
-	$db->free_result($result);
+	$result->free();
 
 	// Need to store all this.
-	Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
+	$GLOBALS['elk']['cache']->put('labelCounts:' . $owner, $context['labels'], 720);
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 
@@ -468,13 +468,13 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 			'not_deleted' => 0,
 		)
 	);
-	if ($db->num_rows($request) === 0)
+	if ($request->numRows() === 0)
 	{
-		$db->free_result($request);
+		$request->free();
 		return false;
 	}
-	$validationResult = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$validationResult = $request->fetchAssoc();
+	$request->free();
 
 	switch ($validFor)
 	{
@@ -547,7 +547,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$recipients = array($recipients);
 
 	// Integrated PMs
-	Hooks::get()->hook('personal_message', array(&$recipients, &$from, &$subject, &$message));
+	$GLOBALS['elk']['hooks']->hook('personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// Get a list of usernames and convert them to IDs.
 	$usernames = array();
@@ -574,10 +574,10 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 				'usernames' => array_keys($usernames),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			if (isset($usernames[Util::strtolower($row['member_name'])]))
 				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
-		$db->free_result($request);
+		$request->free();
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.
 		foreach ($recipients as $rec_type => $rec)
@@ -621,7 +621,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	);
 	$deletes = array();
 	// Check whether we have to apply anything...
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$criteria = unserialize($row['criteria']);
 
@@ -641,7 +641,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		if ($delete)
 			$deletes[$row['id_member']] = 1;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Load the membergroup message limits.
 	static $message_limit_cache = array();
@@ -654,9 +654,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			array(
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$message_limit_cache[$row['id_group']] = $row['max_messages'];
-		$db->free_result($request);
+		$request->free();
 	}
 
 	// Load the groups that are allowed to read PMs.
@@ -673,7 +673,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (empty($row['add_deny']))
 			$disallowed_groups[] = $row['id_group'];
@@ -681,7 +681,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			$allowed_groups[] = $row['id_group'];
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	if (empty($modSettings['permission_enable_deny']))
 		$disallowed_groups = array();
@@ -709,7 +709,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		)
 	);
 	$notifications = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Don't do anything for members to be deleted!
 		if (isset($deletes[$row['id_member']]))
@@ -769,7 +769,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 
 		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Only 'send' the message if there are any recipients left.
 	if (empty($all_to))
@@ -896,7 +896,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	// Integrated After PMs
-	Hooks::get()->hook('personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
+	$GLOBALS['elk']['hooks']->hook('personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
 
 	// Back to what we were on before!
 	loadLanguage('index+PersonalMessage');
@@ -1061,7 +1061,7 @@ function loadPMs($pm_options, $id_member)
 	$lastData = array();
 	$posters = $pm_options['folder'] == 'sent' ? array($id_member) : array();
 	$recipients = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!isset($recipients[$row['id_pm']]))
 		{
@@ -1083,7 +1083,7 @@ function loadPMs($pm_options, $id_member)
 				'head' => $row['id_pm_head'],
 			);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return array($pms, $posters, $recipients, $lastData);
 }
@@ -1111,8 +1111,8 @@ function pmCount($id_member, $time)
 			'msgtime' => time() - $time,
 		)
 	);
-	list ($pmCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($pmCount) = $request->fetchRow();
+	$request->free();
 
 	return $pmCount;
 }
@@ -1158,7 +1158,7 @@ function applyRules($all_messages = false)
 		)
 	);
 	$actions = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		foreach ($context['rules'] as $rule)
 		{
@@ -1199,7 +1199,7 @@ function applyRules($all_messages = false)
 			}
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Deletes are easy!
 	if (!empty($actions['deletes']))
@@ -1271,7 +1271,7 @@ function loadRules($reload = false)
 	);
 	$context['rules'] = array();
 	// Simply fill in the data!
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
@@ -1285,7 +1285,7 @@ function loadRules($reload = false)
 		if ($row['delete_pm'])
 			$context['rules'][$row['id_rule']]['actions'][] = array('t' => 'del', 'v' => 1);
 	}
-	$db->free_result($request);
+	$request->free();
 }
 
 /**
@@ -1333,12 +1333,12 @@ function loadPMLimits($id_group = false)
 		)
 	);
 	$groups = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($row['id_group'] != 1)
 			$groups[$row['id_group']] = $row;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $groups;
 }
@@ -1363,9 +1363,9 @@ function getDiscussions($id_pms)
 		)
 	);
 	$pm_heads = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$pm_heads[$row['id_pm_head']] = $row['id_pm'];
-	$db->free_result($request);
+	$request->free();
 
 	return $pm_heads;
 }
@@ -1391,9 +1391,9 @@ function getPmsFromDiscussion($pm_heads)
 		)
 	);
 	// Copy the action from the single to PM to the others.
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$pms[$row['id_pm']] = $row['id_pm_head'];
-	$db->free_result($request);
+	$request->free();
 
 	return $pms;
 }
@@ -1428,7 +1428,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 			'to_label' => array_keys($to_label),
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
 
@@ -1449,7 +1449,7 @@ function changePMLabels($to_label, $label_type, $user_id)
 
 		$to_update[$row['id_pm']] = $set;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($to_update))
 		return updatePMLabels($to_update, $user_id);
@@ -1481,7 +1481,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 		)
 	);
 	$to_update = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Do the long task of updating them...
 		$toChange = explode(',', $row['labels']);
@@ -1502,7 +1502,7 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 
 		$to_update[$row['id_pm']] = implode(',', array_unique($toChange));
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if (!empty($to_update))
 		return updatePMLabels($to_update, $user_id);
@@ -1579,9 +1579,9 @@ function getPMsOlderThan($user_id, $time)
 			'msgtime' => $time,
 		)
 	);
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$pm_ids[] = $row[0];
-	$db->free_result($request);
+	$request->free();
 
 	// This is the inbox
 	$request = $db->query('', '
@@ -1598,9 +1598,9 @@ function getPMsOlderThan($user_id, $time)
 			'msgtime' => $time,
 		)
 	);
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$pm_ids[] = $row[0];
-	$db->free_result($request);
+	$request->free();
 
 	return $pm_ids;
 }
@@ -1770,7 +1770,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 	);
 	$display_pms = array();
 	$posters = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
 		if ($folder == 'sent' && $row['id_member_from'] == $user_info['id'] && $row['deleted_by_sender'] == 1)
@@ -1787,7 +1787,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 		$display_pms[] = $row['id_pm'];
 		$posters[$row['id_pm']] = $row['id_member_from'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return array($display_pms, $posters);
 }
@@ -1822,9 +1822,9 @@ function loadConversationUnreadStatus($pms)
 		)
 	);
 	$head_pms = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$head_pms[$row['id_pm_head']] = $row['id_pm'];
-	$db->free_result($request);
+	$request->free();
 
 	// Find any unread PM's this member has under these head pm id's
 	$request = $db->query('', '
@@ -1843,14 +1843,14 @@ function loadConversationUnreadStatus($pms)
 		)
 	);
 	$unread_pms = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Return the results under the original index since thats what we are
 		// displaying in the subject list
 		$index = $head_pms[$row['id_pm_head']];
 		$unread_pms[$index] = $row;
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $unread_pms;
 }
@@ -1891,7 +1891,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 	$message_replied = array();
 	$message_unread = array();
 	$message_first_label = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Sent folder recipients
 		if ($folder === 'sent' || empty($row['bcc']))
@@ -1916,7 +1916,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			}
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return array($message_labels, $message_replied, $message_unread, ($search ? $message_first_label : ''));
 }
@@ -2012,8 +2012,8 @@ function checkPMReceived($pmsg)
 			'id_pm' => $pmsg,
 		)
 	);
-	$isReceived = $db->num_rows($request) != 0;
-	$db->free_result($request);
+	$isReceived = $request->numRows() != 0;
+	$request->free();
 
 	return $isReceived;
 }
@@ -2050,8 +2050,8 @@ function loadPMQuote($pmsg, $isReceived)
 			'id_pm' => $pmsg,
 		)
 	);
-	$row_quoted = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row_quoted = $request->fetchAssoc();
+	$request->free();
 
 	return empty($row_quoted) ? false : $row_quoted;
 }
@@ -2087,7 +2087,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 	);
 	$recipients = array();
 	$hidden_recipients = 0;
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// If it's hidden we still don't reveal their names
 		if ($bcc_count && $row['bcc'])
@@ -2108,7 +2108,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 			'link' => sprintf($txt['pm_report_pm_hidden'], $hidden_recipients)
 		);
 
-	$db->free_result($request);
+	$request->free();
 
 	return $recipients;
 }
@@ -2147,10 +2147,10 @@ function loadPersonalMessage($pm_id)
 		)
 	);
 	// Can only be a hacker here!
-	if ($db->num_rows($request) == 0)
+	if ($request->numRows() == 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
-	$pm_details = $db->fetch_row($request);
-	$db->free_result($request);
+	$pm_details = $request->fetchRow();
+	$request->free();
 
 	return $pm_details;
 }
@@ -2190,8 +2190,8 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 			'not_deleted' => 0,
 		))
 	);
-	list ($numResults) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numResults) = $request->fetchRow();
+	$request->free();
 
 	return $numResults;
 }
@@ -2235,13 +2235,13 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
 	$foundMessages = array();
 	$posters = array();
 	$head_pms = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$foundMessages[] = $row['id_pm'];
 		$posters[] = $row['id_member_from'];
 		$head_pms[$row['id_pm']] = $row['id_pm_head'];
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return array($foundMessages, $posters, $head_pms);
 }
@@ -2278,9 +2278,9 @@ function loadPMSearchHeads($head_pms)
 		)
 	);
 	$real_pm_ids = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$real_pm_ids[$row['id_pm_head']] = $row['id_pm'];
-	$db->free_result($request);
+	$request->free();
 
 	return $real_pm_ids;
 }
@@ -2309,9 +2309,9 @@ function loadPMSearchResults($foundMessages, $search_params)
 		)
 	);
 	$search_results = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$search_results[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $search_results;
 }

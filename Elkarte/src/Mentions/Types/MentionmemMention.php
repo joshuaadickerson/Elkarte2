@@ -65,7 +65,7 @@ class MentionmemMentionMentionBoardAccess extends AbstractMentionBoardAccess
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \Mentioning(database(), new \DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new \Mentioning($GLOBALS['elk']['db'], new \DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 

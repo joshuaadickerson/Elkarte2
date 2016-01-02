@@ -41,7 +41,7 @@ function updateSettings($changeArray, $update = false, $group = null)
 	global $modSettings;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -135,7 +135,7 @@ function removeSettings($toRemove)
 	}
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	Cache::instance()->remove('modSettings');
+	$GLOBALS['elk']['cache']->remove('modSettings');
 }
 
 /**
@@ -529,7 +529,7 @@ function pc_next_permutation($p, $size)
  * - Makes sure the browser doesn't come back and repost the form data.
  * - Should be used whenever anything is posted.
  * - Calls AddMailQueue to process any mail queue items its can
- * - Calls Hooks::get()->hook integrate_redirect before headers are sent
+ * - Calls $GLOBALS['elk']['hooks']->hook integrate_redirect before headers are sent
  * - Diverts final execution to obExit() which means a end to processing and sending of final output
  *
  * @param string $setLocation = '' The URL to redirect to
@@ -567,7 +567,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	}
 
 	// Maybe integrations want to change where we are heading?
-	Hooks::get()->hook('redirect', array(&$setLocation, &$refresh));
+	$GLOBALS['elk']['hooks']->hook('redirect', array(&$setLocation, &$refresh));
 
 	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
 	if ($refresh)
@@ -635,7 +635,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
-	Notifications::getInstance()->send();
+	Elkarte\Notifications\Notifications::getInstance()->send();
 
 	$do_header = $header === null ? !$header_done : $header;
 	if ($do_footer === null)
@@ -646,12 +646,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = Elkarte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
 
-		Hooks::get()->buffer_hook();
+		$GLOBALS['elk']['hooks']->buffer_hook();
 
 		// Display the screen in the logical order.
 		theme()->template_header();
@@ -661,7 +661,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	if ($do_footer)
 	{
 		// Show the footer.
-		Templates::getInstance()->loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
+		$GLOBALS['elk']['templates']->loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)
@@ -678,7 +678,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	}
 
 	// Need user agent
-	$req = \Request::instance();
+	$req = $GLOBALS['elk']['req'];
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	$invalid_old_url = array(
@@ -704,7 +704,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 	// Hand off the output to the portal, etc. we're integrated with.
-	Hooks::get()->hook('exit', array($do_footer));
+	$GLOBALS['elk']['hooks']->hook('exit', array($do_footer));
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
@@ -935,7 +935,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
 		return $host;
@@ -1347,7 +1347,7 @@ function replaceBasicActionUrl($string)
 			$scripturl . '?action=memberlist',
 			$scripturl . '?action=stats',
 		);
-		Hooks::get()->hook('basic_url_replacement', array(&$find, &$replace));
+		$GLOBALS['elk']['hooks']->hook('basic_url_replacement', array(&$find, &$replace));
 	}
 
 	return str_replace($find, $replace, $string);
@@ -1363,7 +1363,7 @@ function replaceBasicActionUrl($string)
  */
 function createList($listOptions)
 {
-	Hooks::get()->hook('list_' . $listOptions['id'], array(&$listOptions));
+	$GLOBALS['elk']['hooks']->hook('list_' . $listOptions['id'], array(&$listOptions));
 
 	$list = new Generic_List($listOptions);
 
@@ -1397,7 +1397,7 @@ function response_prefix()
 	global $language, $user_info, $txt;
 	static $response_prefix = null;
 
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))

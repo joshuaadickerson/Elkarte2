@@ -61,7 +61,7 @@ class UpgradeInstructions_upgrade_1_1
 					if ($request)
 					{
 						// Drop it only if it is empty
-						list ($count) = (int) $db->fetch_row($request);
+						list ($count) = (int) $request->fetchRow();
 						if ($count == 0)
 							$db_table->db_drop_table('{db_prefix}admin_info_files');
 					}
@@ -231,12 +231,12 @@ class UpgradeInstructions_upgrade_1_1
 					if (!empty($modSettings['cal_enabled']))
 					{
 						enableModules('calendar', array('post', 'boardindex'));
-						Hooks::get()->enableIntegration('Calendar_Integrate');
+						$GLOBALS['elk']['hooks']->enableIntegration('Calendar_Integrate');
 					}
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						Hooks::get()->enableIntegration('Drafts_Integrate');
+						$GLOBALS['elk']['hooks']->enableIntegration('Drafts_Integrate');
 					}
 					if (!empty($modSettings['enabled_mentions']))
 					{
@@ -245,8 +245,8 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					Hooks::get()->enableIntegration('User_Notification_Integrate');
-					Hooks::get()->enableIntegration('Ila_Integrate');
+					$GLOBALS['elk']['hooks']->enableIntegration('User_Notification_Integrate');
+					$GLOBALS['elk']['hooks']->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',

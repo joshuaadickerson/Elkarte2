@@ -113,7 +113,7 @@ class Recent_Class
 	 */
 	public function findRecentMessages($start, $limit = 10)
 	{
-		$cache = Cache::instance();
+		$cache = $GLOBALS['elk']['cache'];
 		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, array('max_id_msg' => 0)))) . '-' . $start . '-' . $limit;
 		$this->_messages = $cache->get($key, 120);
 		if ($cache->isMiss())
@@ -148,7 +148,7 @@ class Recent_Class
 	public function getRecentPosts($start, $permissions)
 	{
 		// Provide an easy way for integration to interact with the recent display items
-		Hooks::get()->hook('recent_message_list', array($this->_messages, &$permissions));
+		$GLOBALS['elk']['hooks']->hook('recent_message_list', array($this->_messages, &$permissions));
 
 		$this->_getRecentPosts($start);
 

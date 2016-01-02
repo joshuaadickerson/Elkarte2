@@ -5,13 +5,17 @@ namespace Elkarte\Elkarte\Database;
 class Database
 {
 	protected $drivers = [
-		'mysql'         => '\\Elkarte\\Database\\Drivers\\MySQL',
-		'postgresql'    => '\\Elkarte\\Database\\Drivers\\PostgreSQL',
+		'mysql'         => '\\Elkarte\\Elkarte\\Database\\Drivers\\MySQL',
+		'postgresql'    => '\\Elkarte\\Elkarte\\Database\\Drivers\\PostgreSQL',
 	];
 
 	protected $driver = 'mysql';
 
-	public function __construct($driver, $hooks = null)
+	protected $errors;
+	protected $hooks;
+	protected $debug;
+
+	public function __construct($driver, $errors, $debug, $hooks)
 	{
 		// Make it possible to add drivers
 		$drivers = $this->drivers;
@@ -19,13 +23,18 @@ class Database
 		$this->drivers = $drivers;
 
 		$this->setDriver($driver);
+
+		$this->errors = $errors;
+		$this->hooks = $hooks;
+		$this->debug = $debug;
 	}
 
 	public function connect($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		$class = $this->database();
+		$class_name = $this->database();
+		$class = new $class_name($this->errors, $this->debug, $this->hooks);
 
-		return $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
+		return $class->connect($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
 	}
 
 	public function database()

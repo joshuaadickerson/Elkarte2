@@ -2,6 +2,8 @@
 
 namespace Elkarte;
 
+use Elkarte\Elkarte\View\TemplateLayers;
+use Elkarte\Elkarte\View\Templates;
 use \Pimple\Container;
 
 global $elk;
@@ -11,19 +13,19 @@ $elk = new Container;
 /**
  * @return Errors
  */
-$elk['errors'] = function () {
-	return Elkarte\Errors\Errors::instance();
+$elk['errors'] = function ($elk) {
+	return new Elkarte\Errors\Errors($elk);
 };
 
 $elk['http_req'] = function () {
-	return Elkarte\Http\HttpReq::instance();
+	return new Elkarte\Http\HttpReq;
 };
 
 /**
  * @return Request
  */
 $elk['req'] = function () {
-	return Elkarte\Http\Request::instance();
+	return new Elkarte\Http\Request;
 };
 
 /**
@@ -31,7 +33,6 @@ $elk['req'] = function () {
  */
 $elk['hooks'] = function ($elk) {
 	return new Elkarte\Events\Hooks($elk['debug']);
-	//return new Elkarte\Events\Hooks($elk['db'], $elk['debug']);
 };
 
 /**
@@ -45,11 +46,11 @@ $elk['theme'] = function () {
  * @return TemplateLayers
  */
 $elk['layers'] = function () {
-	return TemplateLayers::getInstance();
+	return new TemplateLayers();
 };
 
-$elk['templates'] = function () {
-	return Templates::getInstance();
+$elk['templates'] = function ($elk) {
+	return new Templates($elk['debug']);
 };
 
 /**
@@ -77,8 +78,7 @@ $elk['db'] = function () use ($elk, $db_persist, $db_server, $db_user, $db_passw
 	//global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 	//global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
-//	/$db = new Elkarte\Database\Database($db_type);
-	$db = new Elkarte\Database\Database($db_type, $elk['hooks']);
+	$db = new Elkarte\Database\Database($db_type, $elk['errors'], $elk['debug'], $elk['hooks']);
 
 	$options = array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port);
 
@@ -102,8 +102,8 @@ $elk['dispatcher'] = function () use ($elk) {
 /**
  * @return Session
  */
-$elk['session'] = function () {
-	return Session::getInstance();
+$elk['session'] = function ($elk) {
+	return new Elkarte\Session\Session($elk['req'], $elk['hooks'], $elk['db']);
 };
 
 /**
@@ -117,7 +117,7 @@ $elk['debug'] = function () {
  * @return BanCheck
  */
 $elk['ban_check'] = function () use ($elk) {
-	return new BanCheck($elk['http_req'], $elk['db'], $elk['errors'], $elk['hooks']);
+	return new Elkarte\Security\BanCheck($elk['http_req'], $elk['db'], $elk['errors'], $elk['hooks']);
 };
 
 /**

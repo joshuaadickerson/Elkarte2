@@ -532,7 +532,7 @@ function processAttachments($id_msg = null)
 	//   id_folder => $modSettings['currentAttachmentUploadDir']
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
-	Hooks::get()->hook('attachment_upload');
+	$GLOBALS['elk']['hooks']->hook('attachment_upload');
 }
 
 /**
@@ -737,8 +737,8 @@ function attachmentChecks($attachID)
 					'type' => 1,
 				)
 			);
-			list ($context['dir_files'], $context['dir_size']) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($context['dir_files'], $context['dir_size']) = $request->fetchRow();
+			$request->free();
 		}
 		$context['dir_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
 		$context['dir_files']++;
@@ -1037,7 +1037,7 @@ function getAvatar($id_attach)
 	$db = database();
 
 	// Use our cache when possible
-	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
+	if ($GLOBALS['elk']['cache']->getVar($cache, 'getAvatar_id-' . $id_attach))
 		$avatarData = $cache;
 	else
 	{
@@ -1053,11 +1053,11 @@ function getAvatar($id_attach)
 			)
 		);
 		$avatarData = array();
-		if ($db->num_rows($request) != 0)
-			$avatarData = $db->fetch_row($request);
-		$db->free_result($request);
+		if ($request->numRows() != 0)
+			$avatarData = $request->fetchRow();
+		$request->free();
 
-		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
+		$GLOBALS['elk']['cache']->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
 
 	return $avatarData;
@@ -1094,9 +1094,9 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	);
 
 	$attachmentData = array();
-	if ($db->num_rows($request) != 0)
-		$attachmentData = $db->fetch_row($request);
-	$db->free_result($request);
+	if ($request->numRows() != 0)
+		$attachmentData = $request->fetchRow();
+	$request->free();
 
 	return $attachmentData;
 }
@@ -1258,7 +1258,7 @@ function url_image_size($url)
 	$url = str_replace(' ', '%20', $url);
 
 	// Can we pull this from the cache... please please?
-	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
+	if ($GLOBALS['elk']['cache']->getVar($temp, 'url_image_size-' . md5($url), 240))
 		return $temp;
 
 	$t = microtime(true);
@@ -1315,7 +1315,7 @@ function url_image_size($url)
 
 	// If this took a long time, we may never have to do it again, but then again we might...
 	if (microtime(true) - $t > 0.8)
-		Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+		$GLOBALS['elk']['cache']->put('url_image_size-' . md5($url), $size, 240);
 
 	// Didn't work.
 	return $size;
@@ -1434,7 +1434,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 		)
 	);
 	$temp = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row, $all_posters)))
 			continue;
@@ -1444,7 +1444,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 		if (!isset($attachments[$row['id_msg']]))
 			$attachments[$row['id_msg']] = array();
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// This is better than sorting it with the query...
 	ksort($temp);
@@ -1680,8 +1680,8 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 			)
 		);
 	}
-	$size = $db->fetch_row($request);
-	$db->free_result($request);
+	$size = $request->fetchRow();
+	$request->free();
 
 	return $size;
 }

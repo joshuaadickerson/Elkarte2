@@ -61,7 +61,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	loadLanguage('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
-	if (!TemplateLayers::getInstance()->hasLayers())
+	if (!$GLOBALS['elk']['layers']->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');
@@ -70,7 +70,7 @@ function is_not_guest($message = '', $is_fatal = true)
 		return false;
 	else
 	{
-		\Templates::getInstance()->load('Login');
+		$GLOBALS['elk']['templates']->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
@@ -98,12 +98,12 @@ function createToken($action, $type = 'post')
 	global $context;
 
 	// Generate a new token token_var pair
-	$tokenizer = new Token_Hash();
+	$tokenizer = new TokenHash();
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
 	// We need user agent and the client IP
-	$req = \Request::instance();
+	$req = $GLOBALS['elk']['req'];
 	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
 
 	// Save the session token and make it available to the forms
@@ -153,7 +153,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	// 5. If it matches, success, otherwise we fallout.
 
 	// We need the user agent and client IP
-	$req = \Request::instance();
+	$req = $GLOBALS['elk']['req'];
 
 	// Shortcut
 	$passed_token_var = isset($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) ? $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] : null;
@@ -246,7 +246,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$tokenizer = new Token_Hash();
+		$tokenizer = new TokenHash();
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 			$context['form_sequence_number'] = $tokenizer->generate_hash();
@@ -289,7 +289,7 @@ function allowedTo($permission, $boards = null)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// You're always allowed to do nothing. (unless you're a working man, MR. LAZY :P!)
 	if (empty($permission))
@@ -343,13 +343,13 @@ function allowedTo($permission, $boards = null)
 	);
 
 	// Make sure they can do it on all of the boards.
-	if ($db->num_rows($request) != count($boards))
+	if ($request->numRows() != count($boards))
 		return false;
 
 	$result = true;
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$result &= !empty($row['add_deny']);
-	$db->free_result($request);
+	$request->free();
 
 	// If the query returned 1, they can do it... otherwise, they can't.
 	return $result;
@@ -434,7 +434,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
 	global $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Arrays are nice, most of the time.
 	if (!is_array($permissions))
@@ -483,7 +483,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	);
 	$boards = array();
 	$deny_boards = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if ($simple)
 		{
@@ -500,7 +500,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 				$boards[$row['permission']][] = $row['id_board'];
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
 	if ($simple)
 		$boards = array_unique(array_values(array_diff($boards, $deny_boards)));
@@ -577,7 +577,7 @@ function spamProtection($error_type, $fatal = true)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
+	$db = $GLOBALS['elk']['db'];
 
 	// Certain types take less/more time.
 	$timeOverrides = array(
@@ -590,7 +590,7 @@ function spamProtection($error_type, $fatal = true)
 		'reporttm' => $modSettings['spamWaitTime'] * 4,
 		'search' => !empty($modSettings['search_floodcontrol_time']) ? $modSettings['search_floodcontrol_time'] : 1,
 	);
-	Hooks::get()->hook('spam_protection', array(&$timeOverrides));
+	$GLOBALS['elk']['hooks']->hook('spam_protection', array(&$timeOverrides));
 
 	// Moderators are free...
 	if (!allowedTo('moderate_board'))
@@ -931,7 +931,7 @@ function checkSecurityFiles()
 	$has_files = false;
 
 	$securityFiles = array('Install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-	Hooks::get()->hook('security_files', array(&$securityFiles));
+	$GLOBALS['elk']['hooks']->hook('security_files', array(&$securityFiles));
 
 	foreach ($securityFiles as $securityFile)
 	{

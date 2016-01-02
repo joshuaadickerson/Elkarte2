@@ -180,9 +180,9 @@ if (isset($modSettings['elkVersion']))
 			'db_error_skip' => true,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$modSettings[$row['variable']] = $row['value'];
-	$db->free_result($request);
+	$request->free();
 }
 
 // Make sure we have the theme information setup
@@ -452,9 +452,9 @@ function loadEssentialData()
 			)
 		);
 		$modSettings = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$modSettings[$row['variable']] = $row['value'];
-		$db->free_result($request);
+		$request->free();
 	}
 	else
 		return throw_error('Cannot find ' . SOURCEDIR . '/database/Database.subs.php. Please check you have uploaded all source files and have the correct paths set.');
@@ -652,9 +652,9 @@ function checkLogin()
 					'db_error_skip' => true,
 				)
 			);
-			if ($db->num_rows($request) != 0)
+			if ($request->numRows() != 0)
 				$oldDB = true;
-			$db->free_result($request);
+			$request->free();
 		}
 
 		// Get what we believe to be their details.
@@ -682,9 +682,9 @@ function checkLogin()
 					)
 				);
 
-			if ($db->num_rows($request) != 0)
+			if ($request->numRows() != 0)
 			{
-				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $db->fetch_row($request);
+				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $request->fetchRow();
 
 				// These will come in handy, if you want to login
 				require_once(SOURCEDIR . '/Security.php');
@@ -748,7 +748,7 @@ function checkLogin()
 			else
 				$upcontext['username_incorrect'] = true;
 
-			$db->free_result($request);
+			$request->free();
 		}
 
 		$upcontext['username'] = $_POST['user'];
@@ -799,9 +799,9 @@ function checkLogin()
 							'db_error_skip' => true,
 						)
 					);
-					if ($db->num_rows($request) == 0)
+					if ($request->numRows() == 0)
 						return throw_error('You need to be an Admin to perform an upgrade!');
-					$db->free_result($request);
+					$request->free();
 				}
 
 				$upcontext['user']['id'] = $id_member;
@@ -1335,9 +1335,9 @@ function getMemberGroups()
 			)
 		);
 	}
-	while ($row = $db->fetch_row($request))
+	while ($row = $request->fetchRow())
 		$member_groups[trim($row[0])] = $row[1];
-	$db->free_result($request);
+	$request->free();
 
 	return $member_groups;
 }
@@ -1830,10 +1830,10 @@ function discoverCollation()
 				'db_error_skip' => true,
 			)
 		);
-		if ($db->num_rows($request) === 0)
+		if ($request->numRows() === 0)
 			die('Unable to find members table!');
-		$table_status = $db->fetch_assoc($request);
-		$db->free_result($request);
+		$table_status = $request->fetchAssoc();
+		$request->free();
 
 		if (!empty($table_status['Collation']))
 		{
@@ -1846,9 +1846,9 @@ function discoverCollation()
 				)
 			);
 			// Got something?
-			if ($db->num_rows($request) !== 0)
-				$collation_info = $db->fetch_assoc($request);
-			$db->free_result($request);
+			if ($request->numRows() !== 0)
+				$collation_info = $request->fetchAssoc();
+			$request->free();
 
 			// Excellent!
 			if (!empty($collation_info['Collation']) && !empty($collation_info['Charset']))

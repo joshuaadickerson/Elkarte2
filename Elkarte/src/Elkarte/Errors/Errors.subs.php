@@ -93,7 +93,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	if (empty($tried_hook))
 	{
 		$tried_hook = true;
-		Hooks::get()->hook('error_types', array(&$other_error_types));
+		$GLOBALS['elk']['hooks']->hook('error_types', array(&$other_error_types));
 		$known_error_types += $other_error_types;
 	}
 
@@ -158,7 +158,7 @@ function fatal_error($error, $log = 'general')
 		die($error);
 
 	if (class_exists('TemplateLayers'))
-		TemplateLayers::getInstance()->isError();
+		$GLOBALS['elk']['layers']->isError();
 
 	setup_fatal_error_context($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2) ? log_error($error, $log) : $error, $error);
 }
@@ -195,7 +195,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 		die($error);
 
 	if (class_exists('TemplateLayers'))
-		TemplateLayers::getInstance()->isError();
+		$GLOBALS['elk']['layers']->isError();
 
 	$reload_lang_file = true;
 
@@ -277,7 +277,7 @@ function error_handler($error_level, $error_string, $file, $line)
 	$message = log_error($error_level . ': ' . $error_string, $error_type, $file, $line);
 
 	// Let's give integrations a chance to output a bit differently
-	Hooks::get()->hook('output_error', array($message, $error_type, $error_level, $file, $line));
+	$GLOBALS['elk']['hooks']->hook('output_error', array($message, $error_type, $error_level, $file, $line));
 
 	// Dying on these errors only causes MORE problems (blank pages!)
 	if ($file == 'Unknown')
@@ -333,7 +333,7 @@ function setup_fatal_error_context($error_message, $error_code)
 		$context['page_title'] = $context['error_title'];
 
 	// Load the template and set the sub template.
-	\Templates::getInstance()->load('Errors');
+	$GLOBALS['elk']['templates']->load('Errors');
 	$context['sub_template'] = 'fatal_error';
 
 	// If this is SSI, what do they want us to do?
@@ -342,7 +342,7 @@ function setup_fatal_error_context($error_message, $error_code)
 		if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 			$ssi_on_error_method();
 		elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-			\Templates::getInstance()->loadSubTemplate('fatal_error');
+			$GLOBALS['elk']['templates']->loadSubTemplate('fatal_error');
 
 		// No layers?
 		if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
@@ -405,7 +405,7 @@ function display_db_error()
 	global $webmaster_email, $db_last_error, $db_error_send;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = $GLOBALS['elk']['cache'];
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)
@@ -427,7 +427,7 @@ function display_db_error()
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.
-		$db_error = $db->last_error($db->connection());
+		$db_error = $db->lastError($db->connection());
 		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 	}
 

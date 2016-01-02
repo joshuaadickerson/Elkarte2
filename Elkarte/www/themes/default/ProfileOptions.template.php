@@ -20,7 +20,7 @@
  */
 function template_ProfileOptions_init()
 {
-	\Templates::getInstance()->load('GenericBoards');
+	$GLOBALS['elk']['templates']->load('GenericBoards');
 }
 
 /**

@@ -56,7 +56,7 @@ class QuotedmemMentionMentionBoardAccess extends AbstractMentionBoardAccess
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \Mentioning(database(), new \DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new \Mentioning($GLOBALS['elk']['db'], new \DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 	}
@@ -93,7 +93,7 @@ class QuotedmemMentionMentionBoardAccess extends AbstractMentionBoardAccess
 
 		if (!empty($members_id))
 		{
-			$notifier = new \Notifications(database());
+			$notifier = new \Notifications($GLOBALS['elk']['db']);
 			$notifier->add(new \Notifications_Task(
 				'quotedmem',
 				$msg_id,

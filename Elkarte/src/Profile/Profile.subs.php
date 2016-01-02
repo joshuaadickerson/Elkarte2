@@ -76,7 +76,7 @@ function setupProfileContext($fields, $hook = '')
 	global $profile_fields, $context, $cur_profile, $txt;
 
 	if (!empty($hook))
-		Hooks::get()->hook('' . $hook . '_profile_fields', array(&$fields));
+		$GLOBALS['elk']['hooks']->hook('' . $hook . '_profile_fields', array(&$fields));
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -200,7 +200,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// Shortcut.
 		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
@@ -297,9 +297,9 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
 
-	$db->free_result($request);
+	$request->free();
 
-	Hooks::get()->hook('load_custom_profile_fields', array($memID, $area));
+	$GLOBALS['elk']['hooks']->hook('load_custom_profile_fields', array($memID, $area));
 }
 
 /**
@@ -524,8 +524,8 @@ function loadProfileFields($force_reload = false)
 						'variable' => 'name',
 					)
 				);
-				list ($name) = $db->fetch_row($request);
-				$db->free_result($request);
+				list ($name) = $request->fetchRow();
+				$request->free();
 
 				$context['member']['theme'] = array(
 					'id' => $cur_profile['id_theme'],
@@ -996,7 +996,7 @@ function loadProfileFields($force_reload = false)
 		),
 	);
 
-	Hooks::get()->hook('load_profile_fields', array(&$profile_fields));
+	$GLOBALS['elk']['hooks']->hook('load_profile_fields', array(&$profile_fields));
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
@@ -1189,8 +1189,8 @@ function profileValidateEmail($email, $memID = 0)
 			'email_address' => $email,
 		)
 	);
-	$num = $db->num_rows($request);
-	$db->free_result($request);
+	$num = $request->numRows();
+	$request->free();
 
 	return ($num > 0) ? 'email_taken' : true;
 }
@@ -1233,7 +1233,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'ignore_boards',
 	);
 
-	Hooks::get()->hook('save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+	$GLOBALS['elk']['hooks']->hook('save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
 
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
@@ -1326,9 +1326,9 @@ function makeThemeChanges($memID, $id_theme)
 		)
 	);
 	$custom_fields = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$custom_fields[] = $row['col_name'];
-	$db->free_result($request);
+	$request->free();
 
 	// These are the theme changes...
 	$themeSetArray = array();
@@ -1382,7 +1382,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)
-			Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
+			$GLOBALS['elk']['cache']->remove('theme_settings-' . $t . ':' . $memID);
 	}
 }
 
@@ -1435,9 +1435,9 @@ function makeNotificationChanges($memID)
 			)
 		);
 		$notification_current = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$notification_current[] = $row['id_board'];
-		$db->free_result($request);
+		$request->free();
 
 		// And remove what they no longer want
 		$notification_deletes = array_diff($notification_current, $notification_wanted);
@@ -1519,7 +1519,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	);
 	$changes = array();
 	$log_changes = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		/* This means don't save if:
 			- The user is NOT an Admin.
@@ -1584,9 +1584,9 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			$user_profile[$memID]['options'][$row['col_name']] = $value;
 		}
 	}
-	$db->free_result($request);
+	$request->free();
 
-	Hooks::get()->hook('save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
+	$GLOBALS['elk']['hooks']->hook('save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
 
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))
@@ -1674,7 +1674,7 @@ function profileSendActivation()
 	$context['user']['is_guest'] = true;
 
 	// Send them to the done-with-registration-login screen.
-	\Templates::getInstance()->load('Register');
+	$GLOBALS['elk']['templates']->load('Register');
 
 	$context['page_title'] = $txt['profile'];
 	$context['sub_template'] = 'after';
@@ -2435,9 +2435,9 @@ function profileSaveGroups(&$value)
 			)
 		);
 		$protected_groups = array(1);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$protected_groups[] = $row['id_group'];
-		$db->free_result($request);
+		$request->free();
 
 		$protected_groups = array_unique($protected_groups);
 	}
@@ -2494,8 +2494,8 @@ function profileSaveGroups(&$value)
 					'selected_member' => $context['id_member'],
 				)
 			);
-			list ($another) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($another) = $request->fetchRow();
+			$request->free();
 
 			if (empty($another))
 				$GLOBALS['elk']['errors']->fatal_lang_error('at_least_one_admin', 'critical');
@@ -2544,7 +2544,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$previous_warnings = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$previous_warnings[] = array(
 			'issuer' => array(
@@ -2559,7 +2559,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $previous_warnings;
 }
@@ -2584,8 +2584,8 @@ function list_getUserWarningCount($memID)
 			'warning' => 'warning',
 		)
 	);
-	list ($total_warnings) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_warnings) = $request->fetchRow();
+	$request->free();
 
 	return $total_warnings;
 }
@@ -2642,7 +2642,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 		)
 	);
 	$attachments = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		if (!$row['approved'])
 			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
@@ -2668,7 +2668,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 		);
 	}
 
-	$db->free_result($request);
+	$request->free();
 
 	return $attachments;
 }
@@ -2707,8 +2707,8 @@ function getNumAttachments($boardsAllowed, $memID)
 			'board' => $board,
 		)
 	);
-	list ($attachCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($attachCount) = $request->fetchRow();
+	$request->free();
 
 	return $attachCount;
 }
@@ -2747,9 +2747,9 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$topics[] = $row['id_topic'];
-	$db->free_result($request);
+	$request->free();
 
 	// Any topics found?
 	$topicsInfo = array();
@@ -2767,9 +2767,9 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 				'topics' => $topics,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 			$topicsInfo[] = $row;
-		$db->free_result($request);
+		$request->free();
 	}
 
 	return $topicsInfo;
@@ -2797,8 +2797,8 @@ function getNumUnwatchedBy($memID)
 			'current_member' => $memID,
 		)
 	);
-	list ($unwatchedCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($unwatchedCount) = $request->fetchRow();
+	$request->free();
 
 	return $unwatchedCount;
 }
@@ -2834,8 +2834,8 @@ function count_user_posts($memID, $board = null)
 		)
 	);
 
-	list ($msgCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($msgCount) = $request->fetchRow();
+	$request->free();
 
 	return $msgCount;
 }
@@ -2871,8 +2871,8 @@ function count_user_topics($memID, $board = null)
 		)
 	);
 
-	list ($msgCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($msgCount) = $request->fetchRow();
+	$request->free();
 
 	return $msgCount;
 }
@@ -2906,8 +2906,8 @@ function findMinMaxUserMessage($memID, $board = null)
 			'board' => $board,
 		)
 	);
-	$minmax = $db->fetch_row($request);
-	$db->free_result($request);
+	$minmax = $request->fetchRow();
+	$request->free();
 
 	return empty($minmax) ? array(0, 0) : $minmax;
 }
@@ -2941,8 +2941,8 @@ function findMinMaxUserTopic($memID, $board = null)
 			'board' => $board,
 		)
 	);
-	$minmax = $db->fetch_row($request);
-	$db->free_result($request);
+	$minmax = $request->fetchRow();
+	$request->free();
 
 	return empty($minmax) ? array(0, 0) : $minmax;
 }
@@ -2998,16 +2998,16 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 		);
 
 		// Did we get what we wanted, if so stop looking
-		if ($db->num_rows($request) === $count || empty($range_limit))
+		if ($request->numRows() === $count || empty($range_limit))
 			break;
 		else
 			$range_limit = '';
 	}
 
 	// Place them in the post array
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$user_posts[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $user_posts;
 }
@@ -3063,16 +3063,16 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 		);
 
 		// Did we get what we wanted, if so stop looking
-		if ($db->num_rows($request) === $count || empty($range_limit))
+		if ($request->numRows() === $count || empty($range_limit))
 			break;
 		else
 			$range_limit = '';
 	}
 
 	// Place them in the topic array
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$user_topics[] = $row;
-	$db->free_result($request);
+	$request->free();
 
 	return $user_topics;
 }
@@ -3102,7 +3102,7 @@ function getMemberGeneralPermissions($curGroups)
 		)
 	);
 	$general_permission = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))
@@ -3135,7 +3135,7 @@ function getMemberGeneralPermissions($curGroups)
 		// Once denied is always denied.
 		$general_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $general_permission;
 }
@@ -3175,7 +3175,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 		)
 	);
 	$board_permission = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))
@@ -3203,7 +3203,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 		$board_permission[$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][$row['id_group']] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
 		$board_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	return $board_permission;
 }
@@ -3231,8 +3231,8 @@ function getMembersIPs($memID)
 				'current_member' => $memID,
 			)
 		);
-		list ($max_msg_member) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($max_msg_member) = $request->fetchRow();
+		$request->free();
 
 		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
 		$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
@@ -3259,10 +3259,10 @@ function getMembersIPs($memID)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$ips[] = $row['poster_ip'];
 
-	$db->free_result($request);
+	$request->free();
 
 	// Now also get the IP addresses from the error messages.
 	$request = $db->query('', '
@@ -3277,10 +3277,10 @@ function getMembersIPs($memID)
 
 	$error_ips = array();
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$error_ips[] = $row['ip'];
 
-	$db->free_result($request);
+	$request->free();
 
 	return array('message_ips' => array_unique($ips), 'error_ips' => array_unique($error_ips));
 }
@@ -3313,9 +3313,9 @@ function getMembersInRange($ips, $memID)
 		)
 	);
 
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$message_members[] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	// And then get the member ID's belong to other users
 	$request = $db->query('', '
@@ -3328,9 +3328,9 @@ function getMembersInRange($ips, $memID)
 			'ip_list' => $ips,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$message_members[] = $row['id_member'];
-	$db->free_result($request);
+	$request->free();
 
 	// Once the IDs are all combined, let's clean them up
 	$message_members = array_unique($message_members);

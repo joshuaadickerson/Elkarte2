@@ -108,7 +108,7 @@ class Xcache extends AbstractCacheMethod
 	public static function title()
 	{
 		if (self::available())
-			\Hooks::get()->add('integrate_modify_cache_settings', 'Xcache_Cache::settings', '', false);
+			$GLOBALS['elk']['hooks']->add('integrate_modify_cache_settings', 'Xcache_Cache::settings', '', false);
 
 		return 'XCache';
 	}

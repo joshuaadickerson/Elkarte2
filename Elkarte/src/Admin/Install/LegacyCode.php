@@ -21,10 +21,10 @@ function textfield_alter($change, $substep)
 			'db_error_skip' => true,
 		)
 	);
-	if ($db->num_rows($request) === 0)
+	if ($request->numRows() === 0)
 		die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
-	$table_row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$table_row = $request->fetchAssoc();
+	$request->free();
 
 	// If something of the current column definition is different, fix it.
 	$column_fix = $table_row['Type'] !== $change['type'] || (strtolower($table_row['Null']) === 'yes') !== $change['null_allowed'] || ($table_row['Default'] === null) !== !isset($change['default']) || (isset($change['default']) && $change['default'] !== $table_row['Default']);
@@ -44,11 +44,11 @@ function textfield_alter($change, $substep)
 			)
 		);
 		// No results? Just forget it all together.
-		if ($db->num_rows($request) === 0)
+		if ($request->numRows() === 0)
 			unset($table_row['Collation']);
 		else
-			$collation_info = $db->fetch_assoc($request);
-		$db->free_result($request);
+			$collation_info = $request->fetchAssoc();
+		$request->free();
 	}
 
 	if ($column_fix)
@@ -121,8 +121,8 @@ function checkChange(&$change)
 		if ($db->num_rows != 1)
 			return;
 
-		list (, $current_type) = $db->fetch_assoc($request);
-		$db->free_result($request);
+		list (, $current_type) = $request->fetchAssoc();
+		$request->free();
 	}
 	else
 	{
@@ -136,11 +136,11 @@ function checkChange(&$change)
 		);
 
 		// Mayday!
-		if ($db->num_rows($request) == 0)
+		if ($request->numRows() == 0)
 			return;
 
 		// Oh where, oh where has my little field gone. Oh where can it be...
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
 			{

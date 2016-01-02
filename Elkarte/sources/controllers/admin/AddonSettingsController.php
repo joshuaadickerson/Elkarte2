@@ -140,7 +140,7 @@ class AddonSettingsController extends AbstractController
 		$config_vars = array();
 
 		// Add new settings with a nice hook.
-		Hooks::get()->hook('general_mod_settings', array(&$config_vars));
+		$GLOBALS['elk']['hooks']->hook('general_mod_settings', array(&$config_vars));
 
 		return $config_vars;
 	}

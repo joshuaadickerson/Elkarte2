@@ -20,7 +20,7 @@
  */
 function template_Display_init()
 {
-	\Templates::getInstance()->load('GenericMessages');
+	$GLOBALS['elk']['templates']->load('GenericMessages');
 }
 
 /**

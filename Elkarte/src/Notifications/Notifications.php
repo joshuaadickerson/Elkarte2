@@ -12,8 +12,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Notifications;
+
+use Elkarte\Elkarte\AbstractModel;
 
 class Notifications extends AbstractModel
 {
@@ -63,7 +64,7 @@ class Notifications extends AbstractModel
 
 		$this->_protect_id = true;
 
-		Hooks::get()->hook('notifications_methods', array($this));
+		$GLOBALS['elk']['hooks']->hook('notifications_methods', array($this));
 	}
 
 	/**
@@ -96,8 +97,6 @@ class Notifications extends AbstractModel
 	 */
 	public function send()
 	{
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\Sources\\subs\\MentionType');
-
 		$this->_notification_frequencies = array(
 			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
 			1 => 'notification',
@@ -352,7 +351,7 @@ class Notifications extends AbstractModel
 	public static function getInstance()
 	{
 		if (self::$_instance === null)
-			self::$_instance = new Notifications(database());
+			self::$_instance = new Notifications($GLOBALS['elk']['db']);
 
 		return self::$_instance;
 	}

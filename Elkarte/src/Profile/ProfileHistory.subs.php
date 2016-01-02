@@ -38,8 +38,8 @@ function getUserErrorCount($where, $where_vars = array())
 		WHERE ' . $where,
 		$where_vars
 	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -75,7 +75,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 		))
 	);
 	$error_messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$error_messages[] = array(
 			'ip' => $row['ip'],
 			'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
@@ -85,7 +85,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
-	$db->free_result($request);
+	$request->free();
 
 	return $error_messages;
 }
@@ -108,8 +108,8 @@ function getIPMessageCount($where, $where_vars = array())
 		WHERE {query_see_board} AND ' . $where,
 		$where_vars
 	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -145,7 +145,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 		array_merge($where_vars, array())
 	);
 	$messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$messages[] = array(
 			'ip' => $row['poster_ip'],
 			'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
@@ -160,7 +160,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time'])
 		);
-	$db->free_result($request);
+	$request->free();
 
 	return $messages;
 }
@@ -187,8 +187,8 @@ function getLoginCount($where, $where_vars = array())
 			'id_member' => $where_vars['current_member'],
 		)
 	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($count) = $request->fetchRow();
+	$request->free();
 
 	return $count;
 }
@@ -219,7 +219,7 @@ function getLogins($start, $items_per_page, $sort, $where, $where_vars = array()
 		)
 	);
 	$logins = array();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 		$logins[] = array(
 			'time' => standardTime($row['time']),
 			'html_time' => htmlTime($row['time']),
@@ -227,7 +227,7 @@ function getLogins($start, $items_per_page, $sort, $where, $where_vars = array()
 			'ip' => $row['ip'],
 			'ip2' => $row['ip2'],
 		);
-	$db->free_result($request);
+	$request->free();
 
 	return $logins;
 }
@@ -252,8 +252,8 @@ function getProfileEditCount($memID)
 			'owner' => $memID,
 		)
 	);
-	list ($edit_count) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($edit_count) = $request->fetchRow();
+	$request->free();
 
 	return $edit_count;
 }
@@ -292,7 +292,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	$edits = array();
 	$members = array();
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetchAssoc())
 	{
 		$extra = @unserialize($row['extra']);
 		if (!empty($extra['applicator']))
@@ -326,7 +326,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
 	}
-	$db->free_result($request);
+	$request->free();
 
 	// Get any member names.
 	if (!empty($members))

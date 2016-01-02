@@ -11,13 +11,32 @@
  *
  */
 
-namespace Elkarte\Database\Drivers;
+namespace Elkarte\Elkarte\Database\Drivers;
 
 /**
  * Database driver interface
  */
 interface DatabaseInterface
 {
+	const PERSIST = 'persist';
+	const DONT_SELECT_DB = 'dont_select_db';
+	const COMMIT = 'commit';
+
+	/**
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
+	 *
+	 * @param string $db_server
+	 * @param string $db_name
+	 * @param string $db_user
+	 * @param string $db_passwd
+	 * @param string $this->prefix
+	 * @param mixed[] $db_options
+	 *
+	 * @return DatabaseInterface
+	 */
+	public function connect($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array $db_options = array());
+
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
 	 *
@@ -26,7 +45,7 @@ interface DatabaseInterface
 	 *
 	 * @return string
 	 */
-	public function fix_prefix($db_prefix, $db_name);
+	public function fixPrefix($db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -44,10 +63,10 @@ interface DatabaseInterface
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection = null
+	 * @param resource|null 
 	 * @return string
 	 */
-	public function quote($db_string, $db_values, $connection = null);
+	public function quote($db_string, array $db_values);
 
 	/**
 	 * Do a query.  Takes care of errors too.
@@ -55,49 +74,45 @@ interface DatabaseInterface
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource|null $connection = null
 	 */
-	public function query($identifier, $db_string, $db_values = array(), $connection = null);
+	public function query($identifier, $db_string, array $db_values = array());
 
 	/**
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource|false|null $connection = null
 	 * @return type
 	 */
-	public function select($identifier, $db_string, array $db_values = array(), $connection = null);
+	public function select($identifier, $db_string, array $db_values = array());
 
 	/**
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource|false|null $connection = null
 	 * @return type
 	 */
-	public function update($identifier, $db_string, array $db_values = array(), $connection = null);
+	public function update($identifier, $db_string, array $db_values = array());
 
 	/**
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param resource|false|null $connection = null
 	 * @return type
 	 */
-	public function delete($identifier, $db_string, array $db_values = array(), $connection = null);
+	public function delete($identifier, $db_string, array $db_values = array());
 
 	/**
 	 * Do a query, and returns the results.
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param mixed[]|null
+	 * @param array $seeds = array()
 	 * @return array
 	 */
-	public function fetchQuery($db_string, $db_values = array(), $seeds = null);
+	public function fetchQuery($db_string, array $db_values = array(), array $seeds = array());
 
 	/**
 	 * Do a query and returns the results calling a callback on each row.
@@ -108,87 +123,27 @@ interface DatabaseInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
 	 * @param Callable|null $callback
-	 * @param mixed[]|null
+	 * @param array $seeds = array()
 	 * @return array
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), Callable $callback = null, $seeds = null);
-
-	/**
-	 * Fetch next result as association.
-	 *
-	 * @param resource $request
-	 * @param int|boolean $counter = false
-	 */
-	public function fetch_assoc($request, $counter = false);
-
-	/**
-	 * Fetch a row from the resultset given as parameter.
-	 *
-	 * @param resource $result
-	 * @param int|boolean $counter = false
-	 */
-	public function fetch_row($result, $counter = false);
-
-	/**
-	 * Free the resultset.
-	 *
-	 * @param resource $result
-	 * @return void
-	 */
-	public function free_result($result);
-
-	/**
-	 * Get the number of rows in the result.
-	 *
-	 * @param resource $result
-	 */
-	public function num_rows($result);
-
-	/**
-	 * Get the number of fields in the resultset.
-	 *
-	 * @param resource $request
-	 */
-	public function num_fields($request);
-
-	/**
-	 * Reset the internal result pointer.
-	 *
-	 * @param resource $request
-	 * @param int $counter
-	 */
-	public function data_seek($request, $counter);
-
-	/**
-	 * Returns count of affected rows from the last transaction.
-	 */
-	public function affected_rows();
-
-	/**
-	 * Last insert id
-	 *
-	 * @param string $table
-	 * @param string|null $field = null
-	 * @param resource|null $connection = null
-	 */
-	public function insert_id($table, $field = null, $connection = null);
+	public function fetchQueryCallback($db_string, array $db_values = array(), Callable $callback = null, array $seeds = array());
 
 	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource|null $connection = null
+	 * @param resource|null 
 	 */
-	public function db_transaction($type = 'commit', $connection = null);
+	public function transaction($type = 'commit');
 
 	/**
 	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource|null $connection = null
+	 * @param resource|null 
 	 */
-	public function error($db_string, $connection = null);
+	public function error($db_string);
 
 	/**
 	 * Sets the class not to return the error in case of failures.
@@ -207,10 +162,9 @@ interface DatabaseInterface
 	 * @param mixed[] $data
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource|null $connection = null
 	 * @return void
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
+	public function insert($method = 'replace', $table, array $columns, array $data, array $keys, $disable_trans = false);
 
 	/**
 	 * This function tries to work out additional error information from a back trace.
@@ -221,7 +175,7 @@ interface DatabaseInterface
 	 * @param string|null $file
 	 * @param int|null $line
 	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
+	public function errorBacktrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
 	/**
 	 * Escape string for the database input
@@ -229,7 +183,7 @@ interface DatabaseInterface
 	 * @param string $string
 	 * @return string
 	 */
-	public function escape_string($string);
+	public function escapeString($string);
 
 	/**
 	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
@@ -246,60 +200,34 @@ interface DatabaseInterface
 	 * @param string $string
 	 * @return string
 	 */
-	public function unescape_string($string);
+	public function unescapeString($string);
 
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource|null $connection = null
 	 * @return string
 	 */
-	public function last_error($connection = null);
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return bool
-	 */
-	public function support_ignore();
+	public function lastError();
 
 	/**
 	 * Get the name (title) of the database system.
 	 * @return string
 	 */
-	public function db_title();
-
-	/**
-	 * Whether the database system is case sensitive.
-	 *
-	 * @return bool
-	 */
-	public function db_case_sensitive();
-
-	/**
-	 * Gets all the necessary INSERTs for the table named table_name.
-	 * It goes in 250 row segments.
-	 *
-	 * @param string $tableName - the table to create the inserts for.
-	 * @param bool $new_table
-	 * @return string the query to insert the data back in, or an empty string if the table was empty.
-	 */
-	public function insert_sql($tableName, $new_table = false);
+	public function title();
 
 	/**
 	 * Select database.
 	 *
 	 * @param string|null $dbName = null
-	 * @param resource|null $connection = null
 	 */
-	public function select_db($dbName = null, $connection = null);
+	public function changeSchema($dbName = null);
 
 	/**
 	 * Return the number of queries executed
 	 *
 	 * @return int
 	 */
-	public function num_queries();
+	public function numQueries();
 
 	/**
 	 * Retrieve the connection object

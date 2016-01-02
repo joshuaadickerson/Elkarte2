@@ -20,6 +20,10 @@
  */
 
 namespace Elkarte\Elkarte\Errors;
+use Elkarte\Elkarte\Cache\Cache;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Events\Hooks;
+use Pimple\Container;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -36,7 +40,7 @@ class Errors
 	 * Sole private Errors instance
 	 * @var Errors
 	 */
-	private static $_errors = null;
+	private $_errors = null;
 
 	/**
 	 * Mask for errors that are fatal and will halt
@@ -62,13 +66,20 @@ class Errors
 	 */
 	private $error_name;
 
+	private $db;
+	private $cache;
+	private $hooks;
+	private $elk;
+
 	/**
 	 * Good old constructor
 	 */
-	public function __construct()
+	public function __construct(Container $elk)
 	{
 		// Build the bitwise mask
 		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+
+		$this->elk = $elk;
 	}
 
 	/**
@@ -108,7 +119,6 @@ class Errors
 	{
 		global $modSettings, $sc, $user_info, $scripturl, $last_error;
 
-		$db = database();
 		static $tried_hook = false;
 
 		// Check if error logging is actually on.
@@ -158,7 +168,7 @@ class Errors
 		{
 			// This prevents us from infinite looping if the hook or call produces an error.
 			$tried_hook = true;
-			\Hooks::get()->hook('error_types', array(&$other_error_types));
+			$this->loadHooks()->hook('error_types', array(&$other_error_types));
 			$known_error_types += $other_error_types;
 		}
 
@@ -170,7 +180,7 @@ class Errors
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
-			$db->insert('',
+			$this->loadDatabase()->insert('',
 				'{db_prefix}log_errors',
 				array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 				$error_info,
@@ -228,8 +238,9 @@ class Errors
 		if (empty($txt))
 			$this->terminate($error);
 
+		// @todo this should be moved... just not sure where yet
 		if (class_exists('TemplateLayers'))
-			TemplateLayers::getInstance()->isError();
+			$this->loadTemplateLayers()->isError();
 
 		$this->_setup_fatal_error_context($log ? $this->log_error($error, $log) : $error, $error);
 	}
@@ -267,8 +278,9 @@ class Errors
 		if (empty($context['theme_loaded']))
 			$this->terminate($error);
 
+		// @todo this should be moved... just not sure where yet
 		if (class_exists('TemplateLayers'))
-			TemplateLayers::getInstance()->isError();
+			$this->loadTemplateLayers()->isError();
 
 		$reload_lang_file = true;
 
@@ -300,6 +312,7 @@ class Errors
 	 * @param string $error_string
 	 * @param string $file
 	 * @param int $line
+	 * @return bool
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
 	{
@@ -308,7 +321,7 @@ class Errors
 			return true;
 
 		// Throw it as an exception so our exception_handler deals with it
-		$this->exception_handler(new Exception($error_string, $error_level), $file, $line);
+		$this->exception_handler(new \Exception($error_string, $error_level), $file, $line);
 
 		return false;
 	}
@@ -318,11 +331,11 @@ class Errors
 	 *
 	 * - It dies with fatal_error() if the error_level matches with error_reporting.
 	 *
-	 * @param Exception $e
+	 * @param \Exception $e
 	 * @param string|null $err_file
 	 * @param int|null $err_line
 	 */
-	public function exception_handler(Exception $e, $err_file = null, $err_line = null)
+	public function exception_handler(\Exception $e, $err_file = null, $err_line = null)
 	{
 		$this->error_text = '';
 
@@ -345,7 +358,7 @@ class Errors
 		$this->_displayDebug();
 
 		// Let's give integrations a chance to output a bit differently
-		\Hooks::get()->hook('output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
+		$this->loadHooks()->hook('output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
 
 		// Dying on these errors only causes MORE problems (blank pages!)
 		if ($err_file === 'Unknown')
@@ -479,7 +492,7 @@ class Errors
 		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'] ;
 
 		// Load the template and set the sub template.
-		\Templates::getInstance()->load('Errors');
+		$GLOBALS['elk']['templates']->load('Errors');
 		$context['sub_template'] = 'fatal_error';
 
 		// If this is SSI, what do they want us to do?
@@ -488,7 +501,7 @@ class Errors
 			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 				$ssi_on_error_method();
 			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				\Templates::getInstance()->loadSubTemplate('fatal_error');
+				$GLOBALS['elk']['templates']->loadSubTemplate('fatal_error');
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
@@ -549,9 +562,6 @@ class Errors
 	{
 		global $mbname, $modSettings, $maintenance, $webmaster_email, $db_error_send;
 
-		$db = database();
-		$cache = Cache::instance();
-
 		// Just check we're not in any buffers, just in case.
 		while (ob_get_level() > 0)
 			@ob_end_clean();
@@ -563,22 +573,22 @@ class Errors
 
 		// For our purposes, we're gonna want this on if at all possible.
 		$modSettings['cache_enable'] = 1;
-		$cache->enable(true)->setLevel(1);
+		$this->cache->enable(true)->setLevel(1);
 
-		if ($cache->getVar($temp, 'db_last_error', 600))
+		if ($this->cache->getVar($temp, 'db_last_error', 600))
 			$db_last_error = max($db_last_error, $temp);
 
 		// Perhaps we want to notify by mail that there was a db error
 		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 		{
 			// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
-			$cache->put('db_last_error', time(), 600);
-			if (!$cache->getVar($temp, 'db_last_error', 600))
+			$this->cache->put('db_last_error', time(), 600);
+			if (!$this->cache->getVar($temp, 'db_last_error', 600))
 				logLastDatabaseError();
 
 			// Language files aren't loaded yet :'(
-			$db_error = $db->last_error($db->connection());
-			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
+			$db_error = $this->loadDatabase()->lastError($this->loadDatabase()->connection());
+			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $this->loadDatabase()->title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 		}
 
 		// What to do?  Language files haven't and can't be loaded yet...
@@ -644,16 +654,23 @@ class Errors
 		header('Retry-After: 3600');
 	}
 
-	/**
-	 * Retrieve the sole instance of this class.
-	 *
-	 * @return Errors
-	 */
-	public static function instance()
+	protected function loadDatabase()
 	{
-		if (self::$_errors === null)
-			self::$_errors = new Errors();
+		return $this->elk['db'];
+	}
 
-		return self::$_errors;
+	protected function loadCache()
+	{
+		return $this->elk['cache'];
+	}
+
+	protected function loadHooks()
+	{
+		return $this->elk['hooks'];
+	}
+
+	protected function loadTemplateLayers()
+	{
+		return $this->elk['layers'];
 	}
 }

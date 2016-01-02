@@ -9,8 +9,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte\View;
+use Elkarte\Elkarte\Debug\Debug;
 
 /**
  * Manage templates
@@ -27,20 +27,14 @@ class Templates
 
     protected $subtemplate = 'main';
 
-    public static function getInstance()
-    {
-        if (self::$instance === null)
-        {
-            self::$instance = new Templates;
-        }
+	protected $debug;
 
-        return self::$instance;
-    }
-
-    protected function __construct()
+    public function __construct(Debug $debug)
     {
         // We want to be able to figure out any errors...
         @ini_set('track_errors', '1');
+
+		$this->debug = $debug;
     }
 
     public function setDirectories(array $dirs)
@@ -142,7 +136,7 @@ class Templates
         if ($loaded)
         {
             if ($db_show_debug === true)
-                Debug::get()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
+                $this->debug->add('templates', $template_name . ' (' . basename($template_dir) . ')');
 
             // If they have specified an initialization function for this template, go ahead and call it now.
             if (function_exists('template_' . $template_name . '_init'))
@@ -193,7 +187,7 @@ class Templates
         global $txt, $db_show_debug;
 
         if ($db_show_debug === true)
-            Debug::get()->add('sub_templates', $sub_template_name);
+            $this->debug->add('sub_templates', $sub_template_name);
 
         // Figure out what the template function is named.
         $theme_function = 'template_' . $sub_template_name;

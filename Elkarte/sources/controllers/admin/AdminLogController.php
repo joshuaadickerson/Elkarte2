@@ -105,7 +105,7 @@ class AdminLog_Controller extends AbstractController
 		);
 
 		// Give integration a way to add items
-		Hooks::get()->hook('manage_logs', array(&$log_functions));
+		$GLOBALS['elk']['hooks']->hook('manage_logs', array(&$log_functions));
 		$sub_action = isset($this->_req->query->sa, $log_functions[$this->_req->query->sa]) && empty($log_functions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : 'errorlog';
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
@@ -160,7 +160,7 @@ class AdminLog_Controller extends AbstractController
 
 		$config_vars = $this->_pruningSettings->settings();
 
-		Hooks::get()->hook('prune_settings');
+		$GLOBALS['elk']['hooks']->hook('prune_settings');
 
 		// Saving?
 		if (isset($this->_req->query->save))

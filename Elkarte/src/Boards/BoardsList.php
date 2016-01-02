@@ -439,7 +439,7 @@ class BoardsList
 
 		$boards = array_keys($this->_boards);
 
-		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
+		if (!$GLOBALS['elk']['cache']->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$mod_cached = $this->_db->fetchQuery('
 				SELECT mods.id_board, IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
@@ -450,7 +450,7 @@ class BoardsList
 					'id_boards' => $boards,
 				)
 			);
-			Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+			$GLOBALS['elk']['cache']->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
 		foreach ($mod_cached as $row_mods)

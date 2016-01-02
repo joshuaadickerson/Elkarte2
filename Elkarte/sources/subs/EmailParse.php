@@ -255,8 +255,8 @@ class Email_Parse
 				'id' => $id
 			)
 		);
-		list ($message) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($message) = $request->fetchRow();
+		$request->free();
 
 		return $message;
 	}

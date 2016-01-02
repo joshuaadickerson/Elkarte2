@@ -20,7 +20,7 @@
  */
 function template_PersonalMessage_init()
 {
-	\Templates::getInstance()->load('GenericMessages');
+	$GLOBALS['elk']['templates']->load('GenericMessages');
 }
 
 /**

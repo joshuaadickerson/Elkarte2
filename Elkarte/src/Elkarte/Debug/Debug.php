@@ -225,7 +225,7 @@ class Debug
 	 * Collects some other generic system informations necessary for the
 	 * debug screen
 	 */
-	private function _prepare_last_bits()
+	protected function _prepare_last_bits()
 	{
 		global $context;
 
@@ -312,7 +312,7 @@ class Debug
 		}
 
 		// If the cache is on, how successful was it?
-		if (Cache::instance()->isEnabled() && !empty($this->_cache_hits))
+		if ($GLOBALS['elk']['cache']->isEnabled() && !empty($this->_cache_hits))
 		{
 			$entries = array();
 			$total_t = 0;

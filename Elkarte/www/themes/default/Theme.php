@@ -2,6 +2,8 @@
 
 namespace Themes\DefaultTheme;
 
+use ElkArte\ElkArte\View\AbstractTheme;
+
 /**
  * The default theme
  *
@@ -19,10 +21,7 @@ namespace Themes\DefaultTheme;
  *
  */
 
-if (!defined('ELK'))
-    die('No access...');
-
-class Theme extends \AbstractTheme
+class Theme extends AbstractTheme
 {
     protected $id = 0;
 
@@ -110,7 +109,7 @@ class Theme extends \AbstractTheme
         // Show the load time?  (only makes sense for the footer.)
         $context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
         $context['load_time'] = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3);
-        $context['load_queries'] = $db->num_queries();
+        $context['load_queries'] = $db->numQueries();
 
         if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
         {
@@ -173,7 +172,7 @@ class Theme extends \AbstractTheme
             $combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
             $combine_name = $combiner->site_js_combine($this->js_files, $do_defered);
 
-            \Hooks::get()->hook('post_javascript_combine', array(&$combine_name, $combiner));
+            $GLOBALS['elk']['hooks']->hook('post_javascript_combine', array(&$combine_name, $combiner));
 
             if (!empty($combine_name))
                 echo '
@@ -219,7 +218,7 @@ class Theme extends \AbstractTheme
         }
 
         // Use this hook to work with Javascript files and vars pre output
-        \Hooks::get()->hook('pre_javascript_output');
+        $GLOBALS['elk']['hooks']->hook('pre_javascript_output');
 
         // Combine and minify javascript source files to save bandwidth and requests
         if (!empty($this->js_files))
@@ -280,7 +279,7 @@ class Theme extends \AbstractTheme
         global $modSettings, $boardurl;
 
         // Use this hook to work with CSS files pre output
-        \Hooks::get()->hook('pre_css_output');
+        $GLOBALS['elk']['hooks']->hook('pre_css_output');
 
         // Combine and minify the CSS files to save bandwidth and requests?
         if (!empty($this->css_files))
@@ -290,7 +289,7 @@ class Theme extends \AbstractTheme
                 $combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
                 $combine_name = $combiner->site_css_combine($this->css_files);
 
-                \Hooks::get()->hook('post_css_combine', array(&$combine_name, $combiner));
+                $GLOBALS['elk']['hooks']->hook('post_css_combine', array(&$combine_name, $combiner));
 
                 if (!empty($combine_name))
                     echo '
@@ -885,7 +884,7 @@ class Theme extends \AbstractTheme
             );
 
             // Allow editing menu buttons easily.
-            \Hooks::get()->hook('menu_buttons', array(&$buttons, &$menu_count));
+            $GLOBALS['elk']['hooks']->hook('menu_buttons', array(&$buttons, &$menu_count));
 
             // Now we put the buttons in the context so the theme can use them.
             $menu_buttons = array();
@@ -975,7 +974,7 @@ class Theme extends \AbstractTheme
 
         // Not all actions are simple.
         if (!empty($needs_action_hook))
-            \Hooks::get()->hook('current_action', array(&$current_action));
+            $GLOBALS['elk']['hooks']->hook('current_action', array(&$current_action));
 
         if (isset($context['menu_buttons'][$current_action]))
             $context['menu_buttons'][$current_action]['active_button'] = true;
@@ -1039,7 +1038,7 @@ class Theme extends \AbstractTheme
             'spellcheck',
         );
 
-        \Hooks::get()->hook('simple_actions', array(&$simpleActions));
+        $GLOBALS['elk']['hooks']->hook('simple_actions', array(&$simpleActions));
 
         // Output is fully XML, so no need for the index template.
         if (isset($_REQUEST['xml']))
@@ -1049,13 +1048,13 @@ class Theme extends \AbstractTheme
             // @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
             $this->templates->load('index');
             $this->templates->load('Xml');
-            \TemplateLayers::getInstance()->removeAll();
+            $GLOBALS['elk']['layers']->removeAll();
         }
         // These actions don't require the index template at all.
         elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
         {
             loadLanguage('index+Addons');
-            \TemplateLayers::getInstance()->removeAll();
+            $GLOBALS['elk']['layers']->removeAll();
         }
         else
         {

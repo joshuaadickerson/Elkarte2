@@ -77,12 +77,6 @@ class Request
 	private $_scripturl;
 
 	/**
-	 * Sole private Request instance
-	 * @var Request
-	 */
-	private static $_req = null;
-
-	/**
 	 * Retrieves client IP
 	 */
 	public function client_ip()
@@ -137,7 +131,7 @@ class Request
 	 * Private constructor.
 	 * It parses PHP server variables, and initializes its variables.
 	 */
-	private function __construct()
+	public function __construct()
 	{
 		// Client IP: REMOTE_ADDR, unless missing
 		$this->_getClientIP();
@@ -553,18 +547,5 @@ class Request
 				$_GET += $temp;
 			}
 		}
-	}
-
-	/**
-	 * Retrieve easily the sole instance of this class.
-	 *
-	 * @return Request
-	 */
-	public static function instance()
-	{
-		if (self::$_req === null)
-			self::$_req = new Request();
-
-		return self::$_req;
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * This does the installation steps
  */
-class Install_Controller
+class InstallController
 {
     public $steps = array();
     public $overall_percent = 0;

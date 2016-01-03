@@ -41,7 +41,7 @@ function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
-	$_req = HttpReq::instance();
+	$_req = $GLOBALS['elk']['http_req'];
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/Admin/change_menu.png') ? $settings['images_url'] . '/Admin' : $settings['default_images_url'] . '/Admin';
@@ -379,9 +379,9 @@ function callMenu($selectedMenu)
 
 	if (!empty($selectedMenu['controller']))
 	{
-		// 'controller' => 'ManageAttachments_Controller'
+		// 'controller' => 'ManageAttachmentsController'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller']($elk, new Event_Manager());
+		$controller = new $selectedMenu['controller']($elk, new \Elkarte\Elkarte\Events\EventManager());
 
 		// always set up the environment
 		$controller->pre_dispatch();

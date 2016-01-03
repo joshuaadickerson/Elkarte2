@@ -1091,7 +1091,6 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 
 		// Member id and ip
 		$ban_query[] = 'id_member = ' . $memID;
-		require_once(SOURCEDIR . '/Security.php');
 		$ban_query[] = constructBanQueryIP($memberContext[$memID]['ip']);
 
 		// Do we have a hostname?

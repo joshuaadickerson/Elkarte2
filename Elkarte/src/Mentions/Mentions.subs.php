@@ -16,7 +16,7 @@ if (!defined('ELK'))
 
 /**
  * Count the mentions of the current user
- * callback for createList in action_list of Mentions_Controller
+ * callback for createList in action_list of MentionsController
  *
  * @package Mentions
  * @param bool $all : if true counts all the mentions, otherwise only the unread
@@ -64,7 +64,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 
 /**
  * Retrieve all the info to render the mentions page for the current user
- * callback for createList in action_list of Mentions_Controller
+ * callback for createList in action_list of MentionsController
  *
  * @package Mentions
  * @param int $start Query starts sending results from here

@@ -383,7 +383,7 @@ class Theme extends AbstractTheme
         if (isBrowser('possibly_robot'))
         {
             // @todo Maybe move this somewhere better?!
-            $controller = new \ScheduledTasks_Controller();
+            $controller = new \ScheduledTasksController();
 
             // What to do, what to do?!
             if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -625,7 +625,7 @@ class Theme extends AbstractTheme
         if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
         {
             // Start things up: this is what we know by default
-            require_once(SUBSDIR . '/Menu.subs.php');
+            require_once(ELKDIR . '/Menu/Menu.subs.php');
             $buttons = array(
                 'home' => array(
                     'title' => $txt['community'],

@@ -40,7 +40,7 @@ interface MentionTypeInterface
 	public static function getModules($modules);
 
 	/**
-	 * Used by Mentions_Controller to filter the mentions to display in the list.
+	 * Used by MentionsController to filter the mentions to display in the list.
 	 *
 	 * @param string $type
 	 * @param mixed[] $mentions

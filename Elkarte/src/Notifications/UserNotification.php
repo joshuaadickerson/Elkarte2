@@ -13,7 +13,9 @@
  *
  */
 
-class User_Notification
+namespace Elkarte\Notifications;
+
+class UserNotification
 {
 	/**
 	 * All the shapes the icon can be.

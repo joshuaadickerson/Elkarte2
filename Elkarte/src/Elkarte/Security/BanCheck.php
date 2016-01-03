@@ -424,7 +424,7 @@ class BanCheck
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new Auth_Controller();
+			$controller = new AuthController();
 			$controller->action_logout(true, false);
 		}
 
@@ -503,7 +503,7 @@ class BanCheck
 		writeLog(true);
 
 		// Log them out
-		$controller = new Auth_Controller();
+		$controller = new AuthController();
 		$controller->action_logout(true, false);
 
 		// Tell them thanks

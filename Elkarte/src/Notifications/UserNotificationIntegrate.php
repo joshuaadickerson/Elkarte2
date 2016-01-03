@@ -11,7 +11,9 @@
  *
  */
 
-class User_Notification_Integrate
+namespace Elkarte\Notifications;
+
+class UserNotificationIntegrate
 {
 	/**
 	 * Dynamically registers the hooks for the feature.
@@ -25,7 +27,7 @@ class User_Notification_Integrate
 
 		// $hook, $function, $file
 		return array(
-			array('integrate_user_info', 'User_Notification_Integrate::integrate_user_info'),
+			array('integrate_user_info', 'UserNotificationIntegrate::integrate_user_info'),
 		);
 	}
 
@@ -36,8 +38,8 @@ class User_Notification_Integrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_modify_mention_settings', 'User_Notification_Integrate::integrate_modify_mention_settings'),
-			array('integrate_save_modify_mention_settings', 'User_Notification_Integrate::integrate_save_modify_mention_settings'),
+			array('integrate_modify_mention_settings', 'UserNotificationIntegrate::integrate_modify_mention_settings'),
+			array('integrate_save_modify_mention_settings', 'UserNotificationIntegrate::integrate_save_modify_mention_settings'),
 		);
 	}
 

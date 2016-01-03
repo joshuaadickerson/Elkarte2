@@ -117,7 +117,7 @@ function removeSettings($toRemove)
 		$toRemove = array($toRemove);
 
 	// Remove the setting from the db
-	database()->delete('', '
+	$GLOBALS['elk']['db']->delete('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:setting_name})',
 		array(
@@ -292,6 +292,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  *
  * @param float $number The float value to apply comma formatting
  * @param integer|false $override_decimal_count = false or number of decimals
+ * @return string A formatted version of number.
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -329,6 +330,7 @@ function comma_format($number, $override_decimal_count = false)
  * @param string|bool $show_today = true show "Today"/"Yesterday" or just a date
  * @param string|bool $offset_type = false If false, uses both user time offset and forum offset.
  *   If 'forum', uses only the forum offset. Otherwise no offset is applied.
+ * @return string
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -820,6 +822,7 @@ function memoryReturnBytes($val)
  *
  * @param int $time_limit The time limit
  * @param bool $server_reset whether to reset the server timer or not
+ * @return string
  */
 function setTimeLimit($time_limit, $server_reset = true)
 {

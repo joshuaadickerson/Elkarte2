@@ -30,7 +30,7 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-$controller = new Emailpost_Controller();
+$controller = new EmailpostController();
 $controller->action_pbe_post();
 
 // Always exit as successful

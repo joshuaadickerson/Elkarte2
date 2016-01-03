@@ -24,7 +24,7 @@ use Elkarte\Controllers\AbstractController;
  *
  * @package AdminLog
  */
-class AdminLog_Controller extends AbstractController
+class AdminLogController extends AbstractController
 {
 	/**
 	 * Pruning Settings form
@@ -44,27 +44,27 @@ class AdminLog_Controller extends AbstractController
 		$log_functions = array(
 			'errorlog' => array(
 				'function' => 'action_index',
-				'controller' => 'ManageErrors_Controller'),
+				'controller' => 'ManageErrorsController'),
 			'adminlog' => array(
 				'function' => 'action_log',
-				'controller' => 'Modlog_Controller'),
+				'controller' => 'ModlogController'),
 			'modlog' => array(
 				'function' => 'action_log',
-				'controller' => 'Modlog_Controller',
+				'controller' => 'ModlogController',
 				'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array(
 				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),
-				'controller' => 'BadBehavior_Controller'),
+				'controller' => 'BadBehaviorController'),
 			'banlog' => array(
 				'function' => 'action_log',
-				'controller' => 'ManageBans_Controller'),
+				'controller' => 'ManageBansController'),
 			'spiderlog' => array(
 				'function' => 'action_logs',
-				'controller' => 'ManageSearchEngines_Controller'),
+				'controller' => 'ManageSearchEnginesController'),
 			'tasklog' => array(
 				'function' => 'action_log',
-				'controller' => 'ManageScheduledTasks_Controller'),
+				'controller' => 'ManageScheduledTasksController'),
 			'pruning' => array(
 				'init' => '_initPruningSettingsForm',
 				'display' => 'action_pruningSettings_display'),

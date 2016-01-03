@@ -245,7 +245,7 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					$GLOBALS['elk']['hooks']->enableIntegration('User_Notification_Integrate');
+					$GLOBALS['elk']['hooks']->enableIntegration('UserNotificationIntegrate');
 					$GLOBALS['elk']['hooks']->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',

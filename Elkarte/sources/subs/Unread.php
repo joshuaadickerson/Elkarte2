@@ -221,7 +221,7 @@ class Unread
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
 	 * @return mixed[] - see Topic_$GLOBALS['elk']['text']->prepareContext
 	 */
-	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
+	protected function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{
 		if ($this->_preview_bodies == 'all')
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
@@ -305,7 +305,7 @@ class Unread
 	/**
 	 * Counts unread replies
 	 */
-	private function _countUnreadReplies()
+	protected function _countUnreadReplies()
 	{
 		if (!empty($this->_have_temp_table))
 		{
@@ -353,7 +353,7 @@ class Unread
 	 *             once, then there is an $id_msg_last_visit
 	 * @param int $id_msg_last_visit - highest id_msg found during the last visit
 	 */
-	private function _countRecentTopics($is_first_login, $id_msg_last_visit = 0)
+	protected function _countRecentTopics($is_first_login, $id_msg_last_visit = 0)
 	{
 		$request = $this->_db->query('', '
 			SELECT COUNT(*), MIN(t.id_last_msg)
@@ -386,7 +386,7 @@ class Unread
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
 	 * @return mixed[] - see Topic_$GLOBALS['elk']['text']->prepareContext
 	 */
-	private function _getUnreadReplies($start, $limit, $include_avatars = false)
+	protected function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
 		if (!empty($this->_have_temp_table))
 		{
@@ -522,7 +522,7 @@ class Unread
 	 * @param int $board_id - id of a board if looking at the unread of a single
 	 *            board, 0 if looking at the unread of the entire forum
 	 */
-	private function _unreadreplies_tempTable($board_id)
+	protected function _unreadreplies_tempTable($board_id)
 	{
 		$this->_db->query('', '
 			DROP TABLE IF EXISTS {db_prefix}topics_posted_in',
@@ -591,7 +591,7 @@ class Unread
 	/**
 	 * Creates a temporary table for logging of unread topics
 	 */
-	private function _recent_log_topics_unread_tempTable()
+	protected function _recent_log_topics_unread_tempTable()
 	{
 		$this->_db->query('', '
 			DROP TABLE IF EXISTS {db_prefix}log_topics_unread',

@@ -285,7 +285,7 @@ class CoreFeaturesController extends AbstractController
 
 		foreach ($glob as $file)
 		{
-			$class = $file->getBasename('.controller.php') . '_Controller';
+			$class = $file->getBasename('.controller.php') . 'Controller';
 
 			if (method_exists($class, 'addCoreFeature'))
 				$class::addCoreFeature($core_features);

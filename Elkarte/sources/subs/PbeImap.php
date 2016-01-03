@@ -116,7 +116,7 @@ class Pbe_Imap
 		if ($emails)
 		{
 			// Initialize Emailpost controller
-			$controller = new Emailpost_Controller();
+			$controller = new EmailpostController();
 
 			// Make sure we work from the oldest to the newest message
 			sort($emails);

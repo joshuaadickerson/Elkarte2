@@ -787,6 +787,6 @@ $txt['admin_order_error'] = 'An unknown error occurred while processing your req
 $txt['default'] = 'Default';
 $txt['front_page'] = 'Select the action to show on the front page:';
 
-$txt['BoardIndex_Controller'] = 'Board Index';
-$txt['MessageIndex_Controller'] = 'Content of a board';
+$txt['BoardIndexController'] = 'Board Index';
+$txt['MessageIndexController'] = 'Content of a board';
 $txt['message_index_frontpage'] = 'Select the board to show on the front page:';

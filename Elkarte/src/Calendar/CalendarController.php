@@ -23,7 +23,7 @@ namespace Elkarte\Calendar;
 use \Elkarte\Elkarte\Controller\AbstractController;
 
 /**
- * Calendar_Controller class, displays the calendar for the site and
+ * CalendarController class, displays the calendar for the site and
  * provides for its navigation
  */
 class CalendarController extends AbstractController
@@ -241,7 +241,7 @@ class CalendarController extends AbstractController
 
 	/**
 	 * Takes care of the saving process.
-	 * Not yet used directly, but through Calendar_Controller::action_post
+	 * Not yet used directly, but through CalendarController::action_post
 	 */
 	public function action_save()
 	{
@@ -297,7 +297,7 @@ class CalendarController extends AbstractController
 	}
 
 	/**
-	 * Shortcut to instantiate the Post_Controller:
+	 * Shortcut to instantiate the PostController:
 	 *  - require_once modules of the controller (not addons because these are
 	 *    always all require'd by the dispatcher),
 	 *  - creates the event manager and registers addons and modules,
@@ -307,7 +307,7 @@ class CalendarController extends AbstractController
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new Post_Controller(new EventManager());
+		$controller = new PostController(new EventManager());
 		$controller->pre_dispatch();
 
 		return $controller->action_post();

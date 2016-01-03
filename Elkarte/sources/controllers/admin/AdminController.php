@@ -30,7 +30,7 @@ if (!defined('ELK'))
  * @package Admin
  */
 
-class Admin_Controller extends AbstractController
+class AdminController extends AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks
@@ -81,21 +81,21 @@ class Admin_Controller extends AbstractController
 				'areas' => array(
 					'index' => array(
 						'label' => $txt['admin_center'],
-						'controller' => 'Admin_Controller',
+						'controller' => 'AdminController',
 						'function' => 'action_home',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_administration',
 					),
 					'credits' => array(
 						'label' => $txt['support_credits_title'],
-						'controller' => 'Admin_Controller',
+						'controller' => 'AdminController',
 						'function' => 'action_credits',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_support',
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
-						'controller' => 'ManageMaillist_Controller',
+						'controller' => 'ManageMaillistController',
 						'function' => 'action_index',
 						'icon' => 'mail.png',
 						'class' => 'admin_img_mail',
@@ -111,7 +111,7 @@ class Admin_Controller extends AbstractController
 					),
 					'news' => array(
 						'label' => $txt['news_title'],
-						'controller' => 'ManageNews_Controller',
+						'controller' => 'ManageNewsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_news',
@@ -124,7 +124,7 @@ class Admin_Controller extends AbstractController
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'controller' => 'Packages_Controller',
+						'controller' => 'PackagesController',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -140,7 +140,7 @@ class Admin_Controller extends AbstractController
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'controller' => 'PackageServers_Controller',
+						'controller' => 'PackageServersController',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -148,13 +148,13 @@ class Admin_Controller extends AbstractController
 						'hidden' => true,
 					),
 					'search' => array(
-						'controller' => 'Admin_Controller',
+						'controller' => 'AdminController',
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
 						'select' => 'index'
 					),
 					'adminlogoff' => array(
-						'controller' => 'Admin_Controller',
+						'controller' => 'AdminController',
 						'function' => 'action_endsession',
 						'label' => $txt['admin_logoff'],
 						'enabled' => empty($modSettings['securityDisable']),
@@ -169,14 +169,14 @@ class Admin_Controller extends AbstractController
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'controller' => 'CoreFeatures_Controller',
+						'controller' => 'CoreFeaturesController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_corefeatures',
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
-						'controller' => 'ManageFeatures_Controller',
+						'controller' => 'ManageFeaturesController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_features',
@@ -193,7 +193,7 @@ class Admin_Controller extends AbstractController
 					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
-						'controller' => 'ManageServer_Controller',
+						'controller' => 'ManageServerController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_server',
@@ -208,7 +208,7 @@ class Admin_Controller extends AbstractController
 					),
 					'securitysettings' => array(
 						'label' => $txt['admin_security_moderation'],
-						'controller' => 'ManageSecurity_Controller',
+						'controller' => 'ManageSecurityController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_security',
@@ -221,7 +221,7 @@ class Admin_Controller extends AbstractController
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
-						'controller' => 'ManageThemes_Controller',
+						'controller' => 'ManageThemesController',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=Admin;area=theme',
 						'icon' => 'transparent.png',
@@ -237,7 +237,7 @@ class Admin_Controller extends AbstractController
 					),
 					'current_theme' => array(
 						'label' => $txt['theme_current_settings'],
-						'controller' => 'ManageThemes_Controller',
+						'controller' => 'ManageThemesController',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=Admin;area=theme;sa=list;th=' . $settings['theme_id'],
 						'icon' => 'transparent.png',
@@ -245,7 +245,7 @@ class Admin_Controller extends AbstractController
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
-						'controller' => 'ManageLanguages_Controller',
+						'controller' => 'ManageLanguagesController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_languages',
@@ -257,7 +257,7 @@ class Admin_Controller extends AbstractController
 					),
 					'addonsettings' => array(
 						'label' => $txt['admin_modifications'],
-						'controller' => 'AddonSettings_Controller',
+						'controller' => 'AddonSettingsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_modifications',
@@ -273,7 +273,7 @@ class Admin_Controller extends AbstractController
 				'areas' => array(
 					'manageboards' => array(
 						'label' => $txt['admin_boards'],
-						'controller' => 'ManageBoards_Controller',
+						'controller' => 'ManageBoardsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_boards',
@@ -286,7 +286,7 @@ class Admin_Controller extends AbstractController
 					),
 					'postsettings' => array(
 						'label' => $txt['manageposts'],
-						'controller' => 'ManagePosts_Controller',
+						'controller' => 'ManagePostsController',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -300,7 +300,7 @@ class Admin_Controller extends AbstractController
 					),
 					'bbc' => array(
 						'label' => $txt['bbc_manage'],
-						'controller' => 'ManageBBC_Controller',
+						'controller' => 'ManageBBCController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_smiley',
@@ -308,7 +308,7 @@ class Admin_Controller extends AbstractController
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
-						'controller' => 'ManageSmileys_Controller',
+						'controller' => 'ManageSmileysController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_smiley',
@@ -324,7 +324,7 @@ class Admin_Controller extends AbstractController
 					),
 					'manageattachments' => array(
 						'label' => $txt['attachments_avatars'],
-						'controller' => 'ManageAttachments_Controller',
+						'controller' => 'ManageAttachmentsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_attachment',
@@ -339,7 +339,7 @@ class Admin_Controller extends AbstractController
 					),
 					'managesearch' => array(
 						'label' => $txt['manage_search'],
-						'controller' => 'ManageSearch_Controller',
+						'controller' => 'ManageSearchController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_search',
@@ -359,7 +359,7 @@ class Admin_Controller extends AbstractController
 				'areas' => array(
 					'viewmembers' => array(
 						'label' => $txt['admin_users'],
-						'controller' => 'ManageMembers_Controller',
+						'controller' => 'ManageMembersController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',
@@ -371,7 +371,7 @@ class Admin_Controller extends AbstractController
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
-						'controller' => 'ManageMembergroups_Controller',
+						'controller' => 'ManageMembergroupsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_membergroups',
@@ -384,7 +384,7 @@ class Admin_Controller extends AbstractController
 					),
 					'permissions' => array(
 						'label' => $txt['edit_permissions'],
-						'controller' => 'ManagePermissions_Controller',
+						'controller' => 'ManagePermissionsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_permissions',
@@ -399,7 +399,7 @@ class Admin_Controller extends AbstractController
 					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
-						'controller' => 'ManageBans_Controller',
+						'controller' => 'ManageBansController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_ban',
@@ -413,7 +413,7 @@ class Admin_Controller extends AbstractController
 					),
 					'regcenter' => array(
 						'label' => $txt['registration_center'],
-						'controller' => 'ManageRegistration_Controller',
+						'controller' => 'ManageRegistrationController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_regcenter',
@@ -428,7 +428,7 @@ class Admin_Controller extends AbstractController
 					'sengines' => array(
 						'label' => $txt['search_engines'],
 						'enabled' => in_array('sp', $context['admin_features']),
-						'controller' => 'ManageSearchEngines_Controller',
+						'controller' => 'ManageSearchEnginesController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_engines',
@@ -443,7 +443,7 @@ class Admin_Controller extends AbstractController
 					'paidsubscribe' => array(
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => in_array('ps', $context['admin_features']),
-						'controller' => 'ManagePaid_Controller',
+						'controller' => 'ManagePaidController',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_paid',
 						'function' => 'action_index',
@@ -461,7 +461,7 @@ class Admin_Controller extends AbstractController
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'controller' => 'Maintenance_Controller',
+						'controller' => 'MaintenanceController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_maintain',
@@ -476,7 +476,7 @@ class Admin_Controller extends AbstractController
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'controller' => 'AdminLog_Controller',
+						'controller' => 'AdminLogController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_logs',
@@ -493,7 +493,7 @@ class Admin_Controller extends AbstractController
 					),
 					'scheduledtasks' => array(
 						'label' => $txt['maintain_tasks'],
-						'controller' => 'ManageScheduledTasks_Controller',
+						'controller' => 'ManageScheduledTasksController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_scheduled',
@@ -504,7 +504,7 @@ class Admin_Controller extends AbstractController
 					),
 					'mailqueue' => array(
 						'label' => $txt['mailqueue_title'],
-						'controller' => 'ManageMail_Controller',
+						'controller' => 'ManageMailController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -516,14 +516,14 @@ class Admin_Controller extends AbstractController
 					'reports' => array(
 						'enabled' => in_array('rg', $context['admin_features']),
 						'label' => $txt['generate_reports'],
-						'controller' => 'Reports_Controller',
+						'controller' => 'ReportsController',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
-						'controller' => 'RepairBoards_Controller',
+						'controller' => 'RepairBoardsController',
 						'function' => 'action_repairboards',
 						'select' => 'maintain',
 						'hidden' => true,
@@ -592,7 +592,7 @@ class Admin_Controller extends AbstractController
 		foreach ($glob as $file)
 		{
 			$name = $file->getBasename('.controller.php');
-			$class = $name . '_Controller';
+			$class = $name . 'Controller';
 			$module = strtolower(substr($name, 6, -6));
 
 			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu'))
@@ -827,41 +827,41 @@ class Admin_Controller extends AbstractController
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
-			array('settings_search', 'area=logs;sa=pruning', 'AdminLog_Controller'),
-			array('config_vars', 'area=corefeatures', 'CoreFeatures_Controller'),
-			array('basicSettings_search', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
-			array('layoutSettings_search', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
-			array('karmaSettings_search', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('likesSettings_search', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
-			array('mentionSettings_search', 'area=featuresettings;sa=mention', 'ManageFeatures_Controller'),
-			array('signatureSettings_search', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
-			array('settings_search', 'area=addonsettings;sa=general', 'AddonSettings_Controller'),
-			array('settings_search', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
-			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
-			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
-			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
-			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
-			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
-			array('settings_search', 'area=membergroups;sa=settings', 'ManageMembergroups_Controller'),
-			array('settings_search', 'area=news;sa=settings', 'ManageNews_Controller'),
-			array('settings_search', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
-			array('settings_search', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
-			array('settings_search', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
-			array('settings_search', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
-			array('settings_search', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
-			array('settings_search', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
-			array('securitySettings_search', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('spamSettings_search', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('moderationSettings_search', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
-			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller'),
-			array('generalSettings_search', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-			array('databaseSettings_search', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-			array('cookieSettings_search', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-			array('cacheSettings_search', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-			array('balancingSettings_search', 'area=serversettings;sa=loads', 'ManageServer_Controller'),
-			array('settings_search', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
+			array('settings_search', 'area=logs;sa=pruning', 'AdminLogController'),
+			array('config_vars', 'area=corefeatures', 'CoreFeaturesController'),
+			array('basicSettings_search', 'area=featuresettings;sa=basic', 'ManageFeaturesController'),
+			array('layoutSettings_search', 'area=featuresettings;sa=layout', 'ManageFeaturesController'),
+			array('karmaSettings_search', 'area=featuresettings;sa=karma', 'ManageFeaturesController'),
+			array('likesSettings_search', 'area=featuresettings;sa=likes', 'ManageFeaturesController'),
+			array('mentionSettings_search', 'area=featuresettings;sa=mention', 'ManageFeaturesController'),
+			array('signatureSettings_search', 'area=featuresettings;sa=sig', 'ManageFeaturesController'),
+			array('settings_search', 'area=addonsettings;sa=general', 'AddonSettingsController'),
+			array('settings_search', 'area=manageattachments;sa=attachments', 'ManageAttachmentsController'),
+			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatarsController'),
+			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBCController'),
+			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoardsController'),
+			array('settings_search', 'area=languages;sa=settings', 'ManageLanguagesController'),
+			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMailController'),
+			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillistController'),
+			array('settings_search', 'area=membergroups;sa=settings', 'ManageMembergroupsController'),
+			array('settings_search', 'area=news;sa=settings', 'ManageNewsController'),
+			array('settings_search', 'area=paidsubscribe;sa=settings', 'ManagePaidController'),
+			array('settings_search', 'area=permissions;sa=settings', 'ManagePermissionsController'),
+			array('settings_search', 'area=postsettings;sa=posts', 'ManagePostsController'),
+			array('settings_search', 'area=regcenter;sa=settings', 'ManageRegistrationController'),
+			array('settings_search', 'area=managesearch;sa=settings', 'ManageSearchController'),
+			array('settings_search', 'area=sengines;sa=settings', 'ManageSearchEnginesController'),
+			array('securitySettings_search', 'area=securitysettings;sa=general', 'ManageSecurityController'),
+			array('spamSettings_search', 'area=securitysettings;sa=spam', 'ManageSecurityController'),
+			array('moderationSettings_search', 'area=securitysettings;sa=moderation', 'ManageSecurityController'),
+			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', 'ManageSecurityController'),
+			array('generalSettings_search', 'area=serversettings;sa=general', 'ManageServerController'),
+			array('databaseSettings_search', 'area=serversettings;sa=database', 'ManageServerController'),
+			array('cookieSettings_search', 'area=serversettings;sa=cookie', 'ManageServerController'),
+			array('cacheSettings_search', 'area=serversettings;sa=cache', 'ManageServerController'),
+			array('balancingSettings_search', 'area=serversettings;sa=loads', 'ManageServerController'),
+			array('settings_search', 'area=smileys;sa=settings', 'ManageSmileysController'),
+			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopicsController'),
 		);
 
 		$GLOBALS['elk']['hooks']->hook('admin_search', array(&$language_files, &$include_files, &$settings_search));

@@ -24,7 +24,7 @@ use Elkarte\Controllers\AbstractController;
 /**
  * Admin class for interfacing with the debug function viewquery
  */
-class AdminDebug_Controller extends AbstractController
+class AdminDebugController extends AbstractController
 {
 	/**
 	 * Main dispatcher.

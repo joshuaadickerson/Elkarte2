@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+use Elkarte\Elkarte\TokenHash;
 
 /**
  * Require a user who is logged in. (not a guest.)
@@ -30,6 +29,7 @@ if (!defined('ELK'))
  *
  * @param string $message = ''
  * @param boolean $is_fatal = true
+ * @return bool
  */
 function is_not_guest($message = '', $is_fatal = true)
 {

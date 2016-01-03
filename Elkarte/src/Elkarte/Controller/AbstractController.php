@@ -85,7 +85,7 @@ abstract class AbstractController
 	/**
 	 * Constructor...
 	 * Requires the name of the controller we want to instantiate, lowercase and
-	 * without the "_Controller" part.
+	 * without the "Controller" part.
 	 *
 	 * @param Container $elk
 	 * @param null|Event_Manager $eventManager - The event manager
@@ -143,12 +143,12 @@ abstract class AbstractController
 	/**
 	 * Initialize the event manager for the controller
 	 *
-	 * Uses the XXX_Controller name to define the set of event hooks to load
+	 * Uses the XXXController name to define the set of event hooks to load
 	 */
 	protected function _initEventManager()
 	{
 		// Use the base controller name for the hook, ie post
-		$this->_hook = str_replace('_Controller', '', get_class($this));
+		$this->_hook = str_replace('Controller', '', get_class($this));
 
 		// Find any module classes associated with this controller
 		$classes = $this->_loadModules();
@@ -174,7 +174,7 @@ abstract class AbstractController
 	 * - Uses the Controllers generic hook name to find modules
 	 * - Searches for modules registered against the module name
 	 * - Example
-	 *   - Display_Controller results in searching for modules registered against modules_display
+	 *   - DisplayController results in searching for modules registered against modules_display
 	 *   - $modSettings['modules_display'] returns drafts,calendar,.....
 	 *   - Verifies classes Drafts_Display_Module, Calendar_Display_Module, ... exist
 	 *
@@ -185,7 +185,7 @@ abstract class AbstractController
 		global $modSettings;
 
 		$classes = array();
-		$hook = str_replace('_Controller', '', $this->_hook);
+		$hook = str_replace('Controller', '', $this->_hook);
 		$setting_key = 'modules_' . strtolower($hook);
 
 		// For all the modules that have been registered see if we have a class to load for this hook area

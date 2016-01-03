@@ -146,7 +146,7 @@ if (isset($_GET['scheduled']))
 	if (function_exists('fastcgi_finish_request'))
 		fastcgi_finish_request();
 
-	$controller = new ScheduledTasks_Controller();
+	$controller = new ScheduledTasksController();
 	$controller->action_autotask();
 }
 

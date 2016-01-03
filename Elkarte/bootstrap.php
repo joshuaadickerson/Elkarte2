@@ -205,7 +205,7 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	$controller = new Auth_Controller();
+	$controller = new AuthController();
 	$controller->action_kickguest();
 	obExit(null, true);
 }

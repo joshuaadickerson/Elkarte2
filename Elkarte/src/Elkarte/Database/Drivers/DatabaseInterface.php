@@ -74,6 +74,7 @@ interface DatabaseInterface
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
+	 * @return ResultInterface
 	 */
 	public function query($identifier, $db_string, array $db_values = array());
 
@@ -82,7 +83,7 @@ interface DatabaseInterface
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @return type
+	 * @return ResultInterface
 	 */
 	public function select($identifier, $db_string, array $db_values = array());
 
@@ -91,7 +92,7 @@ interface DatabaseInterface
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @return type
+	 * @return ResultInterface
 	 */
 	public function update($identifier, $db_string, array $db_values = array());
 
@@ -100,7 +101,7 @@ interface DatabaseInterface
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @return type
+	 * @return ResultInterface
 	 */
 	public function delete($identifier, $db_string, array $db_values = array());
 

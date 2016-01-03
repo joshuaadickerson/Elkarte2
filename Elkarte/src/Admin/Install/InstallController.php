@@ -57,7 +57,7 @@ class Install_Controller
      * It makes a few basic checks for compatibility
      * and informs the user if there are problems.
      */
-    private function action_welcome()
+    protected function action_welcome()
     {
         global $incontext, $txt, $databases, $installurl, $db_type;
 
@@ -164,7 +164,7 @@ class Install_Controller
     /**
      * Verify and try to make writable the files and folders that need to be.
      */
-    private function action_checkFilesExist()
+    protected function action_checkFilesExist()
     {
         global $incontext, $txt;
 
@@ -210,7 +210,7 @@ class Install_Controller
     /**
      * Verify and try to make writable the files and folders that need to be.
      */
-    private function action_checkFilesWritable()
+    protected function action_checkFilesWritable()
     {
         global $txt, $incontext;
 
@@ -407,7 +407,7 @@ class Install_Controller
     /**
      * Ask for database settings, verify and save them.
      */
-    private function action_databaseSettings()
+    protected function action_databaseSettings()
     {
         global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings, $db_server, $db_name, $db_user, $db_passwd;
 
@@ -617,7 +617,7 @@ class Install_Controller
     /**
      * Basic forum type settings.
      */
-    private function action_forumSettings()
+    protected function action_forumSettings()
     {
         global $txt, $incontext, $databases, $db_type, $db_connection;
 
@@ -699,7 +699,7 @@ class Install_Controller
     /**
      * Step one. Populate database.
      */
-    private function action_databasePopulation()
+    protected function action_databasePopulation()
     {
         global $txt, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
@@ -884,7 +884,7 @@ class Install_Controller
     /**
      * Ask for the administrator login information.
      */
-    private function action_adminAccount()
+    protected function action_adminAccount()
     {
         global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
 
@@ -980,7 +980,7 @@ class Install_Controller
                 )
             );
 
-            if ($db->num_rows($result) != 0)
+            if ($result->numRows() != 0)
             {
                 list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
                 $result->free();
@@ -1063,7 +1063,7 @@ class Install_Controller
     /**
      * Final step, clean up and a complete message!
      */
-    private function action_deleteInstall()
+    protected function action_deleteInstall()
     {
         global $txt, $incontext, $db_character_set;
         global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
@@ -1147,7 +1147,7 @@ class Install_Controller
                 'db_error_skip' => true,
             )
         );
-        if ($db->num_rows($result) != 0)
+        if ($result->numRows() != 0)
             list ($db_sessions) = $db->fetch_row($result);
         $result->free();
 
@@ -1169,7 +1169,7 @@ class Install_Controller
             );
         }
 
-        require_once(SUBSDIR . '/Members.subs.php');
+        require_once(ROOTDIR . '/Members/Members.subs.php');
         updateMemberStats();
         require_once(SUBSDIR . '/Messages.subs.php');
         updateMessageStats();

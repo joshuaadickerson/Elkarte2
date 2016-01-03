@@ -87,7 +87,7 @@ class QuotedmemMentionMentionBoardAccess extends AbstractMentionBoardAccess
 		$quoted_names = $this->_findQuotedMembers($text);
 		if (!empty($quoted_names))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			$members_id = membersBy(array(array('or' => 'member_names')), array('member_names' => $quoted_names, 'limit' => count($quoted_names)));
 		}
 

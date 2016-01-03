@@ -300,7 +300,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($members))
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Get the latest activated member's display name.
 		$result = getBasicMemberData(array_keys($members));

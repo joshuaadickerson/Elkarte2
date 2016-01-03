@@ -86,7 +86,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Get rid of entities.
-	$subject = un_htmlspecialchars($subject);
+	$subject = $GLOBALS['elk']['text']->un_htmlspecialchar($subject);
 
 	// Make the message use the proper line breaks.
 	$message = str_replace(array("\r", "\n"), array('', $line_break), $message);
@@ -180,7 +180,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	// Sending HTML?  Let's plop in some basic stuff, then.
 	if ($send_html)
 	{
-		$no_html_message = un_htmlspecialchars(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
+		$no_html_message = $GLOBALS['elk']['text']->un_htmlspecialchar(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
 
 		// But, then, dump it and use a plain one for dinosaur clients.
 		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);

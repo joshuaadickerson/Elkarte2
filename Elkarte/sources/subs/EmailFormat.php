@@ -161,7 +161,7 @@ class Email_Format
 	 * @param string $data
 	 * @param boolean $bbc_br
 	 */
-	private function _prep_data($data, $bbc_br)
+	protected function _prep_data($data, $bbc_br)
 	{
 		// Un-wordwrap the email, create a line by line array broken on the newlines
 		if ($bbc_br === true)
@@ -208,7 +208,7 @@ class Email_Format
 	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 */
-	private function _fix_body()
+	protected function _fix_body()
 	{
 		// Go line by line and put in line breaks *only* where (we often erroneously assume) they are needed
 		for ($i = 0, $num = count($this->_body_array); $i < $num; $i++)
@@ -314,7 +314,7 @@ class Email_Format
 	 *
 	 * @param string $charset
 	 */
-	private function _clean_up($charset)
+	protected function _clean_up($charset)
 	{
 		// Remove any chitta chatta from either end
 		$tag = '(>([^a-zA-Z0-9_\[\s]){0,3}){1}';
@@ -377,7 +377,7 @@ class Email_Format
 	 *
 	 * @param string $var
 	 */
-	private function _in_quote($var)
+	protected function _in_quote($var)
 	{
 		// In a quote?
 		if (preg_match('~\[quote( author=.*)?\]?~', $var))
@@ -395,7 +395,7 @@ class Email_Format
 	 *
 	 * @param int $i
 	 */
-	private function _in_sig($i)
+	protected function _in_sig($i)
 	{
 		// Not in a sig yet, the line starts with a sig key as defined by the ACP, and its a short line of text
 		if (!$this->_found_sig && !empty($this->_maillist_sig_keys) && (preg_match('~^(' . $this->_maillist_sig_keys . ')~i', $this->_body_array[$i]['content']) && ($this->_body_array[$i]['length'] < $this->_maillist_short_line)))
@@ -417,7 +417,7 @@ class Email_Format
 	 *
 	 * @param string $var
 	 */
-	private function _in_code($var)
+	protected function _in_code($var)
 	{
 		// In a code block?
 		if (preg_match('~\[code\]?~', $var))
@@ -437,7 +437,7 @@ class Email_Format
 	 *
 	 * @param string $var
 	 */
-	private function _in_bbclist($var)
+	protected function _in_bbclist($var)
 	{
 		// Starting a bbc list
 		if (preg_match('~\[list\]?~', $var))
@@ -453,7 +453,7 @@ class Email_Format
 	 *
 	 * @param string $var
 	 */
-	private function _in_plainlist($var)
+	protected function _in_plainlist($var)
 	{
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
@@ -473,7 +473,7 @@ class Email_Format
 	 *
 	 * @param string $value
 	 */
-	private function _trim_value(&$value)
+	protected function _trim_value(&$value)
 	{
 		$value = trim($value);
 		$value = trim($value, chr(0xC2) . chr(0xA0));

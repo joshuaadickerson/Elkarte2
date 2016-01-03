@@ -53,7 +53,7 @@ class TokenHash
 	/**
 	 * Set a random value for our initial state
 	 */
-	private function _state_seed()
+	protected function _state_seed()
 	{
 		// If openssl is installed, let it create a 16 character code
 		if (function_exists('openssl_random_pseudo_bytes'))
@@ -109,7 +109,7 @@ class TokenHash
 	 * - Wraps a random or supplied salt with $6$ ... $
 	 * - If supplied a salt, validates it is good to use
 	 */
-	private function _gen_salt()
+	protected function _gen_salt()
 	{
 		// Not supplied one, then generate a random one, this is preferred
 		if (empty($this->_salt) || strlen($this->_salt) < 16)
@@ -133,7 +133,7 @@ class TokenHash
 	 *
 	 * @return string
 	 */
-	private function _private_salt($input)
+	protected function _private_salt($input)
 	{
 		$i = 0;
 		$output = '';

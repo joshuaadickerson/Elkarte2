@@ -93,7 +93,7 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 	{
 		if ($this->_members_data === null)
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true));
 		}
 
@@ -110,7 +110,7 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 	{
 		if ($this->_notifier_data === null)
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			$this->_notifier_data = getBasicMemberData($this->id_member_from);
 		}
 

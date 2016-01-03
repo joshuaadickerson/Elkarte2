@@ -232,7 +232,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_childNodes($node)
+	protected function _convert_childNodes($node)
 	{
 		if (empty($node) || self::_has_parent_code($node, $this->_parser))
 			return;
@@ -257,7 +257,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_to_bbc($node)
+	protected function _convert_to_bbc($node)
 	{
 		// HTML tag names
 		$tag = $this->_get_name($node);
@@ -433,7 +433,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_abbr($node)
+	protected function _convert_abbr($node)
 	{
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
@@ -454,7 +454,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_anchor($node)
+	protected function _convert_anchor($node)
 	{
 		global $modSettings, $scripturl;
 
@@ -519,7 +519,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_bdo($node)
+	protected function _convert_bdo($node)
 	{
 		$bbc = '';
 
@@ -537,7 +537,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_code($node)
+	protected function _convert_code($node)
 	{
 		$bbc = '';
 		$value = $this->_get_innerHTML($node);
@@ -580,7 +580,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_font($node)
+	protected function _convert_font($node)
 	{
 		$size = $node->getAttribute('size');
 		$color = $node->getAttribute('color');
@@ -613,7 +613,7 @@ class Html_2_BBC
 	 * @param int $level
 	 * @param string $content
 	 */
-	private function _convert_header($level, $content)
+	protected function _convert_header($level, $content)
 	{
 		$level = (int) trim($level, 'h');
 		$hsize = array(1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1);
@@ -632,7 +632,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_image($node)
+	protected function _convert_image($node)
 	{
 		$src = $node->getAttribute('src');
 		$alt = $node->getAttribute('alt');
@@ -694,7 +694,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_styles($node)
+	protected function _convert_styles($node)
 	{
 		$style = $node->getAttribute('style');
 		$value = $this->_get_innerHTML($node);
@@ -771,7 +771,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _convert_table_cell($node)
+	protected function _convert_table_cell($node)
 	{
 		$value = $this->_get_innerHTML($node);
 		$align = $node->getAttribute('align');
@@ -804,7 +804,7 @@ class Html_2_BBC
 	 * @param object $node
 	 * @param int $item
 	 */
-	private function _get_item($node, $item)
+	protected function _get_item($node, $item)
 	{
 		if ($this->_parser)
 			return $node->item($item);
@@ -817,7 +817,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _get_length($node)
+	protected function _get_length($node)
 	{
 		if ($this->_parser)
 			return $node->length;
@@ -830,7 +830,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _get_value($node)
+	protected function _get_value($node)
 	{
 		if ($node === null)
 			return '';
@@ -846,7 +846,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _get_name($node)
+	protected function _get_name($node)
 	{
 		if ($node === null)
 			return '';
@@ -863,7 +863,7 @@ class Html_2_BBC
 	 * @param object $node
 	 * @return string
 	 */
-	private function _get_innerHTML($node)
+	protected function _get_innerHTML($node)
 	{
 		if ($this->_parser)
 		{
@@ -883,7 +883,7 @@ class Html_2_BBC
 	 *
 	 * @param object $node
 	 */
-	private function _get_outerHTML($node)
+	protected function _get_outerHTML($node)
 	{
 		if ($this->_parser)
 		{
@@ -916,7 +916,7 @@ class Html_2_BBC
 	 *
 	 * @param string $style
 	 */
-	private function _get_style_values($style)
+	protected function _get_style_values($style)
 	{
 		$styles = array();
 
@@ -941,7 +941,7 @@ class Html_2_BBC
 	 *
 	 * @param string $text
 	 */
-	private function _recursive_decode($text)
+	protected function _recursive_decode($text)
 	{
 		do
 		{

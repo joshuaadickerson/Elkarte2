@@ -140,6 +140,8 @@ function deleteMembers($users, $check_not_admin = false)
 		$GLOBALS['elk']['cache']->remove('user_settings-' . $user[0]);
 	}
 
+	// @todo change all of these updates and deletes to just call a single hook. Then each module will respond in the way that they know how
+
 	// Make these peoples' posts guest posts.
 	$db->query('', '
 		UPDATE {db_prefix}messages
@@ -476,7 +478,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = Error_Context::context($error_context, 0);
+	$reg_errors = ErrorContext::context($error_context, 0);
 
 	// What method of authorization are we going to use?
 	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))
@@ -1051,7 +1053,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	// Firstly, if email and username aren't passed find out the members email address and name.
 	if ($email === false && $membername === false)
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$result = getBasicMemberData($memID);
 		$email = $result['email_address'];
 		$membername = $result['member_name'];

@@ -217,7 +217,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 function highlight_php_code($code)
 {
 	// Remove special characters.
-	$code = un_htmlspecialchars(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
+	$code = $GLOBALS['elk']['text']->un_htmlspecialchar(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
 
 	$buffer = str_replace(array("\n", "\r"), '', @highlight_string($code, true));
 

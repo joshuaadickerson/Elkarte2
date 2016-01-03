@@ -135,7 +135,7 @@ class AddonSettingsController extends AbstractController
 	/**
 	 * Retrieve any custom Admin settings for or from addons.
 	 */
-	private function _settings()
+	protected function _settings()
 	{
 		$config_vars = array();
 

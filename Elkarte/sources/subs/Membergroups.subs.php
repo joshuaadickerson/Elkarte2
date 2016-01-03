@@ -161,7 +161,7 @@ function deleteMembergroups($groups)
 		$updates[$row['additional_groups']][] = $row['id_member'];
 	$request->free();
 
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
 
@@ -388,7 +388,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	}
 	$request->free();
 
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
 
@@ -1566,7 +1566,7 @@ function detachDeletedGroupFromMembers($id_group)
 		$updates[$row['additional_groups']][] = $row['id_member'];
 	$request->free();
 
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), array($id_group)))));
 
@@ -1598,7 +1598,7 @@ function setGroupToHidden($id_group)
 		$updates[$row['additional_groups']][] = $row['id_member'];
 	$request->free();
 
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	foreach ($updates as $additional_groups => $memberArray)
 		updateMemberData($memberArray, array('additional_groups' => implode(',', array_merge(explode(',', $additional_groups), array($id_group)))));
 

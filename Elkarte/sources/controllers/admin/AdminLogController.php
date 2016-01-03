@@ -122,7 +122,7 @@ class AdminLog_Controller extends AbstractController
 		if (isset($log_functions[$sub_action]['controller']))
 		{
 			// if we have an object oriented controller, call its method
-			$controller = new $log_functions[$sub_action]['controller']($this->elk, new Event_Manager());
+			$controller = new $log_functions[$sub_action]['controller']($this->elk, new EventManager());
 			$controller->pre_dispatch();
 			$controller->{$log_functions[$sub_action]['function']}();
 		}
@@ -206,7 +206,7 @@ class AdminLog_Controller extends AbstractController
 	/**
 	 * Initializes the _pruningSettings form.
 	 */
-	private function _initPruningSettingsForm()
+	protected function _initPruningSettingsForm()
 	{
 		// instantiate the form
 		$this->_pruningSettings = new Settings_Form();
@@ -220,7 +220,7 @@ class AdminLog_Controller extends AbstractController
 	/**
 	 * Returns the configuration settings for pruning logs.
 	 */
-	private function _settings()
+	protected function _settings()
 	{
 		global $txt;
 

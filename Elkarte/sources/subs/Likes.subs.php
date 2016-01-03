@@ -233,7 +233,7 @@ function updateLike($id_liker, $liked_message, $direction)
 			increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($id_liker, array('likes_given' => '+'));
 		updateMemberData($liked_message['id_member'], array('likes_received' => '+'));
 	}
@@ -255,7 +255,7 @@ function updateLike($id_liker, $liked_message, $direction)
 			increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($id_liker, array('likes_given' => '-'));
 		updateMemberData($liked_message['id_member'], array('likes_received' => '-'));
 	}

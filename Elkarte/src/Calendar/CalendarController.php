@@ -307,7 +307,7 @@ class CalendarController extends AbstractController
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new Post_Controller(new Event_Manager());
+		$controller = new Post_Controller(new EventManager());
 		$controller->pre_dispatch();
 
 		return $controller->action_post();

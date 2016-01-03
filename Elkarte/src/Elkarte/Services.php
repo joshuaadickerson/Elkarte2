@@ -2,6 +2,7 @@
 
 namespace Elkarte;
 
+use Elkarte\Boards\BoardsManager;
 use Elkarte\Elkarte\Util;
 use Elkarte\Elkarte\View\TemplateLayers;
 use Elkarte\Elkarte\View\Templates;
@@ -158,10 +159,21 @@ $elk['action'] = function () {
 	return isset($_GET['action']) ? $_GET['action'] : '';
 };
 
+/**
+ * @var Util
+ * @return Util
+ */
 $elk['text'] = function () {
 	global $modSettings;
 
 	return new Util($modSettings);
+};
+
+/**
+ * @return BoardsManager
+ */
+$elk['boards.manager'] = function ($elk) {
+	return new BoardsManager($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors']);
 };
 
 return $elk;

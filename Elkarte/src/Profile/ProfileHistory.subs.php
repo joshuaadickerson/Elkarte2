@@ -331,7 +331,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	// Get any member names.
 	if (!empty($members))
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$result = getBasicMemberData($members);
 
 		$members = array();

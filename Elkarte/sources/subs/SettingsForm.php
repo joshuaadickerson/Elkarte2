@@ -827,7 +827,7 @@ class Settings_Form
 	 * @param mixed[] $haystack
 	 * @return boolean
 	 */
-	private function _array_value_exists__recursive($needle, $haystack)
+	protected function _array_value_exists__recursive($needle, $haystack)
 	{
 		foreach ($haystack as $item)
 		{

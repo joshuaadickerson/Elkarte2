@@ -227,7 +227,7 @@ class In_Line_Attachment
 	 * @param int $ila_num
 	 * @return string
 	 */
-	private function ila_parse_bbc_tag($data, $ila_num)
+	protected function ila_parse_bbc_tag($data, $ila_num)
 	{
 		$this->_curr_tag = array('id' => '', 'type' => '', 'align' => '', 'width' => '');
 		$data = trim($data);
@@ -298,7 +298,7 @@ class In_Line_Attachment
 	 *
 	 * - Is painfully complicated as is, should consider other approaches me thinks
 	 */
-	private function _ila_find_nested()
+	protected function _ila_find_nested()
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -412,7 +412,7 @@ class In_Line_Attachment
 	 *
 	 * @param int $ila_num
 	 */
-	private function ila_showInline($ila_num)
+	protected function ila_showInline($ila_num)
 	{
 		global $txt, $modSettings;
 
@@ -499,7 +499,7 @@ class In_Line_Attachment
 	 * @param string $uniqueID
 	 * @return string
 	 */
-	private function ila_build_img_tag($uniqueID)
+	protected function ila_build_img_tag($uniqueID)
 	{
 		global $txt, $context, $modSettings, $settings;
 
@@ -576,7 +576,7 @@ class In_Line_Attachment
 	 *
 	 * @param int $uniqueID
 	 */
-	private function ila_create_html_thumb($uniqueID)
+	protected function ila_create_html_thumb($uniqueID)
 	{
 		global $modSettings, $context;
 
@@ -627,7 +627,7 @@ class In_Line_Attachment
 	 * @param string $align
 	 * @param int $width
 	 */
-	private function ila_preview_inline($attachname, $type, $id, $align, $width)
+	protected function ila_preview_inline($attachname, $type, $id, $align, $width)
 	{
 		global $txt, $modSettings;
 
@@ -679,7 +679,7 @@ class In_Line_Attachment
 	 * - Loads attachments for a given msg if they have not yet been loaded
 	 * - Attachments must be enabled and user allowed to see attachments
 	 */
-	private function ila_load_attachments()
+	protected function ila_load_attachments()
 	{
 		global $modSettings;
 
@@ -701,7 +701,7 @@ class In_Line_Attachment
 	 *
 	 * @param int $msg_id
 	 */
-	private function _ila_get_topic($msg_id)
+	protected function _ila_get_topic($msg_id)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -740,7 +740,7 @@ class In_Line_Attachment
 	 * @param string $replace
 	 * @param string $haystack
 	 */
-	private function ila_str_replace_once($needle, $replace, $haystack)
+	protected function ila_str_replace_once($needle, $replace, $haystack)
 	{
 		$pos = strpos($haystack, $needle);
 		if ($pos === false)

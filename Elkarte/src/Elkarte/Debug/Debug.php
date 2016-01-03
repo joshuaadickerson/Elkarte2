@@ -383,7 +383,7 @@ class Debug
 	 * Displays a list of queries executed during the current
 	 * page load
 	 */
-	private function _show_queries()
+	protected function _show_queries()
 	{
 		global $scripturl, $txt;
 

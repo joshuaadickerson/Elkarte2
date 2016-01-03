@@ -1263,7 +1263,7 @@ function createSalvageArea()
 			'cat_name' => $txt['salvaged_category_name'],
 		)
 	);
-	if ($db->num_rows($result) != 0)
+	if ($result->numRows() != 0)
 		list ($salvageCatID) = $db->fetch_row($result);
 	$result->free();
 
@@ -1297,7 +1297,7 @@ function createSalvageArea()
 			'board_name' => $txt['salvaged_board_name'],
 		)
 	);
-	if ($db->num_rows($result) != 0)
+	if ($result->numRows() != 0)
 		list ($salvageBoardID) = $db->fetch_row($result);
 	$result->free();
 

@@ -298,7 +298,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Member requests
 		if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			$awaiting_activation = 0;
 			$activation_numbers = countInactiveMembers();
 

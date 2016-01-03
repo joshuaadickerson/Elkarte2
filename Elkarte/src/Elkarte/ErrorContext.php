@@ -11,13 +11,12 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte;
 
 /**
  *  This class is an experiment for the job of handling errors.
  */
-class Error_Context
+class ErrorContext
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
@@ -71,17 +70,17 @@ class Error_Context
 	 * @param string $id the error identifier
 	 * @param int|null $default_severity the default error severity level
 	 */
-	private function __construct($id = 'default', $default_severity = null)
+	protected function __construct($id = 'default', $default_severity = null)
 	{
 		if (!empty($id))
 			$this->_name = $id;
 
 		// Initialize severity levels... waiting for details!
-		$this->_severity_levels = array(Error_Context::MINOR, Error_Context::SERIOUS);
+		$this->_severity_levels = array(ErrorContext::MINOR, ErrorContext::SERIOUS);
 
 		// Initialize default severity (not sure this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
-			$this->_default_severity = Error_Context::MINOR;
+			$this->_default_severity = ErrorContext::MINOR;
 		else
 			$this->_default_severity = $default_severity;
 
@@ -262,7 +261,7 @@ class Error_Context
 	/**
 	 * Load the default error language and any other language file needed
 	 */
-	private function _loadLang()
+	protected function _loadLang()
 	{
 		// Errors is always needed
 		loadLanguage('Errors');
@@ -285,7 +284,7 @@ class Error_Context
 	 *
 	 * @param string $id
 	 * @param int|null $default_severity
-	 * @return Error_Context
+	 * @return ErrorContext
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
@@ -293,7 +292,7 @@ class Error_Context
 			self::$_contexts = array();
 
 		if (!array_key_exists($id, self::$_contexts))
-			self::$_contexts[$id] = new Error_Context($id, $default_severity);
+			self::$_contexts[$id] = new ErrorContext($id, $default_severity);
 
 		return self::$_contexts[$id];
 	}

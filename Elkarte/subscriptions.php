@@ -27,7 +27,7 @@ if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 require_once(dirname(__FILE__) . '/bootstrap.php');
 require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
-require_once(SUBSDIR . '/Members.subs.php');
+require_once(ROOTDIR . '/Members/Members.subs.php');
 
 loadLanguage('ManagePaid');
 

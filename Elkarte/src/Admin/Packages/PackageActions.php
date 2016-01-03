@@ -376,7 +376,7 @@ class PackageActions extends AbstractController
 	 * @param array $mod_action
 	 * @param string $key
 	 */
-	private function _get_filename($mod_action, $key)
+	protected function _get_filename($mod_action, $key)
 	{
 		// Lets get the last section of the file name.
 		if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) !== '.template.php')
@@ -392,7 +392,7 @@ class PackageActions extends AbstractController
 	 *
 	 * @param array $mod_action
 	 */
-	private function _check_modification($mod_action)
+	protected function _check_modification($mod_action)
 	{
 		global $context, $txt;
 
@@ -639,7 +639,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Helper function for action_remove_dir_file and action_require_dir_file
 	 */
-	private function _check_theme_actions($destination, $set_destination = false)
+	protected function _check_theme_actions($destination, $set_destination = false)
 	{
 		if (preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $destination, $matches))
 		{
@@ -669,7 +669,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Test Install loop collector
 	 */
-	private function _action_our_actions()
+	protected function _action_our_actions()
 	{
 		global $txt;
 

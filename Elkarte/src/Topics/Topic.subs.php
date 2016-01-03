@@ -110,7 +110,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		);
 		if ($db->num_rows($requestMembers) > 0)
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			while ($rowMembers = $db->fetch_assoc($requestMembers))
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
 		}
@@ -512,7 +512,7 @@ function moveTopicsPermissions($moveCache)
 
 		if (!empty($topicRecounts))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			// Get all the members who have posted in the moved topics.
 			$posters = topicsPosters(array_keys($topicRecounts));
@@ -2665,7 +2665,7 @@ function splitAttemptMove($boards, $totopic)
 				}
 				$request->free();
 
-				require_once(SUBSDIR . '/Members.subs.php');
+				require_once(ROOTDIR . '/Members/Members.subs.php');
 				foreach ($posters as $id_member => $posts)
 				{
 					// The board we're moving from counted posts, but not to.

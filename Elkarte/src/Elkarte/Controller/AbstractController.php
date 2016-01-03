@@ -13,6 +13,7 @@
 
 namespace Elkarte\Elkarte\Controller;
 
+use Elkarte\Elkarte\Events\Hooks;
 use \Elkarte\Event_Manager;
 
 use \Pimple\Container;
@@ -77,6 +78,11 @@ abstract class AbstractController
 	protected $context;
 
 	/**
+	 * @var Hooks
+	 */
+	protected $hooks;
+
+	/**
 	 * Constructor...
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
@@ -94,11 +100,12 @@ abstract class AbstractController
 		$this->_errors = $elk['errors'];
 		$this->_req = $elk['http_req'];
 		$this->_session = $elk['session'];
+		$this->hooks = $elk['hooks'];
 
 		// A safety-net to remain backward compatibility
 		if ($eventManager === null)
 		{
-			$eventManager = new Event_Manager();
+			$eventManager = new EventManager();
 		}
 
 		$this->_events = $eventManager;

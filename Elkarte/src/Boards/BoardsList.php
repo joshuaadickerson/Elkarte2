@@ -434,7 +434,7 @@ class BoardsList
 	/**
 	 * Fetches and adds to the results the board moderators for the current boards
 	 */
-	private function _getBoardModerators()
+	protected function _getBoardModerators()
 	{
 		global $txt;
 

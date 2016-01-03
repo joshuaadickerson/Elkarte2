@@ -222,7 +222,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_childNodes($node)
+	protected function _convert_childNodes($node)
 	{
 		if (self::_has_parent_code($node, $this->_parser))
 			return;
@@ -248,7 +248,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_to_markdown($node)
+	protected function _convert_to_markdown($node)
 	{
 		// HTML tag we are dealing with
 		$tag = $this->_get_name($node);
@@ -380,7 +380,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_abbr($node)
+	protected function _convert_abbr($node)
 	{
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
@@ -402,7 +402,7 @@ class Html_2_Md
 	 * @param object $node
 	 * @return string
 	 */
-	private function _convert_anchor($node)
+	protected function _convert_anchor($node)
 	{
 		global $txt;
 
@@ -439,7 +439,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_blockquote($node)
+	protected function _convert_blockquote($node)
 	{
 		$markdown = '';
 
@@ -468,7 +468,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_code($node)
+	protected function _convert_code($node)
 	{
 		$value = $this->_get_innerHTML($node);
 
@@ -547,7 +547,7 @@ class Html_2_Md
 	 * @param int $level
 	 * @param string $content
 	 */
-	private function _convert_header($level, $content)
+	protected function _convert_header($level, $content)
 	{
 		$level = (int) ltrim($level, 'h');
 
@@ -571,7 +571,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_image($node)
+	protected function _convert_image($node)
 	{
 		$src = $node->getAttribute('src');
 		$alt = $node->getAttribute('alt');
@@ -593,7 +593,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_list($node)
+	protected function _convert_list($node)
 	{
 		$list_type = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
 		$value = $this->_get_value($node);
@@ -621,7 +621,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _convert_table($node)
+	protected function _convert_table($node)
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
@@ -718,7 +718,7 @@ class Html_2_Md
 	 * @param object $node
 	 * @param int $item
 	 */
-	private function _get_item($node, $item)
+	protected function _get_item($node, $item)
 	{
 		if ($this->_parser)
 			return $node->item($item);
@@ -731,7 +731,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_length($node)
+	protected function _get_length($node)
 	{
 		if ($this->_parser)
 			return $node->length;
@@ -744,7 +744,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_value($node)
+	protected function _get_value($node)
 	{
 		if ($node === null)
 			return '';
@@ -760,7 +760,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_name($node)
+	protected function _get_name($node)
 	{
 		if ($node === null)
 			return '';
@@ -778,7 +778,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_list_position($node)
+	protected function _get_list_position($node)
 	{
 		$position = 1;
 
@@ -807,7 +807,7 @@ class Html_2_Md
 	 * @param string $content
 	 * @param int $max
 	 */
-	private function _align_row_content($align, $width, $content, $max)
+	protected function _align_row_content($align, $width, $content, $max)
 	{
 		switch ($align)
 		{
@@ -834,7 +834,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_innerHTML($node)
+	protected function _get_innerHTML($node)
 	{
 		if ($this->_parser)
 		{
@@ -854,7 +854,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 */
-	private function _get_outerHTML($node)
+	protected function _get_outerHTML($node)
 	{
 		if ($this->_parser)
 		{
@@ -890,7 +890,7 @@ class Html_2_Md
 	 *
 	 * @param string $value
 	 */
-	private function _escape_text($value)
+	protected function _escape_text($value)
 	{
 		// Search and replace ...
 		foreach ($this->_textEscapeRegex as $regex => $replacement)
@@ -906,7 +906,7 @@ class Html_2_Md
 	 * @param object $node
 	 * @param string $value
 	 */
-	private function _has_ticks($node, $value)
+	protected function _has_ticks($node, $value)
 	{
 		$ticks = '';
 		$code_parent = $this->_parser ? $node->parentNode->nodeName : $node->parentNode()->nodeName();
@@ -946,7 +946,7 @@ class Html_2_Md
 	 * @param int $width
 	 * @param string $break
 	 */
-	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
+	protected function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
 		$strings = explode($break, $string);
 		$lines = array();

@@ -238,7 +238,7 @@ class Email_Parse
 	 *
 	 * @param int $id id of the email to retrieve from the failed log
 	 */
-	private function _query_load_email($id)
+	protected function _query_load_email($id)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -298,7 +298,7 @@ class Email_Parse
 	 * 1 the first empty line or
 	 * 2 a line that does not start with a tab, a field name followed by a colon or a space
 	 */
-	private function _split_headers()
+	protected function _split_headers()
 	{
 		$this->_header_block = '';
 		$match = array();
@@ -319,7 +319,7 @@ class Email_Parse
 	 * Takes the header block created with _split_headers and separates it
 	 * in to header keys => value pairs
 	 */
-	private function _parse_headers()
+	protected function _parse_headers()
 	{
 		// Remove windows style \r's
 		$this->_header_block = str_replace("\r\n", "\n", $this->_header_block);
@@ -360,7 +360,7 @@ class Email_Parse
 	 * - Parses or sets defaults for the following:
 	 * content-type, content-disposition, content-transfer-encoding
 	 */
-	private function _parse_content_headers()
+	protected function _parse_content_headers()
 	{
 		// What kind of message content do we have
 		if (isset($this->headers['content-type']))
@@ -403,7 +403,7 @@ class Email_Parse
 	 * @param string $value
 	 * @param string $key
 	 */
-	private function _parse_content_header_parameters($value, $key)
+	protected function _parse_content_header_parameters($value, $key)
 	{
 		$matches = array();
 
@@ -433,7 +433,7 @@ class Email_Parse
 	 *
 	 * @param boolean $html
 	 */
-	private function _parse_body($html = false)
+	protected function _parse_body($html = false)
 	{
 		// based on the content type for this body, determine what do do
 		switch ($this->headers['content-type'])
@@ -643,7 +643,7 @@ class Email_Parse
 	 * @param string $boundary
 	 * @param boolean $html - flag to indicate html content
 	 */
-	private function _boundary_split($boundary, $html)
+	protected function _boundary_split($boundary, $html)
 	{
 		$this->_boundary_section_count = 0;
 
@@ -678,7 +678,7 @@ class Email_Parse
 	 * @param bool $strict
 	 * @return string
 	 */
-	private function _decode_header($val, $strict = false)
+	protected function _decode_header($val, $strict = false)
 	{
 		// Check if this header even needs to be decoded.
 		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
@@ -752,7 +752,7 @@ class Email_Parse
 	 * @param string $val
 	 * @return string
 	 */
-	private function _decode_body($val)
+	protected function _decode_body($val)
 	{
 		// The encoding tag can be missing in the headers or just wrong
 		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96){1}~s', $val))
@@ -800,7 +800,7 @@ class Email_Parse
 	 *
 	 * @return boolean|null
 	 */
-	private function _check_dsn()
+	protected function _check_dsn()
 	{
 		// If we already know it's a DSN, bug out
 		if ($this->_is_dsn)
@@ -1031,7 +1031,7 @@ class Email_Parse
 	 * @param string|null $string
 	 * @return array
 	 */
-	private function _parse_ip($string)
+	protected function _parse_ip($string)
 	{
 		$string = trim($string, '[] ');
 
@@ -1047,7 +1047,7 @@ class Email_Parse
 	 *
 	 * @param string $val
 	 */
-	private function _parse_address($val)
+	protected function _parse_address($val)
 	{
 		$this->_email_address = '';
 		$this->_email_name = '';
@@ -1091,7 +1091,7 @@ class Email_Parse
 	 * @param string $encoding
 	 * @param string $charset
 	 */
-	private function _decode_string($string, $encoding, $charset = '')
+	protected function _decode_string($string, $encoding, $charset = '')
 	{
 		// Decode if its quoted printable or base64 encoded
 		if ($encoding === 'quoted-printable')
@@ -1112,7 +1112,7 @@ class Email_Parse
 	 * @param string $from
 	 * @param string $to
 	 */
-	private function _charset_convert($string, $from, $to)
+	protected function _charset_convert($string, $from, $to)
 	{
 		// Lets assume we have one of the functions available to us
 		$this->_converted_utf8 = true;

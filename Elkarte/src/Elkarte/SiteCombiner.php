@@ -255,7 +255,7 @@ class Site_Combiner
 	 * - url
 	 * - stale (optional)
 	 */
-	private function _addFile($options)
+	protected function _addFile($options)
 	{
 		if (isset($options['dir']))
 		{
@@ -280,7 +280,7 @@ class Site_Combiner
 	 *
 	 * - If any date of the files that make up the archive are newer than the archive, its considered stale
 	 */
-	private function _isStale()
+	protected function _isStale()
 	{
 		// If any files in the archive are newer than the archive file itself, then the archive is stale
 		$filemtime = file_exists($this->_archive_dir . '/' . $this->_archive_name) ? filemtime($this->_archive_dir . '/' . $this->_archive_name) : 0;
@@ -299,7 +299,7 @@ class Site_Combiner
 	 *
 	 * @param string $type - should be one of '.js' or '.css'
 	 */
-	private function _buildName($type)
+	protected function _buildName($type)
 	{
 		global $settings;
 
@@ -328,7 +328,7 @@ class Site_Combiner
 	 *
 	 * @param string $type one of css or js
 	 */
-	private function _combineFiles($type)
+	protected function _combineFiles($type)
 	{
 		// Remove any old cache file(s)
 		@unlink($this->_archive_dir . '/' . $this->_archive_name);
@@ -368,7 +368,7 @@ class Site_Combiner
 	/**
 	 * Save a compilation as text and optionally a compressed .gz file
 	 */
-	private function _saveFiles()
+	protected function _saveFiles()
 	{
 		// Add in the file header if available
 		if (!empty($this->_archive_header))
@@ -397,7 +397,7 @@ class Site_Combiner
 	 *    b) as multiple calls
 	 * - Failing that will return original uncompressed file
 	 */
-	private function _jsCompiler()
+	protected function _jsCompiler()
 	{
 		global $context;
 
@@ -435,7 +435,7 @@ class Site_Combiner
 	 * - Allows us to make a single request and let the compiler fetch the files from us
 	 * - Best option if its available (closure can see the files)
 	 */
-	private function _closure_code_url()
+	protected function _closure_code_url()
 	{
 		$post_data = '';
 
@@ -457,7 +457,7 @@ class Site_Combiner
 	 * - If the combined string is to large, then it is processed as chunks done
 	 * to minimize the number of posts required
 	 */
-	private function _closure_js_code()
+	protected function _closure_js_code()
 	{
 		// As long as we are below 200000 in post data size we can do this in one request
 		if ($GLOBALS['elk']['text']->strlen(urlencode($this->_post_header . $this->_cache)) <= 200000)
@@ -481,7 +481,7 @@ class Site_Combiner
 	 * - Will do multiple requests until done, combining the results
 	 * - Returns the compressed string or the original if an error occurs
 	 */
-	private function _closure_js_code_chunks()
+	protected function _closure_js_code_chunks()
 	{
 		$fetch_data = '';
 		$combine_files = array_values($this->_combine_files);

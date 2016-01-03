@@ -65,9 +65,7 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-	$db = $GLOBALS['elk']['db'];
-
-	return $db->num_rows($result);
+	return $result->numRows();
 }
 
 /**

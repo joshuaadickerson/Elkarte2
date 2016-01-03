@@ -275,7 +275,7 @@ class BrowserDetector
 	 * - set the browser version for Safari and Chrome
 	 * - set the mobile flag for mobile based useragents
 	 */
-	private function _setupWebkit()
+	protected function _setupWebkit()
 	{
 		$this->_browsers += array(
 			'is_iphone' => (strpos($this->_ua, 'iPhone') !== false || strpos($this->_ua, 'iPod') !== false) && strpos($this->_ua, 'iPad') === false,
@@ -336,7 +336,7 @@ class BrowserDetector
 	 * - detects ie4 onward
 	 * - attempts to distinguish between IE and IE in compatabilty view
 	 */
-	private function _setupIe()
+	protected function _setupIe()
 	{
 		$this->_browsers['is_ie_compat_view'] = false;
 
@@ -380,7 +380,7 @@ class BrowserDetector
 	 * - Gets the version of the FF browser in use
 	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
 	 */
-	private function _setupFirefox()
+	protected function _setupFirefox()
 	{
 		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $this->_ua, $match) === 1)
 			$this->_browsers['is_firefox' . (int) $match[1]] = true;
@@ -407,7 +407,7 @@ class BrowserDetector
 	 * - checks for the version of Opera in use
 	 * - uses checks for 10 first and falls through to <9
 	 */
-	private function _setupOpera()
+	protected function _setupOpera()
 	{
 		// Opera 10+ uses the version tag at the end of the string
 		if (preg_match('~\sVersion/([0-9]+)\.[0-9]+(?:\s*|$)~', $this->_ua, $match))
@@ -425,7 +425,7 @@ class BrowserDetector
 	 * - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
 	 * - only sets browsers that may need some help via css for compatablity
 	 */
-	private function _setupBrowserPriority()
+	protected function _setupBrowserPriority()
 	{
 		global $context;
 

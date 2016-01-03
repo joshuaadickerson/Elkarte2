@@ -90,7 +90,7 @@ if (class_exists('DbTable_MySQL'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		private function __construct($db)
+		protected function __construct($db)
 		{
 			// We are doing Install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -206,7 +206,7 @@ if (class_exists('DbTable_PostgreSQL'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		private function __construct($db)
+		protected function __construct($db)
 		{
 			// We are doing Install, of course we want to do any remove on these
 			$this->_reservedTables = array();

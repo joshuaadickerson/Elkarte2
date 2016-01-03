@@ -106,7 +106,7 @@ class HttpReq
 	 * - looks for duplicate items in $_REQUEST and $_POST and used the $_REQUEST
 	 *   values, being they are "sanitized"  $_GET ones are re-stuffed by cleanRequest
 	 */
-	private function _loadParsed()
+	protected function _loadParsed()
 	{
 		// Any that were born in cleanRequest, like start from topic=xyz.START
 		// are added to the other supers
@@ -135,7 +135,7 @@ class HttpReq
 	 * - json decodes the string and loads its values in to POST
 	 * - Does not overwrite any existing keys
 	 */
-	private function _loadJson()
+	protected function _loadJson()
 	{
 		// Was the magic json value posted?
 		if (!empty($this->_derived_post['jsonString']))

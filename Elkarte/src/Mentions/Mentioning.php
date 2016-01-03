@@ -11,8 +11,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Mentions;
+use Elkarte\Elkarte\AbstractModel;
+use Elkarte\Elkarte\DataValidator;
 
 /**
  * Takes care of validating and inserting mention notifications in the database
@@ -81,7 +82,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Start things up, what else does a constructor do
 	 */
-	public function __construct($db, $validator, $enabled_mentions = '')
+	public function __construct($db, DataValidator $validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
 			'new' => Mentioning::MNEW,
@@ -135,6 +136,7 @@ class Mentioning extends AbstractModel
 	 * actual insert.
 	 *
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 * @return array
 	 */
 	protected function _prepareData($data)
 	{
@@ -204,7 +206,7 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _getAccessible($mention_ids, $action)
 	{
-		require_once(SUBSDIR . '/Mentions.subs.php');
+		require_once(ROOTDIR . '/Mentions/Mentions.subs.php');
 		$sanitization = array(
 			'id_mention' => 'intval',
 			'mark' => 'trim',
@@ -280,7 +282,7 @@ class Mentioning extends AbstractModel
 	{
 		global $user_info;
 
-		$this->_db->query('', '
+		$result = $this->_db->query('', '
 			UPDATE {db_prefix}log_mentions
 			SET status = {int:status}
 			WHERE id_mention IN ({array_int:id_mentions})',
@@ -289,7 +291,7 @@ class Mentioning extends AbstractModel
 				'status' => $this->_known_status[$status],
 			)
 		);
-		$success = $this->_db->affected_rows() != 0;
+		$success = $result->numAffectedRows() != 0;
 
 		// Update the top level mentions count
 		if ($success)
@@ -307,7 +309,7 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _updateMenuCount($status, $member_id)
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// If its new add to our menu count
 		if ($status === 0)

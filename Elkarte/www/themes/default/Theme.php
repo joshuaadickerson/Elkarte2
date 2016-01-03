@@ -574,7 +574,7 @@ class Theme extends AbstractTheme
             $context['page_title'] = '';
 
         // Set some specific vars.
-        $context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+        $context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
         // Load a custom CSS file?
         if (file_exists($settings['theme_dir'] . '/css/custom.css'))

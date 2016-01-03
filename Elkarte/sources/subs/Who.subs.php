@@ -345,7 +345,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load topic names.
 	if (!empty($topic_ids))
 	{
-		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		$topics_data = topicsList(array_keys($topic_ids));
 
 		foreach ($topics_data as $topic)
@@ -373,7 +373,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load member names for the profile.
 	if (!empty($profile_ids) && (allowedTo('profile_view_any') || allowedTo('profile_view_own')))
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$result = getBasicMemberData(array_keys($profile_ids));
 		foreach ($result as $row)
 		{

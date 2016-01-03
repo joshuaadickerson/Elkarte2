@@ -154,7 +154,7 @@ class Action
 			if (isset($subAction['controller']))
 			{
 				// 'controller'->'function'
-				$controller = new $subAction['controller'](new Event_Manager());
+				$controller = new $subAction['controller'](new EventManager());
 				$controller->pre_dispatch();
 
 				$controller->{$subAction['function']}();
@@ -175,7 +175,7 @@ class Action
 					$subAction['controller']->{$subAction['function']}();
 				else
 				{
-					$controller = new $subAction['controller'](new Event_Manager());
+					$controller = new $subAction['controller'](new EventManager());
 					$controller->pre_dispatch();
 
 					$controller->{$subAction['function']}();

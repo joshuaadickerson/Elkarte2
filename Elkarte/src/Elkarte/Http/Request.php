@@ -158,7 +158,7 @@ class Request
 	/**
 	 * Finds the claimed client IP for this connection
 	 */
-	private function _getClientIP()
+	protected function _getClientIP()
 	{
 		// Client IP: REMOTE_ADDR, unless missing
 		if (!isset($_SERVER['REMOTE_ADDR']))
@@ -187,7 +187,7 @@ class Request
 	/**
 	 * Hunts in most request areas for connection IP's for use in banning
 	 */
-	private function _getBanIP()
+	protected function _getBanIP()
 	{
 		// Start off the same as the client ip
 		$this->_ban_ip = $this->_client_ip;
@@ -278,7 +278,7 @@ class Request
 	 *
 	 * - helper function for parseRequest
 	 */
-	private function _checkBoard()
+	protected function _checkBoard()
 	{
 		if (isset($_REQUEST['board']))
 		{
@@ -311,7 +311,7 @@ class Request
 	 *
 	 * helper function for parseRequest
 	 */
-	private function _checkTopic()
+	protected function _checkTopic()
 	{
 		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
 		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
@@ -374,7 +374,7 @@ class Request
 		$this->_cleanRequest();
 
 		// Add entities to GET.  This is kinda like the slashes on everything else.
-		$_GET = htmlspecialchars__recursive($_GET);
+		$_GET = $GLOBALS['elk']['text']->htmlspecialchars__recursive($_GET);
 
 		// Let's not depend on the ini settings... why even have COOKIE in there, anyway?
 		$_REQUEST = $_POST + $_GET;
@@ -402,7 +402,7 @@ class Request
 	 * - No numeric keys in $_GET, $_POST or $_FILE
 	 * - No URL's appended to the query string
 	 */
-	private function _checkExit()
+	protected function _checkExit()
 	{
 		// Reject magic_quotes_sybase='on'.
 		$this->_checkMagicQuotes();
@@ -434,7 +434,7 @@ class Request
 	 * - Fail on illegal keys
 	 * - Clear ones that should not be allowed
 	 */
-	private function _checkNumericKeys()
+	protected function _checkNumericKeys()
 	{
 		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
 			$GLOBALS['elk']['errors']->fatal_error('Invalid request variable.', false);
@@ -459,7 +459,7 @@ class Request
 	 *
 	 * - depreciated in 5.3 and done in 5.4
 	 */
-	private function _checkMagicQuotes()
+	protected function _checkMagicQuotes()
 	{
 		if (version_compare(PHP_VERSION, '5.4.0', '<'))
 		{
@@ -476,7 +476,7 @@ class Request
 	/**
 	 * Helper method used to clean $_GET arguments
 	 */
-	private function _cleanArg()
+	protected function _cleanArg()
 	{
 		// Are we going to need to parse the ; out?
 		if (strpos(ini_get('arg_separator.input'), ';') === false && !empty($this->_server_query_string))
@@ -529,7 +529,7 @@ class Request
 	/**
 	 * If a request URI is present, this will prepare it for use
 	 */
-	private function _cleanRequest()
+	protected function _cleanRequest()
 	{
 		// There's no query string, but there is a URL... try to get the data from there.
 		if (!empty($_SERVER['REQUEST_URI']))

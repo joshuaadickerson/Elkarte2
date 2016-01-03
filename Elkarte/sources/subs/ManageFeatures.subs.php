@@ -61,7 +61,7 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	updateMemberData($id_member, array('signature' => $signature));
 }
 
@@ -72,7 +72,7 @@ function updateAllSignatures($applied_sigs)
 {
 	global $context, $sig_start, $modSettings;
 
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	$sig_start = time();
 
 	// This is horrid - but I suppose some people will want the option to do it.

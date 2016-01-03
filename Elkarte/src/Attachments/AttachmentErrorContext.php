@@ -32,7 +32,7 @@ class AttachmentErrorContext
 
 	/**
 	 * Holds any errors found
-	 * @var Error_Context|null
+	 * @var ErrorContext|null
 	 */
 	private $_generic_error = null;
 
@@ -61,7 +61,7 @@ class AttachmentErrorContext
 		if (!isset($this->_attachs[$id]))
 			$this->_attachs[$id] = array(
 				'name' => $name,
-				'error' => Error_Context::context($id, 1),
+				'error' => ErrorContext::context($id, 1),
 			);
 
 		$this->activate($id);
@@ -98,7 +98,7 @@ class AttachmentErrorContext
 		if ($this->_active_attach == 'generic')
 		{
 			if (!isset($this->_attachs[$this->_active_attach]))
-				$this->_generic_error = Error_Context::context('attach_generic_error', 1);
+				$this->_generic_error = ErrorContext::context('attach_generic_error', 1);
 
 			$this->_generic_error->addError($error, $lang_file);
 			return;

@@ -721,7 +721,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	if ($member_name == null)
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Get the new user's name....
 		$member_info = getBasicMemberData($memberID);
@@ -835,7 +835,7 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 		{
 			if (!isset($board_profile[$row['id_board']]))
 			{
-				require_once(SUBSDIR . '/Members.subs.php');
+				require_once(ROOTDIR . '/Members/Members.subs.php');
 				$board_profile[$row['id_board']] = groupsAllowedTo('postby_email', $row['id_board']);
 			}
 

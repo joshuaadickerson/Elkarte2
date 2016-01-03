@@ -452,24 +452,6 @@ function forum_time($use_user_offset = true, $timestamp = null)
 }
 
 /**
- * Removes special entities from strings.  Compatibility...
- *
- * - Faster than html_entity_decode
- * - Removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
- * - Additionally converts &nbsp with str_replace
- *
- * @param string $string The string to apply htmlspecialchars_decode
- * @return string string without entities
- */
-function un_htmlspecialchars($string)
-{
-	$string = htmlspecialchars_decode($string, ENT_QUOTES);
-	$string = str_replace('&nbsp;', ' ', $string);
-
-	return $string;
-}
-
-/**
  * Lexicographic permutation function.
  *
  * This is a special type of permutation which involves the order of the set. The next
@@ -646,7 +628,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -998,7 +980,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars($GLOBALS['elk']['text']->strtolower($words));
+	$words = $GLOBALS['elk']['text']->un_htmlspecialchar($GLOBALS['elk']['text']->strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -1328,7 +1310,7 @@ function replaceBasicActionUrl($string)
 		$replace = array(
 			$context['forum_name'],
 			$context['forum_name_html_safe'],
-			un_htmlspecialchars($context['forum_name_html_safe']),
+			$GLOBALS['elk']['text']->un_htmlspecialchars($context['forum_name_html_safe']),
 			$scripturl,
 			$boardurl,
 			$scripturl . '?action=login',
@@ -1500,6 +1482,7 @@ function removeBr($string)
  * - Wrapper function for detectBrowser
  *
  * @param string $browser  the browser we are checking for.
+ * @return bool
  */
 function isBrowser($browser)
 {
@@ -1508,8 +1491,7 @@ function isBrowser($browser)
 	// Don't know any browser!
 	if (empty($context['browser']))
 	{
-		$detector = new BrowserDetector;
-		$detector->detectBrowser();
+		$GLOBALS['elk']['browser'];
 	}
 
 	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
@@ -1671,58 +1653,6 @@ function expandIPv6($addr, $strict_check = true)
 		return $result;
 	else
 		return false;
-}
-
-/**
- * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
- *
- * What it does:
- * - Adds entities (&quot;, &lt;, &gt;) to the array or string var.
- * - Importantly, does not effect keys, only values.
- * - Calls itself recursively if necessary.
- * - Does not go deeper than 25 to prevent loop exhaustion
- *
- * @param array|string $var The string or array of strings to add entities
- * @param int $level = 0 The current level we're at within the array (if called recursively)
- * @return array|string The string or array of strings with entities added
- */
-function htmlspecialchars__recursive($var, $level = 0)
-{
-	if (!is_array($var))
-		return $GLOBALS['elk']['text']->htmlspecialchars($var, ENT_QUOTES);
-
-	// Add the htmlspecialchars to every element.
-	foreach ($var as $k => $v)
-		$var[$k] = $level > 25 ? null : htmlspecialchars__recursive($v, $level + 1);
-
-	return $var;
-}
-
-/**
- * Trim a string including the HTML space, character 160.  Uses two underscores to guard against overloading.
- *
- * What it does:
- * - Trims a string or an array using html characters as well.
- * - Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
- * - Does not effect keys, only values.
- * - May call itself recursively if needed.
- * - Does not go deeper than 25 to prevent loop exhaustion
- *
- * @param array|string $var The string or array of strings to trim
- * @param int $level = 0 How deep we're at within the array (if called recursively)
- * @return mixed[]|string The trimmed string or array of trimmed strings
- */
-function htmltrim__recursive($var, $level = 0)
-{
-	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
-	if (!is_array($var))
-		return $GLOBALS['elk']['text']->htmltrim($var);
-
-	// Go through all the elements and remove the whitespace.
-	foreach ($var as $k => $v)
-		$var[$k] = $level > 25 ? null : htmltrim__recursive($v, $level + 1);
-
-	return $var;
 }
 
 /**

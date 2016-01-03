@@ -383,7 +383,7 @@ class Errors
 	 * Display debug information, shows exceptions / errors similar to standard
 	 * PHP error output.
 	 */
-	private function _displayDebug()
+	protected function _displayDebug()
 	{
 		global $db_show_debug;
 
@@ -409,7 +409,7 @@ class Errors
 	 * @param string|null $err_file
 	 * @param int|null $err_line
 	 */
-	private function _prepareErrorDisplay($e, $err_file = null, $err_line = null)
+	protected function _prepareErrorDisplay($e, $err_file = null, $err_line = null)
 	{
 		global $db_show_debug;
 
@@ -450,7 +450,7 @@ class Errors
 	 *
 	 * @return string
 	 */
-	private function _debug_error_func($error_trace, $entry, $not_thrown, $key)
+	protected function _debug_error_func($error_trace, $entry, $not_thrown, $key)
 	{
 		// If from the error_handler, the stack is out of sync
 		if ($not_thrown)
@@ -468,7 +468,7 @@ class Errors
 	 * @param string $error_message
 	 * @param string $error_code string or int code
 	 */
-	private function _setup_fatal_error_context($error_message, $error_code)
+	protected function _setup_fatal_error_context($error_message, $error_code)
 	{
 		global $context, $txt, $ssi_on_error_method;
 		static $level = 0;
@@ -641,7 +641,7 @@ class Errors
 	 * - Used by display_db_error(), display_loadavg_error(),
 	 * display_maintenance_message()
 	 */
-	private function _set_fatal_error_headers()
+	protected function _set_fatal_error_headers()
 	{
 		// Don't cache this page!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');

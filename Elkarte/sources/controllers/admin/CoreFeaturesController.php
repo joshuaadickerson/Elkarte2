@@ -376,7 +376,7 @@ class CoreFeaturesController extends AbstractController
 	 * @param mixed[] $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
 	 */
-	private function _save_core_features($core_features)
+	protected function _save_core_features($core_features)
 	{
 		global $modSettings;
 

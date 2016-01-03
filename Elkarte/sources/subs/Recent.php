@@ -188,7 +188,7 @@ class Recent_Class
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 */
-	private function _findRecentMessages($start, $limit = 10)
+	protected function _findRecentMessages($start, $limit = 10)
 	{
 		$done = false;
 		while (!$done)
@@ -237,7 +237,7 @@ class Recent_Class
 	 *
 	 * @param int $start
 	 */
-	private function _getRecentPosts($start)
+	protected function _getRecentPosts($start)
 	{
 		// Get all the most recent posts.
 		$request = $this->_db->query('', '

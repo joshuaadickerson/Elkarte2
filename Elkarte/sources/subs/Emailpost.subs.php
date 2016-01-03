@@ -1691,7 +1691,7 @@ function query_mark_pms($email_message, $pbe)
 		$result->free();
 
 		// Update things for when they do come to the site
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($pbe['profile']['id_member'], array('unread_messages' => $total_unread));
 	}
 
@@ -1784,7 +1784,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	}
 
 	// Update the members total time logged in data
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 	updateMemberData($pbe['profile']['id_member'], array('total_time_logged_in' => $total_time_logged_in, 'last_login' => $last_login));
 
 	// Show they are active in the who's online list and what they have done

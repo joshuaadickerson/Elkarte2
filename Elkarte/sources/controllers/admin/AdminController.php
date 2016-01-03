@@ -891,10 +891,10 @@ class Admin_Controller extends AbstractController
 
 		// Set the query values
 		$this->_req->post->sa = 'query';
-		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
+		$this->_req->post->membername = $GLOBALS['elk']['text']->un_htmlspecialchar($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers = new ManageMembersController(new \Elkarte\Elkarte\Events\EventManager()anager());
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}

@@ -739,7 +739,7 @@ function checkLogin()
 						$password_salt = substr(md5(mt_rand()), 0, 4);
 
 						// Update the password hash and set up the salt.
-						require_once(SUBSDIR . '/Members.subs.php');
+						require_once(ROOTDIR . '/Members/Members.subs.php');
 						updateMemberData($id_member, array('passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => ''));
 					}
 				}
@@ -1758,7 +1758,7 @@ function loadEssentialFunctions()
 			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
-			$words = un_htmlspecialchars($GLOBALS['elk']['text']->strtolower($words));
+			$words = $GLOBALS['elk']['text']->un_htmlspecialchar($GLOBALS['elk']['text']->strtolower($words));
 
 			// Step 3: Ready to split apart and index!
 			$words = explode(' ', $words);

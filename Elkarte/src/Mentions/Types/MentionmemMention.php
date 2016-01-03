@@ -122,7 +122,7 @@ class MentionmemMentionMentionBoardAccess extends AbstractMentionBoardAccess
 				'member_ids' => array_unique(array_map('intval', $_REQUEST['uid']))
 			);
 
-			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(ROOTDIR . '/Members/Members.subs.php');
 			$mentioned_members = membersBy('member_ids', $query_params, true);
 			$replacements = 0;
 			$this->_actually_mentioned = array();

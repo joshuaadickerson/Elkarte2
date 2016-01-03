@@ -188,7 +188,7 @@ class CSSmin
     /**
      * Try to configure PHP to use at least the suggested minimum settings
      */
-    private function do_raise_php_limits()
+    protected function do_raise_php_limits()
     {
         $php_limits = array(
             'memory_limit' => $this->memory_limit,
@@ -213,7 +213,7 @@ class CSSmin
      * @param int|bool $linebreak_pos
      * @return string
      */
-    private function minify($css, $linebreak_pos)
+    protected function minify($css, $linebreak_pos)
     {
         // strings are safe, now wrestle the comments
         for ($i = 0, $max = count($this->comments); $i < $max; $i++) {
@@ -423,7 +423,7 @@ class CSSmin
      * @param string $css
      * @return string
      */
-    private function extract_data_urls($css)
+    protected function extract_data_urls($css)
     {
         // Leave data urls alone to increase parse performance.
         $max_index = strlen($css) - 1;
@@ -501,7 +501,7 @@ class CSSmin
      * @param string $css
      * @return string
      */
-    private function compress_hex_colors($css)
+    protected function compress_hex_colors($css)
     {
         // Look for hex colors inside { ... } (to avoid IDs) and which don't have a =, or a " in front of them (to avoid filters)
         $pattern = '/(\=\s*?["\']?)?#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])(\}|[^0-9a-f{][^{]*?\})/iS';
@@ -557,7 +557,7 @@ class CSSmin
      * ---------------------------------------------------------------------------------------------
      */
 
-    private function replace_string($matches)
+    protected function replace_string($matches)
     {
         $match = $matches[0];
         $quote = substr($match, 0, 1);
@@ -579,29 +579,29 @@ class CSSmin
         return $quote . self::TOKEN . (count($this->preserved_tokens) - 1) . '___' . $quote;
     }
 
-    private function replace_colon($matches)
+    protected function replace_colon($matches)
     {
         return preg_replace('/\:/', self::CLASSCOLON, $matches[0]);
     }
 
-    private function replace_calc($matches)
+    protected function replace_calc($matches)
     {
         $this->preserved_tokens[] = trim(preg_replace('/\s*([\*\/\(\),])\s*/', '$1', $matches[2]));
         return 'calc('. self::TOKEN . (count($this->preserved_tokens) - 1) . '___' . ')';
     }
 
-	private function preserve_old_IE_specific_matrix_definition($matches)
+	protected function preserve_old_IE_specific_matrix_definition($matches)
 	{
 		$this->preserved_tokens[] = $matches[1];
 		return 'filter:progid:DXImageTransform.Microsoft.Matrix(' . self::TOKEN . (count($this->preserved_tokens) - 1) . '___' . ')';
     }
 
-	private function replace_keyframe_zero($matches)
+	protected function replace_keyframe_zero($matches)
     {
         return $matches[1] . preg_replace('/0(\{|,[^\)\{]+\{)/', '0%$1', $matches[2]) . $matches[3];
     }
 
-    private function rgb_to_hex($matches)
+    protected function rgb_to_hex($matches)
     {
         // Support for percentage values rgb(100%, 0%, 45%);
         if ($this->index_of($matches[1], '%') >= 0){
@@ -627,7 +627,7 @@ class CSSmin
         return '#' . implode('', $rgbcolors) . $matches[2];
     }
 
-    private function hsl_to_hex($matches)
+    protected function hsl_to_hex($matches)
     {
         $values = explode(',', str_replace('%', '', $matches[1]));
         $h = floatval($values[0]);
@@ -652,32 +652,32 @@ class CSSmin
         return $this->rgb_to_hex(array('', $r.','.$g.','.$b, $matches[2]));
     }
 
-    private function lowercase_pseudo_first($matches)
+    protected function lowercase_pseudo_first($matches)
     {
         return ':first-'. strtolower($matches[1]) .' '. $matches[2];
     }
 
-    private function lowercase_directives($matches)
+    protected function lowercase_directives($matches)
     {
         return '@'. strtolower($matches[1]);
     }
 
-    private function lowercase_pseudo_elements($matches)
+    protected function lowercase_pseudo_elements($matches)
     {
         return ':'. strtolower($matches[1]);
     }
 
-    private function lowercase_common_functions($matches)
+    protected function lowercase_common_functions($matches)
     {
         return ':'. strtolower($matches[1]) .'(';
     }
 
-    private function lowercase_common_functions_values($matches)
+    protected function lowercase_common_functions_values($matches)
     {
         return $matches[1] . strtolower($matches[2]);
     }
 
-    private function lowercase_properties($matches)
+    protected function lowercase_properties($matches)
     {
         return $matches[1].strtolower($matches[2]).$matches[3];
     }
@@ -686,7 +686,7 @@ class CSSmin
      * ---------------------------------------------------------------------------------------------
      */
 
-    private function hue_to_rgb($v1, $v2, $vh)
+    protected function hue_to_rgb($v1, $v2, $vh)
     {
         $vh = $vh < 0 ? $vh + 1 : ($vh > 1 ? $vh - 1 : $vh);
         if ($vh * 6 < 1) return $v1 + ($v2 - $v1) * 6 * $vh;
@@ -695,12 +695,12 @@ class CSSmin
         return $v1;
     }
 
-    private function round_number($n)
+    protected function round_number($n)
     {
         return intval(floor(floatval($n) + 0.5), 10);
     }
 
-    private function clamp_number($n, $min, $max)
+    protected function clamp_number($n, $min, $max)
     {
         return min(max($n, $min), $max);
     }
@@ -714,7 +714,7 @@ class CSSmin
      * @param int    $offset index (optional)
      * @return int
      */
-    private function index_of($haystack, $needle, $offset = 0)
+    protected function index_of($haystack, $needle, $offset = 0)
     {
         $index = strpos($haystack, $needle, $offset);
 
@@ -731,7 +731,7 @@ class CSSmin
      * @param int|bool $end index (optional)
      * @return string
      */
-    private function str_slice($str, $start = 0, $end = FALSE)
+    protected function str_slice($str, $start = 0, $end = FALSE)
     {
         if ($end !== FALSE && ($start < 0 || $end <= 0)) {
             $max = strlen($str);
@@ -762,7 +762,7 @@ class CSSmin
      * @param mixed $size
      * @return int
      */
-    private function normalize_int($size)
+    protected function normalize_int($size)
     {
         if (is_string($size)) {
             switch (substr($size, -1)) {

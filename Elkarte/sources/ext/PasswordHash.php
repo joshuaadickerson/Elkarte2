@@ -44,7 +44,7 @@ class PasswordHash {
 		$this->random_state = microtime() . uniqid(rand(), TRUE);
 	}
 
-	private function get_random_bytes($count)
+	protected function get_random_bytes($count)
 	{
 		$output = '';
 		if (@is_readable('/dev/urandom') &&
@@ -67,7 +67,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	private function encode64($input, $count)
+	protected function encode64($input, $count)
 	{
 		$output = '';
 		$i = 0;
@@ -90,7 +90,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	private function gensalt_private($input)
+	protected function gensalt_private($input)
 	{
 		$output = '$P$';
 		$output .= $this->itoa64[min($this->iteration_count_log2 +
@@ -100,7 +100,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	private function crypt_private($password, $setting)
+	protected function crypt_private($password, $setting)
 	{
 		$output = '*0';
 		if (substr($setting, 0, 2) == $output)
@@ -145,7 +145,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	private function gensalt_extended($input)
+	protected function gensalt_extended($input)
 	{
 		$count_log2 = min($this->iteration_count_log2 + 8, 24);
 		# This should be odd to not reveal weak DES keys, and the
@@ -163,7 +163,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	private function gensalt_blowfish($input)
+	protected function gensalt_blowfish($input)
 	{
 		# This one needs to use a different order of characters and a
 		# different encoding scheme from the one in encode64() above.
@@ -271,7 +271,7 @@ class PasswordHash {
 	 *
 	 * @return bool
 	 */
-	private function _hash_equals($a, $b)
+	protected function _hash_equals($a, $b)
 	{
 		// PHP 5.6+
 		if (function_exists('hash_equals'))

@@ -57,7 +57,7 @@ class OpenID
 			$assoc = $this->makeAssociation($response_data['provider']);
 
 		// Include file for member existence
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Before we go wherever it is we are going, store the GET and POST data, because it might be useful when we get back.
 		$request_time = time();

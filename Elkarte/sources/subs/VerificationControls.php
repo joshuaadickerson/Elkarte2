@@ -94,7 +94,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	elseif (!$isNew && !$do_test)
 		return true;
 
-	$verification_errors = Error_Context::context($verificationOptions['id']);
+	$verification_errors = ErrorContext::context($verificationOptions['id']);
 	$increase_error_count = false;
 
 	// Start with any testing.
@@ -464,7 +464,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	 * Does what they typed = what was supplied in the image
 	 * @return boolean
 	 */
-	private function _verifyCode()
+	protected function _verifyCode()
 	{
 		return !$this->_show_captcha || (!empty($_REQUEST[$this->_options['id'] . '_vv']['code']) && !empty($_SESSION[$this->_options['id'] . '_vv']['code']) && strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) === $_SESSION[$this->_options['id'] . '_vv']['code']);
 	}
@@ -768,7 +768,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *
 	 * @return boolean
 	 */
-	private function _verifyAnswers()
+	protected function _verifyAnswers()
 	{
 		// Get the answers and see if they are all right!
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $_SESSION[$this->_options['id'] . '_vv']['q']));
@@ -790,7 +790,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	/**
 	 * Updates the cache of questions IDs
 	 */
-	private function _refreshQuestionsCache()
+	protected function _refreshQuestionsCache()
 	{
 		global $modSettings;
 
@@ -820,7 +820,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
 	 */
-	private function _loadAntispamQuestions($filter = null)
+	protected function _loadAntispamQuestions($filter = null)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -858,7 +858,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *
 	 * @param int $id
 	 */
-	private function _delete($id)
+	protected function _delete($id)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -879,7 +879,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 * @param string $answers
 	 * @param string $language
 	 */
-	private function _update($id, $question, $answers, $language)
+	protected function _update($id, $question, $answers, $language)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -905,7 +905,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *
 	 * @param mixed[] $questions
 	 */
-	private function _insert($questions)
+	protected function _insert($questions)
 	{
 		$db = $GLOBALS['elk']['db'];
 
@@ -1091,7 +1091,7 @@ class Verification_Controls_EmptyField implements Verification_Controls
 	/**
 	 * Test the field, easy, its on, its is set and it is empty
 	 */
-	private function _verifyField()
+	protected function _verifyField()
 	{
 		return $this->_empty_field && !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]);
 	}

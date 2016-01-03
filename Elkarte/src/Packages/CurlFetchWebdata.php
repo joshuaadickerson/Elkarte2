@@ -151,7 +151,7 @@ class CurlFetchWebdata
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
 	 */
-	private function _curlRequest($url, $redirect = false)
+	protected function _curlRequest($url, $redirect = false)
 	{
 		// We do have a url I hope
 		if ($url == '')
@@ -209,7 +209,7 @@ class CurlFetchWebdata
 	 * @param string $last_url URL where we went to
 	 * @param string $new_url URL where we were redirected to
 	 */
-	private function _getRedirectURL($last_url = '', $new_url = '')
+	protected function _getRedirectURL($last_url = '', $new_url = '')
 	{
 		// Get the elements for these urls
 		$last_url_parse = parse_url($last_url);
@@ -274,7 +274,7 @@ class CurlFetchWebdata
 	 *
 	 * @param mixed[] $post_data
 	*/
-	private function _buildPostData($post_data)
+	protected function _buildPostData($post_data)
 	{
 		if (is_array($post_data))
 		{
@@ -297,7 +297,7 @@ class CurlFetchWebdata
 	 * - Overwrites our default values with user supplied ones or appends new user ones to what we have
 	 * - Sets the callback function now that $this exists
 	 */
-	private function _setOptions()
+	protected function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
 		$this->default_options[CURLOPT_HEADERFUNCTION] = array($this, '_headerCallback');
@@ -329,7 +329,7 @@ class CurlFetchWebdata
 	 * @param string $target_url The URL of the target
 	 * @param string $referer_url The URL of the link that referred us to the new target
 	 */
-	private function _redirect($target_url, $referer_url)
+	protected function _redirect($target_url, $referer_url)
 	{
 		// No no I last saw that over there ... really, 301, 302, 307
 		$this->_setOptions();
@@ -346,7 +346,7 @@ class CurlFetchWebdata
 	 * @param object $cr Not used but passed by the cURL agent
 	 * @param string $header The headers received
 	 */
-	private function _headerCallback($cr, $header)
+	protected function _headerCallback($cr, $header)
 	{
 		$_header = trim($header);
 		$temp = explode(': ', $_header, 2);

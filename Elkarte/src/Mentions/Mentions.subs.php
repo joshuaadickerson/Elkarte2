@@ -55,7 +55,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	// Counts as maintenance! :P
 	if ($all === false && empty($type))
 	{
-		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($id_member, array('mentions' => $counts[$id_member]));
 	}
 
@@ -472,7 +472,7 @@ function findMemberMention($id_mention, $id_member)
  */
 function updateMentionMenuCount($status, $member_id)
 {
-	require_once(SUBSDIR . '/Members.subs.php');
+	require_once(ROOTDIR . '/Members/Members.subs.php');
 
 	// If its new add to our menu count
 	if ($status === 0)

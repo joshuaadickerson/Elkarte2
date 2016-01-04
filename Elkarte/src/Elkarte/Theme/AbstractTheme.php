@@ -17,7 +17,7 @@
  *
  */
 
-namespace Elkarte\Elkarte\View;
+namespace Elkarte\Elkarte\Theme;
 
 abstract class AbstractTheme
 {

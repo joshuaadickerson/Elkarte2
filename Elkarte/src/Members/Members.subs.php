@@ -356,7 +356,6 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete personal messages.
-	require_once(SUBSDIR . '/PersonalMessage.subs.php');
 	deleteMessages(null, null, $users);
 
 	$db->query('', '
@@ -379,7 +378,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete avatar.
-	require_once(SUBSDIR . '/ManageAttachments.subs.php');
+	require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $users));
 
 	// It's over, no more moderation for you.
@@ -675,13 +674,13 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// Register them into the database.
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}members',
 		$column_names,
 		$values,
 		array('id_member')
 	);
-	$memberID = $db->insert_id('{db_prefix}members', 'id_member');
+	$memberID = $result->insertId('{db_prefix}members', 'id_member');
 
 	// Update the number of members and latest member's info - and pass the name, but remove the 's.
 	if ($regOptions['register_vars']['is_activated'] == 1)
@@ -956,7 +955,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$profile_id = $board_info['profile'];
 		elseif ($board_id !== 0)
 		{
-			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(ROOTDIR . '/Boards/Boards.subs.php');
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
@@ -2364,7 +2363,7 @@ function memberQuerySeeBoard($id_member)
 		return '1=1';
 	else
 	{
-		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(ROOTDIR . '/Boards/Boards.subs.php');
 
 		$boards_mod = boardsModerated($id_member);
 		$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
@@ -2506,7 +2505,7 @@ function updateMemberData($members, $data)
 		$parameters
 	);
 
-	require_once(SUBSDIR . '/Membergroups.subs.php');
+	require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 	updatePostGroupStats($members, array_keys($data));
 
 	$cache = $GLOBALS['elk']['cache'];

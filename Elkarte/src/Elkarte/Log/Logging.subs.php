@@ -210,7 +210,7 @@ function insertLogActions($inserts)
 {
 	$db = $GLOBALS['elk']['db'];
 
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
@@ -220,7 +220,7 @@ function insertLogActions($inserts)
 		array('id_action')
 	);
 
-	return $db->insert_id('{db_prefix}log_actions', 'id_action');
+	return $result->insertId('{db_prefix}log_actions', 'id_action');
 }
 
 function deleteMemberLogOnline()

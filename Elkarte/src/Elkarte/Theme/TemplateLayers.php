@@ -11,7 +11,7 @@
  *
  */
 
-namespace Elkarte\Elkarte\View;
+namespace Elkarte\Elkarte\Theme;
 
 use Elkarte\Elkarte\Priority;
 

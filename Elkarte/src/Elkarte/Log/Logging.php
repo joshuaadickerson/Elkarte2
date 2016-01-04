@@ -49,7 +49,7 @@ function writeLog($force = false)
 	// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
 	if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
 		logSpider();
 	}
 
@@ -312,7 +312,7 @@ function logActions($logs)
 		{
 			if (loadLogReported($msg_id, $topic_id))
 			{
-				require_once(SUBSDIR . '/Moderation.subs.php');
+				require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports(true, allowedTo('admin_forum'));
 			}

@@ -982,7 +982,7 @@ class InstallController
 
             if ($result->numRows() != 0)
             {
-                list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
+                list ($incontext['member_id'], $incontext['member_salt']) = $result->fetchRow();
                 $result->free();
 
                 $incontext['account_existed'] = $txt['error_user_settings_taken'];
@@ -1043,6 +1043,7 @@ class InstallController
                 );
 
                 // Awww, crud!
+                // @todo $request can't return false, it returns ResultInterface. What are we trying to do here?
                 if ($request === false)
                 {
                     $incontext['error'] = $txt['error_user_settings_query'] . '<br />
@@ -1050,7 +1051,7 @@ class InstallController
                     return false;
                 }
 
-                $incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
+                $incontext['member_id'] = $request->insertId("{$db_prefix}members", 'id_member');
             }
 
             // If we're here we're good.
@@ -1148,7 +1149,7 @@ class InstallController
             )
         );
         if ($result->numRows() != 0)
-            list ($db_sessions) = $db->fetch_row($result);
+            list ($db_sessions) = $result->fetchRow();
         $result->free();
 
         if (empty($db_sessions))

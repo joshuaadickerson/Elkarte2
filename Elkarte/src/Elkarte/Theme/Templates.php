@@ -9,7 +9,7 @@
  *
  */
 
-namespace Elkarte\Elkarte\View;
+namespace Elkarte\Elkarte\Theme;
 use Elkarte\Elkarte\Debug\Debug;
 
 /**
@@ -304,7 +304,7 @@ class Templates
         }
         else
         {
-            require_once(SUBSDIR . '/Package.subs.php');
+            require_once(ROOTDIR . '/Packages/Package.subs.php');
 
             $error = fetch_web_data($boardurl . strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
             if (empty($error) && ini_get('track_errors') && !empty($php_errormsg))

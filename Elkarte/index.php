@@ -81,8 +81,6 @@ if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/c
 	$cachedir = $boarddir . '/cache';
 if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
 	$extdir = $sourcedir . '/ext';
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
-	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('ROOTDIR', __DIR__ . '/src');
@@ -90,14 +88,14 @@ DEFINE('ELKDIR', ROOTDIR . '/Elkarte');
 DEFINE('BOARDDIR', $boarddir);
 DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
-DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('LANGUAGEDIR', ELKDIR . '/Language/languages');
 DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/Controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 DEFINE('ADDONSDIR', $boarddir . '/addons');
 DEFINE('VENDORDIR', $vendordir . '/vendor');
-unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir, $vendordir);
+unset($boarddir, $cachedir, $sourcedir, $extdir, $vendordir);
 
 // Files we cannot live without.
 require_once(__DIR__ . '/src/Elkarte/Subs.php');

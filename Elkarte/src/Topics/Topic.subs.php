@@ -161,7 +161,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				moveTopics($recycleTopics, $modSettings['recycle_board']);
 
 				// Close reports that are being recycled.
-				require_once(SUBSDIR . '/Moderation.subs.php');
+				require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 
 				$db->query('', '
 				UPDATE {db_prefix}log_reported
@@ -282,7 +282,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	}
 
 	// Get rid of the attachment(s).
-	require_once(SUBSDIR . '/ManageAttachments.subs.php');
+	require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
 	$attachmentQuery = array(
 		'attachment_type' => 0,
 		'id_topic' => $topics,
@@ -334,7 +334,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	if (!empty($messages))
 	{
 		// Decrease / Update the member like counts
-		require_once(SUBSDIR . '/Likes.subs.php');
+		require_once(ROOTDIR . '/Likes/Likes.subs.php');
 		decreaseLikeCounts($messages);
 
 		// Remove all likes now that the topic is gone
@@ -429,7 +429,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		'calendar_updated' => time(),
 	));
 
-	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(ROOTDIR . '/Messages/Post.subs.php');
 	$updates = array();
 	foreach ($adjustBoards as $stats)
 		$updates[] = $stats['id_board'];
@@ -490,7 +490,7 @@ function moveTopicsPermissions($moveCache)
 	// Does the post counts need to be updated?
 	if (!empty($moveTos))
 	{
-		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(ROOTDIR . '/Boards/Boards.subs.php');
 		$topicRecounts = array();
 		$boards_info = fetchBoardsInfo(array('boards' => array_keys($moveTos)), array('selects' => 'posts'));
 
@@ -810,7 +810,7 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
-		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(ROOTDIR . '/Boards/Boards.subs.php');
 		markBoardsRead($toBoard);
 	}
 
@@ -819,7 +819,7 @@ function moveTopics($topics, $toBoard, $log = false)
 	foreach ($topics as $topic_id)
 		$cache->remove('topic_board-' . $topic_id);
 
-	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 	$updates = array_keys($fromBoards);
 	$updates[] = $toBoard;
@@ -2235,7 +2235,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
 	}
 	else
 	{
-		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(ROOTDIR . '/Messages/Post.subs.php');
 		approvePosts($messages);
 
 		// and tell the world about it again
@@ -2305,7 +2305,7 @@ function approveTopics($topics, $approve = true, $log = false)
 		$msgs[] = $row['id_msg'];
 	$request->free();
 
-	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(ROOTDIR . '/Messages/Post.subs.php');
 	return approvePosts($msgs, $approve);
 }
 
@@ -2495,7 +2495,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		$GLOBALS['elk']['errors']->fatal_lang_error('split_first_post', false);
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}topics',
 		array(
 			'id_board' => 'int',
@@ -2514,7 +2514,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		),
 		array('id_topic')
 	);
-	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
+	$split2_ID_TOPIC = $result->insertId('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
 		$GLOBALS['elk']['errors']->fatal_lang_error('cant_insert_topic');
 

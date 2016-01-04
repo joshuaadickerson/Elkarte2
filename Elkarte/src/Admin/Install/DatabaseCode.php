@@ -32,9 +32,9 @@ class DbWrapper
 			}
 		}
 
-		call_user_func_array(array($this->db, 'insert'), $args);
+		$result = call_user_func_array(array($this->db, 'insert'), $args);
 
-		return $this->db->affected_rows();
+		return $result->numAffectedRows();
 	}
 
 	public function countMode($on = true)

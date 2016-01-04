@@ -207,14 +207,14 @@ function logTask($id_log, $task_id, $total_time = null)
 
 	if (empty($id_log))
 	{
-		$db->insert('',
+		$result = $db->insert('',
 			'{db_prefix}log_scheduled_tasks',
 			array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
 			array($task_id, time(), $total_time === null ? -1 : $total_time),
 			array('id_task')
 		);
 
-		return $db->insert_id('{db_prefix}log_scheduled_tasks', 'id_log');
+		return $result->insertId('{db_prefix}log_scheduled_tasks', 'id_log');
 	}
 	else
 	{

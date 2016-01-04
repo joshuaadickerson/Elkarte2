@@ -1914,7 +1914,7 @@ function profileValidateSignature(&$value)
 {
 	global $modSettings, $txt;
 
-	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 	// Admins can do whatever they hell they want!
 	if (!allowedTo('admin_forum'))
@@ -1924,7 +1924,7 @@ function profileValidateSignature(&$value)
 		$sig_limits = explode(',', $sig_limits);
 		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
 
-		$unparsed_signature = strtr(un_htmlspecialchars($value), array("\r" => '', '&#039' => '\''));
+		$unparsed_signature = strtr($GLOBALS['elk']['text']->un_htmlspecialchars($value), array("\r" => '', '&#039' => '\''));
 
 		// Too many lines?
 		if (!empty($sig_limits[2]) && substr_count($unparsed_signature, "\n") >= $sig_limits[2])
@@ -2134,7 +2134,7 @@ function profileSaveAvatarData(&$value)
 
 	// We need to know where we're going to be putting it..
 	require_once(SUBSDIR . '/Attachments.subs.php');
-	require_once(SUBSDIR . '/ManageAttachments.subs.php');
+	require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
 	$uploadDir = getAvatarPath();
 	$id_folder = getAvatarPathID();
 
@@ -2365,7 +2365,7 @@ function profileSaveAvatarData(&$value)
 				// Remove previous attachments this member might have had.
 				removeAttachments(array('id_member' => $memID));
 
-				$db->insert('',
+				$result = $db->insert('',
 					'{db_prefix}attachments',
 					array(
 						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
@@ -2378,7 +2378,7 @@ function profileSaveAvatarData(&$value)
 					array('id_attach')
 				);
 
-				$cur_profile['id_attach'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+				$cur_profile['id_attach'] = $result->insertId('{db_prefix}attachments', 'id_attach');
 				$cur_profile['filename'] = $destName;
 				$cur_profile['attachment_type'] = empty($modSettings['custom_avatar_enabled']) ? 0 : 1;
 

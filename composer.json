@@ -37,6 +37,10 @@
 		  	"Elkarte\\": "Elkarte/src/",
 		  	"Elkarte\\Elkarte\\": "Elkarte/src/Elkarte/",
 		  	"Elkarte\\Elkarte\\Events\\": "Elkarte/src/Elkarte/Events"
-		}
+		},
+		"exclude-from-classmap": [
+		  "/Build/",
+		  "/Docs/"
+		]
 	}
 }

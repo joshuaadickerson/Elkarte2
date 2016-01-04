@@ -6,7 +6,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Http\HttpReq;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\View\TemplateLayers;
+use Elkarte\Elkarte\Theme\TemplateLayers;
 
 class BanCheck
 {
@@ -302,7 +302,7 @@ class BanCheck
 			$context['open_mod_reports'] = $_SESSION['rc']['reports'];
 		elseif ($_SESSION['mc']['bq'] != '0=1')
 		{
-			require_once(SUBSDIR . '/Moderation.subs.php');
+			require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 			recountOpenReports(true, allowedTo('admin_forum'));
 		}
 		else

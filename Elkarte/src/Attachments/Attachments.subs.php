@@ -898,7 +898,7 @@ function createAttachment(&$attachmentOptions)
 			$attachmentOptions['fileext'] = '';
 	}
 
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -912,7 +912,7 @@ function createAttachment(&$attachmentOptions)
 		),
 		array('id_attach')
 	);
-	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+	$attachmentOptions['id'] = $result->insertId('{db_prefix}attachments', 'id_attach');
 
 	// @todo Add an error here maybe?
 	if (empty($attachmentOptions['id']))
@@ -987,7 +987,7 @@ function createAttachment(&$attachmentOptions)
 			}
 
 			// To the database we go!
-			$db->insert('',
+			$result = $db->insert('',
 				'{db_prefix}attachments',
 				array(
 					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
@@ -999,7 +999,7 @@ function createAttachment(&$attachmentOptions)
 				),
 				array('id_attach')
 			);
-			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+			$attachmentOptions['thumb'] = $result->insertId('{db_prefix}attachments', 'id_attach');
 
 			if (!empty($attachmentOptions['thumb']))
 			{
@@ -1156,12 +1156,12 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	if (empty($memID))
 		return false;
 
-	require_once(SUBSDIR . '/ManageAttachments.subs.php');
+	require_once('ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $memID));
 
 	$id_folder = getAttachmentPathID();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}attachments',
 		array(
 			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int',
@@ -1173,7 +1173,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		),
 		array('id_attach')
 	);
-	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
+	$attachID = $result->insertId('{db_prefix}attachments', 'id_attach');
 
 	// First, the temporary file will have the .tmp extension.
 	$tempName = getAvatarPath() . '/' . $destName . '.tmp';
@@ -1608,14 +1608,14 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$db = $GLOBALS['elk']['db'];
 
 		// Add this beauty to the database.
-		$db->insert('',
+		$result = $db->insert('',
 			'{db_prefix}attachments',
 			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string', 'mime_type' => 'string'),
 			array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
 			array('id_attach')
 		);
 
-		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+		$attachment['id_thumb'] = $result->insertId('{db_prefix}attachments', 'id_attach');
 		if (!empty($attachment['id_thumb']))
 		{
 			$db->query('', '
@@ -1634,7 +1634,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			// Do we need to remove an old thumbnail?
 			if (!empty($old_id_thumb))
 			{
-				require_once(SUBSDIR . '/ManageAttachments.subs.php');
+				require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
 				removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 			}
 		}

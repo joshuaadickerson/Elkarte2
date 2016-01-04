@@ -527,7 +527,7 @@ class PersonalMessagesManager
 
 		// Needed for our email and post functions
 		require_once(SUBSDIR . '/Mail.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// Initialize log array.
 		$log = array(
@@ -794,7 +794,7 @@ class PersonalMessagesManager
 			trackStats(array('pm' => '+'));
 
 		// Insert the message itself and then grab the last insert id.
-		$this->db->insert('',
+		$result = $this->db->insert('',
 			'{db_prefix}personal_messages',
 			array(
 				'id_pm_head' => 'int', 'id_member_from' => 'int', 'deleted_by_sender' => 'int',
@@ -806,7 +806,7 @@ class PersonalMessagesManager
 			),
 			array('id_pm')
 		);
-		$id_pm = $this->db->insert_id('{db_prefix}personal_messages', 'id_pm');
+		$id_pm = $result->insertId('{db_prefix}personal_messages', 'id_pm');
 
 		// Add the recipients.
 		if (!empty($id_pm))

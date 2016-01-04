@@ -843,7 +843,7 @@ function ssi_boardStats($output_method = 'echo')
 	if (!allowedTo('view_stats'))
 		return false;
 
-	require_once(SUBSDIR . '/Boards.subs.php');
+	require_once(ROOTDIR . '/Boards/Boards.subs.php');
 	require_once(SUBSDIR . '/Stats.subs.php');
 
 	$totals = array(
@@ -877,7 +877,7 @@ function ssi_whosOnline($output_method = 'echo')
 {
 	global $user_info, $txt, $settings;
 
-	require_once(SUBSDIR . '/MembersOnline.subs.php');
+	require_once(ROOTDIR . '/Members/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 	);

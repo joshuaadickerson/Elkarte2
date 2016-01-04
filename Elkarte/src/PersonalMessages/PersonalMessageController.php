@@ -953,7 +953,7 @@ class PersonalMessageController extends AbstractController
 
 		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		loadLanguage('PersonalMessage', '', false);
 
@@ -1939,7 +1939,7 @@ class PersonalMessageController extends AbstractController
 					loadLanguage('PersonalMessage', $cur_language, false);
 
 					// Make the body.
-					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($user_info['name']), $memberFromName), $txt['pm_report_pm_user_sent']);
+					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array($GLOBALS['elk']['text']->un_htmlspecialchars($user_info['name']), $memberFromName), $txt['pm_report_pm_user_sent']);
 					$report_body .= "\n" . '[b]' . $this->_req->post->reason . '[/b]' . "\n\n";
 					if (!empty($recipients))
 					{
@@ -2292,7 +2292,7 @@ class PersonalMessageController extends AbstractController
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_params['search']);
-		$wordArray = explode(' ', $GLOBALS['elk']['text']->htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		$excludedWords = array();

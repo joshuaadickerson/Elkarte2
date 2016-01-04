@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Packages;
 
 /**
  * Simple cURL class to fetch a web page

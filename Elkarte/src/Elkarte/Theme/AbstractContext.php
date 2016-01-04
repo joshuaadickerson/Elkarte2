@@ -1,6 +1,6 @@
 <?php
 
-namespace Elkarte\Elkarte\View;
+namespace Elkarte\Elkarte\Theme;
 
 abstract class AbstractContext extends \ArrayObject
 {

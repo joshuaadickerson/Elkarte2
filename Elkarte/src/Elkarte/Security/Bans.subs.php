@@ -690,7 +690,7 @@ function insertBanGroup($ban_info = array())
 	$request->free();
 
 	// Yes yes, we're ready to add now.
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}ban_groups',
 		array(
 			'name' => 'string-20', 'ban_time' => 'int', 'expire_time' => 'raw', 'cannot_access' => 'int', 'cannot_register' => 'int',
@@ -702,7 +702,7 @@ function insertBanGroup($ban_info = array())
 		),
 		array('id_ban_group')
 	);
-	$ban_info['id'] = $db->insert_id('{db_prefix}ban_groups', 'id_ban_group');
+	$ban_info['id'] = $result->insertId('{db_prefix}ban_groups', 'id_ban_group');
 
 	if (empty($ban_info['id']))
 		$ban_errors->addError('impossible_insert_new_bangroup');
@@ -787,6 +787,7 @@ function validateIPBan($ip_array, $fullip = '')
 	$db = $GLOBALS['elk']['db'];
 
 	if (count($ip_array) == 4 || count($ip_array) == 8)
+	{
 		$values = array(
 			'ip_low1' => $ip_array[0]['low'],
 			'ip_high1' => $ip_array[0]['high'],
@@ -805,6 +806,7 @@ function validateIPBan($ip_array, $fullip = '')
 			'ip_low8' => $ip_array[7]['low'],
 			'ip_high8' => $ip_array[7]['high'],
 		);
+	}
 	else
 		$values = array('error' => 'invalid_ip');
 

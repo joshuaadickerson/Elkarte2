@@ -220,7 +220,7 @@ class CalendarController extends AbstractController
 				$this->_errors->fatal_lang_error('cannot_post_new', 'permission');
 
 			// Load the list of boards and categories in the context.
-			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(ROOTDIR . '/Boards/Boards.subs.php');
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,

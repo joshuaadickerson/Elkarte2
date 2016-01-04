@@ -35,13 +35,12 @@ function bb2_db_date()
 /**
  * Return affected rows from most recent query.
  *
+ * @param ResultInterface $result
  * @return int
  */
-function bb2_db_affected_rows()
+function bb2_db_affected_rows(ResultInterface $result)
 {
-	$db = $GLOBALS['elk']['db'];
-
-	return $db->affected_rows();
+	return $result->numAffectedRows();
 }
 
 /**
@@ -95,7 +94,7 @@ function bb2_db_query($query)
 	if (!$result)
 		return false;
 	elseif ($result === true)
-		return (bb2_db_affected_rows() !== 0);
+		return (bb2_db_affected_rows($result) !== 0);
 	elseif (bb2_db_num_rows($result) === 0)
 		return false;
 

@@ -2,7 +2,7 @@
 
 namespace Themes\DefaultTheme;
 
-use Elkarte\Elkarte\View\AbstractTheme;
+use Elkarte\Elkarte\Theme\AbstractTheme;
 
 /**
  * The default theme
@@ -614,7 +614,7 @@ class Theme extends AbstractTheme
         if ($context['allow_moderation_center'])
         {
             // Get the numbers for the menu ...
-            require_once(SUBSDIR . '/Moderation.subs.php');
+            require_once(ROOTDIR . '/Messages/Moderation.subs.php');
             $menu_count = loadModeratorMenuCounts();
         }
 

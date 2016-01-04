@@ -3,9 +3,10 @@
 namespace Elkarte;
 
 use Elkarte\Boards\BoardsManager;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Util;
-use Elkarte\Elkarte\View\TemplateLayers;
-use Elkarte\Elkarte\View\Templates;
+use Elkarte\Elkarte\Theme\TemplateLayers;
+use Elkarte\Elkarte\Theme\Templates;
 use Elkarte\Elkarte\Text\BBC\ParserWrapper;
 use \Pimple\Container;
 
@@ -75,7 +76,8 @@ $elk['cache'] = function () {
 };
 
 /**
- * @return Database
+ * @var DatabaseInterface
+ * @return DatabaseInterface
  */
 $elk['db'] = function () use ($elk, $db_persist, $db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix) {
 	//global $db_persist, $db_server, $db_user, $db_passwd, $db_port;

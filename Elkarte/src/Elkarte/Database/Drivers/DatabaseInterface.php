@@ -163,7 +163,7 @@ interface DatabaseInterface
 	 * @param mixed[] $data
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @return void
+	 * @return ResultInterface
 	 */
 	public function insert($method = 'replace', $table, array $columns, array $data, array $keys, $disable_trans = false);
 

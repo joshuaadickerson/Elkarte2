@@ -611,7 +611,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// Add a new entry, deleting the old if necessary.
-	$db->insert('replace',
+	$result = $db->insert('replace',
 		'{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array($user_info['ip'], time(), $error_type),
@@ -619,7 +619,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// If affected is 0 or 2, it was there already.
-	if ($db->affected_rows() != 1)
+	if ($result->numAffectedRows() != 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)

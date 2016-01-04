@@ -255,7 +255,7 @@ function changeMentionStatus($id_mention, $status = 1)
 
 	$db = $GLOBALS['elk']['db'];
 
-	$db->query('', '
+	$result = $db->query('', '
 		UPDATE {db_prefix}log_mentions
 		SET status = {int:status}
 		WHERE id_mention = {int:id_mention}',
@@ -264,7 +264,7 @@ function changeMentionStatus($id_mention, $status = 1)
 			'status' => $status,
 		)
 	);
-	$success = $db->affected_rows() != 0;
+	$success = $result->numAffectedRows() != 0;
 
 	// Update the top level mentions count
 	if ($success)
@@ -287,14 +287,14 @@ function removeMentions($id_mentions)
 
 	$db = $GLOBALS['elk']['db'];
 
-	$db->query('', '
+	$result = $db->query('', '
 		DELETE FROM {db_prefix}log_mentions
 		WHERE id_mention IN ({array_int:id_mentions})',
 		array(
 			'id_mentions' => $id_mentions,
 		)
 	);
-	$success = $db->affected_rows() != 0;
+	$success = $result->numAffectedRows() != 0;
 
 	// Update the top level mentions count
 	if ($success)

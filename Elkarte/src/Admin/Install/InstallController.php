@@ -1092,7 +1092,7 @@ class InstallController
         require_once(SOURCEDIR . '/Logging.php');
         require_once(SOURCEDIR . '/Subs.php');
         require_once(SOURCEDIR . '/Load.php');
-        require_once(SUBSDIR . '/Cache.subs.php');
+        require_once(ELKDIR . '/Cache/Cache.subs.php');
         require_once(SOURCEDIR . '/Security.php');
         require_once(SUBSDIR . '/Auth.subs.php');
         require_once(SUBSDIR . '/Util.php');

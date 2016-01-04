@@ -1,6 +1,7 @@
 <?php
 
 namespace Elkarte;
+use Elkarte\Elkarte\ProviderInterface;
 
 /**
  * Get Elkarte running
@@ -13,6 +14,7 @@ class Elkarte
 
 	protected $config;
 	protected $container;
+	protected $providers = [];
 
 	public function __construct(Config $config)
 	{
@@ -21,12 +23,37 @@ class Elkarte
 
 	public function run()
 	{
-
+		$this->boot();
+		// Get the route/action
+		// Dispatch
 	}
 
 	public function services()
 	{
-		return new \Pimple\Conainter;
+		$elk = new \Pimple\Container;
+		require_once 'Services.php';
+		return $elk;
+	}
+
+	public function register(ProviderInterface $provider)
+	{
+		$provider->register($this->container);
+		$this->providers[] = $provider;
+		return $this;
+	}
+
+	public function boot()
+	{
+		$this->container['hooks']->hook('pre_boot');
+
+		foreach ($this->providers as $provider)
+		{
+			$provider->boot($this->container);
+		}
+
+		$this->container['hooks']->hook('after_provider_boot');
+
+		return $this;
 	}
 
 	public function database()

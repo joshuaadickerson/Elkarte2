@@ -1643,7 +1643,7 @@ function profileSendActivation()
 {
 	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
 
-	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(ROOTDIR . '/Mail/Mail.subs.php');
 
 	// Shouldn't happen but just in case.
 	if (empty($profile_vars['email_address']))
@@ -1841,7 +1841,7 @@ function profileLoadGroups()
 {
 	global $cur_profile, $context, $user_settings;
 
-	require_once(SUBSDIR . '/Membergroups.subs.php');
+	require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 
 	$context['member_groups'] = getGroupsList();
 	$context['member_groups'][0]['is_primary'] = $cur_profile['id_group'] == 0;
@@ -2147,7 +2147,7 @@ function profileSaveAvatarData(&$value)
 		if (!is_writable($uploadDir))
 			$GLOBALS['elk']['errors']->fatal_lang_error('attachments_no_write', 'critical');
 
-		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 		$url = parse_url($_POST['userpicpersonal']);
 		$contents = fetch_web_data((empty($url['scheme']) ? 'http://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));

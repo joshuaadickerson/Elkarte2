@@ -526,7 +526,7 @@ class PersonalMessagesManager
 		loadLanguage('PersonalMessage');
 
 		// Needed for our email and post functions
-		require_once(SUBSDIR . '/Mail.subs.php');
+		require_once(ROOTDIR . '/Mail/Mail.subs.php');
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// Initialize log array.

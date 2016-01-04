@@ -190,7 +190,7 @@ class PackageActions extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Generic subs for this controller
-		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 		// Oh my
 		$subActions = array(
@@ -711,7 +711,7 @@ class PackageActions extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Generic subs for this controller
-		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 		// Here is what we need to do!
 		$subActions = array(

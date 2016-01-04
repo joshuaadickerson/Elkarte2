@@ -2006,7 +2006,7 @@ class PersonalMessageController extends AbstractController
 		loadRules();
 
 		// Likely to need all the groups!
-		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 		$context['groups'] = accessibleGroups();
 
 		// Applying all rules?

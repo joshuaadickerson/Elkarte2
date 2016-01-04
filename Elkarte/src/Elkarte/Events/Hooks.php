@@ -445,8 +445,8 @@ class Hooks
 				'variable' => $hook,
 			)
 		);
-		list ($current_functions) = $this->_db->fetch_row($request);
-		$this->_db->free_result($request);
+		list ($current_functions) = $request->fetchRow();
+		$request->free();
 
 		if (!empty($current_functions))
 		{
@@ -528,7 +528,7 @@ class Hooks
 			$modSettings[$hook] = implode(',', $functions);
 		}
 
-		$this->_db->free_result($request);
+		$request->free();
 	}
 
 	/**

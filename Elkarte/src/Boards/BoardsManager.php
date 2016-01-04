@@ -9,9 +9,13 @@ use Elkarte\Elkarte\Events\Hooks;
 
 class BoardsManager
 {
+	/** @var DatabaseInterface  */
 	protected $db;
+	/** @var Cache  */
 	protected $cache;
+	/** @var Hooks  */
 	protected $hooks;
+	/** @var Errors  */
 	protected $errors;
 
 	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors)
@@ -308,11 +312,8 @@ class BoardsManager
 	{
 		global $scripturl;
 
-		$db = $GLOBALS['elk']['db'];
-		$cache = $GLOBALS['elk']['cache'];
-
 		// First check if we have this cached already.
-		if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
+		if (!$this->cache->getVar($boards = null, 'board_parents-' . $id_parent, 480))
 		{
 			$boards = array();
 			$original_parent = $id_parent;
@@ -320,7 +321,7 @@ class BoardsManager
 			// Loop while the parent is non-zero.
 			while ($id_parent != 0)
 			{
-				$result = $db->query('', '
+				$result = $this->db->query('', '
 				SELECT
 					b.id_parent, b.name, {int:board_parent} AS id_board, IFNULL(mem.id_member, 0) AS id_moderator,
 					mem.real_name, b.child_level
@@ -334,7 +335,7 @@ class BoardsManager
 				);
 				// In the EXTREMELY unlikely event this happens, give an error message.
 				if ($result->numRows() == 0)
-					$GLOBALS['elk']['errors']->fatal_lang_error('parent_not_found', 'critical');
+					$this->errors->fatal_lang_error('parent_not_found', 'critical');
 				while ($row = $result->fetchAssoc())
 				{
 					if (!isset($boards[$row['id_board']]))
@@ -362,7 +363,7 @@ class BoardsManager
 				$result->free();
 			}
 
-			$cache->put('board_parents-' . $original_parent, $boards, 480);
+			$this->cache->put('board_parents-' . $original_parent, $boards, 480);
 		}
 
 		return $boards;

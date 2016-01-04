@@ -474,7 +474,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// We'll need some external functions.
 	require_once(SUBSDIR . '/Auth.subs.php');
-	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(ROOTDIR . '/Mail/Mail.subs.php');
 
 	// Put any errors in here.
 	$reg_errors = ErrorContext::context($error_context, 0);
@@ -620,7 +620,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	if (isset($regOptions['memberGroup']))
 	{
-		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 
 		// Make sure the id_group will be valid, if this is an administrator.
 		$regOptions['register_vars']['id_group'] = $regOptions['memberGroup'] == 1 && !allowedTo('admin_forum') ? 0 : $regOptions['memberGroup'];

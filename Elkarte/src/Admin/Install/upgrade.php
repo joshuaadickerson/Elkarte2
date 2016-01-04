@@ -156,7 +156,7 @@ if (isset($_GET['ssi']))
 	loadPermissions();
 }
 // We may need this later
-require_once(SUBSDIR . '/Package.subs.php');
+require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 // All the non-SSI stuff.
 loadEssentialFunctions();
@@ -424,7 +424,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/Errors.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Load.php');
-		require_once(SUBSDIR . '/Cache.subs.php');
+		require_once(ELKDIR . '/Cache/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
 		require_once(SOURCEDIR . '/Services.php');

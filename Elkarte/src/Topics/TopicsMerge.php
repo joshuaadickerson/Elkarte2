@@ -114,7 +114,7 @@ class TopicsMerge
 	public function __construct($topics)
 	{
 		// Prepare the vars
-		$this->_db = database();
+		$this->_db = $GLOBALS['elk']['db'];
 
 		// Ensure all the id's are integers
 		$topics = array_map('intval', $topics);
@@ -176,7 +176,7 @@ class TopicsMerge
 					'limit' => count($this->_polls),
 				)
 			);
-			while ($row = $this->_db->fetch_assoc($request))
+			while ($row = $request->fetchAssoc())
 			{
 				$polls[] = array(
 					'id' => $row['id_poll'],
@@ -188,7 +188,7 @@ class TopicsMerge
 					'selected' => $row['id_topic'] == $this->firstTopic
 				);
 			}
-			$this->_db->free_result($request);
+			$request->free();
 		}
 
 		return $polls;
@@ -256,7 +256,7 @@ class TopicsMerge
 		);
 		$topic_approved = 1;
 		$first_msg = 0;
-		while ($row = $this->_db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			// If this is approved, or is fully unapproved.
 			if ($row['approved'] || !isset($first_msg))
@@ -287,7 +287,7 @@ class TopicsMerge
 				$num_unapproved = $row['message_count'];
 			}
 		}
-		$this->_db->free_result($request);
+		$request->free();
 
 		// Ensure we have a board stat for the target board.
 		if (!isset($this->_boardTotals[$target_board]))
@@ -321,14 +321,14 @@ class TopicsMerge
 				'last_msg' => $last_msg,
 			)
 		);
-		list ($member_started) = $this->_db->fetch_row($request);
-		list ($member_updated) = $this->_db->fetch_row($request);
+		list ($member_started) = $request->fetchRow();
+		list ($member_updated) = $request->fetchRow();
 
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === null)
 			$member_updated = $member_started;
 
-		$this->_db->free_result($request);
+		$request->free();
 
 		// Obtain all the message ids we are going to affect.
 		$affected_msgs = messagesInTopics($this->_topics);
@@ -444,13 +444,13 @@ class TopicsMerge
 		);
 		if ($this->_db->num_rows($request) < 2)
 		{
-			$this->_db->free_result($request);
+			$request->free();
 
 			$this->_errors[] = 'no_topic_id';
 
 			return false;
 		}
-		while ($row = $this->_db->fetch_assoc($request))
+		while ($row = $request->fetchAssoc())
 		{
 			// Make a note for the board counts...
 			if (!isset($this->_boardTotals[$row['id_board']]))
@@ -511,7 +511,7 @@ class TopicsMerge
 
 			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
 		}
-		$this->_db->free_result($request);
+		$request->free();
 
 		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
 

@@ -669,7 +669,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	{
 		if (!$cache->getVar($group_info, 'moderator_group_info', 480))
 		{
-			require_once(SUBSDIR . '/Membergroups.subs.php');
+			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 			$group_info = membergroupById(3, true);
 
 			$cache->put('moderator_group_info', $group_info, 480);
@@ -1726,7 +1726,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -1770,7 +1770,7 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	$GLOBALS['elk']['hooks']->hook('avatar', array(&$avatar));
 
@@ -1939,7 +1939,7 @@ function loadLoadAverage()
 
 	if (($context['load_average'] = $cache->get('loadavg', 90)) == null)
 	{
-		require_once(SUBSDIR . '/Server.subs.php');
+		require_once(ELKDIR . '/Server/Server.subs.php');
 		$context['load_average'] = detectServerLoad();
 
 		$cache->put('loadavg', $context['load_average'], 90);

@@ -440,6 +440,7 @@ class BoardsList
 
 		$boards = array_keys($this->_boards);
 
+		$mod_cached = null;
 		if (!$GLOBALS['elk']['cache']->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$mod_cached = $this->_db->fetchQuery('

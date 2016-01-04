@@ -103,7 +103,7 @@ function action_deleteInstaller()
 
 	definePaths();
 	define('ELK', 'SSI');
-	require_once(SUBSDIR . '/Package.subs.php');
+	require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 	if (isset($_SESSION['installer_temp_ftp']))
 	{

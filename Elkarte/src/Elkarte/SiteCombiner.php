@@ -167,7 +167,7 @@ class Site_Combiner
 		if ($this->_isStale())
 		{
 			// Our buddies will be needed for this to work.
-			require_once(SUBSDIR . '/Package.subs.php');
+			require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 			$this->_archive_header = '// ' . $this->_archive_filenames . "\n";
 			$this->_combineFiles('js');

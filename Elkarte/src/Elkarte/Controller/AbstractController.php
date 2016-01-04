@@ -13,10 +13,15 @@
 
 namespace Elkarte\Elkarte\Controller;
 
+use Elkarte\Elkarte\Events\EventManager;
 use Elkarte\Elkarte\Events\Hooks;
-use \Elkarte\Event_Manager;
-
-use \Pimple\Container;
+use Pimple\Container;
+use Elkarte\Elkarte\Errors\Errors;
+use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\Http\HttpReq;
+use Elkarte\Elkarte\Session\Session;
+use Elkarte\Elkarte\Theme\TemplateLayers;
+use Elkarte\Elkarte\Theme\Templates;
 
 /**
  * Abstract base class for Controllers.
@@ -26,61 +31,30 @@ use \Pimple\Container;
  */
 abstract class AbstractController
 {
-	/**
-	 * @var \Pimple\Container
-	 */
-	protected $elk;
-
-	/**
-	 * The event manager.
-	 * @var object
-	 */
-	protected $_events = null;
-
-	/**
-	 * The current hook.
-	 * @var string
-	 */
+	/** @var EventManager The event manager. */
+	protected $_events;
+	/** @var string The current hook */
 	protected $_hook = '';
-
-	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
+	/** @var HttpReq instance of HttpReq object */
 	protected $_req;
-
-	/**
-	 * The template layers
-	 * @var Template_Layers
-	 */
+	/** @var TemplateLayers The template layers */
 	protected $_layers;
-
-	/**
-	 * The actual templates
-	 * @var Templates
-	 */
+	/** @var Templates The actual templates */
 	protected $_templates;
-
-	/**
-	 * Errors
-	 * @var Errors
-	 */
+	/** @var Errors */
 	protected $_errors;
-
-	/**
-	 * @var Session
-	 */
+	/** @var Session */
 	protected $_session;
-
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $context;
-
-	/**
-	 * @var Hooks
-	 */
+	/** @var Container  */
+	protected $elk;
+	/** @var Hooks  */
 	protected $hooks;
+	/** @var Errors  */
+	protected $errors;
+	/** @var Util  */
+	protected $text;
 
 	/**
 	 * Constructor...
@@ -88,9 +62,10 @@ abstract class AbstractController
 	 * without the "Controller" part.
 	 *
 	 * @param Container $elk
-	 * @param null|Event_Manager $eventManager - The event manager
+	 * @param null|EventManager $eventManager - The event manager
 	 */
-	public function __construct(Container $elk, $eventManager = null)
+	/*
+	public function __construct(Container $elk, EventManager $eventManager = null)
 	{
 		$this->elk = $elk;
 
@@ -109,6 +84,24 @@ abstract class AbstractController
 		}
 
 		$this->_events = $eventManager;
+
+		// Initialize the events associated with this controller
+		$this->_initEventManager();
+	}*/
+
+	public function bootstrap()
+	{
+		$elk = $this->elk;
+
+		// @todo inject these in the constructor arguments
+		$this->_layers = $elk['layers'];
+		$this->_templates = $elk['templates'];
+		$this->_errors = $elk['errors'];
+		$this->_req = $elk['http_req'];
+		$this->_session = $elk['session'];
+		$this->hooks = $elk['hooks'];
+
+		$this->_events = new EventManager();
 
 		// Initialize the events associated with this controller
 		$this->_initEventManager();

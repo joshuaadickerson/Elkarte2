@@ -1,14 +1,15 @@
 <?php
 
 namespace Elkarte;
-use Elkarte\Elkarte\ProviderInterface;
+use Pimple\ServiceProviderInterface;
+use Pimple\Container;
 
 /**
  * Get Elkarte running
  * @package Elkarte
  *
  */
-class Elkarte
+class Elkarte extends Container
 {
 	const VERSION = '2.0';
 
@@ -16,9 +17,9 @@ class Elkarte
 	protected $container;
 	protected $providers = [];
 
-	public function __construct(Config $config)
+	public function __construct(Config $config = null)
 	{
-		$this->config = $config;
+		$this->config = $config === null ? $this->findConfig() : $config;
 	}
 
 	public function run()
@@ -28,23 +29,24 @@ class Elkarte
 		// Dispatch
 	}
 
-	public function services()
+	/**
+	 * Registers a service provider.
+	 *
+	 * @param ServiceProviderInterface $provider A ServiceProviderInterface instance
+	 * @param array                    $values   An array of values that customizes the provider
+	 *
+	 * @return Application
+	 */
+	public function register(ServiceProviderInterface $provider, array $values = array())
 	{
-		$elk = new \Pimple\Container;
-		require_once 'Services.php';
-		return $elk;
-	}
-
-	public function register(ProviderInterface $provider)
-	{
-		$provider->register($this->container);
 		$this->providers[] = $provider;
+		parent::register($provider, $values);
 		return $this;
 	}
 
 	public function boot()
 	{
-		$this->container['hooks']->hook('pre_boot');
+		$this->offsetGet('hooks')->hook('pre_boot');
 
 		foreach ($this->providers as $provider)
 		{
@@ -88,5 +90,11 @@ class Elkarte
 	public function debugger()
 	{
 
+	}
+
+	public function defaultProviders()
+	{
+		$this->register(new About\Provider);
+		$this->register(new Boards\Provider);
 	}
 }

@@ -21,12 +21,31 @@ namespace Elkarte\Boards;
 
 use \Elkarte\Elkarte\Controller\AbstractController;
 use \Elkarte\Elkarte\Controller\FrontpageInterface;
+use Elkarte\Elkarte\Theme\TemplateLayers;
+use Pimple\Container;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Errors\Errors;
+
 
 /**
  * BoardIndexController class, displays the main board index
  */
 class BoardIndexController extends AbstractController implements FrontpageInterface
 {
+	protected $manager;
+
+	public function __construct(Container $elk, BoardsManager $manager, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+	{
+		$this->elk = $elk;
+
+		$this->bootstrap();
+
+		$this->hooks = $hooks;
+		$this->errors = $errors;
+		$this->_layers = $layers;
+		$this->manager = $manager;
+	}
+
 	/**
 	 * {@inheritdoc }
 	 */

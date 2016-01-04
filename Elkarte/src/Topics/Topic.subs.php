@@ -855,18 +855,8 @@ function moveTopics($topics, $toBoard, $log = false)
 function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
 {
 	global $scripturl;
-	// @deprecated since 1.1
-	global $board, $topic;
 
 	$db = $GLOBALS['elk']['db'];
-
-	// @deprecated since 1.1
-	if ($move_from === null && isset($_GET['current_board']))
-		$move_from = (int) $_GET['current_board'];
-	if ($id_board = null && !empty($board))
-		$id_board = $board;
-	if ($id_topic = null && !empty($topic))
-		$id_topic = $topic;
 
 	if (empty($move_from) || empty($id_board) || empty($id_topic))
 		return true;
@@ -1893,13 +1883,6 @@ function setTopicAttribute($topic, $attributes)
 	$update = array();
 	foreach ($attributes as $key => $attr)
 	{
-		// @deprecated since 1.1 - kept for backward compatibility
-		if ($key == 'sticky')
-		{
-			$key = 'is_sticky';
-			$attributes['is_sticky'] = $attr;
-		}
-
 		$attributes[$key] = (int) $attr;
 		$update[] = '
 				' . $key . ' = {int:' . $key . '}';

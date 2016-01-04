@@ -396,7 +396,7 @@ class BanCheck
 				$ban_reason = $row['reason'];
 			}
 		}
-		$this->db->free_result($request);
+		$request->free();
 
 		// You're in biiig trouble.  Banned for the rest of this session!
 		if ($this->hasBan(self::CANNOT_ACCESS))

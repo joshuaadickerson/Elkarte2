@@ -83,18 +83,18 @@ if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'
 	$extdir = $sourcedir . '/ext';
 
 // Time to forget about variables and go with constants!
-DEFINE('ROOTDIR', __DIR__ . '/src');
-DEFINE('ELKDIR', ROOTDIR . '/Elkarte');
-DEFINE('BOARDDIR', $boarddir);
-DEFINE('CACHEDIR', $cachedir);
-DEFINE('EXTDIR', $extdir);
-DEFINE('LANGUAGEDIR', ELKDIR . '/Language/languages');
-DEFINE('SOURCEDIR', $sourcedir);
-DEFINE('ADMINDIR', $sourcedir . '/admin');
-DEFINE('CONTROLLERDIR', $sourcedir . '/Controllers');
-DEFINE('SUBSDIR', $sourcedir . '/subs');
-DEFINE('ADDONSDIR', $boarddir . '/addons');
-DEFINE('VENDORDIR', $vendordir . '/vendor');
+define('ROOTDIR', __DIR__ . '/src');
+define('ELKDIR', ROOTDIR . '/Elkarte');
+define('BOARDDIR', $boarddir);
+define('CACHEDIR', $cachedir);
+define('EXTDIR', $extdir);
+define('LANGUAGEDIR', ELKDIR . '/Language/languages');
+define('SOURCEDIR', $sourcedir);
+define('ADMINDIR', $sourcedir . '/admin');
+define('CONTROLLERDIR', $sourcedir . '/Controllers');
+define('SUBSDIR', $sourcedir . '/subs');
+define('ADDONSDIR', $boarddir . '/addons');
+define('VENDORDIR', $vendordir . '/vendor');
 unset($boarddir, $cachedir, $sourcedir, $extdir, $vendordir);
 
 // Files we cannot live without.
@@ -105,7 +105,13 @@ require_once(__DIR__ . '/src/Elkarte/Security/Security.php');
 require_once(__DIR__ . '/src/Elkarte/Cache/Cache.subs.php');
 
 require_once(VENDORDIR . '/autoload.php');
+
+// Initiate the application
+// @todo fix the autoloader for this directory
+require_once('Config.php');
+$elk = new \Elkarte\Elkarte(new \Elkarte\Config());
 require_once(__DIR__ . '/src/Elkarte/Services.php');
+$elk->defaultProviders();
 
 
 // Show lots of debug information below the page, not for production sites

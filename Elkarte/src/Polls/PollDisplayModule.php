@@ -49,9 +49,6 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 	{
 		global $context;
 
-		// @deprecated since 1.1 - $context['is_poll'] is not used anywhere.
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && self::$_enabled && allowedTo('poll_view');
-
 		$this->_id_poll = $topicinfo['id_poll'];
 
 		$anyown_permissions = array(

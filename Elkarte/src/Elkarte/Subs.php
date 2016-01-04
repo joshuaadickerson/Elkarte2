@@ -717,10 +717,6 @@ function determineTopicClass(&$topic_context)
 
 	if ($topic_context['is_sticky'])
 		$topic_context['class'] .= '_sticky';
-
-	// This is so old themes will still work.
-	// @deprecated since 1.0 do not rely on it
-	$topic_context['extended_class'] = &$topic_context['class'];
 }
 /**
  * Sets up the basic theme context stuff.

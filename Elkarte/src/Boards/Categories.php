@@ -19,15 +19,21 @@
 
 namespace Elkarte\Boards;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Events\Hooks;
 
 class Categories
 {
+	/** @var DatabaseInterface  */
 	protected $db;
+	/** @var Hooks  */
 	protected $hooks;
+	/** @var BoardsManager  */
+	protected $board_manager;
 
-	public function __construct(DatabaseInterface $db, Hooks $hooks)
+	public function __construct(BoardsManager $board_manager, DatabaseInterface $db, Hooks $hooks)
 	{
+		$this->board_manager = $board_manager;
 		$this->db = $db;
 		$this->hooks = $hooks;
 	}
@@ -42,8 +48,6 @@ class Categories
 	 */
 	public function modify($category_id, $catOptions)
 	{
-		$db = $this->db;
-
 		$catUpdates = array();
 		$catParameters = array();
 
@@ -51,7 +55,8 @@ class Categories
 		$this->hooks->hook('pre_modify_category', array($cat_id, &$catOptions));
 
 		// Wanna change the categories position?
-		if (isset($catOptions['move_after'])) {
+		if (isset($catOptions['move_after']))
+		{
 			// Store all categories in the proper order.
 			$cats = array();
 			$cat_order = array();
@@ -67,18 +72,21 @@ class Categories
 				ORDER BY cat_order',
 				array()
 			);
-			while ($row = $request->fetchAssoc()) {
+			while ($row = $request->fetchAssoc())
+			{
 				if ($row['id_cat'] != $category_id)
 					$cats[] = $row['id_cat'];
 				if ($row['id_cat'] == $catOptions['move_after'])
 					$cats[] = $category_id;
 				$cat_order[$row['id_cat']] = $row['cat_order'];
 			}
-			$this->db->free_result($request);
+			$request->free();
 
 			// Set the new order for the categories.
 			foreach ($cats as $index => $cat)
+			{
 				if ($index != $cat_order[$cat])
+				{
 					$this->db->query('', '
 						UPDATE {db_prefix}categories
 						SET cat_order = {int:new_order}
@@ -88,6 +96,8 @@ class Categories
 							'current_category' => $cat,
 						)
 					);
+				}
+			}
 		}
 
 		if (isset($catOptions['cat_name'])) {
@@ -188,18 +198,16 @@ class Categories
 	{
 		global $cat_tree;
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
-
-		getBoardTree();
+		$this->board_manager->getBoardTree();
 
 		$this->hooks->hook('delete_category', array($categories, &$moveBoardsTo));
 
 		// With no category set to move the boards to, delete them all.
 		if ($moveBoardsTo === null) {
-			$boards_inside = array_keys(fetchBoardsInfo(array('categories' => $categories)));
+			$boards_inside = array_keys($this->board_manager->fetchBoardsInfo(array('categories' => $categories)));
 
 			if (!empty($boards_inside))
-				deleteBoards($boards_inside, null);
+				$this->board_manager->deleteBoards($boards_inside, null);
 		} // Make sure the safe category is really safe.
 		elseif (in_array($moveBoardsTo, $categories))
 			trigger_error('deleteCategories(): You cannot move the boards to a category that\'s being deleted', E_USER_ERROR);
@@ -343,8 +351,8 @@ class Categories
 				'id_cat' => $id_cat,
 			)
 		);
-		list ($name) = $this->db->fetch_row($request);
-		$this->db->free_result($request);
+		list ($name) = $request->fetchRow();
+		$request->free();
 
 		return $name;
 	}

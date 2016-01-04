@@ -82,15 +82,4 @@ class AdminDebugController extends AbstractController
 		$context['sub_template'] = 'viewquery';
 		$context['queries_data'] = $debug->viewQueries($query_id);
 	}
-
-	/**
-	 * Get Admin information from the database.
-	 * Accessed by ?action=viewadminfile.
-	 *
-	 * @deprecated since 1.1 - the action has been removed
-	 */
-	public function action_viewadminfile()
-	{
-		$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
-	}
 }

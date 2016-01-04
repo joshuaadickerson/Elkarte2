@@ -74,7 +74,7 @@ class SiteDispatcher
 		// Default action of the forum: board index
 		// Every time we don't know what to do, we'll do this :P
 		$this->_default_action = array(
-			'controller' => 'Elkarte\\Boards\\BoardIndexController',
+			'controller' => 'boards.index_controller',
 			'function' => 'action_boardindex'
 		);
 
@@ -195,34 +195,36 @@ class SiteDispatcher
 	{
 		if (!empty($this->_controller_name))
 		{
-			//$controller_class = 'Elkarte\\Controllers\\' . $this->_controller_name;
 			$controller_class = $this->_controller_name;
 
-			if (!class_exists($controller_class))
+			// There's two ways to do this - either it's a service
+			if ($this->elk->offsetExists($controller_class))
 			{
-				throw new \Exception('SiteDispatcher controller not found: ' . $controller_class);
+				$controller = $this->elk[$controller_class];
+			}
+			// Or it's a class that needs to be instanciated
+			else
+			{
+				if (!class_exists($controller_class)) {
+					throw new \Exception('SiteDispatcher controller not found: ' . $controller_class);
+				}
+
+				// Initialize this controller with its event manager
+				$controller = new $controller_class($this->elk, new EventManager());
 			}
 
 			// 3, 2, ... and go
-			if (is_callable(array($controller_class, $this->_function_name)))
-			{
+			if (is_callable(array($controller, $this->_function_name))) {
 				$method = $this->_function_name;
-			}
-			elseif (is_callable(array($controller_class, 'action_index')))
-			{
+			} elseif (is_callable(array($controller, 'action_index'))) {
 				$method = 'action_index';
-			}
-			// This should never happen, that's why its here :P
-			else
-			{
+			} // This should never happen, that's why its here :P
+			else {
 				$this->_controller_name = $this->_default_action['controller'];
 				$this->_function_name = $this->_default_action['function'];
 
 				return $this->dispatch();
 			}
-
-			// Initialize this controller with its event manager
-			$controller = new $controller_class($this->elk, new EventManager());
 
 			// Fetch Controllers generic hook name from the action controller
 			$hook = $controller->getHook();

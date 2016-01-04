@@ -972,3 +972,25 @@ function write_theme_info($name, $version, $theme_dir, $theme_values)
 	// Now write it.
 	file_put_contents($theme_dir . '/theme_info.xml', $xml_info);
 }
+
+
+/**
+ * Get all available themes
+ *
+ * @package Boards
+ * @return array
+ */
+function getAllThemes()
+{
+	$db = $GLOBALS['elk']['db'];
+
+	// Get all the themes...
+	return $db->fetchQuery('
+		SELECT id_theme AS id, value AS name
+		FROM {db_prefix}themes
+		WHERE variable = {string:name}',
+		array(
+			'name' => 'name',
+		)
+	);
+}

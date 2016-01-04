@@ -130,10 +130,6 @@ class ManageScheduledTasksController extends AbstractController
 			// Load up the tasks.
 			$nextTasks = loadTasks($tasks);
 
-			// Lets get it on!
-			// @deprecated since 1.1
-			$GLOBALS['elk']['hooks']->include_hook('autotask_include');
-
 			ignore_user_abort(true);
 
 			foreach ($nextTasks as $task_id => $taskname)

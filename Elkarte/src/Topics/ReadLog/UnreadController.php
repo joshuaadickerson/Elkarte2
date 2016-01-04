@@ -482,7 +482,7 @@ class UnreadController extends AbstractController
 
 		// Allow help desks and bug trackers and what not to add their own unread
 		// data (just add a template_layer to show custom stuff in the template!)
-		$GLOBALS['elk']['hooks']->hook('unread_list');
+		$this->hooks->hook('unread_list');
 	}
 
 	/**
@@ -539,7 +539,7 @@ class UnreadController extends AbstractController
 		 * loaded into $context.
 		 * Starting from 2.0 this should be changed to a local variable and passed to the hook
 		 */
-		$GLOBALS['elk']['hooks']->hook('recent_buttons', array(&$context['recent_buttons']));
+		$this->hooks->hook('recent_buttons', array(&$context['recent_buttons']));
 
 		return $context['recent_buttons'];
 	}
@@ -549,7 +549,7 @@ class UnreadController extends AbstractController
 	 */
 	protected function _checkServerLoad()
 	{
-		global $context, $modSettings;
+		global $context;
 
 		// Check for any server load issues
 		if ($context['showing_all_topics'] && checkLoad('allunread'))

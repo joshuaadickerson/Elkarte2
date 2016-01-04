@@ -220,7 +220,7 @@ class BoardsList
 				if (empty($this->_categories[$row_board['id_cat']]))
 				{
 					$cat_name = $row_board['cat_name'];
-					$this->_categories[$row_board['id_cat']] = array(
+					$this->_categories[$row_board['id_cat']] = new Category([
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
 						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
@@ -230,7 +230,7 @@ class BoardsList
 						'href' => $this->_scripturl . '#c' . $row_board['id_cat'],
 						'boards' => array(),
 						'new' => false
-					);
+					]);
 					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
 							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
 							: $cat_name);
@@ -257,7 +257,7 @@ class BoardsList
 				// Is this a new board, or just another moderator?
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
-					$this->_current_boards[$row_board['id_board']] = array(
+					$this->_current_boards[$row_board['id_board']] = new Board([
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
 						'name' => $row_board['board_name'],
@@ -276,7 +276,7 @@ class BoardsList
 						'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
 						'href' => $this->_scripturl . '?board=' . $row_board['id_board'] . '.0',
 						'link' => '<a href="' . $this->_scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
-					);
+					]);
 				}
 				$this->_boards[$row_board['id_board']] = $this->_options['include_categories'] ? $row_board['id_cat'] : 0;
 			}

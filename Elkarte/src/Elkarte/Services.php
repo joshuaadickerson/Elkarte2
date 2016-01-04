@@ -12,8 +12,6 @@ use \Pimple\Container;
 
 global $elk;
 
-$elk = new Container;
-
 /**
  * @return Errors
  */
@@ -171,11 +169,5 @@ $elk['text'] = function () {
 	return new Util($modSettings);
 };
 
-/**
- * @return BoardsManager
- */
-$elk['boards.manager'] = function ($elk) {
-	return new BoardsManager($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors']);
-};
 
 return $elk;

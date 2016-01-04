@@ -94,7 +94,7 @@ class Settings implements \ArrayAccess
 			$this->group_keys[$group] = $row[0];
 		}
 
-		$this->db->free_result($request);
+		$request->free();
 
 		$this->group_keys[$group] = array_unique($this->group_keys);
 	}

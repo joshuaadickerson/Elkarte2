@@ -608,49 +608,6 @@ function run_this_task($id_task, $task_name)
 }
 
 /**
- * 1.0 compatibility function, used to maintain compatibility with naming
- * scheme used in ElkArte 1.0
- *
- * @package ScheduledTasks
- * @param string $task_name name of the task, class name, function name, method in ScheduledTasks.class
- * @return mixed bool
- * @deprecated since 1.1 - Deprecated in favour of naming scheme
- */
-function run_this_task_compat($task_name)
-{
-	$completed = false;
-
-	// The method must exist in ScheduledTasks class, or we are wasting our time.
-	// Actually for extendability sake, we need to have other ways, so:
-	// A simple procedural function?
-	if (strpos($task_name, '::') === false && function_exists($task_name))
-	{
-		$method = $task_name;
-
-		// Do the task...
-		$completed = $method();
-	}
-	// It may be a class (no static, sorry)
-	elseif (strpos($task_name, '::') !== false)
-	{
-		$call = explode('::', $task_name);
-		$task_object = new $call[0];
-		$method = $call[1];
-
-		if (method_exists($task_object, $method))
-		{
-			// Try to stop a timeout, this would be bad...
-			setTimeLimit(300);
-
-			// Do the task...
-			$completed = $task_object->{$method}();
-		}
-	}
-
-	return $completed;
-}
-
-/**
  * Retrieve info if there's any next task scheduled and when.
  *
  * @package ScheduledTasks

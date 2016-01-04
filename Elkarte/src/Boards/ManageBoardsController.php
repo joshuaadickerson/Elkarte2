@@ -20,6 +20,11 @@
 namespace Elkarte\Boards;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+use Pimple\Container;
+use Elkarte\Elkarte\Errors\Errors;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Util;
 
 /**
  * This class controls execution for actions in the manage boards area
@@ -29,6 +34,17 @@ use Elkarte\Elkarte\Controller\AbstractController;
  */
 class ManageBoardsController extends AbstractController
 {
+	/** @var Container  */
+	protected $elk;
+	/** @var Credits  */
+	protected $credits;
+	/** @var Hooks  */
+	protected $hooks;
+	/** @var Errors  */
+	protected $errors;
+	/** @var Util  */
+	protected $text;
+
 	/**
 	 * Category being worked on
 	 * @var int
@@ -46,6 +62,17 @@ class ManageBoardsController extends AbstractController
 	 * @var Settings_Form
 	 */
 	protected $_boardSettings;
+
+	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, Util $text)
+	{
+		$this->elk = $elk;
+		$this->credits = $credits;
+
+		$this->hooks = $hooks;
+		$this->errors = $errors;
+		$this->text = $text;
+	}
+
 
 	/**
 	 * The main dispatcher; delegates.

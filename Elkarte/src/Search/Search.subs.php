@@ -31,16 +31,3 @@ $GLOBALS['search_versions'] = array(
 	// (strtr to stop accidentally updating version on release)
 	'search_version' => strtr('ElkArte 1+0=Beta', array('+' => '.', '=' => ' ')),
 );
-
-/**
- * Creates a search API and returns the object.
- *
- * @package Search
- * @deprecated since 1.1 - please use the Search class
- */
-function findSearchAPI()
-{
-	Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-	$search = new Search();
-	return $search->findSearchAPI();
-}

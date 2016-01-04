@@ -33,10 +33,7 @@
 	},
   	"autoload": {
 		"psr-4": {
-		  	"": "Elkarte/Sources/",
-		  	"Elkarte\\": "Elkarte/src/",
-		  	"Elkarte\\Elkarte\\": "Elkarte/src/Elkarte/",
-		  	"Elkarte\\Elkarte\\Events\\": "Elkarte/src/Elkarte/Events"
+		  	"Elkarte\\": "Elkarte/src/"
 		},
 		"exclude-from-classmap": [
 		  "/Build/",

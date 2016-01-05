@@ -9,7 +9,7 @@ promoted: false
 # src-path: /src
 # repository name for gh-pages branch, useful if want the api Docs in a separate project
 # default: same as source repository
-docs-repository: elkarte/Docs
+docs-repository: /Docs/API
 # if you don't want to use github pages, you can specify another branch for Docs here
 # Docs-branch: gh-pages
 # path inside of gh-pages branch, useful if want the api Docs in a sub directory

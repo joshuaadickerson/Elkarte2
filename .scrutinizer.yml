@@ -1,16 +1,19 @@
 filter:
     excluded_paths:
-        - 'attachments/*'
+        - 'Elkarte/www/*'
+        - 'Build/*'
         - 'avatars/*'
         - 'cache/*'
         - 'Docs/*'
-        - 'packages/*'
+        - 'Elkarte/Packages/*'
+        - 'Elkarte/_temp/*'
         - 'smileys/*'
         - 'tests/*'
         - 'ext/*'
         - 'Sources/ext/*'
         - 'Install/*'
         - 'languages/*'
+        - 'vendor/*'
         - themes/default/scripts/jquery-1.11.1.min.js
         - themes/default/scripts/jquery.atwho.js
         - themes/default/scripts/jquery.caret.min.js
@@ -76,6 +79,7 @@ tools:
             excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'Docs/*', 'packages/*', 'smileys/*', 'tests/*']
     php_loc:
         names:
+            - 'src/*.php'
             - 'Sources/*.php'
             - 'themes/*.php'
             - '*.php'

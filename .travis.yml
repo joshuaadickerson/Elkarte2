@@ -11,7 +11,7 @@ matrix:
   fast_finish: true
 
 install:
-    - cwd /var/www
+    - cd /var/www
     - ./Build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
     - export PATH="$HOME/.composer/vendor/bin:$PATH"
 

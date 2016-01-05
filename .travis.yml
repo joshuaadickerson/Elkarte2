@@ -11,9 +11,6 @@ matrix:
   fast_finish: true
 
 install:
-    - ls
-    - chmod +x ./Build/tests/travis-ci/setup-server.sh
-    - chmod +x ./Build/tests/travis-ci/setup-selenium.sh
     - ./Build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
 
 before_script:

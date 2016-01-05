@@ -19,16 +19,14 @@
  *
  */
 
-$time_start = $_SERVER['REQUEST_TIME_FLOAT'];
-
 // The software version
-const FORUM_VERSION = 'ElkArte 1.1';
+const FORUM_VERSION = 'ElkArte 2.0';
 
 // First things first, but not necessarily in that order.
 const ELK = '1';
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11';
+const CACHE_STALE = '?R20';
 
 // Report errors but not deprecated ones
 // @todo before release turn this back or maybe we should just let the environment decide what to do?
@@ -125,15 +123,6 @@ if (!empty($maintenance) && $maintenance == 2)
 // Clean the request.
 $elk['req']->cleanRequest()->parseRequest();
 
-// Initiate the database connection and define some database functions to use.
-if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-	loadDatabase($db_persist, $db_server, $ssi_db_user, $ssi_db_passwd, $db_port, $db_type, $db_name, $db_prefix);
-else
-	loadDatabase($db_persist, $db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix);
-
-// Let's set up out shiny new hooks handler.
-//Hooks::init($elk['db'], $elk['debug']);
-
 // It's time for settings loaded from the database.
 reloadSettings();
 
@@ -182,6 +171,8 @@ if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_dat
 
 // Pre-dispatch
 elk_main($elk);
+
+$elk->run();
 
 // Call obExit specially; we're coming from the main area ;).
 obExit(null, null, true);

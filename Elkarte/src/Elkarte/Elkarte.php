@@ -14,7 +14,6 @@ class Elkarte extends Container
 	const VERSION = '2.0';
 
 	protected $config;
-	protected $container;
 	/** @var ServiceProviderInterface[] */
 	protected $providers = [];
 
@@ -46,7 +45,7 @@ class Elkarte extends Container
 
 		foreach ($this->providers as $provider)
 		{
-			$provider->boot($this->container);
+			$provider->boot($this);
 		}
 
 		$this->offsetGet('hooks')->hook('after_provider_boot');
@@ -100,5 +99,25 @@ class Elkarte extends Container
 		$this->register(new Members\Provider);
 
 		return $this;
+	}
+
+	/**
+	 * Get a local url
+	 *
+	 * @param array $parameters
+	 * @param bool $relative
+	 * @return string
+	 */
+	public function url(array $parameters = array(), $relative = true)
+	{
+		global $scripturl;
+
+		$query = [];
+		foreach ($parameters as $k => $v)
+		{
+			$query[] = $k . '=' . $v;
+		}
+
+		return ($relative ? '' : $scripturl) . (empty($parameters) ? '' : '?' . implode(';', $query));
 	}
 }

@@ -101,6 +101,7 @@ function template_list_boards($boards, $id)
 	// topics (# of), posts (# of), link, href, and last_post. (see below.)
 	foreach ($boards as $board)
 	{
+		$board = $GLOBALS['elk']['context']->context($board, 'board');
 		echo '
 				<li class="board_row', (!empty($board['children'])) ? ' parent_board' : '', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
 					<div class="board_info">

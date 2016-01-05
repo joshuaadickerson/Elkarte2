@@ -17,8 +17,343 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+/**
+ * Loads an array of users' data by ID or member_name.
+ *
+ * @param int[]|int|string[]|string $users An array of users by id or name
+ * @param bool $is_name = false $users is by name or by id
+ * @param string $set = 'normal' What kind of data to load (normal, profile, minimal)
+ * @return array|bool The ids of the members loaded or false
+ */
+function loadMemberData($users, $is_name = false, $set = 'normal')
+{
+	global $user_profile, $modSettings, $board_info, $context;
+
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
+
+	// Can't just look for no users :P.
+	if (empty($users))
+		return false;
+
+	// Pass the set value
+	$context['loadMemberContext_set'] = $set;
+
+	// Make sure it's an array.
+	$users = !is_array($users) ? array($users) : array_unique($users);
+	$loaded_ids = array();
+
+	if (!$is_name && $cache->isEnabled() && $cache->checkLevel(3))
+	{
+		$users = array_values($users);
+		for ($i = 0, $n = count($users); $i < $n; $i++)
+		{
+			$data = $cache->get('member_data-' . $set . '-' . $users[$i], 240);
+			if ($cache->isMiss())
+				continue;
+
+			$loaded_ids[] = $data['id_member'];
+			$user_profile[$data['id_member']] = $data;
+			unset($users[$i]);
+		}
+	}
+
+	// Used by default
+	$select_columns = '
+			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
+			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
+			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login, mem.likes_given, mem.likes_received,
+			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
+			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
+			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
+			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '') . '
+			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
+	$select_tables = '
+			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
+			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
+
+	// We add or replace according to the set
+	switch ($set)
+	{
+		case 'normal':
+			$select_columns .= ', mem.buddy_list';
+			break;
+		case 'profile':
+			$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
+			mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
+			mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
+			mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.otp_secret, mem.enable_otp';
+			break;
+		case 'minimal':
+			$select_columns = '
+			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.hide_email, mem.date_registered,
+			mem.posts, mem.last_login, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group';
+			$select_tables = '';
+			break;
+		default:
+			trigger_error('loadMemberData(): Invalid member data set \'' . $set . '\'', E_USER_WARNING);
+	}
+
+	// Allow addons to easily add to the selected member data
+	$GLOBALS['elk']['hooks']->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
+
+	if (!empty($users))
+	{
+		// Load the member's data.
+		$request = $db->select('', '
+			SELECT' . $select_columns . '
+			FROM {db_prefix}members AS mem' . $select_tables . '
+			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
+			array(
+				'blank_string' => '',
+				'users' => count($users) == 1 ? current($users) : $users,
+			)
+		);
+		$new_loaded_ids = array();
+		while ($row = $request->fetchAssoc())
+		{
+			$new_loaded_ids[] = $row['id_member'];
+			$loaded_ids[] = $row['id_member'];
+			$row['options'] = array();
+			$user_profile[$row['id_member']] = $row;
+		}
+		$request->free();
+	}
+
+	// Custom profile fields as well
+	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	{
+		$request = $db->select('', '
+			SELECT id_member, variable, value
+			FROM {db_prefix}custom_fields_data
+			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
+			array(
+				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
+			)
+		);
+		while ($row = $request->fetchAssoc())
+			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
+		$request->free();
+	}
+
+	// Anything else integration may want to add to the user_profile array
+	if (!empty($new_loaded_ids))
+		$GLOBALS['elk']['hooks']->hook('add_member_data', array($new_loaded_ids, $set));
+
+	if (!empty($new_loaded_ids) && $cache->checkLevel(3))
+	{
+		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
+			$cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
+	}
+
+	// Are we loading any moderators?  If so, fix their group data...
+	if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0)
+	{
+		if (!$cache->getVar($group_info = null, 'moderator_group_info', 480))
+		{
+			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+			$group_info = membergroupById(3, true);
+
+			$cache->put('moderator_group_info', $group_info, 480);
+		}
+
+		foreach ($temp_mods as $id)
+		{
+			// By popular demand, don't show admins or global moderators as moderators.
+			if ($user_profile[$id]['id_group'] != 1 && $user_profile[$id]['id_group'] != 2)
+				$user_profile[$id]['member_group'] = $group_info['group_name'];
+
+			// If the Moderator group has no color or icons, but their group does... don't overwrite.
+			if (!empty($group_info['icons']))
+				$user_profile[$id]['icons'] = $group_info['icons'];
+			if (!empty($group_info['online_color']))
+				$user_profile[$id]['member_group_color'] = $group_info['online_color'];
+		}
+	}
+
+	return empty($loaded_ids) ? false : $loaded_ids;
+}
+
+/**
+ * Loads the user's basic values... meant for template/theme usage.
+ *
+ * What it does:
+ * - Always loads the minimal values of username, name, id, href, link, email, show_email, registered, registered_timestamp
+ * - if $context['loadMemberContext_set'] is not minimal it will load in full a full set of user information
+ * - prepares signature, personal_text, location fields for display (censoring if enabled)
+ * - loads in the members custom fields if any
+ * - prepares the users buddy list, including reverse buddy flags
+ *
+ * @param int $user
+ * @param bool $display_custom_fields = false
+ * @return boolean
+ */
+function loadMemberContext($user, $display_custom_fields = false)
+{
+	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
+	global $context, $modSettings, $settings;
+	static $dataLoaded = array();
+
+	// If this person's data is already loaded, skip it.
+	if (isset($dataLoaded[$user]))
+		return true;
+
+	// We can't load guests or members not loaded by loadMemberData()!
+	if ($user == 0)
+		return false;
+
+	if (!isset($user_profile[$user]))
+	{
+		trigger_error('loadMemberContext(): member id ' . $user . ' not previously loaded by loadMemberData()', E_USER_WARNING);
+		return false;
+	}
+
+	$parsers = $GLOBALS['elk']['bbc'];
+
+	// Well, it's loaded now anyhow.
+	$dataLoaded[$user] = true;
+	$profile = $user_profile[$user];
+
+	// Censor everything.
+	$profile['signature'] = censor($profile['signature']);
+	$profile['personal_text'] = censor($profile['personal_text']);
+	$profile['location'] = censor($profile['location']);
+
+	// Set things up to be used before hand.
+	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');
+	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
+	$profile['signature'] = $parsers->parseSignature($profile['signature'], true);
+	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
+	$profile['icons'] = empty($profile['icons']) ? array('', '') : explode('#', $profile['icons']);
+
+	// Setup the buddy status here (One whole in_array call saved :P)
+	$profile['buddy'] = in_array($profile['id_member'], $user_info['buddies']);
+	$buddy_list = !empty($profile['buddy_list']) ? explode(',', $profile['buddy_list']) : array();
+
+	// These minimal values are always loaded
+	$memberContext[$user] = array(
+		'username' => $profile['member_name'],
+		'name' => $profile['real_name'],
+		'id' => $profile['id_member'],
+		'href' => $scripturl . '?action=profile;u=' . $profile['id_member'],
+		'link' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . trim($profile['real_name']) . '">' . $profile['real_name'] . '</a>',
+		'email' => $profile['email_address'],
+		'show_email' => showEmailAddress(!empty($profile['hide_email']), $profile['id_member']),
+		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : standardTime($profile['date_registered']),
+		'registered_timestamp' => empty($profile['date_registered']) ? 0 : forum_time(true, $profile['date_registered']),
+	);
+
+	// If the set isn't minimal then load the monstrous array.
+	if ($context['loadMemberContext_set'] !== 'minimal')
+	{
+		$memberContext[$user] += array(
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') .'>' . $profile['real_name'] . '</a>',
+			'is_buddy' => $profile['buddy'],
+			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
+			'buddies' => $buddy_list,
+			'title' => !empty($modSettings['titlesEnable']) ? $profile['usertitle'] : '',
+			'blurb' => $profile['personal_text'],
+			'gender' => array(
+				'name' => $gendertxt,
+				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/profile/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
+			),
+			'website' => array(
+				'title' => $profile['website_title'],
+				'url' => $profile['website_url'],
+			),
+			'birth_date' => empty($profile['birthdate']) || $profile['birthdate'] === '0001-01-01' ? '0000-00-00' : (substr($profile['birthdate'], 0, 4) === '0004' ? '0000' . substr($profile['birthdate'], 4) : $profile['birthdate']),
+			'signature' => $profile['signature'],
+			'location' => $profile['location'],
+			'real_posts' => $profile['posts'],
+			'posts' => comma_format($profile['posts']),
+			'avatar' => determineAvatar($profile),
+			'last_login' => empty($profile['last_login']) ? $txt['never'] : standardTime($profile['last_login']),
+			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(false, $profile['last_login']),
+			'karma' => array(
+				'good' => $profile['karma_good'],
+				'bad' => $profile['karma_bad'],
+				'allow' => !$user_info['is_guest'] && !empty($modSettings['karmaMode']) && $user_info['id'] != $user && allowedTo('karma_edit') &&
+					($user_info['posts'] >= $modSettings['karmaMinPosts'] || $user_info['is_admin']),
+			),
+			'likes' => array(
+				'given' => $profile['likes_given'],
+				'received' => $profile['likes_received']
+			),
+			'ip' => htmlspecialchars($profile['member_ip'], ENT_COMPAT, 'UTF-8'),
+			'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
+			'online' => array(
+				'is_online' => $profile['is_online'],
+				'text' => $GLOBALS['elk']['text']->htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $GLOBALS['elk']['text']->htmlspecialchars($profile['real_name'])),
+				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
+				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
+				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
+				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
+			),
+			'language' => $GLOBALS['elk']['text']->ucwords(strtr($profile['lngfile'], array('_' => ' '))),
+			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
+			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
+			'options' => $profile['options'],
+			'is_guest' => false,
+			'group' => $profile['member_group'],
+			'group_color' => $profile['member_group_color'],
+			'group_id' => $profile['id_group'],
+			'post_group' => $profile['post_group'],
+			'post_group_color' => $profile['post_group_color'],
+			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="[*]" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
+			'warning' => $profile['warning'],
+			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
+			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
+			'custom_fields' => array(),
+		);
+	}
+
+	// Are we also loading the members custom fields into context?
+	if ($display_custom_fields && !empty($modSettings['displayFields']))
+	{
+		if (!isset($context['display_fields']))
+			$context['display_fields'] = unserialize($modSettings['displayFields']);
+
+		foreach ($context['display_fields'] as $custom)
+		{
+			if (!isset($custom['title']) || trim($custom['title']) == '' || empty($profile['options'][$custom['colname']]))
+				continue;
+
+			$value = $profile['options'][$custom['colname']];
+
+			// BBC?
+			if ($custom['bbc'])
+				$value = $parsers->parseCustomFields($value);
+			// ... or checkbox?
+			elseif (isset($custom['type']) && $custom['type'] == 'check')
+				$value = $value ? $txt['yes'] : $txt['no'];
+
+			// Enclosing the user input within some other text?
+			if (!empty($custom['enclose']))
+				$value = strtr($custom['enclose'], array(
+					'{SCRIPTURL}' => $scripturl,
+					'{IMAGES_URL}' => $settings['images_url'],
+					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
+					'{INPUT}' => $value,
+				));
+
+			$memberContext[$user]['custom_fields'][] = array(
+				'title' => $custom['title'],
+				'colname' => $custom['colname'],
+				'value' => $value,
+				'placement' => !empty($custom['placement']) ? $custom['placement'] : 0,
+			);
+		}
+	}
+
+	$GLOBALS['elk']['hooks']->hook('member_context', array($user, $display_custom_fields));
+	return true;
+}
 
 /**
  * Delete one or more members.
@@ -2559,4 +2894,298 @@ function loadMembersIPs($ip_string, $ip_var)
 	ksort($ips);
 
 	return $ips;
+}
+
+function loadUserContext()
+{
+	global $context, $user_info, $txt, $modSettings;
+
+	// Set up the contextual user array.
+	$context['user'] = array(
+		'id' => $user_info['id'],
+		'is_logged' => !$user_info['is_guest'],
+		'is_guest' => &$user_info['is_guest'],
+		'is_admin' => &$user_info['is_admin'],
+		'is_mod' => &$user_info['is_mod'],
+		'is_moderator' => &$user_info['is_moderator'],
+		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
+		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
+		'username' => $user_info['username'],
+		'language' => $user_info['language'],
+		'email' => $user_info['email'],
+		'ignoreusers' => $user_info['ignoreusers'],
+	);
+
+	// Something for the guests
+	if (!$context['user']['is_guest'])
+		$context['user']['name'] = $user_info['name'];
+	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
+		$context['user']['name'] = $txt['guest_title'];
+
+	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
+	$context['smiley_enabled'] = $user_info['smiley_set'] !== 'none';
+	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
+}
+
+/**
+ * Load all the important user information.
+ *
+ * What it does:
+ * - sets up the $user_info array
+ * - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
+ * - first checks for cookie or integration validation.
+ * - uses the current session if no integration function or cookie is found.
+ * - checks password length, if member is activated and the login span isn't over.
+ * - if validation fails for the user, $id_member is set to 0.
+ * - updates the last visit time when needed.
+ */
+function loadUserSettings()
+{
+	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
+
+	$db = $GLOBALS['elk']['db'];
+	$cache = $GLOBALS['elk']['cache'];
+	$hooks = $GLOBALS['elk']['hooks'];
+	$req = $GLOBALS['elk']['req'];
+
+	// Check first the integration, then the cookie, and last the session.
+	if (count($integration_ids = $hooks->hook('verify_user')) > 0)
+	{
+		$id_member = 0;
+		foreach ($integration_ids as $integration_id)
+		{
+			$integration_id = (int) $integration_id;
+			if ($integration_id > 0)
+			{
+				$id_member = $integration_id;
+				$already_verified = true;
+				break;
+			}
+		}
+	}
+	else
+		$id_member = 0;
+
+	if (empty($id_member) && isset($_COOKIE[$cookiename]))
+	{
+		// Fix a security hole in PHP 4.3.9 and below...
+		if (preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|64):"([a-fA-F0-9]{64})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~i', $_COOKIE[$cookiename]) == 1)
+		{
+			list ($id_member, $password) = @unserialize($_COOKIE[$cookiename]);
+			$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
+		}
+		else
+			$id_member = 0;
+	}
+	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && ($_SESSION['USER_AGENT'] == $req->user_agent() || !empty($modSettings['disableCheckUA'])))
+	{
+		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
+		list ($id_member, $password, $login_span) = @unserialize($_SESSION['login_' . $cookiename]);
+		$id_member = !empty($id_member) && strlen($password) == 64 && $login_span > time() ? (int) $id_member : 0;
+	}
+
+	// Only load this stuff if the user isn't a guest.
+	if ($id_member != 0)
+	{
+		// Is the member data cached?
+		if (!$cache->checkLevel(2) || !$cache->getVar($user_settings, 'user_settings-' . $id_member, 60))
+		{
+			list ($user_settings) = $db->fetchQuery('
+				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
+				FROM {db_prefix}members AS mem
+					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
+				WHERE mem.id_member = {int:id_member}
+				LIMIT 1',
+				array(
+					'id_member' => $id_member,
+				)
+			);
+
+			// Make the ID specifically an integer
+			$user_settings['id_member'] = (int) $user_settings['id_member'];
+
+			if ($cache->checkLevel(2))
+				$cache->put('user_settings-' . $id_member, $user_settings, 60);
+		}
+
+		// Did we find 'im?  If not, junk it.
+		if (!empty($user_settings))
+		{
+			// As much as the password should be right, we can assume the integration set things up.
+			if (!empty($already_verified) && $already_verified === true)
+				$check = true;
+			// SHA-256 passwords should be 64 characters long.
+			elseif (strlen($password) == 64)
+				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) == $password;
+			else
+				$check = false;
+
+			// Wrong password or not activated - either way, you're going nowhere.
+			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? (int) $user_settings['id_member'] : 0;
+		}
+		else
+			$id_member = 0;
+
+		// If we no longer have the member maybe they're being all hackey, stop brute force!
+		if (!$id_member)
+			validatePasswordFlood(!empty($user_settings['id_member']) ? $user_settings['id_member'] : $id_member, !empty($user_settings['passwd_flood']) ? $user_settings['passwd_flood'] : false, $id_member != 0);
+	}
+
+	// Found 'im, let's set up the variables.
+	if ($id_member != 0)
+	{
+		// Let's not update the last visit time in these cases...
+		// 1. SSI doesn't count as visiting the forum.
+		// 2. RSS feeds and XMLHTTP requests don't count either.
+		// 3. If it was set within this session, no need to set it again.
+		// 4. New session, yet updated < five hours ago? Maybe cache can help.
+		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (!$cache->isEnabled() || !$cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $id_member, 5 * 3600)))
+		{
+			// @todo can this be cached?
+			// Do a quick query to make sure this isn't a mistake.
+
+			$visitOpt = basicMessageInfo($user_settings['id_msg_last_visit'], true);
+
+			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
+
+			// If it was *at least* five hours ago...
+			if ($visitOpt['poster_time'] < time() - 5 * 3600)
+			{
+				require_once(ROOTDIR . '/Members/Members.subs.php');
+				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
+				$user_settings['last_login'] = time();
+
+				if ($cache->checkLevel(2))
+					$cache->put('user_settings-' . $id_member, $user_settings, 60);
+
+				$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
+			}
+		}
+		elseif (empty($_SESSION['id_msg_last_visit']))
+			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
+
+		$username = $user_settings['member_name'];
+
+		if (empty($user_settings['additional_groups']))
+			$user_info = array(
+				'groups' => array($user_settings['id_group'], $user_settings['id_post_group'])
+			);
+		else
+			$user_info = array(
+				'groups' => array_merge(
+					array($user_settings['id_group'], $user_settings['id_post_group']),
+					explode(',', $user_settings['additional_groups'])
+				)
+			);
+
+		// Because history has proven that it is possible for groups to go bad - clean up in case.
+		foreach ($user_info['groups'] as $k => $v)
+			$user_info['groups'][$k] = (int) $v;
+
+		// This is a logged in user, so definitely not a spider.
+		$user_info['possibly_robot'] = false;
+	}
+	// If the user is a guest, initialize all the critical user settings.
+	else
+	{
+		// This is what a guest's variables should be.
+		$username = '';
+		$user_info = array('groups' => array(-1));
+		$user_settings = array();
+
+		if (isset($_COOKIE[$cookiename]))
+			$_COOKIE[$cookiename] = '';
+
+		// Create a login token if it doesn't exist yet.
+		if (!isset($_SESSION['token']['post-login']))
+			createToken('login');
+		else
+			list ($context['login_token_var'],,, $context['login_token']) = $_SESSION['token']['post-login'];
+
+		// Do we perhaps think this is a search robot? Check every five minutes just in case...
+		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
+		{
+			require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
+			$user_info['possibly_robot'] = spiderCheck();
+		}
+		elseif (!empty($modSettings['spider_mode']))
+			$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
+		// If we haven't turned on proper spider hunts then have a guess!
+		else
+		{
+			$ci_user_agent = strtolower($req->user_agent());
+			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu)~u', $ci_user_agent) == 1;
+		}
+	}
+
+	// Set up the $user_info array.
+	$user_info += array(
+		'id' => $id_member,
+		'username' => $username,
+		'name' => isset($user_settings['real_name']) ? $user_settings['real_name'] : '',
+		'email' => isset($user_settings['email_address']) ? $user_settings['email_address'] : '',
+		'passwd' => isset($user_settings['passwd']) ? $user_settings['passwd'] : '',
+		'language' => empty($user_settings['lngfile']) || empty($modSettings['userLanguage']) ? $language : $user_settings['lngfile'],
+		'is_guest' => $id_member == 0,
+		'is_admin' => in_array(1, $user_info['groups']),
+		'theme' => empty($user_settings['id_theme']) ? 0 : $user_settings['id_theme'],
+		'last_login' => empty($user_settings['last_login']) ? 0 : $user_settings['last_login'],
+		'ip' => $req->client_ip(),
+		'ip2' => $req->ban_ip(),
+		'posts' => empty($user_settings['posts']) ? 0 : $user_settings['posts'],
+		'time_format' => empty($user_settings['time_format']) ? $modSettings['time_format'] : $user_settings['time_format'],
+		'time_offset' => empty($user_settings['time_offset']) ? 0 : $user_settings['time_offset'],
+		'avatar' => array_merge(array(
+			'url' => isset($user_settings['avatar']) ? $user_settings['avatar'] : '',
+			'filename' => empty($user_settings['filename']) ? '' : $user_settings['filename'],
+			'custom_dir' => !empty($user_settings['attachment_type']) && $user_settings['attachment_type'] == 1,
+			'id_attach' => isset($user_settings['id_attach']) ? $user_settings['id_attach'] : 0
+		), determineAvatar($user_settings)),
+		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
+		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
+		'mentions' => empty($user_settings['mentions']) ? 0 : max(0, $user_settings['mentions']),
+		'unread_messages' => empty($user_settings['unread_messages']) ? 0 : $user_settings['unread_messages'],
+		'total_time_logged_in' => empty($user_settings['total_time_logged_in']) ? 0 : $user_settings['total_time_logged_in'],
+		'buddies' => !empty($modSettings['enable_buddylist']) && !empty($user_settings['buddy_list']) ? explode(',', $user_settings['buddy_list']) : array(),
+		'ignoreboards' => !empty($user_settings['ignore_boards']) && !empty($modSettings['allow_ignore_boards']) ? explode(',', $user_settings['ignore_boards']) : array(),
+		'ignoreusers' => !empty($user_settings['pm_ignore_list']) ? explode(',', $user_settings['pm_ignore_list']) : array(),
+		'warning' => isset($user_settings['warning']) ? $user_settings['warning'] : 0,
+		'permissions' => array(),
+	);
+	$user_info['groups'] = array_unique($user_info['groups']);
+
+	// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
+	if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
+		unset($user_info['ignoreboards'][$tmp]);
+
+	// Do we have any languages to validate this?
+	if (!empty($modSettings['userLanguage']) && (!empty($_GET['language']) || !empty($_SESSION['language'])))
+		$languages = getLanguages();
+
+	// Allow the user to change their language if its valid.
+	if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
+	{
+		$user_info['language'] = strtr($_GET['language'], './\\:', '____');
+		$_SESSION['language'] = $user_info['language'];
+	}
+	elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
+		$user_info['language'] = strtr($_SESSION['language'], './\\:', '____');
+
+	// Just build this here, it makes it easier to change/use - administrators can see all boards.
+	if ($user_info['is_admin'])
+		$user_info['query_see_board'] = '1=1';
+	// Otherwise just the groups in $user_info['groups'].
+	else
+		$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
+	// Build the list of boards they WANT to see.
+	// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
+
+	// If they aren't ignoring any boards then they want to see all the boards they can see
+	if (empty($user_info['ignoreboards']))
+		$user_info['query_wanna_see_board'] = $user_info['query_see_board'];
+	// Ok I guess they don't want to see all the boards
+	else
+		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
+
+	$GLOBALS['elk']['hooks']->hook('user_info');
 }

@@ -42,7 +42,6 @@ if (function_exists('getrusage'))
 else
 	$rusage_start = array();
 
-$time_start = $_SERVER['REQUEST_TIME_FLOAT'];
 $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)

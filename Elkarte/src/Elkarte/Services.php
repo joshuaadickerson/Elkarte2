@@ -4,6 +4,7 @@ namespace Elkarte;
 
 use Elkarte\Boards\BoardsManager;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Theme\Context;
 use Elkarte\Elkarte\Util;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 use Elkarte\Elkarte\Theme\Templates;
@@ -169,5 +170,8 @@ $elk['text'] = function () {
 	return new Util($modSettings);
 };
 
+$elk['context'] = function () {
+	return new Context();
+};
 
 return $elk;

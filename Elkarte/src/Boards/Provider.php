@@ -23,14 +23,24 @@ class Provider implements ProviderInterface
 		$elk['boards.list'] = function ($elk) {
 			return new BoardsList($elk['db'], $elk['cache'], $elk['text'], $elk['boards.container'], $elk['members.container']);
 		};
+
+		// @todo this should check settings/hooks to see if the boards have a separate BBC parser
+		$elk['boards.bbc_parser'] = function ($elk) {
+			return $elk['bbc'];
+		};
+
+		$elk['boards.context'] = function ($elk) {
+			return new BoardContext([
+				'elk' => $elk,
+				'bbc_parser' => $elk['boards.bbc_parser'],
+			]);
+		};
 	}
 
 	public function boot(Container $elk)
 	{
 		// Register board context handler
-		$elk['boards.context'] = $elk->factory(function ($elk) {
-			return new BoardContext;
-		});
+		$elk['context']->register($elk['boards.context'], 'board');
 	}
 
 	protected function controllers(Container $elk)

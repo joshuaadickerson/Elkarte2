@@ -972,6 +972,7 @@ function host_from_ip($ip)
  *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
  *     - if encrypt = false this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
+ * @return array
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
@@ -1690,7 +1691,7 @@ function JavaScriptEscape($string)
 		'<script' => '<scri\'+\'pt',
 		'<body>' => '<bo\'+\'dy>',
 		'<a href' => '<a hr\'+\'ef',
-		$scripturl => '\' + elk_scripturl + \'',
+		(string) $scripturl => '\' + elk_scripturl + \'',
 	)) . '\'';
 }
 
@@ -1738,6 +1739,7 @@ function ob_sessrewrite($buffer)
  * Callback function for the Rewrite URLs preg_replace_callback
  *
  * @param mixed[] $matches
+ * @return string
  */
 function buffer_callback($matches)
 {

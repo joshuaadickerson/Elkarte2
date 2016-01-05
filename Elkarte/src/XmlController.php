@@ -13,9 +13,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Xml controller receives XMLhttp requests of various types.
  * (jump to, message and group icons, core features)

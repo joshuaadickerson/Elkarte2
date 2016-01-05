@@ -235,19 +235,18 @@ class BoardsList
 			if (!isset($boards[$row['id_board']]))
 			{
 				$board = $this->board_container->board($row['id_board'], new Board([
-					'new' => empty($row['is_read']),
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
-					'description' => $bbc_parser->parseBoard($row['description']),
-					'raw_description' => $row['description'],
+					// @todo change to description_bbc
+					//'description' => $bbc_parser->parseBoard($row['description']),
+					'description' => $row['description'],
+					'new' => empty($row['is_read']),
 					'topics' => (int) $row['num_topics'],
 					'posts' => (int) $row['num_posts'],
 					'is_redirect' => (bool) $row['is_redirect'],
 					'unapproved_topics' => (int) $row['unapproved_topics'],
 					'unapproved_posts' => $row['unapproved_posts'] - $row['unapproved_topics'],
 					'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row['id_board'], $this->_user['mod_cache_ap']),
-					'href' => $this->_scripturl . '?board=' . $row['id_board'] . '.0',
-					'link' => '<a href="' . $this->_scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>'
 				]));
 
 				$boards[$board->id] = $board;
@@ -332,8 +331,9 @@ class BoardsList
 				'subject' => $row['short_subject'],
 				'member' => $this->mem_container->member($row['id_member'], new Member([
 					'id' => $row['id_member'],
-					'username' => $row['poster_name'] != '' ? $row['poster_name'] : $txt['not_applicable'],
 					'name' => $row['real_name'],
+					// @todo move to context
+					'username' => $row['poster_name'] != '' ? $row['poster_name'] : $txt['not_applicable'],
 					'href' => $row['poster_name'] != '' && !empty($row['id_member']) ? $this->_scripturl . '?action=profile;u=' . $row['id_member'] : '',
 					'link' => $row['poster_name'] != '' ? (!empty($row['id_member']) ? '<a href="' . $this->_scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>' : $row['real_name']) : $txt['not_applicable'],
 				])),

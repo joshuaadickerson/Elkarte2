@@ -952,3 +952,133 @@ function checkSecurityFiles()
 
 	return $has_files;
 }
+
+
+/**
+ * Load this user's permissions.
+ *
+ * What it does:
+ * - If the user is an Admin, validate that they have not been banned.
+ * - Attempt to load permissions from cache for cache level > 2
+ * - See if the user is possibly a robot and apply added permissions as needed
+ * - Load permissions from the general permissions table.
+ * - If inside a board load the necessary board permissions.
+ * - If the user is not a guest, identify what other boards they have access to.
+ */
+function loadPermissions()
+{
+	global $user_info, $board, $board_info, $modSettings, $elk;
+
+	$db = $GLOBALS['elk']['db'];
+
+	if ($user_info['is_admin'])
+	{
+		$elk['ban_check']->banPermissions();
+		return;
+	}
+
+	$removals = array();
+
+	$cache = $GLOBALS['elk']['cache'];
+
+	if ($cache->isEnabled())
+	{
+		$cache_groups = $user_info['groups'];
+		asort($cache_groups);
+		$cache_groups = implode(',', $cache_groups);
+
+		// If it's a spider then cache it different.
+		if ($user_info['possibly_robot'])
+			$cache_groups .= '-spider';
+
+		if ($cache->checkLevel(2) && !empty($board) && $cache->getVar($temp = null, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
+		{
+			list ($user_info['permissions']) = $temp;
+			$elk['ban_check']->banPermissions();
+
+			return;
+		}
+		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 240) && time() - 240 > $modSettings['settings_updated'])
+			list ($user_info['permissions'], $removals) = $temp;
+	}
+
+	// If it is detected as a robot, and we are restricting permissions as a special group - then implement this.
+	$spider_restrict = $user_info['possibly_robot'] && !empty($modSettings['spider_group']) ? ' OR (id_group = {int:spider_group} AND add_deny = 0)' : '';
+
+	if (empty($user_info['permissions']))
+	{
+		// Get the general permissions.
+		$request = $db->select('', '
+			SELECT permission, add_deny
+			FROM {db_prefix}permissions
+			WHERE id_group IN ({array_int:member_groups})
+				' . $spider_restrict,
+			array(
+				'member_groups' => $user_info['groups'],
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
+			)
+		);
+		while ($row = $request->fetchAssoc())
+		{
+			if (empty($row['add_deny']))
+				$removals[] = $row['permission'];
+			else
+				$user_info['permissions'][] = $row['permission'];
+		}
+		$request->free();
+
+		if (isset($cache_groups))
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
+	}
+
+	// Get the board permissions.
+	if (!empty($board))
+	{
+		// Make sure the board (if any) has been loaded by loadBoard().
+		if (!isset($board_info['profile']))
+			$GLOBALS['elk']['errors']->fatal_lang_error('no_board');
+
+		$request = $db->select('', '
+			SELECT permission, add_deny
+			FROM {db_prefix}board_permissions
+			WHERE (id_group IN ({array_int:member_groups})
+				' . $spider_restrict . ')
+				AND id_profile = {int:id_profile}',
+			array(
+				'member_groups' => $user_info['groups'],
+				'id_profile' => $board_info['profile'],
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
+			)
+		);
+		while ($row = $request->fetchAssoc())
+		{
+			if (empty($row['add_deny']))
+				$removals[] = $row['permission'];
+			else
+				$user_info['permissions'][] = $row['permission'];
+		}
+		$request->free();
+	}
+
+	// Remove all the permissions they shouldn't have ;).
+	if (!empty($modSettings['permission_enable_deny']))
+		$user_info['permissions'] = array_diff($user_info['permissions'], $removals);
+
+	if (isset($cache_groups) && !empty($board) && $cache->checkLevel(2))
+		$cache->put('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
+
+	// Banned?  Watch, don't touch..
+	$elk['ban_check']->banPermissions();
+
+	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
+	if (!$user_info['is_guest'])
+	{
+		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
+		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+			rebuildModCache();
+		}
+		else
+			$user_info['mod_cache'] = $_SESSION['mc'];
+	}
+}

@@ -23,9 +23,9 @@ class Provider implements ProviderInterface
 	public function boot(Container $elk)
 	{
 		// Register member context handler
-		$elk['members.context'] = $elk->factory(function ($elk) {
+		$elk['members.context'] = function ($elk) {
 			return new MemberContext;
-		});
+		};
 	}
 
 	protected function controllers(Container $elk)

@@ -11,10 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
-class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
+class RandomPostModule implements ElkArte\sources\modules\Module_Interface
 {
 	/**
 	 * {@inheritDoc}

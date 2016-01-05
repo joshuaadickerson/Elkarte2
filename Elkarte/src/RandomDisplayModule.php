@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $includeUnapproved = false;

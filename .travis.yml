@@ -11,22 +11,22 @@ matrix:
   fast_finish: true
 
 install:
-    - chmod +x build/tests/travis-ci/setup-server.sh
-    - chmod +x build/tests/travis-ci/setup-selenium.sh
-    - build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
+    - chmod +x Build/tests/travis-ci/setup-server.sh
+    - chmod +x Build/tests/travis-ci/setup-selenium.sh
+    - Build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
 
 before_script:
     - chmod +x tests/travis-ci/setup-elkarte.sh
-    - build/tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+    - Build/tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
 
 script: 
     - chmod +x /var/www/tests/travis-ci/setup-script.sh
-    - /var/www/build/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+    - /var/www/Build/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
 
 after_script:
     - chmod +x /var/www/tests/travis-ci/setup-results.sh
-    - /var/www/build/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+    - /var/www/Build/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
 
 after_failure:
     - chmod +x /var/www/tests/travis-ci/setup-failure.sh
-    - /var/www/build/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
+    - /var/www/Build/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION

@@ -1,6 +1,6 @@
 [![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](http://www.elkarte.net "ElkArte")
 
-This is the **ElkArte** repository.
+This is the **ElkArte2** repository.
 
 ElkArte is a modern, free, powerful community building forum software. It is completely free and licensed with an open source [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
@@ -12,7 +12,7 @@ Test ElkArte yourself by [visiting ElkArte.net](http://www.elkarte.net).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
-[![Build Status](http://img.shields.io/travis/joshuaadickerson/Elkarte2/master.svg?style=flat)](https://travis-ci.org/joshuaadickerson/Elkarte2)
+[![Build Status](https://travis-ci.org/joshuaadickerson/Elkarte2.svg?branch=development)](https://travis-ci.org/joshuaadickerson/Elkarte2)
 [![Open Issues](http://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
 [![License](http://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
@@ -36,7 +36,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 
 ## Requirements
 
-* PHP version 5.3 or newer
+* PHP version 5.5 or newer
 * MySQL 5 and newer OR PostgreSQL 8.3 and newer
 
 On the client side, ElkArte will run & look good in just about any modern browser.  Using IE?, well we support that too! You'll want IE8 or greater but some visual enhancements will not be present with IE versions < IE9

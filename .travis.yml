@@ -11,6 +11,7 @@ matrix:
   fast_finish: true
 
 install:
+    - chmod +x ./Build/tests/travis-ci/setup-server.sh
     - ./Build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
     - export PATH="$HOME/.composer/vendor/bin:$PATH"
 

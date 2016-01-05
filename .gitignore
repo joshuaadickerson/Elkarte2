@@ -12,5 +12,4 @@ Elkarte/packages/temp
 nbproject/*
 .*.swp
 /vendor/*
-/build/*
 .idea

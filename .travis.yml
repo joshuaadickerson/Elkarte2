@@ -20,13 +20,20 @@ matrix:
   fast_finish: true
 
 install:
-    - chmod +x ./Build/tests/travis-ci/setup-server.sh
-    - ./Build/tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
-    - export PATH="$HOME/.composer/vendor/bin:$PATH"
+    - if [ "$DB" == "postgres" ]; then psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres; fi;
+    - if [ "$DB" == "postgres" ]; then psql -c "create database elkarte_test;" -U postgres; fi;
+    - if [ "$DB" == "mysqli" ]; then mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot; fi;
+    - if [ "$DB" == "mysqli" ]; then mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot; fi;
 
 before_script:
-    - chmod +x ./Build/tests/travis-ci/setup-elkarte.sh
-    - ./Build/tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+    - SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
+    - composer install --no-interaction --prefer-source --quiet
+    - phpenv config-add /var/www/Build/tests/travis-ci/travis_php.ini
+    - if [ "$DB" == "mysqli" ]; then php ./Build/tests/travis-ci/setup_mysql.php; fi;
+    - if [ "$DB" == "postgres" ]; then php ./Build/tests/travis-ci/setup_pgsql.php; fi;
+    - rm -rf /var/www/Elkarte/src/Admin/Install
+    - if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]; then phpenv config-add /var/www/Build/tests/travis-ci/travis_webtest_php.ini; fi;
+    - if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]; then ./Build/tests/travis-ci/setup-selenium.sh; fi;
 
 script: 
     - chmod +x /var/www/tests/travis-ci/setup-script.sh

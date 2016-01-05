@@ -12,7 +12,16 @@ class Provider implements ProviderInterface
 		$this->controllers($elk);
 
 		$elk['boards.manager'] = function ($elk) {
-			return new BoardsManager($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors'], $elk['text']);
+			return new BoardsManager($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors'], $elk['text'],
+				$elk['boards.container'], $elk['members.container']);
+		};
+
+		$elk['boards.container'] = function ($elk) {
+			return new BoardsContainer;
+		};
+
+		$elk['boards.list'] = function ($elk) {
+			return new BoardsList($elk['db'], $elk['cache'], $elk['text'], $elk['boards.container'], $elk['members.container']);
 		};
 	}
 

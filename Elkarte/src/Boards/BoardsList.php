@@ -20,7 +20,11 @@
 
 namespace Elkarte\Boards;
 
+use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Util;
+use Elkarte\Members\Member;
+use Elkarte\Members\MemberContainer;
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -99,6 +103,9 @@ class BoardsList
 	 */
 	private $_db = null;
 
+	protected $board_container;
+	protected $mem_container;
+
 	/**
 	 * Initialize the class
 	 *
@@ -112,48 +119,14 @@ class BoardsList
 	 *       'set_latest_post' => false
 	 *       'get_moderators' => true
 	 */
-	public function __construct(DatabaseInterface $db, array $options)
+	public function __construct(DatabaseInterface $db, Cache $cache, Util $text,
+								BoardsContainer $board_container, MemberContainer $mem_container)
 	{
-		global $user_info, $settings, $context, $scripturl, $modSettings;
-
-		$this->_options = array_merge(array(
-			'include_categories' => false,
-			'countChildPosts' => false,
-			'base_level' => false,
-			'parent_id' => 0,
-			'set_latest_post' => false,
-			'get_moderators' => true,
-		), $options);
-
-		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
-
-		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
-		$this->_scripturl = $scripturl;
-		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
-
-		$this->_subject_length = $modSettings['subject_length'];
-
-		$this->_user = array(
-			'id' => $user_info['id'],
-			'is_guest' => $user_info['is_guest'],
-			'ignoreboards' => $user_info['ignoreboards'],
-			'mod_cache_ap' => !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : array(),
-		);
-
 		$this->_db = $db;
-
-		// Start with an empty array.
-		if ($this->_options['include_categories'])
-			$this->_categories = array();
-		else
-			$this->_current_boards = array();
-
-		// For performance, track the latest post while going through the boards.
-		if (!empty($this->_options['set_latest_post']))
-			$this->_latest_post = array('timestamp' => 0);
-
-		if (!empty($modSettings['recycle_enable']))
-			$this->_recycle_board = $modSettings['recycle_board'];
+		$this->cache = $cache;
+		$this->text = $text;
+		$this->board_container = $board_container;
+		$this->mem_container = $mem_container;
 	}
 
 	/**
@@ -172,7 +145,7 @@ class BoardsList
 		global $txt;
 
 		// Find all boards and categories, as well as related information.
-		$result_boards = $this->_db->query('boardindex_fetch_boards', '
+		$result = $this->_db->query('boardindex_fetch_boards', '
 			SELECT' . ($this->_options['include_categories'] ? '
 				c.id_cat, c.name AS cat_name,' : '') . '
 				b.id_board, b.name AS board_name, b.description,
@@ -205,141 +178,139 @@ class BoardsList
 
 		$bbc_parser = $GLOBALS['elk']['bbc'];
 
+		$boards = [];
+		$categories = [];
+		$parent_map = [];
+
 		// Run through the categories and boards (or only boards)....
-		while ($row_board = $result_boards->fetchAssoc())
+		while ($row = $result->fetchAssoc())
 		{
 			// Perhaps we are ignoring this board?
-			$ignoreThisBoard = in_array($row_board['id_board'], $this->_user['ignoreboards']);
-			$row_board['is_read'] = !empty($row_board['is_read']) || $ignoreThisBoard ? '1' : '0';
+			$ignoreThisBoard = in_array($row['id_board'], $this->_user['ignoreboards']);
+			$row['is_read'] = !empty($row['is_read']) || $ignoreThisBoard ? '1' : '0';
 			// Not a child.
 			$isChild = false;
 
 			if ($this->_options['include_categories'])
 			{
 				// Haven't set this category yet.
-				if (empty($this->_categories[$row_board['id_cat']]))
+				if (!isset($categories[$row['id_cat']]))
 				{
-					$cat_name = $row_board['cat_name'];
-					$this->_categories[$row_board['id_cat']] = new Category([
-						'id' => $row_board['id_cat'],
-						'name' => $row_board['cat_name'],
-						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
-						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
-						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
-						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
-						'href' => $this->_scripturl . '#c' . $row_board['id_cat'],
-						'boards' => array(),
+					$cat_name = $row['cat_name'];
+					$category = new Category([
+						'id' => $row['id_cat'],
+						'name' => $row['cat_name'],
+						'is_collapsed' => isset($row['can_collapse']) && $row['can_collapse'] == 1 && $row['is_collapsed'] > 0,
+						'can_collapse' => isset($row['can_collapse']) && $row['can_collapse'] == 1,
+						'collapse_href' => isset($row['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row['id_cat'] . ';sa=' . ($row['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row['id_cat'] : '',
+						'collapse_image' => isset($row['can_collapse']) ? '<img src="' . $this->_images_url . ($row['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
+						'href' => $this->_scripturl . '#c' . $row['id_cat'],
 						'new' => false
 					]);
-					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
-							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
+
+					$this->_categories[$row['id_cat']] = $category;
+					$categories[$row['id_cat']] = $category;
+
+					$this->_categories[$row['id_cat']]['link'] = '<a id="c' . $row['id_cat'] . '"></a>' . (!$this->_user['is_guest']
+							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row['cat_name'])) . '">' . $cat_name . '</a>'
 							: $cat_name);
 				}
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
-				if ($this->_recycle_board != $row_board['id_board'])
-					$this->_categories[$row_board['id_cat']]['new'] |= empty($row_board['is_read']) && $row_board['poster_name'] != '';
+				if ($this->_recycle_board != $row['id_board'])
+					$this->_categories[$row['id_cat']]['new'] |= empty($row['is_read']) && $row['poster_name'] != '';
 
 				// Avoid showing category unread link where it only has redirection boards.
-				$this->_categories[$row_board['id_cat']]['show_unread'] = !empty($this->_categories[$row_board['id_cat']]['show_unread']) ? 1 : !$row_board['is_redirect'];
+				$this->_categories[$row['id_cat']]['show_unread'] = !empty($this->_categories[$row['id_cat']]['show_unread']) ? 1 : !$row['is_redirect'];
 
 				// Collapsed category - don't do any of this.
-				if ($this->_categories[$row_board['id_cat']]['is_collapsed'])
+				if ($this->_categories[$row['id_cat']]['is_collapsed'])
 					continue;
 
 				// Let's save some typing.  Climbing the array might be slower, anyhow.
-				$this->_current_boards = &$this->_categories[$row_board['id_cat']]['boards'];
+				$this->_current_boards = &$this->_categories[$row['id_cat']]['boards'];
+			}
+
+			// It's a new board
+			if (!isset($boards[$row['id_board']]))
+			{
+				$board = $this->board_container->board($row['id_board'], new Board([
+					'new' => empty($row['is_read']),
+					'id' => $row['id_board'],
+					'name' => $row['board_name'],
+					'description' => $bbc_parser->parseBoard($row['description']),
+					'raw_description' => $row['description'],
+					'topics' => (int) $row['num_topics'],
+					'posts' => (int) $row['num_posts'],
+					'is_redirect' => (bool) $row['is_redirect'],
+					'unapproved_topics' => (int) $row['unapproved_topics'],
+					'unapproved_posts' => $row['unapproved_posts'] - $row['unapproved_topics'],
+					'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row['id_board'], $this->_user['mod_cache_ap']),
+					'href' => $this->_scripturl . '?board=' . $row['id_board'] . '.0',
+					'link' => '<a href="' . $this->_scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>'
+				]));
+
+				$boards[$board->id] = $board;
+			}
+			else
+			{
+				$board = $boards[$row['id_board']];
 			}
 
 			// This is a parent board.
-			if ($row_board['id_parent'] == $this->_options['parent_id'])
+			if ($row['id_parent'] == $this->_options['parent_id'])
 			{
 				// Is this a new board, or just another moderator?
-				if (!isset($this->_current_boards[$row_board['id_board']]))
+				if (!isset($this->_current_boards[$board->id]))
 				{
-					$this->_current_boards[$row_board['id_board']] = new Board([
-						'new' => empty($row_board['is_read']),
-						'id' => $row_board['id_board'],
-						'name' => $row_board['board_name'],
-						'description' => $bbc_parser->parseBoard($row_board['description']),
-						'raw_description' => $row_board['description'],
-						'moderators' => array(),
-						'link_moderators' => array(),
-						'children' => array(),
-						'link_children' => array(),
-						'children_new' => false,
-						'topics' => $row_board['num_topics'],
-						'posts' => $row_board['num_posts'],
-						'is_redirect' => $row_board['is_redirect'],
-						'unapproved_topics' => $row_board['unapproved_topics'],
-						'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
-						'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
-						'href' => $this->_scripturl . '?board=' . $row_board['id_board'] . '.0',
-						'link' => '<a href="' . $this->_scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
-					]);
+					$this->_current_boards[$board->id] = $board;
 				}
-				$this->_boards[$row_board['id_board']] = $this->_options['include_categories'] ? $row_board['id_cat'] : 0;
+
+				$this->_boards[$board->id] = $this->_options['include_categories'] ? $row['id_cat'] : 0;
 			}
 			// Found a sub-board.... make sure we've found its parent and the child hasn't been set already.
-			elseif (isset($this->_current_boards[$row_board['id_parent']]['children']) && !isset($this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]))
+			elseif (isset($this->_current_boards[$row['id_parent']]['children']) && !isset($this->_current_boards[$row['id_parent']]['children'][$row['id_board']]))
 			{
 				// A valid child!
 				$isChild = true;
 
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
-					'id' => $row_board['id_board'],
-					'name' => $row_board['board_name'],
-					'description' => $bbc_parser->parseBoard($row_board['description']),
-					'raw_description' => $row_board['description'],
-					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
-					'topics' => $row_board['num_topics'],
-					'posts' => $row_board['num_posts'],
-					'is_redirect' => $row_board['is_redirect'],
-					'unapproved_topics' => $row_board['unapproved_topics'],
-					'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
-					'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
-					'href' => $this->_scripturl . '?board=' . $row_board['id_board'] . '.0',
-					'link' => '<a href="' . $this->_scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
-				);
+				// @todo I don't think this is supposed to be different
+				$board['new'] = empty($row['is_read']) && $row['poster_name'] != '';
 
 				// Counting sub-board posts is... slow :/.
-				if (!empty($this->_options['countChildPosts']) && !$row_board['is_redirect'])
+				if (!empty($this->_options['countChildPosts']) && !$row['is_redirect'])
 				{
-					$this->_current_boards[$row_board['id_parent']]['posts'] += $row_board['num_posts'];
-					$this->_current_boards[$row_board['id_parent']]['topics'] += $row_board['num_topics'];
+					$this->_current_boards[$row['id_parent']]['posts'] += $row['num_posts'];
+					$this->_current_boards[$row['id_parent']]['topics'] += $row['num_topics'];
 				}
 
 				// Does this board contain new boards?
-				$this->_current_boards[$row_board['id_parent']]['children_new'] |= empty($row_board['is_read']);
+				$this->_current_boards[$row['id_parent']]['children_new'] |= empty($row['is_read']);
 
 				// This is easier to use in many cases for the theme....
-				$this->_current_boards[$row_board['id_parent']]['link_children'][] = &$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['link'];
+				$this->_current_boards[$row['id_parent']]['link_children'][] = &$this->_current_boards[$row['id_parent']]['children'][$row['id_board']]['link'];
 			}
 			// Child of a child... just add it on...
 			elseif (!empty($this->_options['countChildPosts']))
 			{
-				// @todo why this is not initialized outside the loop?
-				if (!isset($parent_map))
-					$parent_map = array();
-
-				if (!isset($parent_map[$row_board['id_parent']]))
+				if (!isset($parent_map[$row['id_parent']]))
 					foreach ($this->_current_boards as $id => $board)
 					{
-						if (!isset($board['children'][$row_board['id_parent']]))
+						if (!isset($board['children'][$row['id_parent']]))
 							continue;
 
-						$parent_map[$row_board['id_parent']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
-						$parent_map[$row_board['id_board']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
+						$parent_map[$row['id_parent']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row['id_parent']]);
+						$parent_map[$row['id_board']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row['id_parent']]);
 
 						break;
 					}
 
-				if (isset($parent_map[$row_board['id_parent']]) && !$row_board['is_redirect'])
+				if (isset($parent_map[$row['id_parent']]) && !$row['is_redirect'])
 				{
-					$parent_map[$row_board['id_parent']][0]['posts'] += $row_board['num_posts'];
-					$parent_map[$row_board['id_parent']][0]['topics'] += $row_board['num_topics'];
-					$parent_map[$row_board['id_parent']][1]['posts'] += $row_board['num_posts'];
-					$parent_map[$row_board['id_parent']][1]['topics'] += $row_board['num_topics'];
+					$parent_map[$row['id_parent']][0]['posts'] += $row['num_posts'];
+					$parent_map[$row['id_parent']][0]['topics'] += $row['num_topics'];
+					$parent_map[$row['id_parent']][1]['posts'] += $row['num_posts'];
+					$parent_map[$row['id_parent']][1]['topics'] += $row['num_topics'];
 
 					continue;
 				}
@@ -351,33 +322,33 @@ class BoardsList
 				continue;
 
 			// Prepare the subject, and make sure it's not too long.
-			$row_board['subject'] = censor($row_board['subject']);
-			$row_board['short_subject'] = $GLOBALS['elk']['text']->shorten_text($row_board['subject'], $this->_subject_length);
+			$row['subject'] = censor($row['subject']);
+			$row['short_subject'] = $this->text->shorten_text($row['subject'], $this->_subject_length);
 			$this_last_post = array(
-				'id' => $row_board['id_msg'],
-				'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
-				'html_time' => $row_board['poster_time'] > 0 ? htmlTime($row_board['poster_time']) : $txt['not_applicable'],
-				'timestamp' => forum_time(true, $row_board['poster_time']),
-				'subject' => $row_board['short_subject'],
-				'member' => array(
-					'id' => $row_board['id_member'],
-					'username' => $row_board['poster_name'] != '' ? $row_board['poster_name'] : $txt['not_applicable'],
-					'name' => $row_board['real_name'],
-					'href' => $row_board['poster_name'] != '' && !empty($row_board['id_member']) ? $this->_scripturl . '?action=profile;u=' . $row_board['id_member'] : '',
-					'link' => $row_board['poster_name'] != '' ? (!empty($row_board['id_member']) ? '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_board['id_member'] . '">' . $row_board['real_name'] . '</a>' : $row_board['real_name']) : $txt['not_applicable'],
-				),
-				'start' => 'msg' . $row_board['new_from'],
-				'topic' => $row_board['id_topic']
+				'id' => $row['id_msg'],
+				'time' => $row['poster_time'] > 0 ? standardTime($row['poster_time']) : $txt['not_applicable'],
+				'html_time' => $row['poster_time'] > 0 ? htmlTime($row['poster_time']) : $txt['not_applicable'],
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'subject' => $row['short_subject'],
+				'member' => $this->mem_container->member($row['id_member'], new Member([
+					'id' => $row['id_member'],
+					'username' => $row['poster_name'] != '' ? $row['poster_name'] : $txt['not_applicable'],
+					'name' => $row['real_name'],
+					'href' => $row['poster_name'] != '' && !empty($row['id_member']) ? $this->_scripturl . '?action=profile;u=' . $row['id_member'] : '',
+					'link' => $row['poster_name'] != '' ? (!empty($row['id_member']) ? '<a href="' . $this->_scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>' : $row['real_name']) : $txt['not_applicable'],
+				])),
+				'start' => 'msg' . $row['new_from'],
+				'topic' => $row['id_topic']
 			);
 
 			if ($this->_options['avatars_on_indexes'])
-				$this_last_post['member']['avatar'] = determineAvatar($row_board);
+				$this_last_post['member']['avatar'] = determineAvatar($row);
 
 			// Provide the href and link.
-			if ($row_board['subject'] != '')
+			if ($row['subject'] != '')
 			{
-				$this_last_post['href'] = $this->_scripturl . '?topic=' . $row_board['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']) . (empty($row_board['is_read']) ? ';boardseen' : '') . '#new';
-				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . $row_board['subject'] . '">' . $row_board['short_subject'] . '</a>';
+				$this_last_post['href'] = $this->_scripturl . '?topic=' . $row['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row['id_msg'] : $row['new_from']) . (empty($row['is_read']) ? ';boardseen' : '') . '#new';
+				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . $row['subject'] . '">' . $row['short_subject'] . '</a>';
 				/* The board's and children's 'last_post's have:
 				time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
 				link, href, subject, start (where they should go for the first unread post.),
@@ -392,25 +363,25 @@ class BoardsList
 			}
 
 			// Set the last post in the parent board.
-			if ($row_board['id_parent'] == $this->_options['parent_id'] || ($isChild && !empty($row_board['poster_time']) && $this->_current_boards[$row_board['id_parent']]['last_post']['timestamp'] < forum_time(true, $row_board['poster_time'])))
-				$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'] = $this_last_post;
+			if ($row['id_parent'] == $this->_options['parent_id'] || ($isChild && !empty($row['poster_time']) && $this->_current_boards[$row['id_parent']]['last_post']['timestamp'] < forum_time(true, $row['poster_time'])))
+				$this->_current_boards[$isChild ? $row['id_parent'] : $row['id_board']]['last_post'] = $this_last_post;
 			// Just in the child...?
 			if ($isChild)
 			{
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['last_post'] = $this_last_post;
+				$this->_current_boards[$row['id_parent']]['children'][$row['id_board']]['last_post'] = $this_last_post;
 
 				// If there are no posts in this board, it really can't be new...
-				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] != '';
+				$this->_current_boards[$row['id_parent']]['children'][$row['id_board']]['new'] &= $row['poster_name'] != '';
 			}
 			// No last post for this board?  It's not new then, is it..?
-			elseif ($row_board['poster_name'] == '')
-				$this->_current_boards[$row_board['id_board']]['new'] = false;
+			elseif ($row['poster_name'] == '')
+				$this->_current_boards[$row['id_board']]['new'] = false;
 
 			// Determine a global most recent topic.
-			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
-				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
+			if ($this->_options['set_latest_post'] && !empty($row['poster_time']) && $row['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
+				$this->_latest_post = &$this->_current_boards[$isChild ? $row['id_parent'] : $row['id_board']]['last_post'];
 		}
-		$result_boards->free();
+		$result->free();
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();
@@ -441,7 +412,7 @@ class BoardsList
 		$boards = array_keys($this->_boards);
 
 		$mod_cached = null;
-		if (!$GLOBALS['elk']['cache']->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
+		if (!$this->cache->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$mod_cached = $this->_db->fetchQuery('
 				SELECT mods.id_board, IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
@@ -452,21 +423,64 @@ class BoardsList
 					'id_boards' => $boards,
 				)
 			);
-			$GLOBALS['elk']['cache']->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+
+			$this->cache->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
-		foreach ($mod_cached as $row_mods)
+		foreach ($mod_cached as $row)
 		{
 			if ($this->_options['include_categories'])
-				$this->_current_boards = &$this->_categories[$this->_boards[$row_mods['id_board']]]['boards'];
+				$this->_current_boards = &$this->_categories[$this->_boards[$row['id_board']]]['boards'];
 
-			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = array(
-				'id' => $row_mods['id_moderator'],
-				'name' => $row_mods['mod_real_name'],
-				'href' => $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'],
-				'link' => '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>'
-			);
-			$this->_current_boards[$row_mods['id_board']]['link_moderators'][] = '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>';
+			$this->_current_boards[$row['id_board']]['moderators'][$row['id_moderator']] = $this->mem_container->member($row['id_member'], new Member([
+				'id' => $row['id_moderator'],
+				'name' => $row['mod_real_name'],
+				'href' => $this->_scripturl . '?action=profile;u=' . $row['id_moderator'],
+				'link' => '<a href="' . $this->_scripturl . '?action=profile;u=' . $row['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row['mod_real_name'] . '</a>'
+			]));
+			$this->_current_boards[$row['id_board']]['link_moderators'][] = '<a href="' . $this->_scripturl . '?action=profile;u=' . $row['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row['mod_real_name'] . '</a>';
 		}
+	}
+
+	public function setOptions(array $options)
+	{
+		global $user_info, $settings, $context, $scripturl, $modSettings;
+
+		$this->_options = array_merge(array(
+			'include_categories' => false,
+			'countChildPosts' => false,
+			'base_level' => false,
+			'parent_id' => 0,
+			'set_latest_post' => false,
+			'get_moderators' => true,
+		), $options);
+
+		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
+
+		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
+		$this->_scripturl = $scripturl;
+		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
+
+		$this->_subject_length = $modSettings['subject_length'];
+
+		$this->_user = array(
+			'id' => $user_info['id'],
+			'is_guest' => $user_info['is_guest'],
+			'ignoreboards' => $user_info['ignoreboards'],
+			'mod_cache_ap' => !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : array(),
+		);
+
+		// Start with an empty array.
+		if ($this->_options['include_categories'])
+			$this->_categories = array();
+		else
+			$this->_current_boards = array();
+
+		// For performance, track the latest post while going through the boards.
+		if (!empty($this->_options['set_latest_post']))
+			$this->_latest_post = array('timestamp' => 0);
+
+		if (!empty($modSettings['recycle_enable']))
+			$this->_recycle_board = $modSettings['recycle_board'];
 	}
 }

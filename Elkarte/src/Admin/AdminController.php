@@ -776,7 +776,8 @@ class AdminController extends AbstractController
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
+		//$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
+		//$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
@@ -894,9 +895,9 @@ class AdminController extends AbstractController
 		$this->_req->post->membername = $GLOBALS['elk']['text']->un_htmlspecialchar($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new ManageMembersController(new \Elkarte\Elkarte\Events\EventManager()anager());
-		$managemembers->pre_dispatch();
-		$managemembers->action_index();
+		//$managemembers = new ManageMembersController(new \Elkarte\Elkarte\Events\EventManager()anager());
+		//$managemembers->pre_dispatch();
+		//$managemembers->action_index();
 	}
 
 	/**

@@ -17,14 +17,18 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Topics;
+use Elkarte\Boards\BoardsManager;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Move Topic Controller
  */
 class MoveTopicController extends AbstractController
 {
+	/** @var  BoardsManager */
+	protected $board_manager;
+
 	/**
 	 * The id of the topic being manipulated
 	 * @var int
@@ -89,8 +93,7 @@ class MoveTopicController extends AbstractController
 		$this->_check_access();
 
 		// Get a list of boards this moderator can move to.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
-		$context += getBoardList(array('not_redirection' => true));
+		$context += $this->board_manager->getBoardList(array('not_redirection' => true));
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
@@ -134,7 +137,7 @@ class MoveTopicController extends AbstractController
 
 		$this->_session->check();
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// The destination board must be numeric.
 		$this->_toboard = (int) $this->_req->post->toboard;
@@ -343,7 +346,7 @@ class MoveTopicController extends AbstractController
 					topicSubject($this->_topic_info, $custom_subject);
 
 				// Fix the subject cache.
-				require_once(SUBSDIR . '/Messages.subs.php');
+
 				updateSubjectStats($this->_topic, $custom_subject);
 			}
 		}

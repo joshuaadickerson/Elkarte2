@@ -418,7 +418,7 @@ class DisplayController extends AbstractController
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if ($boardseen)
 			{
-				require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 				markBoardsRead($board, false, false);
 			}
 		}

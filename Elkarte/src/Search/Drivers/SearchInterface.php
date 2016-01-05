@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Search;
+namespace Elkarte\Search;
 
 /**
  * Interface Search_Interface

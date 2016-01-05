@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Mentions\Types;
+namespace Elkarte\Mentions\Types;
 
 if (!defined('ELK'))
 	die('No access...');

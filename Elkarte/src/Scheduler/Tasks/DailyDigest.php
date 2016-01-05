@@ -110,7 +110,7 @@ class DailyDigest implements ScheduledTaskInterface
 			return true;
 
 		// Just get the board names.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
 
 		if (empty($boards))

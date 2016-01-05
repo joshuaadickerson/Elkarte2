@@ -1,6 +1,6 @@
 <?php
 
-namespace ElkArte;
+namespace Elkarte;
 
 use \Elkarte\Database\Drivers\DatabaseInterface;
 

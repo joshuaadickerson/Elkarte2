@@ -10,12 +10,9 @@
  * @version 1.1 dev Release Candidate 1
  */
 
-namespace ElkArte\Search\API;
+namespace Elkarte\Search\API;
 
-use ElkArte\Search\Search_Interface;
-
-if (!defined('ELK'))
-	die('No access...');
+use Elkarte\Search\SearchInterface;
 
 /**
  * Abstract class that defines the methods any search API shall implement
@@ -23,7 +20,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-abstract class SearchAPI implements Search_Interface
+abstract class SearchAPI implements SearchInterface
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -68,6 +65,7 @@ abstract class SearchAPI implements Search_Interface
 	 * @param bool $no_regexp - If true or $modSettings['search_match_words']
 	 *              is empty, uses % at the beginning and end of the string,
 	 *              otherwise returns a regular expression
+	 * @return string
 	 */
 	public function prepareWord($phrase, $no_regexp)
 	{

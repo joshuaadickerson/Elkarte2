@@ -534,7 +534,7 @@ class ModerationCenterController extends AbstractController
 		// Get the names of boards these topics are in.
 		if (!empty($report_ids))
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$board_names = getBoardList(array('included_boards' => $report_boards_ids), true);
 
 			// Add the board name to the report array

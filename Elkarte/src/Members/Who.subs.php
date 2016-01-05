@@ -227,7 +227,7 @@ function determineActions($urls, $preferred_prefix = false)
 				// Whose?  Their own?
 				if (empty($actions['u']))
 				{
-					require_once(SUBSDIR . '/Profile.subs.php');
+					require_once(ROOTDIR . '/Profile/Profile.subs.php');
 					$memID = currentMemberID();
 
 					if ($memID == $user_info['id'])
@@ -359,7 +359,7 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load board names.
 	if (!empty($board_ids))
 	{
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		$boards_list = getBoardList(array('included_boards' => array_keys($board_ids)), true);
 		foreach ($boards_list as $board)

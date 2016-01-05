@@ -85,7 +85,7 @@ class UnreadController extends AbstractController
 		stop_prefetching();
 
 		require_once(SUBSDIR . '/Recent.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Determine the action, unreadreplies or unread
 		$this->_action = $this->_req->getQuery('action') === 'unreadreplies' ? 'unreadreplies' : 'unread';

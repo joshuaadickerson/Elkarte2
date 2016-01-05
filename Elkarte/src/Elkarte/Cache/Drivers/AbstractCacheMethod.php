@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Elkarte\Cache\Drivers;
+namespace Elkarte\Elkarte\Cache\Drivers;
 
 /**
  * Abstract cache class, implementing the Cache_Method_Interface interface.

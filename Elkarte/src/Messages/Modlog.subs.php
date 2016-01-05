@@ -211,7 +211,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($boards))
 	{
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boards_info = fetchBoardsInfo(array('boards' => array_keys($boards)));
 
 		foreach ($boards_info as $row)

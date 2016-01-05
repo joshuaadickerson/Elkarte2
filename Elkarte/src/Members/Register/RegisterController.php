@@ -371,7 +371,7 @@ class RegisterController extends AbstractController
 		$regOptions['theme_vars'] = $GLOBALS['elk']['text']->htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 		loadCustomFields(0, 'register', isset($this->_req->post->customfield) ? $this->_req->post->customfield : array());
 
 		foreach ($context['custom_fields'] as $row)
@@ -465,7 +465,7 @@ class RegisterController extends AbstractController
 		// We'll do custom fields after as then we get to use the helper function!
 		if (!empty($this->_req->post->customfield))
 		{
-			require_once(SUBSDIR . '/Profile.subs.php');
+			require_once(ROOTDIR . '/Profile/Profile.subs.php');
 			makeCustomFieldChanges($memberID, 'register');
 		}
 
@@ -688,7 +688,7 @@ class RegisterController extends AbstractController
 		global $context, $modSettings, $user_info, $cur_profile;
 
 		// Any custom fields to load?
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 		loadCustomFields(0, 'register');
 
 		// Or any standard ones?

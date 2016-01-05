@@ -126,7 +126,7 @@ class XmlPreviewController extends AbstractController
 	{
 		global $context, $txt, $user_info;
 
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 		loadLanguage('Profile');
 		loadLanguage('Errors');
 

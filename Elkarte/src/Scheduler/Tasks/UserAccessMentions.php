@@ -43,7 +43,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				if (empty($member))
 					continue;
 
-				require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 				require_once(SUBSDIR . '/Mentions.subs.php');
 				require_once(ROOTDIR . '/Members/Members.subs.php');
 

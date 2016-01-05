@@ -12,7 +12,7 @@
  *
  */
 
-namespace ElkArte\sources\modules;
+namespace Elkarte\sources\modules;
 
 if (!defined('ELK'))
 	die('No access...');

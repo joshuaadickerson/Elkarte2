@@ -119,7 +119,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 		$members = array();
 		if (in_array(2, $addGroups))
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$all_mods = allBoardModerators(true);
 
 			// Make sure they get included in the big loop.

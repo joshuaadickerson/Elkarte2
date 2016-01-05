@@ -2,11 +2,52 @@
 
 namespace Elkarte\Boards;
 
-class Category extends \ArrayObject
-{
-	public function __construct($input, $flags = 0, $iterator_class = 'ArrayIterator')
-	{
+use Elkarte\Elkarte\Entity;
 
-		parent::__construct($input, $flags & \ArrayObject::ARRAY_AS_PROPS, $iterator_class);
+class Category extends Entity
+{
+	public function getDefault()
+	{
+		return [
+			'can_collapse' => false,
+			'new' => false,
+			'show_unread' => true,
+			'boards' => [],
+		];
+	}
+
+	public function addBoard(Board $board)
+	{
+		$this->boards[$board->id] = $board;
+		return $this;
+	}
+
+	/**
+	 * Reorder the boards
+	 *
+	 * @param array $order
+	 * @return array the $boards which aren't already set
+	 */
+	public function reorderBoards(array $order)
+	{
+		$boards = $this->offsetGet('boards');
+
+		$new_order = [];
+		$not_found = [];
+		foreach ($order as $id)
+		{
+			if (!isset($boards[$id]))
+			{
+				$not_found[] = $id;
+			}
+			else
+			{
+				$new_order[] = $boards[$id];
+			}
+		}
+
+		$this->offsetSet('boards', $new_order);
+
+		return $not_found;
 	}
 }

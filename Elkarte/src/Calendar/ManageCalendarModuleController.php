@@ -392,7 +392,7 @@ class ManageCalendarModuleController extends AbstractController
 		global $txt;
 
 		// Load the boards list.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)

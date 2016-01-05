@@ -145,7 +145,7 @@ class ProfileAccountController extends AbstractController
 		$context['page_title'] = $txt['profile_issue_warning'];
 
 		// Let's use a generic list to get all the current warnings
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		// Work our the various levels.
 		$context['level_effects'] = array(
@@ -176,7 +176,7 @@ class ProfileAccountController extends AbstractController
 		// Are they warning because of a message?
 		if (!empty($warning_for_message) && $warning_for_message > 0)
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			$message = basicMessageInfo($warning_for_message);
 
 			if (!empty($message))
@@ -578,7 +578,7 @@ class ProfileAccountController extends AbstractController
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
 				require_once(ROOTDIR . '/Topics/Topic.subs.php');
-				require_once(SUBSDIR . '/Messages.subs.php');
+
 
 				// First off we delete any topics the member has started - if they wanted topics being done.
 				if ($this->_req->post->remove_type == 'topics')

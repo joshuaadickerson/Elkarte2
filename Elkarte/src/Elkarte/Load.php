@@ -237,7 +237,7 @@ function loadUserSettings()
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			$visitOpt = basicMessageInfo($user_settings['id_msg_last_visit'], true);
 
 			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];

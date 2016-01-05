@@ -1378,7 +1378,7 @@ class ManageSmileysController extends AbstractController
 			$boardListOptions = array(
 				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 			);
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$context += getBoardList($boardListOptions);
 		}
 	}

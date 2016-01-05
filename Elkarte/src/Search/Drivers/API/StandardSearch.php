@@ -17,7 +17,7 @@
  *
  */
 
-namespace ElkArte\Search\API;
+namespace Elkarte\Search\API;
 
 if (!defined('ELK'))
 	die('No access...');

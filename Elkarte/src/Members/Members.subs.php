@@ -955,7 +955,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$profile_id = $board_info['profile'];
 		elseif ($board_id !== 0)
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
@@ -2363,7 +2363,7 @@ function memberQuerySeeBoard($id_member)
 		return '1=1';
 	else
 	{
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		$boards_mod = boardsModerated($id_member);
 		$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';

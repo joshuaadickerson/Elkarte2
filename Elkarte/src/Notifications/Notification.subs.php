@@ -429,7 +429,7 @@ function sendBoardNotifications(&$topicData)
 		return;
 
 	// Load the actual board names
-	require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 	$board_names = fetchBoardsInfo(array('boards' => $board_index, 'override_permissions' => true));
 
 	// Yea, we need to add this to the digest queue.

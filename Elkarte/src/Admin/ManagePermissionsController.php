@@ -517,7 +517,7 @@ class ManagePermissionsController extends AbstractController
 		}
 
 		// Get the board tree.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		getBoardTree();
 
 		// Build the list of the boards.

@@ -111,7 +111,7 @@ class RepairBoardsController extends AbstractController
 			$context['error_search'] = false;
 			$context['to_fix'] = isset($this->_req->session->repairboards_to_fix) ? $this->_req->session->repairboards_to_fix : array();
 
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 			// Logging may cause session issues with many queries
 			$old_db_show_debug = $db_show_debug;
@@ -128,7 +128,7 @@ class RepairBoardsController extends AbstractController
 				'settings_updated' => time(),
 			));
 
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			updateMessageStats();
 
 			require_once(ROOTDIR . '/Topics/Topic.subs.php');

@@ -238,7 +238,7 @@ class MessagesDelete
 
 		$db = $GLOBALS['elk']['db'];
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Lets get the data for these topics.
 		$request = $db->query('', '
@@ -538,7 +538,7 @@ class MessagesDelete
 				// Mark recycle board as seen, if it was marked as seen before.
 				if (!empty($isRead) && !$user_info['is_guest'])
 				{
-					require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 					markBoardsRead($this->_recycle_board);
 				}
 
@@ -951,7 +951,7 @@ class MessagesDelete
 		$request->free();
 
 		// We have a new post count for the board.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		incrementBoard($target_board, array(
 			'num_posts' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
 			'unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
@@ -1039,7 +1039,7 @@ class MessagesDelete
 		// Update stats.
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		updateTopicStats();
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		updateMessageStats();
 
 		// Subject cache?
@@ -1060,7 +1060,7 @@ class MessagesDelete
 					'first_messages' => $cache_updates,
 				)
 			);
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			while ($row = $request->fetchAssoc())
 				updateSubjectStats($row['id_topic'], $row['subject']);
 			$request->free();

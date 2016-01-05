@@ -106,7 +106,7 @@ class NewsController extends AbstractController
 				$feed_title = ' - ' . strip_tags($feed_title);
 			}
 
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$boards_posts = boardsPosts(array(), $categories);
 			$total_cat_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
@@ -121,7 +121,7 @@ class NewsController extends AbstractController
 		// Maybe they only want to see feeds form some certain boards?
 		elseif (!empty($this->_req->query->boards))
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
 
 			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
@@ -150,7 +150,7 @@ class NewsController extends AbstractController
 		// Just a single board
 		elseif (!empty($board))
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$boards_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 
 			$feed_title = ' - ' . strip_tags($board_info['name']);

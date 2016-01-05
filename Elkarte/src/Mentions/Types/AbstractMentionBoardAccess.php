@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Mentions\Types;
+namespace Elkarte\Mentions\Types;
 
 abstract class AbstractMentionBoardAccess extends Mention_Message_Abstract
 {
@@ -57,7 +57,7 @@ abstract class AbstractMentionBoardAccess extends Mention_Message_Abstract
 		global $user_info, $modSettings;
 
 		// Do the permissions checks and replace inappropriate messages
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		$removed = false;
 		$accessibleBoards = accessibleBoards($boards);

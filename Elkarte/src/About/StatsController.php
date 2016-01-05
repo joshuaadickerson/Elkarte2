@@ -142,7 +142,7 @@ class StatsController extends AbstractController
 	{
 		global $scripturl, $modSettings, $context;
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Get averages...
 		$averages = $this->stats->getAverages();

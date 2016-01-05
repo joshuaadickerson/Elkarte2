@@ -2,42 +2,59 @@
 
 namespace Elkarte\Boards;
 
-class Board extends \ArrayObject
-{
-	public function __construct($input, $flags = 0, $iterator_class = 'ArrayIterator')
-	{
-		$this->exchangeArray([
-			'moderators' => array(),
-			'unapproved_user_topics' => 0,
-		]);
+use Elkarte\Elkarte\Entity;
+use Elkarte\Members\Member;
 
-		parent::__construct($input, $flags & \ArrayObject::ARRAY_AS_PROPS, $iterator_class);
+class Board extends Entity
+{
+	public function getDefault()
+	{
+		return [
+			'children' => [],
+			'moderators' => [],
+			'unapproved_user_topics' => 0,
+			'children_new' => false,
+			'link_moderators' => array(),
+			'link_children' => array(),
+		];
 	}
 
-	public function parentBoards()
+	public function parentBoards(BoardsManager $manager)
 	{
 		if (!$this->offsetExists('parent_boards'))
 		{
-			$this->offsetSet('parent_boards', $GLOBALS['elk']['boards.manager']->getBoardParents($this->offsetGet('id')));
+			$this->offsetSet('parent_boards', $manager->getBoardParents($this->offsetGet('id')));
 		}
 
 		return $this->offsetGet('parent_boards');
 	}
 
-	public function addModerator($id, $name)
+	//public function addModerator($id, $name)
+	public function addModerator(Member $member)
 	{
 		global $scripturl;
 
-		$this->moderators[$id] = array(
+		$this->moderators[$member->id] = $member;
+		/*array(
 			'id' => $id,
 			'name' => $name,
-			'href' => $scripturl . '?action=profile;u=' . $id,
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $name . '</a>'
-		);
+			//'href' => $scripturl . '?action=profile;u=' . $id,
+			//'link' => '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $name . '</a>'
+		);*/
 	}
 
 	public function isModerator($id)
 	{
-		return isset($board_info['moderators'][$id]);
+		return isset($this->moderators[$id]);
+	}
+
+	public function isParent()
+	{
+
+	}
+
+	public function hasChildren()
+	{
+
 	}
 }

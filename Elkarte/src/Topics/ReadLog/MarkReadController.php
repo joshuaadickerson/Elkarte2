@@ -152,7 +152,7 @@ class MarkReadController extends AbstractController
 	{
 		global $modSettings;
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Find all the boards this user can see.
 		$boards = accessibleBoards();
@@ -206,7 +206,7 @@ class MarkReadController extends AbstractController
 		global $board, $topic, $user_info;
 
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 
 		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
@@ -251,7 +251,7 @@ class MarkReadController extends AbstractController
 
 		//$this->_session->check('get');
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		$categories = array();
 		$boards = array();

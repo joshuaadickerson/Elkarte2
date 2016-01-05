@@ -375,7 +375,7 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('not_redirection' => true));
@@ -879,7 +879,7 @@ class MaintenanceController extends AbstractController
 		// Update all the basic statistics.
 		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberStats();
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		updateMessageStats();
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		updateTopicStats();

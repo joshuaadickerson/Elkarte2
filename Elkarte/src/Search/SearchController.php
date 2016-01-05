@@ -199,7 +199,7 @@ class SearchController extends AbstractController
 			}
 		}
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$context += getBoardList(array('not_redirection' => true));
 
 		$context['boards_in_category'] = array();

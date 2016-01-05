@@ -316,7 +316,7 @@ function loadForumTests()
 					)
 				);
 
-				require_once(SUBSDIR . '/Messages.subs.php');
+
 				updateSubjectStats($newTopicID, $txt['salvaged_poll_topic_name']);
 			},
 			'force_fix' => array('stats_topics'),

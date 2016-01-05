@@ -134,7 +134,7 @@ class RemoveTopicController extends AbstractController
 		$this->_session->check('get');
 
 		// This has some handy functions for topics
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 
 		// Need a message to remove
 		$_msg = $this->_req->getQuery('msg', 'intval', null);

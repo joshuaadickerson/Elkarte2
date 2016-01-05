@@ -17,9 +17,6 @@ namespace Elkarte\Subscriptions\PayPal;
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class of functions to validate a IPN response and provide details of the payment
  *
@@ -100,7 +97,7 @@ class PayPal_Payment
 
 		// Post IPN data back to PayPal to validate the IPN data is genuine
 		// First we try cURL
-		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'http://www.') . 'paypal.com/cgi-bin/webscr'))
+		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'https://www.') . 'paypal.com/cgi-bin/webscr'))
 		{
 			// Set the post data.
 			curl_setopt($curl, CURLOPT_POST, true);
@@ -147,7 +144,7 @@ class PayPal_Payment
 			if (!empty($modSettings['paidsubs_test']))
 				$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
 			else
-				$fp = fsockopen('www.paypal.com', 80, $errno, $errstr, 30);
+				$fp = fsockopen('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 
 			// Did it work?
 			if (!$fp)

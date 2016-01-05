@@ -62,7 +62,7 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
 
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
 			if (!empty($board))

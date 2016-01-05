@@ -129,7 +129,7 @@ class PostModerationController extends AbstractController
 			$this->_session->check('request');
 
 			require_once(ROOTDIR . '/Topics/Topic.subs.php');
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 
 			// Handy shortcut.
 			$any_array = $curAction === 'approve' ? $approve_boards : $delete_any_boards;
@@ -483,7 +483,7 @@ class PostModerationController extends AbstractController
 
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 
 		isAllowedTo('approve_posts');
 

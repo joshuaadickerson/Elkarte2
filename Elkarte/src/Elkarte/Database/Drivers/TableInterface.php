@@ -1,6 +1,6 @@
 <?php
 
-namespace ElkArte\Database\Drivers;
+namespace Elkarte\Database\Drivers;
 
 interface TableInterface
 {

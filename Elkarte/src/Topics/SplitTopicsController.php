@@ -68,7 +68,7 @@ class SplitTopicsController extends AbstractController
 		if (!isset($this->_req->query->xml))
 			$this->_templates->load('SplitTopics');
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// The things we know to do
@@ -109,8 +109,8 @@ class SplitTopicsController extends AbstractController
 			$this->_errors->fatal_lang_error('numbers_one_to_nine', false);
 
 		// We deal with topics here.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
+
 
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('not_redirection' => true));
@@ -196,7 +196,7 @@ class SplitTopicsController extends AbstractController
 
 		// We work with them topics.
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Make sure they can see the board they are trying to move to
 		// (and get whether posts count in the target board).
@@ -313,7 +313,7 @@ class SplitTopicsController extends AbstractController
 		}
 
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 
 		$context['not_selected'] = array(
 			'num_messages' => 0,

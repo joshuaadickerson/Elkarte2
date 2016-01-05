@@ -89,7 +89,6 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 	protected static function _getBoardsList()
 	{
 		// Load the boards list.
-		require_once(ELKDIR . '/Boards/Boards.subs.php');
 		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 
 		$boards = array();
@@ -136,9 +135,6 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
-
-		// Fairly often, we'll work with boards. Current board, sub-boards.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
 
 		// If this is a redirection board head off.
 		if ($board_info['redirect'])
@@ -665,7 +661,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		}
 
 		updateTopicStats();
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 			updateMessageStats();
 		updateSettings(array(
 			'calendar_updated' => time(),

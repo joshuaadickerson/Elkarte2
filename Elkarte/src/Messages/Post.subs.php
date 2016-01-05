@@ -771,7 +771,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 		updateTopicStats(true);
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 
 		// What if we want to export new topics out to a CMS?
@@ -920,7 +920,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$_SESSION['topicseen_cache'][$topicOptions['board']]--;
 
 	// Update all the stats so everyone knows about this new topic and message.
-	require_once(SUBSDIR . '/Messages.subs.php');
+
 	updateMessageStats(true, $msgOptions['id']);
 
 	// Update the last message on the board assuming it's approved AND the topic is.
@@ -969,7 +969,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// using a custom search index, then lets get the old message so we can update our index as needed
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			$message = basicMessageInfo($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
 		}
@@ -1067,7 +1067,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 		if ($request->numRows() == 1)
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 		}
 		$request->free();
@@ -1548,7 +1548,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 	{
 		case 1:
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 
 			// Get the existing message.
 			$message = messageDetails($msg_id, $topic);

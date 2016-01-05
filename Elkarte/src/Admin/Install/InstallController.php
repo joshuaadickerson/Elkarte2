@@ -1172,7 +1172,7 @@ class InstallController
 
         require_once(ROOTDIR . '/Members/Members.subs.php');
         updateMemberStats();
-        require_once(SUBSDIR . '/Messages.subs.php');
+
         updateMessageStats();
         require_once(ROOTDIR . '/Topics/Topic.subs.php');
         updateTopicStats();

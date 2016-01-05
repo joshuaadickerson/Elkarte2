@@ -18,7 +18,7 @@
  *
  */
 
-namespace ElkArte\ElkArte\Text;
+namespace Elkarte\ElkArte\Text;
 
 class Censor
 {

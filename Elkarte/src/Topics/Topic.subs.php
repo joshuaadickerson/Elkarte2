@@ -422,7 +422,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$GLOBALS['elk']['hooks']->hook('remove_topics', array($topics));
 
 	// Update the totals...
-	require_once(SUBSDIR . '/Messages.subs.php');
+
 	updateMessageStats();
 	updateTopicStats();
 	updateSettings(array(
@@ -490,7 +490,7 @@ function moveTopicsPermissions($moveCache)
 	// Does the post counts need to be updated?
 	if (!empty($moveTos))
 	{
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$topicRecounts = array();
 		$boards_info = fetchBoardsInfo(array('boards' => array_keys($moveTos)), array('selects' => 'posts'));
 
@@ -810,7 +810,7 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		markBoardsRead($toBoard);
 	}
 
@@ -828,7 +828,7 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	// Update 'em pesky stats.
 	updateTopicStats();
-	require_once(SUBSDIR . '/Messages.subs.php');
+
 	updateMessageStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -2527,7 +2527,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 		// Cache the new topics subject... we can do it now as all the subjects are the same!
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		updateSubjectStats($split2_ID_TOPIC, $new_subject);
 	}
 

@@ -173,7 +173,7 @@ class ManageBoardsController extends AbstractController
 
 		$this->_templates->load('ManageBoards');
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Moving a board, child of, before, after, top
 		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
@@ -321,7 +321,7 @@ class ManageBoardsController extends AbstractController
 		global $txt, $context, $cat_tree, $boardList, $boards;
 
 		$this->_templates->load('ManageBoards');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		getBoardTree();
 
 		// id_cat must be a number.... if it exists.
@@ -479,7 +479,7 @@ class ManageBoardsController extends AbstractController
 		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
 
 		$this->_templates->load('ManageBoards');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 		getBoardTree();
 
@@ -655,7 +655,7 @@ class ManageBoardsController extends AbstractController
 		$this->_session->check();
 		validateToken('Admin-be-' . $this->_req->post->boardid);
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// Mode: modify aka. don't delete.
@@ -857,7 +857,7 @@ class ManageBoardsController extends AbstractController
 		loadLanguage('ManagePermissions');
 
 		// Load the boards list - for the recycle bin!
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boards = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)

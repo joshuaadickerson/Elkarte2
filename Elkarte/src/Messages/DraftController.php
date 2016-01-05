@@ -35,7 +35,7 @@ class DraftController extends AbstractController
 		// Language and helper functions
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
 	}

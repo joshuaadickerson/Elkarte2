@@ -7,6 +7,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
 use Elkarte\Elkarte\Util;
+use Elkarte\Members\MemberContainer;
 
 class BoardsManager
 {
@@ -20,14 +21,21 @@ class BoardsManager
 	protected $errors;
 	/** @var Util  */
 	protected $text;
+	/** @var BoardsContainer  */
+	protected $boards_container;
+	/** @var MemberContainer  */
+	protected $mem_container;
 
-	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, Util $text,
+								BoardsContainer $boards_container, MemberContainer $mem_container)
 	{
 		$this->db = $db;
 		$this->cache = $cache;
 		$this->hooks = $hooks;
 		$this->errors = $errors;
 		$this->text = $text;
+		$this->boards_container = $boards_container;
+		$this->mem_container = $mem_container;
 	}
 
 	public function load()
@@ -141,10 +149,11 @@ class BoardsManager
 					'boards' => [$board],
 				]);
 
+				$category->addBoard($board);
+
 				// Basic operating information. (globals... :/)
 				$board_info = new Board([
 					'id' => $board,
-					'moderators' => array(),
 					'cat' => $category,
 					'name' => $row['bname'],
 					'raw_description' => $row['description'],
@@ -152,7 +161,6 @@ class BoardsManager
 					'num_topics' => $row['num_topics'],
 					'unapproved_topics' => $row['unapproved_topics'],
 					'unapproved_posts' => $row['unapproved_posts'],
-					'unapproved_user_topics' => 0,
 					'parent' => $row['id_parent'],
 					'child_level' => $row['child_level'],
 					'theme' => $row['id_theme'],

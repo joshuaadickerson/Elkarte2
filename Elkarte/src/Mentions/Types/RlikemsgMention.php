@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Mentions\Types;
+namespace Elkarte\Mentions\Types;
 
 class RlikemsgMentionMentionBoardAccess extends AbstractMentionBoardAccess
 {

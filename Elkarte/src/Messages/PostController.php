@@ -54,7 +54,7 @@ class PostController extends AbstractController
 		$this->_template_layers = $this->_layers;
 
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
 	}
 
@@ -639,7 +639,7 @@ class PostController extends AbstractController
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		loadLanguage('Post');
 
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));

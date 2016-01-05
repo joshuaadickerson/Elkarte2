@@ -133,7 +133,7 @@ class LikesController extends AbstractController
 
 		// We like these
 		require_once(ROOTDIR . '/Likes/Likes.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 
 		// Have to be able to access it to like it
 		if ($this->prepare_like() && canAccessMessage($this->_id_liked))

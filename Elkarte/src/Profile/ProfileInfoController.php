@@ -1038,7 +1038,7 @@ class ProfileInfoController extends AbstractController
 		$curGroups[] = $user_profile[$this->_memID]['id_post_group'];
 
 		// Load a list of boards for the jump box - except the defaults.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$board_list = getBoardList(array('moderator' => $this->_memID), true);
 
 		$context['boards'] = array();

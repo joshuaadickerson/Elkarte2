@@ -207,7 +207,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 				$GLOBALS['elk']['errors']->fatal_lang_error('invalid_year', false);
 
 			// Get a list of boards they can post in.
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))

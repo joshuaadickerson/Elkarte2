@@ -566,9 +566,9 @@ class ProfileOptionsController extends AbstractController
 		$this->_templates->load('ProfileOptions');
 
 		// Going to need this for the list.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
@@ -847,7 +847,7 @@ class ProfileOptionsController extends AbstractController
 		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'ignoreboards';
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$context += getBoardList(array('not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 		// Include a list of boards per category for easy toggling.

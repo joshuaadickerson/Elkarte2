@@ -15,6 +15,7 @@ class Elkarte extends Container
 
 	protected $config;
 	protected $container;
+	/** @var ServiceProviderInterface[] */
 	protected $providers = [];
 
 	public function __construct(Config $config = null)
@@ -30,12 +31,7 @@ class Elkarte extends Container
 	}
 
 	/**
-	 * Registers a service provider.
-	 *
-	 * @param ServiceProviderInterface $provider A ServiceProviderInterface instance
-	 * @param array                    $values   An array of values that customizes the provider
-	 *
-	 * @return Application
+	 * {@inheritdoc}
 	 */
 	public function register(ServiceProviderInterface $provider, array $values = array())
 	{
@@ -53,7 +49,7 @@ class Elkarte extends Container
 			$provider->boot($this->container);
 		}
 
-		$this->container['hooks']->hook('after_provider_boot');
+		$this->offsetGet('hooks')->hook('after_provider_boot');
 
 		return $this;
 	}
@@ -92,9 +88,17 @@ class Elkarte extends Container
 
 	}
 
+	public function view()
+	{
+
+	}
+
 	public function defaultProviders()
 	{
 		$this->register(new About\Provider);
 		$this->register(new Boards\Provider);
+		$this->register(new Members\Provider);
+
+		return $this;
 	}
 }

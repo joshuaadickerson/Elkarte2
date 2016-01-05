@@ -83,7 +83,7 @@ class RecentController extends AbstractController
 
 		// Some common method dependencies
 		require_once(SUBSDIR . '/Recent.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// There might be - and are - different permissions between any and own.
 		$this->_permissions = array(

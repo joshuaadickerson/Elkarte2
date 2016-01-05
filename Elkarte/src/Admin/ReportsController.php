@@ -158,7 +158,7 @@ class ReportsController extends AbstractController
 
 		// Load the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
 
@@ -273,7 +273,7 @@ class ReportsController extends AbstractController
 		setMemoryLimit('256M');
 
 		// Boards, first.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 
 		// Lets get started
@@ -405,7 +405,7 @@ class ReportsController extends AbstractController
 	{
 		global $txt, $settings, $modSettings;
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(SUBSDIR . '/Reports.subs.php');
 
 		// Fetch all the board names.
@@ -567,7 +567,7 @@ class ReportsController extends AbstractController
 		global $txt;
 
 		require_once(ROOTDIR . '/Members/Members.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 
 		// Fetch all the board names.

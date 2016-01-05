@@ -63,7 +63,7 @@ class XmlController extends AbstractController
 		global $context;
 
 		// Find the boards/categories they can see.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boardListOptions = array(
 			'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
 		);
@@ -317,7 +317,7 @@ class XmlController extends AbstractController
 		loadLanguage('Errors');
 		loadLanguage('ManageBoards');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Validating that you can do this is always a good idea
 		$validation_token = validateToken('Admin-sort', 'post', false, false);

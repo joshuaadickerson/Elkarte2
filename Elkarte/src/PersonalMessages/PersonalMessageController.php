@@ -1783,7 +1783,7 @@ class PersonalMessageController extends AbstractController
 	{
 		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile, $user_profile;
 
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		// Load the member data for editing
 		loadMemberData($user_info['id'], false, 'profile');
@@ -1891,7 +1891,7 @@ class PersonalMessageController extends AbstractController
 			// First, load up the message they want to file a complaint against, and verify it actually went to them!
 			list ($subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message) = loadPersonalMessage($pmsg);
 
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 
 			recordReport(array(
 				'id_msg' => $pmsg,

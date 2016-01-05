@@ -52,7 +52,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 	public static function frontPageHook(&$default_action)
 	{
 		$default_action = array(
-			'controller' => 'BoardIndexController',
+			'controller' => 'boards.index_controller',
 			'function' => 'action_boardindex'
 		);
 	}
@@ -64,7 +64,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 	 */
 	public function action_index()
 	{
-		loadBoard();
+		$this->manager->load();
 
 		// What to do... boardindex, 'course!
 		$this->action_boardindex();
@@ -103,7 +103,9 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 
 		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
 
-		$boardlist = new BoardsList($this->db(), $boardIndexOptions);
+		$boardlist = $this->elk['boards.list'];
+		$boardlist->setOptions($boardIndexOptions);
+
 		$context['categories'] = $boardlist->getBoards();
 		$context['latest_post'] = $boardlist->getLatestPost();
 

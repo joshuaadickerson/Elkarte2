@@ -116,7 +116,7 @@ class MergeTopicsController extends AbstractController
 			$this->_errors->fatal_lang_error('cannot_merge_any', 'user');
 
 		// Get a list of boards they can navigate to to merge.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boardListOptions = array(
 			'not_redirection' => true
 		);
@@ -213,7 +213,7 @@ class MergeTopicsController extends AbstractController
 			$query_boards['boards'] = array_merge($query_boards['boards'], $allowedto_merge_boards);
 
 		// Saved in a variable to (potentially) save a query later
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$boards_info = fetchBoardsInfo($query_boards);
 
 		$boardListOptions = array(

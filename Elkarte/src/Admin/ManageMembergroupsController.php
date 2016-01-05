@@ -466,7 +466,7 @@ class ManageMembergroupsController extends AbstractController
 
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$context += getBoardList();
 
 		// Include a list of boards per category for easy toggling.
@@ -748,7 +748,7 @@ class ManageMembergroupsController extends AbstractController
 		$context['boards'] = array();
 		if ($row['id_group'] == 2 || $row['id_group'] > 3)
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$context += getBoardList(array('override_permissions' => true, 'access' => $row['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.

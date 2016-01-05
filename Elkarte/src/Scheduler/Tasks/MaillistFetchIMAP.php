@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\ScheduledTask;
+namespace Elkarte\sources\subs\ScheduledTask;
 
 if (!defined('ELK'))
 	die('No access...');

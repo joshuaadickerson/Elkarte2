@@ -10,7 +10,7 @@
  *
  */
 
-namespace ElkArte\Elkarte\Cache\Drivers;
+namespace Elkarte\Elkarte\Cache\Drivers;
 
 if (!defined('ELK'))
 	die('No access...');

@@ -283,7 +283,7 @@ class NotifyController extends AbstractController
 		global $user_info, $board;
 
 		// Our board functions are here
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 
 		// Turn notification on/off for this board.
 		setBoardNotification($user_info['id'], $board, $this->_req->query->sa === 'on');

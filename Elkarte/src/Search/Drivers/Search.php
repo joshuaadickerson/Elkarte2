@@ -17,7 +17,7 @@
  *
  */
 
-namespace ElkArte\Search;
+namespace Elkarte\Search;
 
 if (!defined('ELK'))
 {
@@ -876,7 +876,7 @@ class Search
 		}
 		else
 		{
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$this->_search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('include_recycle' => false, 'include_redirects' => false, 'wanna_see_board' => empty($this->_search_params['advanced']))));
 
 			// This error should pro'bly only happen for hackers.
@@ -892,7 +892,7 @@ class Search
 				$this->_search_params['brd'][$k] = (int) $v;
 
 			// If we've selected all boards, this parameter can be left empty.
-			require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 			$num_boards = countBoards();
 
 			if (count($this->_search_params['brd']) == $num_boards)

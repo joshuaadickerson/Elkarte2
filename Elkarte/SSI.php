@@ -843,7 +843,7 @@ function ssi_boardStats($output_method = 'echo')
 	if (!allowedTo('view_stats'))
 		return false;
 
-	require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 	require_once(SUBSDIR . '/Stats.subs.php');
 
 	$totals = array(

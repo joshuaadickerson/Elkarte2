@@ -1,6 +1,6 @@
 <?php
 
-namespace ElkArte\Boards\ReadLog;
+namespace Elkarte\Boards\ReadLog;
 
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;

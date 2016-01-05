@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Elkarte\Cache\Drivers;
+namespace Elkarte\Elkarte\Cache\Drivers;
 
 use FilesystemIterator;
 use UnexpectedValueException;

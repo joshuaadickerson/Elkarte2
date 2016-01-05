@@ -303,7 +303,7 @@ class EmailuserController extends AbstractController
 		}
 		elseif (isset($this->_req->post->msg) || isset($this->_req->query->msg))
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			$mid = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 			$row = mailFromMessage($mid);
 
@@ -465,7 +465,7 @@ class EmailuserController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
-		require_once(SUBSDIR . '/Messages.subs.php');
+
 		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
 			$this->_errors->fatal_lang_error('no_board', false);
@@ -613,7 +613,7 @@ class EmailuserController extends AbstractController
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))
 		{
-			require_once(SUBSDIR . '/Messages.subs.php');
+
 			$message['type'] = 'msg';
 			$id_report = recordReport($message, $poster_comment);
 
@@ -623,7 +623,7 @@ class EmailuserController extends AbstractController
 		}
 
 		// Find out who the real moderators are - for mod preferences.
-		require_once(ROOTDIR . '/Boards/Boards.subs.php');
+
 		$real_mods = getBoardModerators($board, true);
 
 		// Send every moderator an email.

@@ -365,29 +365,4 @@ class Cache
 
 		$this->_key_prefix = md5($boardurl . filemtime(CACHEDIR . '/index.php')) . '-ELK-';
 	}
-
-	/**
-	 * Find and return the instance of the Cache class if it exists,
-	 * or create it if it doesn't exist
-	 */
-	public static function instance()
-	{
-		if (self::$_instance === null)
-		{
-			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
-
-			$options = array();
-			if ($cache_accelerator === 'xcache')
-			{
-				$options = array(
-					'cache_uid' => $cache_uid,
-					'cache_password' => $cache_password,
-				);
-			}
-
-			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
-		}
-
-		return self::$_instance;
-	}
 }

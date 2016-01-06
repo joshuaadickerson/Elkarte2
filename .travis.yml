@@ -28,7 +28,7 @@ install:
 before_script:
     - SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
     - composer install --no-interaction --prefer-source --quiet
-    - phpenv config-add /var/www/Build/tests/travis-ci/travis_php.ini
+    - phpenv config-add Build/tests/travis-ci/travis_php.ini
     - if [ "$DB" == "mysqli" ]; then php ./Build/tests/travis-ci/setup_mysql.php; fi;
     - if [ "$DB" == "postgres" ]; then php ./Build/tests/travis-ci/setup_pgsql.php; fi;
     - rm -rf /var/www/Elkarte/src/Admin/Install

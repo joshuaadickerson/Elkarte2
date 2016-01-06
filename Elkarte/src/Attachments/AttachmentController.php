@@ -92,7 +92,7 @@ class AttachmentController extends AbstractController
 
 			if ($context['attachments']['can']['post'] && empty($this->_req->post->from_qr))
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
+
 
 				$process = $this->_req->getPost('msg', 'intval', '');
 				processAttachments($process);
@@ -161,7 +161,7 @@ class AttachmentController extends AbstractController
 		// We need a filename and path or we are not going any further
 		if (isset($this->_req->post->attachid) && !empty($_SESSION['temp_attachments']))
 		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
+
 
 			$result = removeTempAttachById($this->_req->post->attachid);
 			if ($result === true)
@@ -200,7 +200,7 @@ class AttachmentController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+
 
 		$id_attach = isset($this->_req->query->attach)
 			? (int) $this->_req->query->attach
@@ -381,7 +381,7 @@ class AttachmentController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+
 		require_once(SUBSDIR . '/Graphics.subs.php');
 
 		try

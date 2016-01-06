@@ -195,10 +195,10 @@ function elk_main(\Pimple\Container $elk)
 	securityOptionsHeader();
 
 	// Load the user's cookie (or set as guest) and load their settings.
-	loadUserSettings();
+	$elk['members.manager']->loadUserSettings();
 
 	// Load the current board's information.
-	loadBoard();
+	loadBoard($GLOBALS['board']);
 
 	// Load the current user's permissions.
 	loadPermissions();
@@ -233,7 +233,7 @@ function elk_main(\Pimple\Container $elk)
 		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions)))
 	{
 		// I see you!
-		writeLog();
+		$elk['onlinelog.manager']->writeLog();
 
 		// Track forum statistics and hits...?
 		if (!empty($modSettings['hitStats']))

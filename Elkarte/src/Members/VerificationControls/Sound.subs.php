@@ -25,6 +25,7 @@
  * Used by action=register;sa=verificationcode() (Register.controller.php).
  *
  * @param string $word
+ * @return bool
  */
 function createWaveFile($word)
 {
@@ -33,8 +34,11 @@ function createWaveFile($word)
 	$cache = $GLOBALS['elk']['cache'];
 
 	// Allow max 2 requests per 20 seconds.
+	// @todo move to the controller
 	if (($ip = $cache->get('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = $cache->get('wave_file/' . $user_info['ip2'], 20)) > 2)
+	{
 		die(header('HTTP/1.1 400 Bad Request'));
+	}
 
 	$cache->put('wave_file/' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
 	$cache->put('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);

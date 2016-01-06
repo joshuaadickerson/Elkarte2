@@ -891,7 +891,7 @@ class Attachments
 
 		// Get the hash if no hash has been given yet.
 		if (empty($attachmentOptions['file_hash']))
-			$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
+			$attachmentOptions['file_hash'] = $this->getHash($attachmentOptions['name']);
 
 		// Assuming no-one set the extension let's take a look at it.
 		if (empty($attachmentOptions['fileext']))
@@ -922,7 +922,7 @@ class Attachments
 			return false;
 
 		// Now that we have the attach id, let's rename this and finish up.
-		$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
+		$attachmentOptions['destination'] = $this->getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
 		rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
 
 		// If it's not approved then add to the approval queue.
@@ -1613,7 +1613,7 @@ class Attachments
 				// Do we need to remove an old thumbnail?
 				if (!empty($old_id_thumb))
 				{
-					require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 					removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
 				}
 			}
@@ -1720,10 +1720,11 @@ class Attachments
 				if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 				{
 					// A proper thumb doesn't exist yet? Create one! Or, it needs update.
+					// @todo this shouldn't be happening this late.
 					if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 					{
-						$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
-						$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
+						$filename = $this->getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
+						$attachment = array_merge($attachment, $this->updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
 					}
 
 					// Only adjust dimensions on successful thumbnail creation.
@@ -1809,6 +1810,7 @@ class Attachments
 	 * @package Attachments
 	 * @param mixed[] $attachment_info
 	 * @param mixed[] $all_posters
+	 * @return bool
 	 */
 	function filter_accessible_attachment($attachment_info, $all_posters)
 	{
@@ -1825,6 +1827,7 @@ class Attachments
 	 * @param int $attachment_id
 	 * @param string|null $dir
 	 * @param boolean $new
+	 * @return string
 	 */
 	function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 	{
@@ -1908,12 +1911,12 @@ class Attachments
 
 		// Just make up a nice hash...
 		if ($new)
-			return hash('sha1', hash('md5', $filename . time()) . mt_rand());
+			return $this->getHash($filename);
 
 		// In case of files from the old system, do a legacy call.
 		if (empty($file_hash))
 		{
-			return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
+			return $this->getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
 		}
 
 		// Are we using multiple directories?
@@ -1927,5 +1930,10 @@ class Attachments
 			$path = $modSettings['attachmentUploadDir'];
 
 		return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
+	}
+
+	public function getHash($filename)
+	{
+		return hash('sha1', hash('md5', $filename . time()) . mt_rand());
 	}
 }

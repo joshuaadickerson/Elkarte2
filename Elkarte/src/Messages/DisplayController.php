@@ -152,10 +152,10 @@ class DisplayController extends AbstractController
 		);
 
 		// Allow addons to add additional details to the topic query
-		$GLOBALS['elk']['hooks']->hook('topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
+		$this->hooks->hook('topic_query', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
-		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
+		$topicinfo = $this->elk['topics.manager']->getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
@@ -283,7 +283,7 @@ class DisplayController extends AbstractController
 		$context['page_title'] = $topicinfo['subject'];
 
 		// Allow addons access to the topicinfo array
-		$GLOBALS['elk']['hooks']->hook('display_topic', array(&$topicinfo));
+		$this->hooks->hook('display_topic', array(&$topicinfo));
 
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
@@ -296,7 +296,7 @@ class DisplayController extends AbstractController
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
 		{
-			require_once(SUBSDIR . '/Who.subs.php');
+
 			formatViewers($topic, 'topic');
 		}
 
@@ -387,13 +387,13 @@ class DisplayController extends AbstractController
 		);
 
 		// Get each post and poster in this topic.
-		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
+		$topic_details = $this->elk['topics.manager']->getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
 		$messages = $topic_details['messages'];
 		$posters = array_unique($topic_details['all_posters']);
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		$GLOBALS['elk']['hooks']->hook('display_message_list', array(&$messages, &$posters));
+		$this->hooks->hook('display_message_list', array(&$messages, &$posters));
 
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
@@ -405,20 +405,19 @@ class DisplayController extends AbstractController
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
 			{
-				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
-				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
+				$this->elk['topics.manager']->markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				$numNewTopics = $this->elk['topics.manager']->getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 				if (empty($numNewTopics))
 					$boardseen = true;
 			}
 
-			updateReadNotificationsFor($topic, $board);
+			$this->elk['topics.manager']->updateReadNotificationsFor($topic, $board);
 
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if ($boardseen)
 			{
-
-				markBoardsRead($board, false, false);
+				$this->elk['topics.manager']->markBoardsRead($board, false, false);
 			}
 		}
 
@@ -438,17 +437,16 @@ class DisplayController extends AbstractController
 			);
 			$msg_selects = array();
 			$msg_tables = array();
-			$GLOBALS['elk']['hooks']->hook('message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
+			$this->hooks->hook('message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
 
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
-				loadMemberData($posters);
+				$this->elk['members.manager']->loadMemberData($posters);
 
 			// Load in the likes for this group of messages
 			if (!empty($modSettings['likes_enabled']))
 			{
-				require_once(ROOTDIR . '/Likes/Likes.subs.php');
-				$context['likes'] = loadLikes($messages, true);
+				$context['likes'] = $this->elk['likes.manager']->loadLikes($messages, true);
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
@@ -653,8 +651,8 @@ class DisplayController extends AbstractController
 		$this->_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
-		$GLOBALS['elk']['hooks']->hook('display_buttons');
-		$GLOBALS['elk']['hooks']->hook('mod_buttons');
+		$this->hooks->hook('display_buttons');
+		$this->hooks->hook('mod_buttons');
 	}
 
 	/**
@@ -668,7 +666,7 @@ class DisplayController extends AbstractController
 		// Check the session = get or post.
 		$this->_session->check('request');
 
-		require_once(ROOTDIR . '/Messages/Messages.subs.php');
+
 
 		if (empty($this->_req->post->msgs))
 			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));
@@ -775,7 +773,7 @@ class DisplayController extends AbstractController
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
-		if (!loadMemberContext($message['id_member'], true))
+		if (!$this->elk['members.manager']->loadMemberContext($message['id_member'], true))
 		{
 			// Notice this information isn't used anywhere else....
 			$memberContext[$message['id_member']]['name'] = $message['poster_name'];
@@ -870,7 +868,7 @@ class DisplayController extends AbstractController
 			);
 		}
 
-		$GLOBALS['elk']['hooks']->hook('prepare_display_context', array(&$output, &$message));
+		$this->hooks->hook('prepare_display_context', array(&$output, &$message));
 
 		$output['classes'] = implode(' ', $output['classes']);
 

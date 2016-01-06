@@ -665,7 +665,7 @@ class MessagesDelete
 			}
 
 			// Delete attachment(s) if they exist.
-			require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 			$attachmentQuery = array(
 				'attachment_type' => 0,
 				'id_msg' => $message,

@@ -87,8 +87,8 @@ class ManageAttachmentsController extends AbstractController
 	public function pre_dispatch()
 	{
 		// These get used often enough that it makes sense to include them for every action
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
+
 	}
 
 	/**

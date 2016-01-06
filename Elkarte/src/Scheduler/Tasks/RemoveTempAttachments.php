@@ -39,7 +39,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 		global $context, $txt;
 
 		// We need to know where this thing is going.
-		require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 		$attach_dirs = attachmentPaths();
 
 		foreach ($attach_dirs as $attach_dir)

@@ -4,7 +4,7 @@ namespace Elkarte;
 
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Theme\Context;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 use Elkarte\Elkarte\Theme\Templates;
 use Elkarte\Elkarte\Text\BBC\ParserWrapper;

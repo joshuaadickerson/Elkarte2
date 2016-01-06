@@ -235,7 +235,7 @@ class CalendarEvent
 			{
 				// We load the board up, for a check on the board access rights...
 				$topic = $event['topic']['id'];
-				loadBoard();
+				loadBoard($GLOBALS['board']);
 			}
 
 			// Make sure the user is allowed to edit this event.

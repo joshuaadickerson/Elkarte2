@@ -2,30 +2,16 @@
 
 namespace Elkarte\Boards;
 
+use Elkarte\Elkarte\AbstractManager;
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Members\MemberContainer;
 
-class BoardsManager
+class BoardsManager extends AbstractManager
 {
-	/** @var DatabaseInterface  */
-	protected $db;
-	/** @var Cache  */
-	protected $cache;
-	/** @var Hooks  */
-	protected $hooks;
-	/** @var Errors  */
-	protected $errors;
-	/** @var StringUtil  */
-	protected $text;
-	/** @var BoardsContainer  */
-	protected $boards_container;
-	/** @var MemberContainer  */
-	protected $mem_container;
-
 	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, StringUtil $text,
 								BoardsContainer $boards_container, MemberContainer $mem_container)
 	{
@@ -38,12 +24,12 @@ class BoardsManager
 		$this->mem_container = $mem_container;
 	}
 
-	public function load()
+	public function load(&$board_id)
 	{
 		global $txt, $scripturl, $context, $modSettings;
 		global $board_info, $topic, $user_info;
 
-		$board_id = &$GLOBALS['board'];
+		//$board_id = &$GLOBALS['board'];
 
 		// Assume they are not a moderator.
 		$user_info['is_mod'] = false;
@@ -65,8 +51,7 @@ class BoardsManager
 			// Looking through the message table can be slow, so try using the cache first.
 			if (!$this->cache->getVar($topic, 'msg_topic-' . $_REQUEST['msg'], 120))
 			{
-				require_once(ROOTDIR . '/Messages/Messages.subs.php');
-				$topic = associatedTopic($_REQUEST['msg']);
+				$topic = $this->msg_manager->associatedTopic($_REQUEST['msg']);
 
 				// So did it find anything?
 				if ($topic !== false)
@@ -317,6 +302,8 @@ class BoardsManager
 	 * - It finds all the parents of id_parent, and that board itself.
 	 * - Additionally, it detects the moderators of said boards.
 	 * - Returns an array of information about the boards found.
+	 *
+	 * @todo check the boards container first. It might already be loaded! Same goes for the moderators
 	 *
 	 * @param int $id_parent
 	 * @return array
@@ -818,8 +805,7 @@ class BoardsManager
 			)
 		);
 
-
-		removeTopics($topics, false);
+		$this->topics_manager->removeTopics($topics, false);
 
 		// Delete the board's logs.
 		$this->db->query('', '
@@ -881,10 +867,9 @@ class BoardsManager
 		);
 
 		// Latest message/topic might not be there anymore.
-		require_once(ROOTDIR . '/Messages/Messages.subs.php');
-		updateMessageStats();
 
-		updateTopicStats();
+		$this->msg_manager->updateMessageStats();
+		$this->topics_manager->updateTopicStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
 		));
@@ -999,7 +984,7 @@ class BoardsManager
 				if ($row['child_level'] != $curLevel)
 					$prevBoard = 0;
 
-				$boards[$row['id_board']] = array(
+				$boards[$row['id_board']] = new Board(array(
 					'id' => $row['id_board'],
 					'category' => $row['id_cat'],
 					'parent' => $row['id_parent'],
@@ -1017,7 +1002,7 @@ class BoardsManager
 					'profile' => $row['id_profile'],
 					'redirect' => $row['redirect'],
 					'prev_board' => $prevBoard
-				);
+				));
 				$prevBoard = $row['id_board'];
 				$last_board_order = $row['board_order'];
 
@@ -1288,6 +1273,8 @@ class BoardsManager
 	 * @param int $child The ID of the child board
 	 * @param int $parent The ID of a parent board
 	 *
+	 * @todo move to Board
+	 *
 	 * @return boolean if the specified child board is a child of the specified parent board.
 	 */
 	function isChildOf($child, $parent)
@@ -1301,155 +1288,6 @@ class BoardsManager
 			return true;
 
 		return $this->isChildOf($boards[$child]['parent'], $parent);
-	}
-
-	/**
-	 * Returns whether this member has notification turned on for the specified board.
-	 *
-	 * @param int $id_member the member id
-	 * @param int $id_board the board to check
-	 * @return bool if they have notifications turned on for the board
-	 */
-	function hasBoardNotification($id_member, $id_board)
-	{
-		// Find out if they have notification set for this board already.
-		$request = $this->db->query('', '
-		SELECT id_member
-		FROM {db_prefix}log_notify
-		WHERE id_member = {int:current_member}
-			AND id_board = {int:current_board}
-		LIMIT 1',
-			array(
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-			)
-		);
-		$hasNotification = $request->numRows() != 0;
-		$request->free();
-
-		return $hasNotification;
-	}
-
-	/**
-	 * Set board notification on or off for the given member.
-	 *
-	 * @package Boards
-	 * @param int $id_member
-	 * @param int $id_board
-	 * @param bool $on = false
-	 */
-	function setBoardNotification($id_member, $id_board, $on = false)
-	{
-		if ($on)
-		{
-			// Turn notification on.  (note this just blows smoke if it's already on.)
-			$this->db->insert('ignore',
-				'{db_prefix}log_notify',
-				array('id_member' => 'int', 'id_board' => 'int'),
-				array($id_member, $id_board),
-				array('id_member', 'id_board')
-			);
-		}
-		else
-		{
-			// Turn notification off for this board.
-			$this->db->query('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_member = {int:current_member}
-				AND id_board = {int:current_board}',
-				array(
-					'current_board' => $id_board,
-					'current_member' => $id_member,
-				)
-			);
-		}
-	}
-
-	/**
-	 * Reset sent status for board notifications.
-	 *
-	 * This function returns a boolean equivalent with hasBoardNotification().
-	 * This is unexpected, but it's done this way to avoid any extra-query is executed on MessageIndex::action_messageindex().
-	 * Just ignore the return value for normal use.
-	 *
-	 * @package Boards
-	 * @param int $id_member
-	 * @param int $id_board
-	 * @param bool $check = true check if the user has notifications enabled for the board
-	 * @return bool if the board was marked for notifications
-	 */
-	function resetSentBoardNotification($id_member, $id_board, $check = true)
-	{
-		// Check if notifications are enabled for this user on the board?
-		if ($check)
-		{
-			// check if the member has notifications enabled for this board
-			$request = $this->db->query('', '
-			SELECT sent
-			FROM {db_prefix}log_notify
-			WHERE id_board = {int:current_board}
-				AND id_member = {int:current_member}
-			LIMIT 1',
-				array(
-					'current_board' => $id_board,
-					'current_member' => $id_member,
-				)
-			);
-			// nothing to do
-			if ($request->numRows() == 0)
-				return false;
-			$sent = $request->fetchRow();
-			$request->free();
-
-			// not sent already? No need to stay around then
-			if (empty($sent))
-				return true;
-		}
-
-		// Reset 'sent' status.
-		$this->db->query('', '
-		UPDATE {db_prefix}log_notify
-		SET sent = {int:is_sent}
-		WHERE id_board = {int:current_board}
-			AND id_member = {int:current_member}',
-			array(
-				'current_board' => $id_board,
-				'current_member' => $id_member,
-				'is_sent' => 0,
-			)
-		);
-		return true;
-	}
-
-	/**
-	 * Counts the board notification for a given member.
-	 *
-	 * @package Boards
-	 * @param int $memID
-	 * @return int
-	 */
-	function getBoardNotificationsCount($memID)
-	{
-		global $user_info;
-
-
-		// All the boards that you have notification enabled
-		$request = $this->db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-		WHERE ln.id_member = {int:selected_member}
-			AND {query_see_board}',
-			array(
-				'current_member' => $user_info['id'],
-				'selected_member' => $memID,
-			)
-		);
-		list ($totalNotifications) = $request->fetchRow();
-		$request->free();
-
-		return $totalNotifications;
 	}
 
 	/**
@@ -1599,49 +1437,6 @@ class BoardsManager
 	}
 
 	/**
-	 * Loads properties from non-standard groups
-	 *
-	 * @package Boards
-	 * @param int $curBoard
-	 * @param boolean $new_board = false Whether this is a new board
-	 * @return array
-	 */
-	function getOtherGroups($curBoard, $new_board = false)
-	{
-
-		$groups = array();
-
-		// Load membergroups.
-		$request = $this->db->query('', '
-		SELECT group_name, id_group, min_posts
-		FROM {db_prefix}membergroups
-		WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
-		ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
-			array(
-				'moderator_group' => 3,
-				'global_moderator' => 2,
-			)
-		);
-
-		while ($row = $request->fetchAssoc())
-		{
-			if ($new_board && $row['min_posts'] == -1)
-				$curBoard['member_groups'][] = $row['id_group'];
-
-			$groups[(int) $row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => trim($row['group_name']),
-				'allow' => in_array($row['id_group'], $curBoard['member_groups']),
-				'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
-				'is_post_group' => $row['min_posts'] != -1,
-			);
-		}
-		$request->free();
-
-		return $groups;
-	}
-
-	/**
 	 * Get a list of moderators from a specific board
 	 *
 	 * @package Boards
@@ -1651,7 +1446,6 @@ class BoardsManager
 	 */
 	function getBoardModerators($idboard, $only_id = false)
 	{
-
 		$moderators = array();
 
 		if ($only_id)
@@ -1837,7 +1631,6 @@ class BoardsManager
 	 */
 	function sumRecentPosts()
 	{
-
 		global $modSettings;
 
 		$request = $this->db->query('', '
@@ -1880,7 +1673,6 @@ class BoardsManager
 	function fetchBoardsInfo($conditions = 'all', $params = array())
 	{
 		global $modSettings;
-
 
 		// Ensure default values are set
 		$params = array_merge(array('override_permissions' => false, 'wanna_see_board' => false, 'include_recycle' => true, 'include_redirects' => true), $params);
@@ -1972,16 +1764,11 @@ class BoardsManager
 	/**
 	 * Retrieve the all the sub-boards of an array of boards and add the ids to the same array
 	 *
-	 * @package Boards
 	 * @param int[]|int $boards an array of board IDs (it accepts a single board too).
-	 * @deprecated since 1.1 - The param is passed by ref in 1.0 and the result
-	 *                         is returned through the param itself, starting from
-	 *                         1.1 the expected behaviour is that the result is
-	 *                         returned.
-	 *                         The pass-by-ref is kept for backward compatibility.
+	 *
 	 * @return int[]
 	 */
-	function addChildBoards(&$boards)
+	function addChildBoards($boards)
 	{
 		if (empty($boards))
 			return false;
@@ -2002,9 +1789,15 @@ class BoardsManager
 				'board_list' => $boards,
 			)
 		);
+
 		while ($row = $request->fetchAssoc())
+		{
 			if (in_array($row['id_parent'], $boards))
+			{
 				$boards[] = $row['id_board'];
+			}
+		}
+
 		$request->free();
 
 		return $boards;
@@ -2013,13 +1806,11 @@ class BoardsManager
 	/**
 	 * Increment a board stat field, for example num_posts.
 	 *
-	 * @package Boards
 	 * @param int $id_board
 	 * @param mixed[]|string $values an array of index => value of a string representing the index to increment
 	 */
 	function incrementBoard($id_board, $values)
 	{
-
 		$knownInts = array(
 			'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
 			'unapproved_posts', 'unapproved_topics'
@@ -2056,13 +1847,11 @@ class BoardsManager
 	/**
 	 * Decrement a board stat field, for example num_posts.
 	 *
-	 * @package Boards
 	 * @param int $id_board
 	 * @param mixed[]|string $values an array of index => value of a string representing the index to decrement
 	 */
 	function decrementBoard($id_board, $values)
 	{
-
 		$knownInts = array(
 			'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
 			'unapproved_posts', 'unapproved_topics'
@@ -2094,80 +1883,6 @@ class BoardsManager
 		WHERE id_board = {int:id_board}',
 			$params
 		);
-	}
-
-	/**
-	 * Retrieve all the boards the user can see and their notification status:
-	 *
-	 * - if they're subscribed to notifications for new topics in each of them
-	 * or they're not.
-	 * - (used by createList() callbacks)
-	 *
-	 * @package Boards
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param int $memID id_member
-	 * @return array
-	 */
-	function boardNotifications($start, $items_per_page, $sort, $memID)
-	{
-		global $scripturl, $user_info, $modSettings;
-
-		// All the boards that you have notification enabled
-		$notification_boards = $this->db->fetchQueryCallback('
-		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
-		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-		WHERE ln.id_member = {int:selected_member}
-			AND {query_see_board}
-		ORDER BY ' . $sort,
-			array(
-				'current_member' => $user_info['id'],
-				'selected_member' => $memID,
-			),
-			function($row) use ($scripturl)
-			{
-				return array(
-					'id' => $row['id_board'],
-					'name' => $row['name'],
-					'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0"><strong>' . $row['name'] . '</strong></a>',
-					'new' => $row['board_read'] < $row['id_msg_updated'],
-					'checked' => 'checked="checked"',
-				);
-			}
-		);
-
-		// and all the boards that you can see but don't have notify turned on for
-		$request = $this->db->query('', '
-		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-		WHERE {query_see_board}
-			AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . '
-		ORDER BY ' . $sort,
-			array(
-				'selected_member' => $memID,
-				'current_member' => $user_info['id'],
-				'recycle_board' => $modSettings['recycle_board'],
-			)
-		);
-		while ($row = $request->fetchAssoc())
-			$notification_boards[] = array(
-				'id' => $row['id_board'],
-				'name' => $row['name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-				'new' => $row['board_read'] < $row['id_msg_updated'],
-				'checked' => '',
-			);
-		$request->free();
-
-		return $notification_boards;
 	}
 
 	/**
@@ -2239,5 +1954,169 @@ class BoardsManager
 		$request->free();
 
 		return $num_boards;
+	}
+
+	/**
+	 * Get the last message for boards
+	 *
+	 * @param int|int[] $boards
+	 * @return int|int[]
+	 */
+	public function getLastMessage($boards)
+	{
+		// Find the latest message on this board (highest id_msg.)
+		$request = $this->db->query('', '
+			SELECT MAX(id_last_msg) AS id_msg, id_board
+			FROM {db_prefix}topics
+			WHERE id_board IN ({array_int:board_list})
+				AND approved = {int:approved}
+			GROUP BY id_board',
+			array(
+				'board_list' => is_array($boards) ? $boards : [$boards],
+				'approved' => 1,
+			)
+		);
+
+		if (is_array($boards))
+		{
+			$last_msg = [];
+			while ($row = $request->fetchAssoc())
+				$last_msg[$row['id_board']] = $row['id_msg'];
+		}
+		else
+		{
+			list($last_msg) = $request->fetchRow();
+		}
+
+		$request->free();
+
+		return $last_msg;
+	}
+
+	/**
+	 * Takes an array of board IDs and updates their last messages.
+	 *
+	 * - If the board has a parent, that parent board is also automatically updated.
+	 * - The columns updated are id_last_msg and last_updated.
+	 * - Note that id_last_msg should always be updated using this function,
+	 * and is not automatically updated upon other changes.
+	 *
+	 * @param int[]|int $setboards
+	 * @param int $id_msg = 0
+	 */
+	function updateLastMessages($setboards, $id_msg = 0)
+	{
+		global $board_info, $board;
+
+		if (empty($setboards))
+			return;
+
+		if (!is_array($setboards))
+			$setboards = array($setboards);
+
+		$lastMsg = array();
+
+		// If we don't know the id_msg we need to find it.
+		if (!$id_msg)
+		{
+			// Find the latest message on this board (highest id_msg.)
+			$lastMsg = $this->getLastMessage($setboards);
+		}
+		else
+		{
+			// Just to note - there should only be one board passed if we are doing this.
+			foreach ($setboards as $id_board)
+				$lastMsg[$id_board] = $id_msg;
+		}
+
+		$parent_boards = array();
+
+		// Keep track of last modified dates.
+		$lastModified = $lastMsg;
+
+		// Get all the sub-boards for the parents, if they have some...
+		foreach ($setboards as $id_board)
+		{
+			if (!isset($lastMsg[$id_board]))
+			{
+				$lastMsg[$id_board] = 0;
+				$lastModified[$id_board] = 0;
+			}
+
+			if (!empty($board) && $id_board == $board)
+				$parents = $board_info->parentBoards($this);
+			else
+				$parents = $this->getBoardParents($id_board);
+
+			// Ignore any parents on the top child level.
+			foreach ($parents as $id => $parent)
+			{
+				if ($parent['level'] != 0)
+				{
+					// If we're already doing this one as a board, is this a higher last modified?
+					if (isset($lastModified[$id]) && $lastModified[$id_board] > $lastModified[$id])
+						$lastModified[$id] = $lastModified[$id_board];
+					elseif (!isset($lastModified[$id]) && (!isset($parent_boards[$id]) || $parent_boards[$id] < $lastModified[$id_board]))
+						$parent_boards[$id] = $lastModified[$id_board];
+				}
+			}
+		}
+
+		// Note to help understand what is happening here. For parents we update the timestamp of the last message
+		// for determining whether there are sub-boards which have not been read. For the boards themselves we
+		// update both this and id_last_msg.
+		$board_updates = array();
+		$parent_updates = array();
+
+		// Finally, to save on queries make the changes...
+		foreach ($parent_boards as $id => $msg)
+		{
+			if (!isset($parent_updates[$msg]))
+				$parent_updates[$msg] = array($id);
+			else
+				$parent_updates[$msg][] = $id;
+		}
+
+		foreach ($lastMsg as $id => $msg)
+		{
+			if (!isset($board_updates[$msg . '-' . $lastModified[$id]]))
+				$board_updates[$msg . '-' . $lastModified[$id]] = array(
+					'id' => $msg,
+					'updated' => $lastModified[$id],
+					'boards' => array($id)
+				);
+
+			else
+				$board_updates[$msg . '-' . $lastModified[$id]]['boards'][] = $id;
+		}
+
+		// Now commit the changes!
+		foreach ($parent_updates as $id_msg => $boards)
+		{
+			$this->db->query('', '
+			UPDATE {db_prefix}boards
+			SET id_msg_updated = {int:id_msg_updated}
+			WHERE id_board IN ({array_int:board_list})
+				AND id_msg_updated < {int:id_msg_updated}',
+				array(
+					'board_list' => $boards,
+					'id_msg_updated' => $id_msg,
+				)
+			);
+		}
+
+		foreach ($board_updates as $board_data)
+		{
+			$this->db->query('', '
+			UPDATE {db_prefix}boards
+			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
+			WHERE id_board IN ({array_int:board_list})',
+				array(
+					'board_list' => $board_data['boards'],
+					'id_last_msg' => $board_data['id'],
+					'id_msg_updated' => $board_data['updated'],
+				)
+			);
+		}
 	}
 }

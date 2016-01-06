@@ -15,6 +15,7 @@
 namespace Elkarte\Notifications;
 
 use Elkarte\Elkarte\AbstractModel;
+use Elkarte\Mentions\Types\MentionTypeInterface;
 
 class Notifications extends AbstractModel
 {
@@ -28,7 +29,7 @@ class Notifications extends AbstractModel
 	/**
 	 * List of notifications to send
 	 *
-	 * @var \Notifications_Task[]
+	 * @var NotificationsTask[]
 	 */
 	protected $_to_send;
 
@@ -85,9 +86,9 @@ class Notifications extends AbstractModel
 	/**
 	 * We hax a new notification to send out!
 	 *
-	 * @param \Notifications_Task $task
+	 * @param NotificationsTask $task
 	 */
-	public function add(\Notifications_Task $task)
+	public function add(NotificationsTask $task)
 	{
 		$this->_to_send[] = $task;
 	}
@@ -157,9 +158,9 @@ class Notifications extends AbstractModel
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param \Notifications_Task $task
+	 * @param NotificationsTask $task
 	 */
-	protected function _send_task(\Notifications_Task $task)
+	protected function _send_task(NotificationsTask $task)
 	{
 		$class = $task->getClass();
 		$obj = new $class($this->_db);
@@ -191,12 +192,12 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\MentionTypeInterface $obj
-	 * @param \Notifications_Task $task
+	 * @param MentionTypeInterface $obj
+	 * @param NotificationsTask $task
 	 * @param mixed[] $bodies
 	 * @global $modSettings - Not sure if actually necessary
 	 */
-	protected function _send_notification(\ElkArte\sources\subs\MentionType\MentionTypeInterface $obj, \Notifications_Task $task, $bodies)
+	protected function _send_notification(MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		global $modSettings;
 
@@ -217,11 +218,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\MentionTypeInterface $obj
-	 * @param \Notifications_Task $task
+	 * @param MentionTypeInterface $obj
+	 * @param NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_email(\ElkArte\sources\subs\MentionType\MentionTypeInterface $obj, \Notifications_Task $task, $bodies)
+	protected function _send_email(MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
@@ -233,11 +234,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a daily digest.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\MentionTypeInterface $obj
-	 * @param \Notifications_Task $task
+	 * @param MentionTypeInterface $obj
+	 * @param NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_daily_email(\ElkArte\sources\subs\MentionType\MentionTypeInterface $obj, \Notifications_Task $task, $bodies)
+	protected function _send_daily_email(MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
@@ -254,11 +255,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\MentionTypeInterface $obj
-	 * @param \Notifications_Task $task
+	 * @param MentionTypeInterface $obj
+	 * @param NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_weekly_email(\ElkArte\sources\subs\MentionType\MentionTypeInterface $obj, \Notifications_Task $task, $bodies)
+	protected function _send_weekly_email(MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{

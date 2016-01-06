@@ -17,6 +17,7 @@
  */
 
 namespace Elkarte\Elkarte\Debug;
+use Elkarte\Elkarte\Server\Server;
 
 /**
  * Stored debugging informations.
@@ -239,8 +240,8 @@ class Debug
 
 		// Compute some system info, if we can
 		$this->_system['system_type'] = php_uname();
-		require_once(ELKDIR . '/Server/Server.subs.php');
-		$this->_system['server_load'] = detectServerLoad();
+		$server = new Server();
+		$this->_system['server_load'] = $server->detectServerLoad();
 		$this->_system['script_mem_load'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
 
 		// getrusage() information is CPU time, not wall clock time like microtime, *nix only

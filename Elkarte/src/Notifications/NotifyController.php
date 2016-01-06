@@ -18,8 +18,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Notifications;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Notify Controller
@@ -54,7 +55,7 @@ class NotifyController extends AbstractController
 		global $topic, $scripturl, $txt, $user_info, $context;
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
-		is_not_guest();
+		$this->isNotGuest();
 		isAllowedTo('mark_any_notify');
 
 		// Make sure the topic has been specified.
@@ -378,9 +379,6 @@ class NotifyController extends AbstractController
 	protected function _toggle_topic_watch()
 	{
 		global $user_info, $topic;
-
-		// Our topic functions are here
-
 
 		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
 	}

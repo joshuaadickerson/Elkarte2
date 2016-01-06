@@ -22,26 +22,16 @@
 
 namespace Elkarte\Messages;
 
+use Elkarte\Elkarte\AbstractManager;
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\ElkArte\Database\Drivers\ResultInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 
-class Messages
+class Messages extends AbstractManager
 {
-	/** @var DatabaseInterface */
-	protected $db;
-	/** @var Cache */
-	protected $cache;
-	/** @var Hooks */
-	protected $hooks;
-	/** @var Errors */
-	protected $errors;
-	/** @var StringUtil */
-	protected $text;
-
 	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->db = $db;

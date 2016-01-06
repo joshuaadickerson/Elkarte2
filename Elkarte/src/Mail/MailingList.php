@@ -35,7 +35,7 @@ class MailingList
 		$i = 0;
 		$sort = empty($sort) ? 'id_email DESC' : $sort;
 		$postemail = array();
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		// Where can they approve items?
 		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');

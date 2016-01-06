@@ -679,8 +679,6 @@ class AdminController extends AbstractController
 		global $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
-
-		require_once(SUBSDIR . '/Who.subs.php');
 		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.

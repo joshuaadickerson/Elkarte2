@@ -17,11 +17,12 @@ use Elkarte\Elkarte\Events\EventManager;
 use Elkarte\Elkarte\Events\Hooks;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Elkarte\Http\HttpReq;
 use Elkarte\Elkarte\Session\Session;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 use Elkarte\Elkarte\Theme\Templates;
+use Elkarte\Elkarte\TokenHash;
 
 /**
  * Abstract base class for Controllers.
@@ -315,11 +316,6 @@ abstract class AbstractController
 
 		// We should never get to this point, but if we did we wouldn't know the user isn't a guest.
 		trigger_error('Hacking attempt...', E_USER_ERROR);
-	}
-
-	public function db()
-	{
-		return $GLOBALS['elk']['db'];
 	}
 
 	/**

@@ -59,14 +59,14 @@ class EmailpostController extends AbstractController
 			return false;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		// Init
 		loadLanguage('Maillist');
 		setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
-		$email_message = new Email_Parse();
+		$email_message = new EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (!$email_message->raw_message)
 			return false;
@@ -232,7 +232,7 @@ class EmailpostController extends AbstractController
 			return false;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		// Init
 		loadLanguage('Maillist');
@@ -341,7 +341,7 @@ class EmailpostController extends AbstractController
 		global $txt, $modSettings;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/Emailpost.subs.php');
+		require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		// Init
 		$pbe = array();

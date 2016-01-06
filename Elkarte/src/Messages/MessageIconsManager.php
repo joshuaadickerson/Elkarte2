@@ -19,8 +19,16 @@
 
 namespace Elkarte\Messages;
 
-class MessageIconsManager
+use Elkarte\Elkarte\AbstractManager;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+
+class MessageIconsManager extends AbstractManager
 {
+	public function __construct(DatabaseInterface $db)
+	{
+		$this->db = $db;
+	}
+
 	/**
 	 * Gets a list of all available message icons.
 	 */
@@ -31,12 +39,10 @@ class MessageIconsManager
 
 		if (isset($icons))
 			return $icons;
-
-		$db = $GLOBALS['elk']['db'];
-
+		
 		$icons = array();
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 			FROM {db_prefix}message_icons AS m
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -73,10 +79,8 @@ class MessageIconsManager
 	 */
 	function deleteMessageIcons($icons)
 	{
-		$db = $GLOBALS['elk']['db'];
-
 		// Do the actual delete!
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}message_icons
 			WHERE id_icon IN ({array_int:icon_list})',
 			array(
@@ -88,13 +92,11 @@ class MessageIconsManager
 	/**
 	 * Updates a message icon.
 	 *
-	 * @param mixed[] $icon array of values to use in the $db->insert
+	 * @param mixed[] $icon array of values to use in the $this->db->insert
 	 */
 	function updateMessageIcon($icon)
 	{
-		$db = $GLOBALS['elk']['db'];
-
-		$db->insert('replace',
+		$this->db->insert('replace',
 			'{db_prefix}message_icons',
 			array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 			$icon,
@@ -109,9 +111,7 @@ class MessageIconsManager
 	 */
 	function addMessageIcon($icon)
 	{
-		$db = $GLOBALS['elk']['db'];
-
-		$db->insert('',
+		$this->db->insert('',
 			'{db_prefix}message_icons',
 			array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 			$icon,
@@ -126,9 +126,7 @@ class MessageIconsManager
 	 */
 	function sortMessageIconTable()
 	{
-		$db = $GLOBALS['elk']['db'];
-
-		$db->query('alter_table', '
+		$this->db->query('alter_table', '
 			ALTER TABLE {db_prefix}message_icons
 			ORDER BY icon_order',
 			array(

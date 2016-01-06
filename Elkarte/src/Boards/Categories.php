@@ -260,7 +260,8 @@ class Categories
 	function collapse(array $categories, $new_status, $members = null, $check_collapsable = true)
 	{
 		// Collapse or expand the categories.
-		if ($new_status === 'collapse' || $new_status === 'expand') {
+		if ($new_status === 'collapse' || $new_status === 'expand')
+		{
 			$this->db->query('', '
 				DELETE FROM {db_prefix}collapsed_categories
 				WHERE id_cat IN ({array_int:category_list})' . ($members === null ? '' : '
@@ -287,7 +288,8 @@ class Categories
 						'is_collapsible' => 1,
 					)
 				);
-		} // Toggle the categories: collapsed get expanded and expanded get collapsed.
+		}
+		// Toggle the categories: collapsed get expanded and expanded get collapsed.
 		elseif ($new_status === 'toggle') {
 			// Get the current state of the categories.
 			$updates = array(

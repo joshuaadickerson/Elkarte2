@@ -60,7 +60,7 @@ class DailyDigest implements ScheduledTaskInterface
 		// If the maillist function is on then so is the enhanced digest
 		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
 		if ($maillist)
-			require_once(SUBSDIR . '/Emailpost.subs.php');
+			require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		$is_weekly = !empty($is_weekly) ? 1 : 0;
 

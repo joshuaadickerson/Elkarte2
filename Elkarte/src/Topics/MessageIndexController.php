@@ -21,6 +21,7 @@
 namespace Elkarte\Topics;
 
 use Elkarte\Boards\BoardsList;
+use Elkarte\Boards\BoardsManager;
 use Elkarte\Elkarte\Controller\AbstractController;
 use Elkarte\Elkarte\Controller\FrontpageInterface;
 use Pimple\Container;
@@ -33,7 +34,8 @@ use Elkarte\Elkarte\Theme\TemplateLayers;
  */
 class MessageIndexController extends AbstractController implements FrontpageInterface
 {
-	public function __construct(Container $elk, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+	public function __construct(Container $elk, Hooks $hooks, Errors $errors, TemplateLayers $layers,
+								BoardsManager $boards_manager)
 	{
 		$this->elk = $elk;
 
@@ -42,6 +44,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		$this->hooks = $hooks;
 		$this->errors = $errors;
 		$this->_layers = $layers;
+		$this->boards_manager = $boards_manager;
 	}
 
 	/**
@@ -120,7 +123,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 	 */
 	public function action_index()
 	{
-		loadBoard();
+		loadBoard($GLOBALS['board']);
 
 		// Forward to message index, it's not like we know much more :P
 		$this->action_messageindex();
@@ -136,7 +139,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		global $modSettings, $board;
 
 		$board = $modSettings['message_index_frontpage'];
-		loadBoard();
+		$this->boards_manager->load($board);
 
 		$this->action_messageindex();
 	}
@@ -274,7 +277,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			}
 
 			// From now on, they've seen it. So we reset notifications.
-			$context['is_marked_notify'] = $this->elk['boards.manager']->resetSentBoardNotification($user_info['id'], $board);
+			$context['is_marked_notify'] = $this->elk['notifications.board_manager']->resetSentBoardNotification($user_info['id'], $board);
 		}
 		else
 			$context['is_marked_notify'] = false;
@@ -305,7 +308,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		// Nosey, nosey - who's viewing this board?
 		if (!empty($settings['display_who_viewing']))
 		{
-			require_once(SUBSDIR . '/Who.subs.php');
+
 			formatViewers($board, 'board');
 		}
 

@@ -667,7 +667,7 @@ class ManageMembersController extends AbstractController
 		// Are we banning?
 		if (in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
 		{
-			require_once(SUBSDIR . '/Bans.subs.php');
+
 
 			$ban_group_id = insertBanGroup(array(
 				'name' => $txt['admin_ban_name'],

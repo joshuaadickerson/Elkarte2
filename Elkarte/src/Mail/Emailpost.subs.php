@@ -781,7 +781,7 @@ function pbe_email_attachments($pbe, $email_message)
 		$current_attach_dir = $modSettings['attachmentUploadDir'];
 
 	// For attachmentChecks function
-	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	$context['attachments'] = array('quantity' => 0, 'total_size' => 0);
 	$context['attach_dir'] = $current_attach_dir;
 

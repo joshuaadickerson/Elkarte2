@@ -64,7 +64,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 	 */
 	public function action_index()
 	{
-		$this->manager->load();
+		$this->manager->load($GLOBALS['board']);
 
 		// What to do... boardindex, 'course!
 		$this->action_boardindex();
@@ -110,23 +110,23 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 		$context['latest_post'] = $boardlist->getLatestPost();
 
 		// Get the user online list.
-		require_once(ROOTDIR . '/Members/MembersOnline.subs.php');
+
 		$membersOnlineOptions = array(
 			'show_hidden' => allowedTo('moderate_forum'),
 			'sort' => 'log_time',
 			'reverse_sort' => true,
 		);
-		$context += getMembersOnlineStats($membersOnlineOptions);
+		$context += $this->elk['onlinelog.manager']->getMembersOnlineStats($membersOnlineOptions);
 
 		$context['show_buddies'] = !empty($user_info['buddies']);
 
 		// Are we showing all membergroups on the board index?
 		if (!empty($settings['show_group_key']))
-			$context['membergroups'] = cache_quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
+			$context['membergroups'] = $this->cache->get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
 
 		// Track most online statistics? (subs/Members.subs.phpOnline.php)
 		if (!empty($modSettings['trackStats']))
-			trackStatsUsersOnline($context['num_guests'] + $context['num_users_online']);
+			$this->elk['onlinelog.manager']->trackStatsUsersOnline($context['num_guests'] + $context['num_users_online']);
 
 		// Retrieve the latest posts if the theme settings require it.
 		if (isset($settings['number_recent_posts']) && $settings['number_recent_posts'] > 1)
@@ -134,7 +134,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 			$latestPostOptions = array(
 				'number_posts' => $settings['number_recent_posts'],
 			);
-			$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+			$context['latest_posts'] = $this->cache->get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 		}
 
 		// Let the template know what the members can do if the theme enables these options

@@ -13,7 +13,7 @@
  *
  */
 
-namespace Elkarke\Elkarte\Events;
+namespace Elkarte\Elkarte\Events;
 
 /**
  * An event.

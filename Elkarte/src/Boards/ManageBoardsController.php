@@ -24,7 +24,7 @@ use Elkarte\Elkarte\Controller\Action;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 
 /**
  * This class controls execution for actions in the manage boards area

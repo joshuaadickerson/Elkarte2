@@ -22,7 +22,7 @@ namespace Elkarte\About;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Elkarte\Controller\AbstractController;
 
 /**

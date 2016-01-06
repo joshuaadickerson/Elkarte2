@@ -56,7 +56,7 @@ class ModerateAttachmentsController extends AbstractController
 		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject' ? true : false;
 
 		$attachments = array();
-		require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 
 		// If we are approving all ID's in a message, get the ID's.
 		if ($this->_req->query->sa === 'all' && !empty($this->_req->query->mid))

@@ -33,8 +33,6 @@ class Board extends Entity
 	//public function addModerator($id, $name)
 	public function addModerator(Member $member)
 	{
-		global $scripturl;
-
 		$this->moderators[$member->id] = $member;
 		/*array(
 			'id' => $id,

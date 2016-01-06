@@ -307,7 +307,7 @@ class PostModerationController extends AbstractController
 			$this->_session->check('request');
 
 			// This will be handy.
-			require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 
 			// Confirm the attachments are eligible for changing!
 			$attachments = validateAttachments($attachments, $approve_query);
@@ -324,7 +324,7 @@ class PostModerationController extends AbstractController
 			}
 		}
 
-		require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 
 		$listOptions = array(
 			'id' => 'mc_unapproved_attach',

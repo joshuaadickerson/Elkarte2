@@ -327,7 +327,7 @@ class AttachmentsPostModule implements ModuleInterface
 
 			if (!empty($_REQUEST['msg']))
 			{
-				require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 				$attachmentQuery = array(
 					'attachment_type' => 0,
 					'id_msg' => (int) $_REQUEST['msg'],
@@ -341,7 +341,7 @@ class AttachmentsPostModule implements ModuleInterface
 		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
+
 			if (isset($_REQUEST['msg']))
 				processAttachments((int) $_REQUEST['msg']);
 			else

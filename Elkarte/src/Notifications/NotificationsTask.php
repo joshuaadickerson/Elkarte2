@@ -12,10 +12,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Notifications;
 
-class Notifications_Task extends \ElkArte\ValuesContainer
+class Notifications_Task extends \ElkArte\Elkarte\ValuesContainer
 {
 	/**
 	 * Data of the members to notify.

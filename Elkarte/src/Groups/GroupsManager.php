@@ -2172,6 +2172,7 @@ class GroupsManager
 	}
 
 	/**
+	 * @todo remove this. Just use getMembersByGroups()
 	 * @param array $groups
 	 */
 	function loadStaffList(array $groups)
@@ -2196,5 +2197,48 @@ class GroupsManager
 		}
 
 		$context['staff_ids'] = array_keys($members);
+	}
+
+	/**
+	 * Loads properties from non-standard groups
+	 *
+	 * @package Boards
+	 * @param int $curBoard
+	 * @param boolean $new_board = false Whether this is a new board
+	 * @return array
+	 */
+	function getOtherGroups($curBoard, $new_board = false)
+	{
+
+		$groups = array();
+
+		// Load membergroups.
+		$request = $this->db->query('', '
+		SELECT group_name, id_group, min_posts
+		FROM {db_prefix}membergroups
+		WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
+		ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
+			array(
+				'moderator_group' => 3,
+				'global_moderator' => 2,
+			)
+		);
+
+		while ($row = $request->fetchAssoc())
+		{
+			if ($new_board && $row['min_posts'] == -1)
+				$curBoard['member_groups'][] = $row['id_group'];
+
+			$groups[(int) $row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => trim($row['group_name']),
+				'allow' => in_array($row['id_group'], $curBoard['member_groups']),
+				'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
+				'is_post_group' => $row['min_posts'] != -1,
+			);
+		}
+		$request->free();
+
+		return $groups;
 	}
 }

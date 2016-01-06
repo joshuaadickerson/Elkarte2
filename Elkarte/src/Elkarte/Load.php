@@ -131,11 +131,11 @@ function reloadSettings()
  * - adds group id 3 if the user is a local moderator for the board they are in.
  * - prevents access if user is not in proper group nor a local moderator of the board.
  */
-function loadBoard()
+function loadBoard(&$board)
 {
 	global $elk;
 
-	return $elk['boards.manager']->load();
+	return $elk['boards.manager']->load($board);
 }
 
 
@@ -338,7 +338,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	loadThemeUrls();
 
-	loadUserContext();
+	$GLOBALS['elk']['members.manager']->loadUserContext();
 
 	// Set up some additional interface preference context
 	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();

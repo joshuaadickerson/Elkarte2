@@ -1,6 +1,6 @@
 <?php
 
-namespace Elkarke\Elkarte;
+namespace Elkarte\Elkarte;
 
 class IP
 {

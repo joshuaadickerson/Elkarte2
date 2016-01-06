@@ -990,7 +990,7 @@ class PostController extends AbstractController
 			if (!empty($new_board) && $board !== $new_board)
 			{
 				$board = $new_board;
-				loadBoard();
+				loadBoard($GLOBALS['board']);
 
 				// Some details changed
 				$topicOptions['board'] = $board;

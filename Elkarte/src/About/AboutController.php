@@ -26,7 +26,7 @@ use Elkarte\Elkarte\DataValidator;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 
 /**
  * About Controller

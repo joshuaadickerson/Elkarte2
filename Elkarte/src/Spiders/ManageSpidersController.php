@@ -514,7 +514,7 @@ class ManageSearchEnginesController extends AbstractController
 			}
 
 			// Now stick in the new URLs.
-			require_once(SUBSDIR . '/Who.subs.php');
+
 			$urls = determineActions($urls, 'whospider_');
 			foreach ($urls as $k => $new_url)
 				$context['spider_logs']['rows'][$k]['data']['viewing']['value'] = $new_url;

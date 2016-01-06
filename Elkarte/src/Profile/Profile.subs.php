@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Find the ID of the "current" member
  *
@@ -1816,7 +1813,7 @@ function profileLoadAvatarData()
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
 	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
+
 		$context['avatar_list'] = array();
 		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
 	}
@@ -2049,7 +2046,7 @@ function profileValidateSignature(&$value)
 					// If the dimensions are still not fixed - we need to check the actual image.
 					if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
 					{
-						require_once(SUBSDIR . '/Attachments.subs.php');
+
 						$sizes = url_image_size($matches[7][$key]);
 						if (is_array($sizes))
 						{
@@ -2131,8 +2128,8 @@ function profileSaveAvatarData(&$value)
 		return false;
 
 	// We need to know where we're going to be putting it..
-	require_once(SUBSDIR . '/Attachments.subs.php');
-	require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
+
 	$uploadDir = getAvatarPath();
 	$id_folder = getAvatarPathID();
 
@@ -2228,7 +2225,7 @@ function profileSaveAvatarData(&$value)
 				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
+
 					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						$profile_vars['avatar'] = '';
@@ -2278,7 +2275,7 @@ function profileSaveAvatarData(&$value)
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
+
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
@@ -2304,7 +2301,7 @@ function profileSaveAvatarData(&$value)
 					}
 
 					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
+
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender

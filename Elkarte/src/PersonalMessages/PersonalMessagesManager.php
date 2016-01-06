@@ -28,7 +28,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\ElkArte\Database\Drivers\ResultInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 
 class PersonalMessagesManager
 {
@@ -856,7 +856,7 @@ class PersonalMessagesManager
 		}
 		else
 		{
-			require_once(SUBSDIR . '/Emailpost.subs.php');
+			require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 			pbe_prepare_text($message, $subject);
 		}
 

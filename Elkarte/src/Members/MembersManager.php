@@ -19,8 +19,19 @@
 
 namespace Elkarte\Members;
 
-class MembersManager
+use Elkarte\Elkarte\AbstractManager;
+
+class MembersManager extends AbstractManager
 {
+	public function __construct()
+	{
+		$this->elk = $elk = $GLOBALS['elk'];
+		$this->db = $elk['db'];
+		$this->cache = $elk['cache'];
+		$this->hooks = $elk['hooks'];
+		$this->errors = $elk['errors'];
+	}
+
 	/**
 	 * Loads an array of users' data by ID or member_name.
 	 *
@@ -33,9 +44,6 @@ class MembersManager
 	{
 		global $user_profile, $modSettings, $board_info, $context;
 
-		$db = $GLOBALS['elk']['db'];
-		$cache = $GLOBALS['elk']['cache'];
-
 		// Can't just look for no users :P.
 		if (empty($users))
 			return false;
@@ -47,11 +55,11 @@ class MembersManager
 		$users = !is_array($users) ? array($users) : array_unique($users);
 		$loaded_ids = array();
 
-		if (!$is_name && $cache->isEnabled() && $cache->checkLevel(3)) {
+		if (!$is_name && $this->cache->isEnabled() && $this->cache->checkLevel(3)) {
 			$users = array_values($users);
 			for ($i = 0, $n = count($users); $i < $n; $i++) {
-				$data = $cache->get('member_data-' . $set . '-' . $users[$i], 240);
-				if ($cache->isMiss())
+				$data = $this->cache->get('member_data-' . $set . '-' . $users[$i], 240);
+				if ($this->cache->isMiss())
 					continue;
 
 				$loaded_ids[] = $data['id_member'];
@@ -99,11 +107,11 @@ class MembersManager
 		}
 
 		// Allow addons to easily add to the selected member data
-		$GLOBALS['elk']['hooks']->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
+		$this->hooks->hook('load_member_data', array(&$select_columns, &$select_tables, $set));
 
 		if (!empty($users)) {
 			// Load the member's data.
-			$request = $db->select('', '
+			$request = $this->db->select('', '
 				SELECT' . $select_columns . '
 				FROM {db_prefix}members AS mem' . $select_tables . '
 				WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
@@ -124,7 +132,7 @@ class MembersManager
 
 		// Custom profile fields as well
 		if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features']))) {
-			$request = $db->select('', '
+			$request = $this->db->select('', '
 				SELECT id_member, variable, value
 				FROM {db_prefix}custom_fields_data
 				WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
@@ -139,20 +147,20 @@ class MembersManager
 
 		// Anything else integration may want to add to the user_profile array
 		if (!empty($new_loaded_ids))
-			$GLOBALS['elk']['hooks']->hook('add_member_data', array($new_loaded_ids, $set));
+			$this->hooks->hook('add_member_data', array($new_loaded_ids, $set));
 
-		if (!empty($new_loaded_ids) && $cache->checkLevel(3)) {
+		if (!empty($new_loaded_ids) && $this->cache->checkLevel(3)) {
 			for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
-				$cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
+				$this->cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
 		}
 
 		// Are we loading any moderators?  If so, fix their group data...
 		if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0) {
-			if (!$cache->getVar($group_info = null, 'moderator_group_info', 480)) {
+			if (!$this->cache->getVar($group_info = null, 'moderator_group_info', 480)) {
 
 				$group_info = membergroupById(3, true);
 
-				$cache->put('moderator_group_info', $group_info, 480);
+				$this->cache->put('moderator_group_info', $group_info, 480);
 			}
 
 			foreach ($temp_mods as $id) {
@@ -341,7 +349,7 @@ class MembersManager
 			}
 		}
 
-		$GLOBALS['elk']['hooks']->hook('member_context', array($user, $display_custom_fields));
+		$this->hooks->hook('member_context', array($user, $display_custom_fields));
 		return true;
 	}
 
@@ -371,7 +379,7 @@ class MembersManager
 	{
 		global $modSettings, $user_info;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Try give us a while to sort this out...
 		setTimeLimit(600);
@@ -407,7 +415,7 @@ class MembersManager
 		}
 
 		// Get their names for logging purposes.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member, member_name, email_address, CASE WHEN id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0 THEN 1 ELSE 0 END AS is_admin
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:user_list})
@@ -462,7 +470,7 @@ class MembersManager
 		// @todo change all of these updates and deletes to just call a single hook. Then each module will respond in the way that they know how
 
 		// Make these peoples' posts guest posts.
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_member = {int:guest_id}' . (!empty($modSettings['deleteMembersRemovesEmail']) ? ',
 			poster_email = {string:blank_email}' : '') . '
@@ -473,7 +481,7 @@ class MembersManager
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}polls
 			SET id_member = {int:guest_id}
 			WHERE id_member IN ({array_int:users})',
@@ -484,7 +492,7 @@ class MembersManager
 		);
 
 		// Make these peoples' posts guest first posts and last posts.
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}topics
 			SET id_member_started = {int:guest_id}
 			WHERE id_member_started IN ({array_int:users})',
@@ -493,7 +501,7 @@ class MembersManager
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}topics
 			SET id_member_updated = {int:guest_id}
 			WHERE id_member_updated IN ({array_int:users})',
@@ -503,7 +511,7 @@ class MembersManager
 			)
 		);
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}log_actions
 			SET id_member = {int:guest_id}
 			WHERE id_member IN ({array_int:users})',
@@ -513,7 +521,7 @@ class MembersManager
 			)
 		);
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}log_banned
 			SET id_member = {int:guest_id}
 			WHERE id_member IN ({array_int:users})',
@@ -523,7 +531,7 @@ class MembersManager
 			)
 		);
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}log_errors
 			SET id_member = {int:guest_id}
 			WHERE id_member IN ({array_int:users})',
@@ -534,7 +542,7 @@ class MembersManager
 		);
 
 		// Delete the member.
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}members
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -543,7 +551,7 @@ class MembersManager
 		);
 
 		// Delete any likes...
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}message_likes
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -552,7 +560,7 @@ class MembersManager
 		);
 
 		// Delete any custom field data...
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}custom_fields_data
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -561,7 +569,7 @@ class MembersManager
 		);
 
 		// Delete any post by email keys...
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}postby_emails
 			WHERE email_to IN ({array_string:emails})',
 			array(
@@ -570,7 +578,7 @@ class MembersManager
 		);
 
 		// Delete the logs...
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_actions
 			WHERE id_log = {int:log_type}
 				AND id_member IN ({array_int:users})',
@@ -579,14 +587,14 @@ class MembersManager
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_boards
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_comments
 			WHERE id_recipient IN ({array_int:users})
 				AND comment_type = {string:warntpl}',
@@ -595,14 +603,14 @@ class MembersManager
 				'warntpl' => 'warntpl',
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_group_requests
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_karma
 			WHERE id_target IN ({array_int:users})
 				OR id_executor IN ({array_int:users})',
@@ -610,42 +618,42 @@ class MembersManager
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_mark_read
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_subscribed
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_topics
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}collapsed_categories
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -655,7 +663,7 @@ class MembersManager
 
 		// Make their votes appear as guest votes - at least it keeps the totals right.
 		// @todo Consider adding back in cookie protection.
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}log_polls
 			SET id_member = {int:guest_id}
 			WHERE id_member IN ({array_int:users})',
@@ -666,7 +674,7 @@ class MembersManager
 		);
 
 		// Remove the mentions
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}log_mentions
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -677,7 +685,7 @@ class MembersManager
 		// Delete personal messages.
 		deleteMessages(null, null, $users);
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}personal_messages
 			SET id_member_from = {int:guest_id}
 			WHERE id_member_from IN ({array_int:users})',
@@ -688,7 +696,7 @@ class MembersManager
 		);
 
 		// They no longer exist, so we don't know who it was sent to.
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}pm_recipients
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -697,18 +705,18 @@ class MembersManager
 		);
 
 		// Delete avatar.
-		require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 		removeAttachments(array('id_member' => $users));
 
 		// It's over, no more moderation for you.
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}moderators
 			WHERE id_member IN ({array_int:users})',
 			array(
 				'users' => $users,
 			)
 		);
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}group_moderators
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -717,7 +725,7 @@ class MembersManager
 		);
 
 		// If you don't exist we can't ban you.
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}ban_items
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -726,7 +734,7 @@ class MembersManager
 		);
 
 		// Remove individual theme settings.
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}themes
 			WHERE id_member IN ({array_int:users})',
 			array(
@@ -735,7 +743,7 @@ class MembersManager
 		);
 
 		// These users are nobody's buddy nomore.
-		$db->fetchQueryCallback('
+		$this->db->fetchQueryCallback('
 			SELECT id_member, pm_ignore_list, buddy_list
 			FROM {db_prefix}members
 			WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
@@ -757,7 +765,7 @@ class MembersManager
 		));
 
 		// Integration rocks!
-		$GLOBALS['elk']['hooks']->hook('delete_members', array($users));
+		$this->hooks->hook('delete_members', array($users));
 
 		updateMemberStats();
 
@@ -786,7 +794,7 @@ class MembersManager
 	{
 		global $scripturl, $txt, $modSettings;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		loadLanguage('Login');
 
@@ -849,7 +857,7 @@ class MembersManager
 		}
 
 		// Perhaps someone else wants to check this user
-		$GLOBALS['elk']['hooks']->hook('register_check', array(&$regOptions, &$reg_errors));
+		$this->hooks->hook('register_check', array(&$regOptions, &$reg_errors));
 
 		// If there's any errors left return them at once!
 		if ($reg_errors->hasErrors())
@@ -876,7 +884,7 @@ class MembersManager
 
 		// Can't change reserved vars.
 		if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-			$GLOBALS['elk']['errors']->fatal_lang_error('no_theme');
+			$this->errors->fatal_lang_error('no_theme');
 
 		$tokenizer = new TokenHash();
 
@@ -966,7 +974,7 @@ class MembersManager
 		);
 
 		// Call an optional function to validate the users' input.
-		$GLOBALS['elk']['hooks']->hook('register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
+		$this->hooks->hook('register', array(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats));
 
 		$column_names = array();
 		$values = array();
@@ -984,7 +992,7 @@ class MembersManager
 		}
 
 		// Register them into the database.
-		$result = $db->insert('',
+		$result = $this->db->insert('',
 			'{db_prefix}members',
 			$column_names,
 			$values,
@@ -1004,7 +1012,7 @@ class MembersManager
 			$inserts = array();
 			foreach ($theme_vars as $var => $val)
 				$inserts[] = array($memberID, $var, $val);
-			$db->insert('insert',
+			$this->db->insert('insert',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$inserts,
@@ -1090,7 +1098,7 @@ class MembersManager
 		}
 
 		// If they are for sure registered, let other people to know about it
-		$GLOBALS['elk']['hooks']->hook('register_after', array($regOptions, $memberID));
+		$this->hooks->hook('register_after', array($regOptions, $memberID));
 
 		return $memberID;
 	}
@@ -1107,12 +1115,13 @@ class MembersManager
 	 * @param int $current_ID_MEMBER
 	 * @param bool $is_name
 	 * @param bool $fatal
+	 * @return bool
 	 */
 	function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 	{
 		global $modSettings;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
 		$checkName = $GLOBALS['elk']['text']->strtolower($name);
@@ -1138,7 +1147,7 @@ class MembersManager
 				// If it's not just entire word, check for it in there somewhere...
 				if ($checkMe == $reservedCheck || ($GLOBALS['elk']['text']->strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 					if ($fatal)
-						$GLOBALS['elk']['errors']->fatal_lang_error('username_reserved', 'password', array($reserved));
+						$this->errors->fatal_lang_error('username_reserved', 'password', array($reserved));
 					else
 						return true;
 			}
@@ -1146,24 +1155,28 @@ class MembersManager
 			$censor_name = $name;
 			if (censor($censor_name) != $name)
 				if ($fatal)
-					$GLOBALS['elk']['errors']->fatal_lang_error('name_censored', 'password', array($name));
+					$this->errors->fatal_lang_error('name_censored', 'password', array($name));
 				else
 					return true;
 		}
 
 		// Characters we just shouldn't allow, regardless.
 		foreach (array('*') as $char)
+		{
 			if (strpos($checkName, $char) !== false)
+			{
 				if ($fatal)
-					$GLOBALS['elk']['errors']->fatal_lang_error('username_reserved', 'password', array($char));
+					$this->errors->fatal_lang_error('username_reserved', 'password', array($char));
 				else
 					return true;
+			}
+		}
 
 		// Get rid of any SQL parts of the reserved name...
 		$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
 
 		// Make sure they don't want someone else's name.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
@@ -1182,13 +1195,13 @@ class MembersManager
 		}
 
 		// Does name case insensitive match a member group name?
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_group
 			FROM {db_prefix}membergroups
 			WHERE {raw:group_name} LIKE {string:check_name}
 			LIMIT 1',
 			array(
-				'group_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(group_name)' : 'group_name',
+				'group_name' => $db::CASE_SENSITIVE ? 'LOWER(group_name)' : 'group_name',
 				'check_name' => $checkName,
 			)
 		);
@@ -1208,6 +1221,8 @@ class MembersManager
 	 * - If board_id is not null, a board permission is assumed.
 	 * - The function takes different permission settings into account.
 	 *
+	 * @todo move to a Security or Groups class
+	 *
 	 * @package Members
 	 * @param string $permission
 	 * @param integer|null $board_id = null
@@ -1218,7 +1233,7 @@ class MembersManager
 	{
 		global $board_info;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Admins are allowed to do anything.
 		$member_groups = array(
@@ -1228,7 +1243,7 @@ class MembersManager
 
 		// Assume we're dealing with regular permissions (like profile_view_own).
 		if ($board_id === null) {
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT id_group, add_deny
 				FROM {db_prefix}permissions
 				WHERE permission = {string:permission}',
@@ -1249,12 +1264,12 @@ class MembersManager
 				$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 				if (empty($board_data))
-					$GLOBALS['elk']['errors']->fatal_lang_error('no_board');
+					$this->errors->fatal_lang_error('no_board');
 				$profile_id = $board_data[$board_id]['id_profile'];
 			} else
 				$profile_id = 1;
 
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT bp.id_group, bp.add_deny
 				FROM {db_prefix}board_permissions AS bp
 				WHERE bp.permission = {string:permission}
@@ -1290,8 +1305,6 @@ class MembersManager
 	 */
 	function membersAllowedTo($permission, $board_id = null)
 	{
-		$db = $GLOBALS['elk']['db'];
-
 		$member_groups = groupsAllowedTo($permission, $board_id);
 
 		$include_moderators = in_array(3, $member_groups['allowed']) && $board_id !== null;
@@ -1300,7 +1313,7 @@ class MembersManager
 		$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
 		$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
 
-		return $db->fetchQueryCallback('
+		return $this->db->fetchQueryCallback('
 			SELECT mem.id_member
 			FROM {db_prefix}members AS mem' . ($include_moderators || $exclude_moderators ? '
 				LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
@@ -1335,7 +1348,7 @@ class MembersManager
 	 */
 	function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Firstly, if email and username aren't passed find out the members email address and name.
 		if ($email === false && $membername === false) {
@@ -1346,7 +1359,7 @@ class MembersManager
 
 		// If they want the post count restored then we need to do some research.
 		if ($post_count) {
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT COUNT(*)
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND b.count_posts = {int:count_posts})
@@ -1378,7 +1391,7 @@ class MembersManager
 		$query = implode(' AND ', $query_parts);
 
 		// Finally, update the posts themselves!
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_member = {int:memID}
 			WHERE ' . $query,
@@ -1390,7 +1403,7 @@ class MembersManager
 		);
 
 		// ...and the topics too!
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}topics as t, {db_prefix}messages as m
 			SET t.id_member_started = {int:memID}
 			WHERE m.id_member = {int:memID}
@@ -1401,7 +1414,7 @@ class MembersManager
 		);
 
 		// Allow mods with their own post tables to re-attribute posts as well :)
-		$GLOBALS['elk']['hooks']->hook('reattribute_posts', array($memID, $email, $membername, $post_count));
+		$this->hooks->hook('reattribute_posts', array($memID, $email, $membername, $post_count));
 	}
 
 	/**
@@ -1417,9 +1430,9 @@ class MembersManager
 	 */
 	function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$members = $db->fetchQuery('
+		$members = $this->db->fetchQuery('
 			SELECT
 				mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.member_ip, mem.member_ip2, mem.last_login,
 				mem.posts, mem.is_activated, mem.date_registered, mem.id_group, mem.additional_groups, mg.group_name
@@ -1453,7 +1466,7 @@ class MembersManager
 	{
 		global $modSettings;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// We know how many members there are in total.
 		if (empty($where) || $where == '1=1')
@@ -1461,7 +1474,7 @@ class MembersManager
 
 		// The database knows the amount when there are extra conditions.
 		else {
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT COUNT(*)
 				FROM {db_prefix}members AS mem
 				WHERE ' . $where,
@@ -1482,7 +1495,7 @@ class MembersManager
 	 */
 	function populateDuplicateMembers(&$members)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// This will hold all the ip addresses.
 		$ips = array();
@@ -1526,7 +1539,7 @@ class MembersManager
 		}
 
 		// Also try to get a list of messages using these ips.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT
 				m.poster_ip, mem.id_member, mem.member_name, mem.email_address, mem.is_activated
 			FROM {db_prefix}messages AS m
@@ -1590,7 +1603,7 @@ class MembersManager
 	 */
 	function membersByIP($ip1, $match = 'exact', $ip2 = false)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$ip_params = array('ips' => array());
 		$ip_query = array();
@@ -1622,7 +1635,7 @@ class MembersManager
 				OR member_ip2 ' . implode(' OR member_ip', $ip_query);
 		}
 
-		return $db->fetchQuery('
+		return $this->db->fetchQuery('
 			SELECT
 				id_member, member_name, email_address, member_ip, member_ip2, is_activated
 			FROM {db_prefix}members
@@ -1639,9 +1652,12 @@ class MembersManager
 	 */
 	function isAnotherAdmin($memberID)
 	{
-		$db = $GLOBALS['elk']['db'];
+		/**
+		 * @todo remove this function and replace it with count($this->admins) > 1
+		 */
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -1667,16 +1683,17 @@ class MembersManager
 	 * @param bool $details if true returns additional member details (name, email, ip, etc.)
 	 *             false will only return an array of member id's that match the conditions
 	 * @param bool $only_active see prepareMembersByQuery
+	 * @return array
 	 */
 	function membersBy($query, $query_params, $details = false, $only_active = true)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
 		// Lets see who we can find that meets the built up conditions
 		$members = array();
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
 					hide_email, posts, is_activated, real_name' : '') . '
 			FROM {db_prefix}members
@@ -1707,14 +1724,15 @@ class MembersManager
 	 * @param string[]|string $query see prepareMembersByQuery
 	 * @param mixed[] $query_params see prepareMembersByQuery
 	 * @param boolean $only_active see prepareMembersByQuery
+	 * @return int
 	 */
 	function countMembersBy($query, $query_params, $only_active = true)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}members
 			WHERE ' . $query_where,
@@ -1740,6 +1758,7 @@ class MembersManager
 	 *             'order' used raw in ORDER BY
 	 *             others passed as query params
 	 * @param bool $only_active only fetch active members
+	 * @return string
 	 */
 	function prepareMembersByQuery($query, &$query_params, $only_active = true)
 	{
@@ -1814,13 +1833,14 @@ class MembersManager
 	 *
 	 * @package Members
 	 * @param int $id_admin = 0 if requested, only data about a specific Admin is retrieved
+	 * @return array
 	 */
 	function admins($id_admin = 0)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Now let's get out and loop through the admins.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member, real_name, lngfile
 			FROM {db_prefix}members
 			WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -1846,9 +1866,9 @@ class MembersManager
 	 */
 	function maxMemberID()
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT MAX(id_member)
 			FROM {db_prefix}members',
 			array()
@@ -1878,7 +1898,7 @@ class MembersManager
 	{
 		global $txt, $language;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$members = array();
 
@@ -1902,7 +1922,7 @@ class MembersManager
 		}
 
 		// Get some additional member info...
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (!empty($options['moderation']) ? ',
 			member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (!empty($options['authentication']) ? ',
 			secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (!empty($options['preferences']) ? ',
@@ -1940,11 +1960,11 @@ class MembersManager
 	 */
 	function countInactiveMembers()
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$inactive_members = array();
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT COUNT(*) AS total_members, is_activated
 			FROM {db_prefix}members
 			WHERE is_activated != {int:is_activated}
@@ -1971,9 +1991,9 @@ class MembersManager
 	 */
 	function getMemberByName($name, $flexible = false)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member, id_group
 			FROM {db_prefix}members
 			WHERE {raw:real_name} LIKE {string:name}' . ($flexible ? '
@@ -2004,7 +2024,7 @@ class MembersManager
 	 */
 	function getMember($search, $buddies = array())
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$xml_data = array(
 			'items' => array(
@@ -2013,7 +2033,7 @@ class MembersManager
 			),
 		);
 		// Find the member.
-		$xml_data['items']['children'] = $db->fetchQueryCallback('
+		$xml_data['items']['children'] = $this->db->fetchQueryCallback('
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
@@ -2066,7 +2086,7 @@ class MembersManager
 		// We badly need this
 		assert(isset($conditions['activated_status']));
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$available_conditions = array(
 			'time_before' => '
@@ -2104,7 +2124,7 @@ class MembersManager
 			LIMIT {int:limit}' : '';
 
 		// Get information on each of the members, things that are important to us, like email address...
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
 			FROM {db_prefix}members
 			WHERE is_activated = {int:activated_status}' . implode('', $query_cond) . '
@@ -2146,7 +2166,7 @@ class MembersManager
 	 */
 	function approveMembers($conditions)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// This shall be present
 		assert(isset($conditions['activated_status']));
@@ -2170,7 +2190,7 @@ class MembersManager
 		}
 
 		if ($query) {
-			$data = retrieveMemberData($conditions);
+			$data = $this->retrieveMemberData($conditions);
 			$members_id = $data['members'];
 		} else {
 			$members_id = $conditions['members'];
@@ -2180,7 +2200,7 @@ class MembersManager
 		$conditions['blank_string'] = '';
 
 		// Approve/activate this member.
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}members
 			SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
 			WHERE is_activated = {int:activated_status}' . implode('', $query_cond),
@@ -2189,7 +2209,7 @@ class MembersManager
 
 		// Let the integration know that they've been activated!
 		foreach ($members_id as $member_id)
-			$GLOBALS['elk']['hooks']->hook('activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+			$this->hooks->hook('activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
 
 		return $conditions['is_activated'];
 	}
@@ -2208,7 +2228,7 @@ class MembersManager
 	 */
 	function enforceReactivation($conditions)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// We need all of these
 		assert(isset($conditions['activated_status']));
@@ -2228,7 +2248,7 @@ class MembersManager
 
 		$conditions['not_activated'] = 0;
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}members
 			SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
 			WHERE is_activated = {int:activated_status}
@@ -2247,10 +2267,10 @@ class MembersManager
 	 */
 	function countMembersInGroup($id_group = 0)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Determine the number of ungrouped members.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}members
 			WHERE id_group = {int:group}',
@@ -2273,9 +2293,9 @@ class MembersManager
 	 */
 	function countMembersOnline($conditions)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}log_online AS lo
 				LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
@@ -2302,9 +2322,9 @@ class MembersManager
 	{
 		global $modSettings;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
-		return $db->fetchQuery('
+		return $this->db->fetchQuery('
 			SELECT
 				lo.log_time, lo.id_member, lo.url, lo.ip, mem.real_name,
 				lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
@@ -2334,9 +2354,9 @@ class MembersManager
 	 */
 	function memberExists($url)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT mem.id_member, mem.member_name
 			FROM {db_prefix}members AS mem
 			WHERE mem.openid_uri = {string:openid_uri}',
@@ -2358,10 +2378,10 @@ class MembersManager
 	 */
 	function recentMembers($limit)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Find the most recent members.
-		return $db->fetchQuery('
+		return $this->db->fetchQuery('
 			SELECT id_member, member_name, real_name, date_registered, last_login
 			FROM {db_prefix}members
 			ORDER BY id_member DESC
@@ -2398,10 +2418,10 @@ class MembersManager
 	{
 		global $modSettings, $language;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		// Get the details of all the members concerned...
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
 				mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
 				mg.hidden, mg.group_name
@@ -2478,9 +2498,9 @@ class MembersManager
 	{
 		global $user_info;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT receive_from, buddy_list, pm_ignore_list
 			FROM {db_prefix}members
 			WHERE id_member = {int:member}',
@@ -2523,7 +2543,7 @@ class MembersManager
 	{
 		global $modSettings;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$changes = array(
 			'memberlist_updated' => time(),
@@ -2538,7 +2558,7 @@ class MembersManager
 		} // We need to calculate the totals.
 		else {
 			// Update the latest activated member (highest id_member) and count.
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT COUNT(*), MAX(id_member)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:is_activated}',
@@ -2556,7 +2576,7 @@ class MembersManager
 			// Are we using registration approval?
 			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) {
 				// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-				$request = $db->query('', '
+				$request = $this->db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}members
 					WHERE is_activated IN ({array_int:activation_status})',
@@ -2626,7 +2646,7 @@ class MembersManager
 	{
 		global $modSettings, $user_info;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
 		$parameters = array();
 		if (is_array($members)) {
@@ -2676,7 +2696,7 @@ class MembersManager
 				if ((!is_array($members) && $members === $user_info['id']) || (is_array($members) && count($members) == 1 && in_array($user_info['id'], $members)))
 					$member_names = array($user_info['username']);
 				else {
-					$member_names = $db->fetchQueryCallback('
+					$member_names = $this->db->fetchQueryCallback('
 						SELECT member_name
 						FROM {db_prefix}members
 						WHERE ' . $condition,
@@ -2689,7 +2709,7 @@ class MembersManager
 
 				if (!empty($member_names))
 					foreach ($vars_to_integrate as $var)
-						$GLOBALS['elk']['hooks']->hook('change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
+						$this->hooks->hook('change_member_data', array($member_names, &$var, &$data[$var], &$knownInts, &$knownFloats));
 			}
 		}
 
@@ -2723,7 +2743,7 @@ class MembersManager
 			$parameters['p_' . $var] = $val;
 		}
 
-		$db->query('', '
+		$this->db->query('', '
 			UPDATE {db_prefix}members
 			SET' . substr($setString, 0, -1) . '
 			WHERE ' . $condition,
@@ -2731,23 +2751,23 @@ class MembersManager
 		);
 
 
-		updatePostGroupStats($members, array_keys($data));
+		$GLOBALS['elk']['groups.manager']->updatePostGroupStats($members, array_keys($data));
 
 		$cache = $GLOBALS['elk']['cache'];
 
 		// Clear any caching?
-		if ($cache->checkLevel(2) && !empty($members)) {
+		if ($this->cache->checkLevel(2) && !empty($members)) {
 			if (!is_array($members))
 				$members = array($members);
 
 			foreach ($members as $member) {
-				if ($cache->checkLevel(3)) {
-					$cache->remove('member_data-profile-' . $member);
-					$cache->remove('member_data-normal-' . $member);
-					$cache->remove('member_data-minimal-' . $member);
+				if ($this->cache->checkLevel(3)) {
+					$this->cache->remove('member_data-profile-' . $member);
+					$this->cache->remove('member_data-normal-' . $member);
+					$this->cache->remove('member_data-minimal-' . $member);
 				}
 
-				$cache->remove('user_settings-' . $member);
+				$this->cache->remove('user_settings-' . $member);
 			}
 		}
 	}
@@ -2762,9 +2782,9 @@ class MembersManager
 	{
 		global $scripturl;
 
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT
 				id_member, real_name AS display_name, member_ip
 			FROM {db_prefix}members
@@ -2830,9 +2850,9 @@ class MembersManager
 	{
 		global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
-		$db = $GLOBALS['elk']['db'];
+		
 		$cache = $GLOBALS['elk']['cache'];
-		$hooks = $GLOBALS['elk']['hooks'];
+		$hooks = $this->hooks;
 		$req = $GLOBALS['elk']['req'];
 
 		// Check first the integration, then the cookie, and last the session.
@@ -2865,8 +2885,8 @@ class MembersManager
 		// Only load this stuff if the user isn't a guest.
 		if ($id_member != 0) {
 			// Is the member data cached?
-			if (!$cache->checkLevel(2) || !$cache->getVar($user_settings, 'user_settings-' . $id_member, 60)) {
-				list ($user_settings) = $db->fetchQuery('
+			if (!$this->cache->checkLevel(2) || !$this->cache->getVar($user_settings, 'user_settings-' . $id_member, 60)) {
+				list ($user_settings) = $this->db->fetchQuery('
 					SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 					FROM {db_prefix}members AS mem
 						LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -2880,8 +2900,8 @@ class MembersManager
 				// Make the ID specifically an integer
 				$user_settings['id_member'] = (int)$user_settings['id_member'];
 
-				if ($cache->checkLevel(2))
-					$cache->put('user_settings-' . $id_member, $user_settings, 60);
+				if ($this->cache->checkLevel(2))
+					$this->cache->put('user_settings-' . $id_member, $user_settings, 60);
 			}
 
 			// Did we find 'im?  If not, junk it.
@@ -2912,7 +2932,7 @@ class MembersManager
 			// 2. RSS feeds and XMLHTTP requests don't count either.
 			// 3. If it was set within this session, no need to set it again.
 			// 4. New session, yet updated < five hours ago? Maybe cache can help.
-			if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (!$cache->isEnabled() || !$cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $id_member, 5 * 3600))) {
+			if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $id_member, 5 * 3600))) {
 				// @todo can this be cached?
 				// Do a quick query to make sure this isn't a mistake.
 
@@ -2925,10 +2945,10 @@ class MembersManager
 								updateMemberData($id_member, array('id_msg_last_visit' => (int)$modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
 					$user_settings['last_login'] = time();
 
-					if ($cache->checkLevel(2))
-						$cache->put('user_settings-' . $id_member, $user_settings, 60);
+					if ($this->cache->checkLevel(2))
+						$this->cache->put('user_settings-' . $id_member, $user_settings, 60);
 
-					$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
+					$this->cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
 				}
 			} elseif (empty($_SESSION['id_msg_last_visit']))
 				$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
@@ -3049,7 +3069,7 @@ class MembersManager
 		else
 			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
-		$GLOBALS['elk']['hooks']->hook('user_info');
+		$this->hooks->hook('user_info');
 	}
 
 	/**
@@ -3061,9 +3081,9 @@ class MembersManager
 	 */
 	function memberByOpenID($claimed_id)
 	{
-		$db = $GLOBALS['elk']['db'];
+		
 
-		$result = $db->query('', '
+		$result = $this->db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri
 			FROM {db_prefix}members

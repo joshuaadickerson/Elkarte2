@@ -133,7 +133,7 @@ class InLineAttachment
 		$topic = $this->_topic;
 
 		// Lets make sure we have the attachments
-		require_once(SUBSDIR . '/Attachments.subs.php');
+
 		if (!isset($attachments[$this->_id_msg]))
 		{
 			if (is_array($attachments))

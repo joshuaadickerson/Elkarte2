@@ -13,80 +13,11 @@
  *
  */
 
-// We're going to need, cough, a few globals
-global $mbname, $language;
-global $boardurl, $webmaster_email, $cookiename;
-global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_type, $db_port;
-global $modSettings, $context, $user_info, $topic, $board, $txt;
-global $scripturl, $db_passwd;
-global $boarddir, $sourcedir;
-global $ssi_db_user, $ssi_db_passwd;
-
-// Done to allow the option to runInSeparateProcess for phpunit
-// as done in Auth.subs.Test
-if (!defined('ELK'))
-{
-	DEFINE('ELK', '1');
-	DEFINE('CACHE_STALE', '?R11');
-
-	// Get the forum's settings for database and file paths.
-	require_once('/var/www/Elkarte/Settings.php');
-
-	// Set our site "variable" constants
-	DEFINE('BOARDDIR', $boarddir);
-	DEFINE('CACHEDIR', $cachedir);
-	DEFINE('EXTDIR', $extdir);
-	DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
-	DEFINE('SOURCEDIR', $sourcedir);
-	DEFINE('ADMINDIR', $sourcedir . '/admin');
-	DEFINE('CONTROLLERDIR', $sourcedir . '/Controllers');
-	DEFINE('SUBSDIR', $sourcedir . '/subs');
-	DEFINE('ADDONSDIR', $sourcedir . '/addons');
-	DEFINE('VENDORDIR', $vendordir . '/vendor');
-}
-else
-	require_once('/var/www/Elkarte/Settings.php');
-
-// A few files we cannot live without and will not be autoload
-require_once(VENDORDIR . '/autoload.php');
-require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Logging.php');
-require_once(SOURCEDIR . '/Load.php');
-require_once(SOURCEDIR . '/Security.php');
-require_once(ELKDIR . '/Cache/Cache.subs.php');
-require_once(SOURCEDIR . '/Services.php');
-
-// Get the autoloader rolling
-require(SOURCEDIR . '/Autoloader.class.php');
-$autoloder = Elk_Autoloader::getInstance();
-$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-$autoloder->register(SOURCEDIR, '\\ElkArte');
-
-$elk = new Pimple\Container;
-
-// Used by the test, add others as needed or ...
-$context = array();
-$context['forum_name'] = $mbname;
-$context['forum_name_html_safe'] = $context['forum_name'];
-
-// Just like we are starting, almost
-Request::instance()->cleanRequest()->parseRequest();
-loadDatabase();
-Hooks::init($GLOBALS['elk']['db'], $GLOBALS['elk']['debug']);
-reloadSettings();
-elk_seed_generator();
-loadSession();
-loadUserSettings();
-loadBoard();
-loadPermissions();
-
-// Basic language is good to have for functional tests
-loadLanguage('index+Errors');
-
 // If we are running functional tests as well
 if (defined('PHPUNIT_SELENIUM'))
 {
 	require_once('/var/www/tests/Sources/Controllers/ElkArteWebTest.php');
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
+
 file_put_contents('/var/www/bootstrapcompleted.lock', '1');

@@ -304,8 +304,6 @@ class ManageBansController extends AbstractController
 	{
 		global $txt, $modSettings, $context, $scripturl;
 
-		require_once(SUBSDIR . '/Bans.subs.php');
-
 		$ban_errors = ErrorContext::context('ban', 1);
 
 		// Saving a new or edited ban?
@@ -514,7 +512,7 @@ class ManageBansController extends AbstractController
 	{
 		global $scripturl, $context, $txt;
 
-		require_once(SUBSDIR . '/Bans.subs.php');
+
 
 		// Delete one or more entries.
 		if (!empty($this->_req->post->removeAll) || (!empty($this->_req->post->removeSelected) && !empty($this->_req->post->remove)))
@@ -657,7 +655,7 @@ class ManageBansController extends AbstractController
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/Bans.subs.php');
+
 
 		// Check with security first
 		$this->_session->check();
@@ -771,7 +769,7 @@ class ManageBansController extends AbstractController
 	{
 		global $context, $scripturl;
 
-		require_once(SUBSDIR . '/Bans.subs.php');
+
 
 		$ban_group = $this->_req->getQuery('bg', 'intval', 0);
 		$ban_id = $this->_req->getQuery('bi', 'intval', 0);
@@ -885,7 +883,7 @@ class ManageBansController extends AbstractController
 	{
 		global $modSettings, $context, $scripturl, $txt;
 
-		require_once(SUBSDIR . '/Bans.subs.php');
+
 
 		if (!empty($this->_req->post->remove_triggers) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{

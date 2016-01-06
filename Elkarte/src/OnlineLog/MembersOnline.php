@@ -22,6 +22,111 @@ namespace Elkarte\OnlineLog;
 class MembersOnline
 {
 	/**
+	 * Put this user in the online log.
+	 *
+	 * @param bool $force = false
+	 */
+	function writeLog($force = false)
+	{
+		global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board;
+
+		// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
+		if (!empty($settings['display_who_viewing']) && ($topic || $board))
+		{
+			// Take the opposite approach!
+			$force = true;
+
+			// Don't update for every page - this isn't wholly accurate but who cares.
+			if ($topic)
+			{
+				if (isset($_SESSION['last_topic_id']) && $_SESSION['last_topic_id'] == $topic)
+					$force = false;
+				$_SESSION['last_topic_id'] = $topic;
+			}
+		}
+
+		// Are they a spider we should be tracking? Mode = 1 gets tracked on its spider check...
+		if (!empty($user_info['possibly_robot']) && !empty($modSettings['spider_mode']) && $modSettings['spider_mode'] > 1)
+		{
+			logSpider();
+		}
+
+		// Don't mark them as online more than every so often.
+		if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= (time() - 8) && !$force)
+			return;
+
+		if (!empty($modSettings['who_enabled']))
+		{
+			$req = $GLOBALS['elk']['req'];
+			$serialized = $_GET + array('USER_AGENT' => $req->user_agent());
+
+			// In the case of a dlattach action, session_var may not be set.
+			if (!isset($context['session_var']))
+				$context['session_var'] = $_SESSION['session_var'];
+
+			unset($serialized['sesc'], $serialized[$context['session_var']]);
+			$serialized = serialize($serialized);
+		}
+		else
+			$serialized = '';
+
+		// Guests use 0, members use their session ID.
+		$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
+
+		$cache = $GLOBALS['elk']['cache'];
+
+		// Grab the last all-of-Elk-specific log_online deletion time.
+		$cache->getVar($do_delete, 'log_online-update', 30) && (int) $do_delete < time() - 30;
+
+		// If the last click wasn't a long time ago, and there was a last click...
+		if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= time() - $modSettings['lastActive'] * 20)
+		{
+			if ($do_delete)
+			{
+				deleteLogOnlineInterval($session_id);
+
+				// Cache when we did it last.
+				$cache->put('log_online-update', time(), 30);
+			}
+
+			updateLogOnline($session_id, $serialized);
+		}
+		else
+			$_SESSION['log_time'] = 0;
+
+		// Otherwise, we have to delete and insert.
+		if (empty($_SESSION['log_time']))
+			insertdeleteLogOnline($session_id, $serialized, $do_delete);
+
+		// Mark your session as being logged.
+		$_SESSION['log_time'] = time();
+
+		// Well, they are online now.
+		if (empty($_SESSION['timeOnlineUpdated']))
+			$_SESSION['timeOnlineUpdated'] = time();
+
+		// Set their login time, if not already done within the last minute.
+		if (ELK != 'SSI' && !empty($user_info['last_login']) && $user_info['last_login'] < time() - 60)
+		{
+			// We log IPs the request came with, around here
+			$req = $GLOBALS['elk']['req'];
+
+			// Don't count longer than 15 minutes.
+			if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
+				$_SESSION['timeOnlineUpdated'] = time();
+
+			$user_settings['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
+			$GLOBALS['elk']['members.manager']->updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => $user_settings['total_time_logged_in']));
+
+			if ($cache->checkLevel(2))
+				$cache->put('user_settings-' . $user_info['id'], $user_settings, 60);
+
+			$user_info['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
+			$_SESSION['timeOnlineUpdated'] = time();
+		}
+	}
+
+	/**
 	 * Retrieve a list and several other statistics of the users currently online.
 	 *
 	 * - Used by the board index and SSI.

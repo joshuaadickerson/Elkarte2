@@ -47,7 +47,7 @@ class Provider implements ProviderInterface
 	protected function controllers(Container $elk)
 	{
 		$elk['topics.index_controller'] = function ($elk) {
-			return new MessageIndexController($elk, $elk['hooks'], $elk['errors'], $elk['layers']);
+			return new MessageIndexController($elk, $elk['hooks'], $elk['errors'], $elk['layers'], $elk['boards.manager']);
 		};
 
 		$elk['topics.manage_controller'] = function ($elk) {

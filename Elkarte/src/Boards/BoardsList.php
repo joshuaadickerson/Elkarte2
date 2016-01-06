@@ -22,7 +22,7 @@ namespace Elkarte\Boards;
 
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Members\Member;
 use Elkarte\Members\MemberContainer;
 

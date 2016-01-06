@@ -204,7 +204,7 @@ class BanCheck
 		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
 				|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
 		{
-			require_once(SUBSDIR . '/Bans.subs.php');
+
 			updateBanMembers();
 		}
 	}

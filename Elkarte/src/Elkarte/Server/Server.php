@@ -1,6 +1,6 @@
 <?php
 
-namespace Elkarke\Elkarte\Server;
+namespace Elkarte\Elkarte\Server;
 
 class Server
 {
@@ -15,7 +15,7 @@ class Server
 		if (stristr(PHP_OS, 'win'))
 			return false;
 
-		$cores = detectServerCores();
+		$cores = $this->detectServerCores();
 
 		// The internal function should always be available
 		if (function_exists('sys_getloadavg')) {

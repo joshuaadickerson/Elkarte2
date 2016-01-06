@@ -370,7 +370,7 @@ class ProfileAccountController extends AbstractController
 			}
 
 			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|$GLOBALS['elk']['text']->htmlspecialchars', '');
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|htmlspecialchars', '');
 			$context['warning_data'] = array(
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),
@@ -400,7 +400,7 @@ class ProfileAccountController extends AbstractController
 			$this->_session->check('post');
 
 			// There must be a reason, and use of flowery words is allowed.
-			$warn_reason = $this->_req->getPost('warn_reason', 'trim|$GLOBALS['elk']['text']->htmlspecialchars', '');
+			$warn_reason = $this->_req->getPost('warn_reason', 'trim|htmlspecialchars', '');
 			if ($warn_reason == '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';
@@ -425,9 +425,6 @@ class ProfileAccountController extends AbstractController
 				$warning_level = $context['max_allowed'];
 			}
 
-			// We need this to log moderation notices
-			require_once(ROOTDIR . '/Messages/Moderation.subs.php');
-
 			// Do we actually have to issue them with a PM?
 			$id_notice = $this->_issue_warning_pm();
 
@@ -444,7 +441,7 @@ class ProfileAccountController extends AbstractController
 				}
 
 				// Make the change.
-						updateMemberData($this->_memID, array('warning' => $warning_level));
+				updateMemberData($this->_memID, array('warning' => $warning_level));
 
 				// Leave a lovely message.
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : $txt['profile_warning_success'];

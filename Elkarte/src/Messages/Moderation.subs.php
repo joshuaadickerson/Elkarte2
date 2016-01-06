@@ -277,7 +277,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(ROOTDIR . '/Attachments/ManageAttachments.subs.php');
+
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
@@ -291,7 +291,7 @@ function loadModeratorMenuCounts($brd = null)
 
 		// Group requests
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['gq'] != '0=1')
-			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
+			$menu_errors[$cache_key]['groupreq'] = count($GLOBALS['elk']['groups.manager']->groupRequests());
 
 		// Member requests
 		if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))

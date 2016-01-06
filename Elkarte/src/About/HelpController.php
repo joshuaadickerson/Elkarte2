@@ -23,7 +23,7 @@ use Elkarte\Elkarte\Controller\AbstractController;
 
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 use Pimple\Container;
 
 /**

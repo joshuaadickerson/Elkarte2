@@ -6,7 +6,7 @@ use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Text\StringUtil;
 
 class BoardReadLog
 {

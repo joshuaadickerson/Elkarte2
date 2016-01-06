@@ -35,6 +35,10 @@ class Provider implements ProviderInterface
 				'bbc_parser' => $elk['boards.bbc_parser'],
 			]);
 		};
+
+		$elk['boards.readlog'] = function ($elk) {
+			return new ReadLog\BoardReadLog($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors'], $elk['text']);
+		};
 	}
 
 	public function boot(Container $elk)

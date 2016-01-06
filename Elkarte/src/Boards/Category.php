@@ -18,7 +18,7 @@ class Category extends Entity
 
 	public function addBoard(Board $board)
 	{
-		$this->boards[$board->id] = $board;
+		$this->pushToArray('boards', $board, $board->id);
 		return $this;
 	}
 

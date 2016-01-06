@@ -27,9 +27,9 @@ git checkout "$BRANCH"
 # @todo run tests!
 
 # All the stuff nobody cares about.
-rm -rf ./docs
-rm -rf ./release_tools
-rm -rf ./tests
+rm -rf ./Docs
+rm -rf ./Build/release_tools
+rm -rf ./Build/tests
 rm -rf ./.git
 rm -rf ./install/patch*
 rm composer.json

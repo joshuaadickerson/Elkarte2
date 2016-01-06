@@ -25,12 +25,6 @@ namespace Elkarte\Elkarte\Cache;
 class Cache
 {
 	/**
-	 * Holds our static instance of the class
-	 * @var object
-	 */
-	protected static $_instance = null;
-
-	/**
 	 * Array of options for the methods (if needed)
 	 * @var mixed[]
 	 */

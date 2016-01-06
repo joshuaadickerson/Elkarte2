@@ -13,9 +13,6 @@
 
 namespace Elkarte\Elkarte\Cache\Drivers;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Zend caching engine.
  * Supports both zend_shm_cache_store and the deprecated output_cache_put

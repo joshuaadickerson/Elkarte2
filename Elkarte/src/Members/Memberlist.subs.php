@@ -120,12 +120,12 @@ function ml_memberCache($cache_step_size)
 	// Get/Set our pointers in this list, used to later help limit our query
 	for ($i = 0, $n = $request->numRows(); $i < $n; $i += $cache_step_size)
 	{
-		$db->data_seek($request, $i);
+		$request->dataSeek($i);
 		list ($memberlist_cache['index'][$i]) = $request->fetchRow();
 	}
 
 	// Set the last one
-	$db->data_seek($request, $memberlist_cache['num_members'] - 1);
+	$request->dataSeek($memberlist_cache['num_members'] - 1);
 	list ($memberlist_cache['index'][$i]) = $request->fetchRow();
 	$request->free();
 
@@ -160,6 +160,7 @@ function ml_memberCount()
  * Get all all the members who's name starts below a given letter
  *
  * @param string $start single letter to start with
+ * @return int
  */
 function ml_alphaStart($start)
 {
@@ -178,7 +179,7 @@ function ml_alphaStart($start)
 	list ($start) = $request->fetchRow();
 	$request->free();
 
-	return $start;
+	return (int) $start;
 }
 
 /**

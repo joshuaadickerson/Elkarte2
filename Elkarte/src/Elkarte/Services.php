@@ -90,6 +90,7 @@ $elk['db'] = function () use ($elk, $db_persist, $db_server, $db_user, $db_passw
 };
 
 /**
+ * @var BrowserDetector
  * @return BrowserDetector
  */
 $elk['browser'] = function ($elk) {
@@ -99,6 +100,7 @@ $elk['browser'] = function ($elk) {
 };
 
 /**
+ * @var SiteDispatcher
  * @return SiteDispatcher
  */
 $elk['dispatcher'] = function () use ($elk) {
@@ -106,6 +108,7 @@ $elk['dispatcher'] = function () use ($elk) {
 };
 
 /**
+ * @var Session
  * @return Session
  */
 $elk['session'] = function ($elk) {
@@ -127,7 +130,7 @@ $elk['ban_check'] = function () use ($elk) {
 };
 
 /**
- * @return \BBC\ParserWrapper
+ * @return ParserWrapper
  */
 $elk['bbc'] = function () {
 	global $modSettings;
@@ -155,6 +158,7 @@ $elk['censor'] = function () {
 /**
  * The current action
  * @var string
+ * @return string
  */
 $elk['action'] = function () {
 	return isset($_GET['action']) ? $_GET['action'] : '';

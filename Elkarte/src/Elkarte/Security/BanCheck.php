@@ -472,7 +472,7 @@ class BanCheck
 		global $user_info, $context, $txt;
 
 		// We don't wanna see you!
-		require_once(SUBSDIR . '/Logging.subs.php');
+		require_once(ROOTDIR . '/Logging/Logging.subs.php');
 		deleteMemberLogOnline();
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)

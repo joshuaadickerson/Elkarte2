@@ -17,8 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
@@ -161,6 +159,7 @@ function removeSettings($toRemove)
  * @param int $num_per_page The number of items to be displayed on a given page.
  * @param bool $flexible_start = false Use "url.page" instead of "url;start=page"
  * @param mixed[] $show associative array of option => boolean paris
+ * @return string
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -574,6 +573,7 @@ function redirectexit($setLocation = '', $refresh = false)
  * - Evoked by enabling queryless_urls for systems that support that function
  *
  * @param mixed[] $matches results from the calling preg
+ * @return string
  */
 function redirectexit_callback($matches)
 {
@@ -918,7 +918,7 @@ function host_from_ip($ip)
 
 	$cache = $GLOBALS['elk']['cache'];
 
-	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
+	if ($cache->getVar($host = null, 'hostlookup-' . $ip, 600) || empty($ip))
 		return $host;
 
 	$t = microtime(true);

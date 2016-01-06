@@ -10,6 +10,7 @@ class Board extends Entity
 	public function getDefault()
 	{
 		return [
+			'id' => 0,
 			'children' => [],
 			'moderators' => [],
 			'unapproved_user_topics' => 0,

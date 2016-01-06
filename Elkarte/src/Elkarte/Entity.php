@@ -4,10 +4,14 @@ namespace Elkarte\Elkarte;
 
 class Entity extends \ArrayObject
 {
-	public function __construct($input, $flags = 0, $iterator_class = 'ArrayIterator')
+	public function __construct($input = null, $flags = 0, $iterator_class = 'ArrayIterator')
 	{
 		parent::__construct($this->getDefault(), $flags, $iterator_class);
-		$this->exchangeArray(array_merge($this->getArrayCopy(), $input));
+
+		if (!empty($input))
+		{
+			$this->exchangeArray(array_merge($this->getArrayCopy(), (array) $input));
+		}
 	}
 
 	/**
@@ -66,5 +70,32 @@ class Entity extends \ArrayObject
 		{
 			return $this->$method();
 		}
+	}
+
+	// @todo figure out why I was getting Notice: Indirect modification of overloaded property Elkarte\Boards\Category::$boards has no effect in /var/www/Elkarte2/Elkarte/src/Boards/Category.php on line 21
+	/**
+	 * Add a value to an internal array
+	 *
+	 * @param string|int $index
+	 * @param mixed $value
+	 * @param null|string|int $array_index
+	 * @return array
+	 */
+	public function pushToArray($index, $value, $array_index = null)
+	{
+		$array = $this->offsetGet($index);
+
+		if ($array_index === null)
+		{
+			$array[] = $value;
+		}
+		else
+		{
+			$array[$array_index] = $value;
+		}
+
+		$this->offsetSet($index, $array);
+
+		return $array;
 	}
 }

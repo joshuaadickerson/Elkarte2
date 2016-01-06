@@ -118,7 +118,7 @@ class SiteDispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_controller_name = 'Elkarte\\Topics\\MessageIndexController';
+				$this->_controller_name = 'topics.index_controller';
 				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display

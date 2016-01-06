@@ -27,6 +27,18 @@ class ManageTopicsController extends AbstractController
 	 */
 	protected $_topicSettings;
 
+	public function __construct(Container $elk, BoardsManager $manager, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+	{
+		$this->elk = $elk;
+
+		$this->bootstrap();
+
+		$this->hooks = $hooks;
+		$this->errors = $errors;
+		$this->_layers = $layers;
+		$this->manager = $manager;
+	}
+
 	/**
 	 * Check permissions and forward to the right method.
 	 *

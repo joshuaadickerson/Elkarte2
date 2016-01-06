@@ -97,6 +97,7 @@ class Elkarte extends Container
 		$this->register(new About\Provider);
 		$this->register(new Boards\Provider);
 		$this->register(new Members\Provider);
+		$this->register(new Topics\Provider);
 
 		return $this;
 	}

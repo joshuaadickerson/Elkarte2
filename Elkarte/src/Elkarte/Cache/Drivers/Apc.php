@@ -12,9 +12,6 @@
 
 namespace Elkarte\Elkarte\Cache\Drivers;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Alternative PHP Cache or APC / APCu
  */

@@ -13,9 +13,6 @@
 
 namespace Elkarte\Elkarte\Cache\Drivers;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * In order to work with ElkArte any caching method must implement this
  * interface

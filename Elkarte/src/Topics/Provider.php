@@ -11,9 +11,30 @@ class Provider implements ProviderInterface
 	{
 		$this->controllers($elk);
 
-		$elk['topics.context'] = $elk->factory(function ($elk) {
-			return new TopicContext;
-		});
+		$elk['topics.manager'] = function ($elk) {
+			return new TopicsManager($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors'], $elk['text'],
+				$elk['topics.container'], $elk['members.container']);
+		};
+
+		$elk['topics.container'] = function ($elk) {
+			return new TopicsContainer;
+		};
+
+		$elk['topics.list'] = function ($elk) {
+			return new TopicsList($elk['db'], $elk['cache'], $elk['text'], $elk['topics.container'], $elk['members.container']);
+		};
+
+		// @todo this should check settings/hooks to see if the topics have a separate BBC parser
+		$elk['topics.bbc_parser'] = function ($elk) {
+			return $elk['bbc'];
+		};
+
+		$elk['topics.context'] = function ($elk) {
+			return new BoardContext([
+				'elk' => $elk,
+				'bbc_parser' => $elk['topics.bbc_parser'],
+			]);
+		};
 	}
 
 	public function boot(Container $elk)
@@ -26,7 +47,7 @@ class Provider implements ProviderInterface
 	protected function controllers(Container $elk)
 	{
 		$elk['topics.index_controller'] = function ($elk) {
-			return new MessageIndexController();
+			return new MessageIndexController($elk, $elk['hooks'], $elk['errors'], $elk['layers']);
 		};
 
 		$elk['topics.manage_controller'] = function ($elk) {

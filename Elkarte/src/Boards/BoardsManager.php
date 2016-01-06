@@ -41,7 +41,9 @@ class BoardsManager
 	public function load()
 	{
 		global $txt, $scripturl, $context, $modSettings;
-		global $board_info, $board, $topic, $user_info;
+		global $board_info, $topic, $user_info;
+
+		$board_id = &$GLOBALS['board'];
 
 		// Assume they are not a moderator.
 		$user_info['is_mod'] = false;
@@ -55,7 +57,7 @@ class BoardsManager
 		$context['linktree'] = array();
 
 		// Have they by chance specified a message id but nothing else?
-		if (empty($_REQUEST['action']) && empty($topic) && empty($board) && !empty($_REQUEST['msg']))
+		if (empty($_REQUEST['action']) && empty($topic) && empty($board_id) && !empty($_REQUEST['msg']))
 		{
 			// Make sure the message id is really an int.
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
@@ -86,9 +88,9 @@ class BoardsManager
 		}
 
 		// Load this board only if it is specified.
-		if (empty($board) && empty($topic))
+		if (empty($board_id) && empty($topic))
 		{
-			$board_info = array('moderators' => array());
+			$board_info = new Board;
 			return;
 		}
 
@@ -98,12 +100,12 @@ class BoardsManager
 			if (!empty($topic))
 				$temp = $this->cache->get('topic_board-' . $topic, 120);
 			else
-				$temp = $this->cache->get('board-' . $board, 120);
+				$temp = $this->cache->get('board-' . $board_id, 120);
 
 			if (!empty($temp))
 			{
-				$board_info = $temp;
-				$board = $board_info['id'];
+				$board_info = new Board($temp);
+				$GLOBALS['board'] = $board_info['id'];
 			}
 		}
 
@@ -131,7 +133,7 @@ class BoardsManager
 			WHERE b.id_board = {raw:board_link}',
 				array(
 					'current_topic' => $topic,
-					'board_link' => empty($topic) ? $this->db->quote('{int:current_board}', array('current_board' => $board)) : 't.id_board',
+					'board_link' => empty($topic) ? $this->db->quote('{int:current_board}', array('current_board' => $board_id)) : 't.id_board',
 				)
 			);
 			// If there aren't any, skip.
@@ -141,19 +143,17 @@ class BoardsManager
 
 				// Set the current board.
 				if (!empty($row['id_board']))
-					$board = $row['id_board'];
+					$GLOBALS['board'] = $row['id_board'];
 
 				$category = new Category([
 					'id' => $row['id_cat'],
 					'name' => $row['cname'],
-					'boards' => [$board],
+					'boards' => [$board_id],
 				]);
-
-				$category->addBoard($board);
 
 				// Basic operating information. (globals... :/)
 				$board_info = new Board([
-					'id' => $board,
+					'id' => $board_id,
 					'cat' => $category,
 					'name' => $row['bname'],
 					'raw_description' => $row['description'],
@@ -171,6 +171,8 @@ class BoardsManager
 					'cur_topic_approved' => empty($topic) || $row['approved'],
 					'cur_topic_starter' => empty($topic) ? 0 : $row['id_member_started'],
 				]);
+
+				$category->addBoard($board_info);
 
 				// Load the membergroups allowed, and check permissions.
 				$board_info['groups'] = $row['member_groups'] == '' ? array() : explode(',', $row['member_groups']);
@@ -203,7 +205,7 @@ class BoardsManager
 						array(
 							'id_member' => $user_info['id'],
 							'unapproved' => 0,
-							'board' => $board,
+							'board' => $board_id,
 						)
 					);
 
@@ -217,25 +219,25 @@ class BoardsManager
 					// @todo SLOW?
 					if (!empty($topic))
 						$this->cache->put('topic_board-' . $topic, $board_info, 120);
-					$this->cache->put('board-' . $board, $board_info, 120);
+					$this->cache->put('board-' . $board_id, $board_info, 120);
 				}
 			}
 			else
 			{
 				// Otherwise the topic is invalid, there are no moderators, etc.
-				$board_info = array(
+				$board_info = new Board([
 					'error' => 'exist'
-				);
+				]);
 				$topic = null;
-				$board = 0;
+				$GLOBALS['board'] = 0;
 			}
 			$request->free();
 		}
 
 		if (!empty($topic))
-			$_GET['board'] = (int) $board;
+			$_GET['board'] = (int) $board_id;
 
-		if (!empty($board))
+		if (!empty($board_id))
 		{
 			// Now check if the user is a moderator.
 			$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
@@ -253,9 +255,9 @@ class BoardsManager
 					'url' => $scripturl . '#c' . $board_info['cat']['id'],
 					'name' => $board_info['cat']['name']
 				)),
-				array_reverse($board_info->parentBoards()),
+				array_reverse($board_info->parentBoards($this)),
 				array(array(
-					'url' => $scripturl . '?board=' . $board . '.0',
+					'url' => $scripturl . '?board=' . $board_id . '.0',
 					'name' => $board_info['name']
 				))
 			);
@@ -265,7 +267,7 @@ class BoardsManager
 		$context['user']['is_mod'] = &$user_info['is_mod'];
 		$context['user']['is_moderator'] = &$user_info['is_moderator'];
 		$context['current_topic'] = $topic;
-		$context['current_board'] = $board;
+		$context['current_board'] = $board_id;
 
 		// Hacker... you can't see this topic, I'll tell you that. (but moderators can!)
 		if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_moderator']))

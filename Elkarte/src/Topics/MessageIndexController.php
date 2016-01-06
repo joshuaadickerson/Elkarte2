@@ -23,12 +23,27 @@ namespace Elkarte\Topics;
 use Elkarte\Boards\BoardsList;
 use Elkarte\Elkarte\Controller\AbstractController;
 use Elkarte\Elkarte\Controller\FrontpageInterface;
+use Pimple\Container;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Errors\Errors;
+use Elkarte\Elkarte\Theme\TemplateLayers;
 
 /**
  * Message Index Controller
  */
 class MessageIndexController extends AbstractController implements FrontpageInterface
 {
+	public function __construct(Container $elk, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+	{
+		$this->elk = $elk;
+
+		$this->bootstrap();
+
+		$this->hooks = $hooks;
+		$this->errors = $errors;
+		$this->_layers = $layers;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -231,20 +246,21 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			stop_prefetching();
 
 			// Mark the board as read, and its parents.
-			if ($board_info->parentBoards() !== array())
+			if ($board_info->parentBoards($this->elk['boards.manager']) !== array())
 			{
-				$board_list = array_keys($board_info->parentBoards());
+				$board_list = array_keys($board_info->parentBoards($this->elk['boards.manager']));
 				$board_list[] = $board;
 			}
 			else
 				$board_list = array($board);
 
 			// Mark boards as read. Boards alone, no need for topics.
-			markBoardsRead($board_list, false, false);
+			$board_readlog = $this->elk['boards.readlog'];
+			$this->elk['boards.readlog']->markBoardsRead($board_list, false, false);
 
 			// Clear topicseen cache
 			// We've seen all these boards now!
-			foreach ($board_info->parentBoards() as $k => $dummy)
+			foreach ($board_info->parentBoards($this->elk['boards.manager']) as $k => $dummy)
 			{
 				if (isset($_SESSION['topicseen_cache'][$k]))
 				{
@@ -258,7 +274,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			}
 
 			// From now on, they've seen it. So we reset notifications.
-			$context['is_marked_notify'] = resetSentBoardNotification($user_info['id'], $board);
+			$context['is_marked_notify'] = $this->elk['boards.manager']->resetSentBoardNotification($user_info['id'], $board);
 		}
 		else
 			$context['is_marked_notify'] = false;
@@ -281,7 +297,9 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$boardlist = new BoardsList($GLOBALS['elk']['db'], $boardIndexOptions);
+		//$boardlist = new BoardsList($GLOBALS['elk']['db'], $boardIndexOptions);
+		$boardlist = $this->elk['boards.list'];
+		$boardlist->setOptions($boardIndexOptions);
 		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?
@@ -348,7 +366,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		);
 
 		// Allow integration to modify / add to the $indexOptions
-		$GLOBALS['elk']['hooks']->hook('messageindex_topics', array(&$sort_column, &$indexOptions));
+		$this->hooks->hook('messageindex_topics', array(&$sort_column, &$indexOptions));
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
@@ -356,7 +374,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		$context['topics'] = $topic_util->prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
 		// Allow addons to add to the $context['topics']
-		$GLOBALS['elk']['hooks']->hook('messageindex_listing', array($topics_info));
+		$this->hooks->hook('messageindex_listing', array($topics_info));
 
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 		if ($fake_ascending)
@@ -424,7 +442,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 		{
 			$context['qmod_actions'] = array('approve', 'remove', 'lock', 'sticky', 'move', 'merge', 'restore', 'markread');
-			$GLOBALS['elk']['hooks']->hook('quick_mod_actions');
+			$this->hooks->hook('quick_mod_actions');
 		}
 
 		if (!empty($context['boards']) && $context['start'] == 0)
@@ -447,7 +465,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			$context['normal_buttons']['markread'] = array('text' => 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'], 'custom' => 'onclick="return markboardreadButton(this);"');
 
 		// Allow adding new buttons easily.
-		$GLOBALS['elk']['hooks']->hook('messageindex_buttons');
+		$this->hooks->hook('messageindex_buttons');
 	}
 
 	/**
@@ -471,7 +489,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(ROOTDIR . '/Notifications/Notification.subs.php');
 
 		// Process process process data.
 		require_once(ROOTDIR . '/Topics/Topic.subs.php');
@@ -662,7 +680,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 
 		updateTopicStats();
 
-			updateMessageStats();
+		updateMessageStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
 		));

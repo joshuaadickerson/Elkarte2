@@ -19,10 +19,9 @@
 
 namespace Elkarte\Search;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use Elkarte\Database\Drivers\SearchInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Util;
 
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
@@ -67,13 +66,13 @@ class Search
 
 	/**
 	 * Database instance
-	 * @var \Database|null
+	 * @var DatabaseInterface
 	 */
 	private $_db = null;
 
 	/**
 	 * Search db instance
-	 * @var \DbSearch|null
+	 * @var SearchInterface
 	 */
 	private $_db_search = null;
 
@@ -197,6 +196,9 @@ class Search
 	 */
 	private $_createTemporary = true;
 
+	/** @var  Util */
+	protected $text;
+
 	/**
 	 * Constructor
 	 * Easy enough, initialize the database objects (generic db and search db)
@@ -208,16 +210,17 @@ class Search
 		$this->_search_version = strtr('ElkArte 1+0', array('+' => '.', '=' => ' '));
 		$this->_db = $GLOBALS['elk']['db'];
 		$this->_db_search = db_search();
+		$this->text = $GLOBALS['elk']['text'];
 
 		// Remove any temporary search tables that may exist
-		$this->_db_search->search_query('drop_tmp_log_search_messages', '
+		$this->_db_search->query('drop_tmp_log_search_messages', '
 			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
 			array(
 				'db_error_skip' => true,
 			)
 		);
 
-		$this->_db_search->search_query('drop_tmp_log_search_topics', '
+		$this->_db_search->query('drop_tmp_log_search_topics', '
 			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
 			array(
 				'db_error_skip' => true,
@@ -225,7 +228,7 @@ class Search
 		);
 
 		// Create new temporary table(s) (if we can) to store preliminary results in.
-		$this->_createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
+		$this->_createTemporary = $this->_db_search->query('create_tmp_log_search_messages', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
 				id_msg int(10) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_msg)
@@ -236,7 +239,7 @@ class Search
 			)
 		) !== false;
 
-		$this->_db_search->search_query('create_tmp_log_search_topics', '
+		$this->_db_search->query('create_tmp_log_search_topics', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_topic)
@@ -382,7 +385,7 @@ class Search
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->param('search'));
 
 		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = $GLOBALS['elk']['text']->un_htmlspecialchar($GLOBALS['elk']['text']->strtolower($stripped_query));
+		$stripped_query = $this->text->un_htmlspecialchar($this->text->strtolower($stripped_query));
 
 		// This option will do fulltext searching in the most basic way.
 		if ($search_simple_fulltext)
@@ -398,7 +401,7 @@ class Search
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->param('search'));
-		$wordArray = explode(' ', $GLOBALS['elk']['text']->htmlspecialchars($GLOBALS['elk']['text']->un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', $this->text->htmlspecialchars($this->text->un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
@@ -425,7 +428,7 @@ class Search
 				unset($this->_searchArray[$index]);
 			}
 			// Don't allow very, very short words.
-			elseif ($GLOBALS['elk']['text']->strlen($value) < 2)
+			elseif ($this->text->strlen($value) < 2)
 			{
 				$this->_ignored[] = $value;
 				unset($this->_searchArray[$index]);
@@ -747,7 +750,7 @@ class Search
 		}
 		else
 		{
-			$userString = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr($this->text->htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -784,11 +787,11 @@ class Search
 			);
 
 			// Simply do nothing if there're too many members matching the criteria.
-			if ($this->_db->num_rows($request) > $maxMembersToSearch)
+			if ($request->numRows() > $maxMembersToSearch)
 			{
 				$this->_userQuery = '';
 			}
-			elseif ($this->_db->num_rows($request) == 0)
+			elseif ($request->numRows() == 0)
 			{
 				$this->_userQuery = $this->_db->quote(
 					'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
@@ -860,7 +863,7 @@ class Search
 				)
 			);
 
-			if ($this->_db->num_rows($request) == 0)
+			if ($request->numRows() == 0)
 			{
 				$GLOBALS['elk']['errors']->fatal_lang_error('topic_gone', false);
 			}
@@ -959,7 +962,7 @@ class Search
 		{
 			if (isset($_GET['search']))
 			{
-				$this->_search_params['search'] = $GLOBALS['elk']['text']->un_htmlspecialchar($_GET['search']);
+				$this->_search_params['search'] = $this->text->un_htmlspecialchar($_GET['search']);
 			}
 			elseif (isset($_POST['search']))
 			{
@@ -1020,20 +1023,20 @@ class Search
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
 				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . $GLOBALS['elk']['text']->htmlspecialchars($word) . '&quot;';
+				$did_you_mean['display'][] = '&quot;' . $this->text->htmlspecialchars($word) . '&quot;';
 				continue;
 			}
 			// For some strange reason spell check can crash PHP on decimals.
 			elseif (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $GLOBALS['elk']['text']->htmlspecialchars($word);
+				$did_you_mean['display'][] = $this->text->htmlspecialchars($word);
 				continue;
 			}
 			elseif (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $GLOBALS['elk']['text']->htmlspecialchars($word);
+				$did_you_mean['display'][] = $this->text->htmlspecialchars($word);
 				continue;
 			}
 
@@ -1041,7 +1044,7 @@ class Search
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if ($GLOBALS['elk']['text']->strtolower($s) == $GLOBALS['elk']['text']->strtolower($word))
+				if ($this->text->strtolower($s) == $this->text->strtolower($word))
 				{
 					unset($suggestions[$i]);
 				}
@@ -1057,13 +1060,13 @@ class Search
 			{
 				$suggestions = array_values($suggestions);
 				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = str_replace('{word}', $GLOBALS['elk']['text']->htmlspecialchars($suggestions[0]), $display_highlight);
+				$did_you_mean['display'][] = str_replace('{word}', $this->text->htmlspecialchars($suggestions[0]), $display_highlight);
 				$found_misspelling = true;
 			}
 			else
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = $GLOBALS['elk']['text']->htmlspecialchars($word);
+				$did_you_mean['display'][] = $this->text->htmlspecialchars($word);
 			}
 		}
 
@@ -1076,12 +1079,12 @@ class Search
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
 					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . $GLOBALS['elk']['text']->htmlspecialchars($word) . '&quot;';
+					$temp_excluded['display'][] = '-&quot;' . $this->text->htmlspecialchars($word) . '&quot;';
 				}
 				else
 				{
 					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . $GLOBALS['elk']['text']->htmlspecialchars($word);
+					$temp_excluded['display'][] = '-' . $this->text->htmlspecialchars($word);
 				}
 			}
 
@@ -1100,7 +1103,7 @@ class Search
 	 */
 	public function clearCacheResults($id_search)
 	{
-		$this->_db_search->search_query('delete_log_search_results', '
+		$this->_db_search->query('delete_log_search_results', '
 			DELETE FROM {db_prefix}log_search_results
 			WHERE id_search = {int:search_id}',
 			array(
@@ -1455,7 +1458,7 @@ class Search
 	{
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
-		$request = $this->_db_search->search_query('', '
+		$request = $this->_db_search->query('', '
 			SELECT ' . (empty($this->_search_params['topic']) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->param('sort') === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
@@ -1595,7 +1598,7 @@ class Search
 		// Clean up some previous cache.
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_topics', '
+			$this->_db_search->query('delete_log_search_topics', '
 				DELETE FROM {db_prefix}log_search_topics
 				WHERE id_search = {int:search_id}',
 				array(
@@ -1690,7 +1693,7 @@ class Search
 				continue;
 			}
 
-			$ignoreRequest = $this->_db_search->search_query('insert_log_search_topics', ($this->_db->support_ignore() ? ('
+			$ignoreRequest = $this->_db_search->query('insert_log_search_topics', ($this->_db->support_ignore() ? ('
 				INSERT IGNORE INTO {db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics
 					(' . ($this->_createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
 				SELECT ' . ($this->_createTemporary ? '' : $id_search . ', ') . 't.id_topic
@@ -1708,7 +1711,7 @@ class Search
 			// Don't do INSERT IGNORE? Manually fix this up!
 			if (!$this->_db->support_ignore())
 			{
-				while ($row = $this->_db->fetch_row($ignoreRequest))
+				while ($row = $ignoreRequest->fetchRow())
 				{
 					$ind = $this->_createTemporary ? 0 : 1;
 
@@ -1764,7 +1767,7 @@ class Search
 		// Clear, all clear!
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_messages', '
+			$this->_db_search->query('delete_log_search_messages', '
 				DELETE FROM {db_prefix}log_search_messages
 				WHERE id_search = {int:id_search}',
 				array(
@@ -1914,7 +1917,7 @@ class Search
 	{
 		static $usedIDs;
 
-		$ignoreRequest = $this->_db_search->search_query($query_identifier, ($this->_db->support_ignore() ? ('
+		$ignoreRequest = $this->_db_search->query($query_identifier, ($this->_db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}log_search_results
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT

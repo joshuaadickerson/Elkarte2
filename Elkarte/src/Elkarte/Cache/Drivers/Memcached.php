@@ -1,5 +1,7 @@
 <?php
 
+// @todo change this to use the OO Memcached. Deprecate memcache or move to Memcache driver
+
 /**
  * This file contains functions that deal with getting and setting cache values.
  *
@@ -13,9 +15,6 @@
 
 namespace Elkarte\Elkarte\Cache\Drivers;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Memcache and memcached.
  *
@@ -23,7 +22,7 @@ if (!defined('ELK'))
  */
 class Memcached extends AbstractCacheMethod
 {
-	private $_memcache = null;
+	protected $_memcache;
 
 	/**
 	 * {@inheritdoc }

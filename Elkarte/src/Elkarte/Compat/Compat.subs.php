@@ -19,13 +19,11 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Define the old SMF sha1 function.
  *
  * @param string $str the string
+ * @return string
  */
 function sha1_smf($str)
 {
@@ -50,6 +48,7 @@ function sha1_smf($str)
  *
  * @param int[] $x
  * @param int $len
+ * @return string
  */
 function sha1_core($x, $len)
 {
@@ -103,6 +102,7 @@ function sha1_core($x, $len)
  * @param int $b
  * @param int $c
  * @param int $d
+ * @return int
  */
 function sha1_ft($t, $b, $c, $d)
 {
@@ -120,6 +120,7 @@ function sha1_ft($t, $b, $c, $d)
  * Helper function for the core SHA-1 calculation
  *
  * @param int $t
+ * @return int
  */
 function sha1_kt($t)
 {
@@ -131,6 +132,7 @@ function sha1_kt($t)
  *
  * @param int $num
  * @param int $cnt
+ * @return int
  */
 function sha1_rol($num, $cnt)
 {
@@ -153,6 +155,7 @@ if (!function_exists('crc32_compat'))
 	 * http://www.php.net/crc32#79567
 	 *
 	 * @param int $number
+	 * @return int
 	 */
 	function crc32_compat($number)
 	{

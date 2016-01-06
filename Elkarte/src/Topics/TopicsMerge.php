@@ -442,7 +442,7 @@ class TopicsMerge
 				'limit' => count($this->_topics),
 			)
 		);
-		if ($this->_db->num_rows($request) < 2)
+		if ($request->numRows() < 2)
 		{
 			$request->free();
 

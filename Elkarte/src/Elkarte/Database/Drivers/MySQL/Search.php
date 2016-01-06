@@ -14,6 +14,7 @@
 namespace Elkarte\Database\Drivers\MySQL;
 
 use Elkarte\Database\Drivers\SearchInterface;
+use Elkarte\ElkArte\Database\Drivers\ResultInterface;
 
 /**
  * MySQL implementation of DbSearch
@@ -30,6 +31,7 @@ class Search implements SearchInterface
 	 * This method will tell you whether this database type supports this search type.
 	 *
 	 * @param string $search_type
+	 * @return bool
 	 */
 	public function search_support($search_type)
 	{
@@ -45,6 +47,7 @@ class Search implements SearchInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values
 	 * @param resource|null $connection
+	 * @return ResultInterface
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -58,7 +61,7 @@ class Search implements SearchInterface
 	 * Returns some basic info about the {db_prefix}messages table
 	 * Used in ManageSearch.controller.php in the page to select the index method
 	 */
-	public function membersTableInfo()
+	public function messagesTableInfo()
 	{
 		global $db_prefix;
 

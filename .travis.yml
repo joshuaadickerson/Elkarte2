@@ -46,12 +46,12 @@ before_script:
 
 script: 
     - chmod ugo+x Build/tests/travis-ci/setup-script.sh
-    - Build/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+    - ./Build/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
 
 after_script:
     - chmod ugo+x Build/tests/travis-ci/setup-results.sh
-    - Build/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+    - ./Build/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
 
 after_failure:
     - chmod ugo+x Build/tests/travis-ci/setup-failure.sh
-    - Build/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
+    - ./Build/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION

@@ -9,7 +9,8 @@ addons:
       - libapache2-mod-php5
       - php5-curl
       - php5-mysql
-      - php5-pgsql
+# Postgresql will come in to play later. For now, let's speed up our testing and make it easier on Travis-CI
+#      - php5-pgsql
 
 matrix:
   include:
@@ -30,8 +31,8 @@ matrix:
   fast_finish: true
 
 install:
-    - if [ "$DB" == "postgres" ]; then psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres; fi;
-    - if [ "$DB" == "postgres" ]; then psql -c "create database elkarte_test;" -U postgres; fi;
+#    - if [ "$DB" == "postgres" ]; then psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres; fi;
+#    - if [ "$DB" == "postgres" ]; then psql -c "create database elkarte_test;" -U postgres; fi;
     - if [ "$DB" == "mysqli" ]; then mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot; fi;
     - if [ "$DB" == "mysqli" ]; then mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot; fi;
 

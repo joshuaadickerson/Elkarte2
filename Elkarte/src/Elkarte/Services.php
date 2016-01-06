@@ -77,9 +77,6 @@ $elk['cache'] = function () {
  * @return DatabaseInterface
  */
 $elk['db'] = function ($elk) use ($db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix) {
-	//global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
-	//global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
-
 	// Fix the db type
 	switch (strtolower($db_type))
 	{

@@ -99,18 +99,6 @@ class Config
 	public $db_passwd = 'password';
 
 	/**
-	 * Database user for when connecting with SSI
-	 * @var string
-	 */
-	public $ssi_db_user = '';
-
-	/**
-	 * Database password for when connecting with SSI
-	 * @var string
-	 */
-	public $ssi_db_passwd = '';
-
-	/**
 	 * A prefix to put in front of your table names.
 	 * This helps to prevent conflicts
 	 * @var string
@@ -132,7 +120,7 @@ class Config
 	########## Cache Info ##########
 	/**
 	 * Select a cache system. You want to leave this up to the cache area of the Admin panel for
-	 * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, xcache or filesystem-based
+	 * proper detection of apc, memcache, output_cache, xcache or filebased
 	 * (you can add more with a mod).
 	 * @var string
 	 */

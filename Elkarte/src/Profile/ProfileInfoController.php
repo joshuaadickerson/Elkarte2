@@ -289,8 +289,8 @@ class ProfileInfoController extends AbstractController
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
-					$preview = $GLOBALS['elk']['text']->shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-					$short_subject = $GLOBALS['elk']['text']->shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$preview = $GLOBALS['elk']['text']->shorten_text($preview, 128);
+					$short_subject = $GLOBALS['elk']['text']->shorten_text($row['subject'], 24);
 
 					// And the array...
 					$context['topics'][] = array(
@@ -355,8 +355,8 @@ class ProfileInfoController extends AbstractController
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
-					$preview = $GLOBALS['elk']['text']->shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-					$short_subject = $GLOBALS['elk']['text']->shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+					$preview = $GLOBALS['elk']['text']->shorten_text($preview, 128);
+					$short_subject = $GLOBALS['elk']['text']->shorten_text($row['subject'], 24);
 
 					// And the array...
 					$context['posts'][] = array(

@@ -169,12 +169,6 @@ function getFilesChanged($from, $to)
 			continue;
 		if ($file === 'index.php')
 			continue;
-		if ($file === 'SSI.php')
-		{
-			$list[] = 'sourcesSSI.php';
-			continue;
-		}
-
 		$list[] = strtr($file, $dirs);
 	}
 

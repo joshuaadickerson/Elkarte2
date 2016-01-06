@@ -12,6 +12,8 @@
 
 namespace Elkarte\Elkarte\Errors;
 
+// @todo https://github.com/SimpleMachines/SMF2.1/issues/3235
+
 class ErrorLogManager
 {
 	/**

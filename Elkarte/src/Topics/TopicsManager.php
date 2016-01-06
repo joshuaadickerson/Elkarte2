@@ -3109,4 +3109,36 @@ class TopicsManager
 			);
 		}
 	}
+
+	/**
+	 * This function determines if a user has posted in the list of topics,
+	 * and returns the list of those topics they posted in.
+	 *
+	 * @param int $id_member member to check
+	 * @param int[] $topic_ids array of topics ids to check for participation
+	 */
+	function topicsParticipation($id_member, $topic_ids)
+	{
+		$db = $GLOBALS['elk']['db'];
+		$topics = array();
+
+		$result = $db->query('', '
+		SELECT id_topic
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})
+			AND id_member = {int:current_member}
+		GROUP BY id_topic
+			LIMIT ' . count($topic_ids),
+			array(
+				'current_member' => $id_member,
+				'topic_list' => $topic_ids,
+			)
+		);
+		while ($row = $result->fetchAssoc())
+			$topics[] = $row;
+
+		$result->free();
+
+		return $topics;
+	}
 }

@@ -418,7 +418,6 @@ class SettingsForm
 		// Any passwords?
 		$config_passwords = array(
 			'db_passwd',
-			'ssi_db_passwd',
 			'cache_password',
 		);
 
@@ -428,7 +427,7 @@ class SettingsForm
 			'language', 'mbname', 'boardurl',
 			'cookiename',
 			'webmaster_email',
-			'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
+			'db_name', 'db_user', 'db_server', 'db_prefix',
 			'cache_accelerator', 'cache_memcached', 'cache_uid',
 		);
 

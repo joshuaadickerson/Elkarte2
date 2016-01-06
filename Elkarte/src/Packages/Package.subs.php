@@ -2426,7 +2426,15 @@ function package_create_backup($id = 'backup')
 	$files = array();
 
 	// The files that reside outside of Sources, in the base, we add manually
-	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php', 'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
+	// @todo this no longer holds true
+	$base_files = array(
+		'index.php',
+		'agreement.txt',
+		'subscriptions.php',
+		'email_imap_cron.php',
+		'emailpost.php',
+		'emailtopic.php'
+	);
 	foreach ($base_files as $file)
 	{
 		if (file_exists(BOARDDIR . '/' . $file))

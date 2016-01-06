@@ -4,6 +4,8 @@ namespace Elkarte\Boards;
 
 class BoardsContainer
 {
+	/** @var Board the current board */
+	protected $current;
 	/** @var Board[] */
 	protected $boards = [];
 	/** @var Category[] */
@@ -59,5 +61,15 @@ class BoardsContainer
 		}
 
 		return $return;
+	}
+
+	public function getCurrentBoard()
+	{
+		return $this->current;
+	}
+
+	public function setCurrentBoard(Board $board)
+	{
+		$this->current = $board;
 	}
 }

@@ -19,8 +19,8 @@
  * ETA: Sorry, we did.
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Topics;
+
 
 /**
  * MergeTopicsController class.  Merges two or more topics into a single topic.

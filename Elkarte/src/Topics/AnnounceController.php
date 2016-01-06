@@ -17,6 +17,8 @@
  *
  */
 
+namespace Elkarte\Topics;
+
 use Elkarte\Elkarte\Controller\AbstractController;
 
 

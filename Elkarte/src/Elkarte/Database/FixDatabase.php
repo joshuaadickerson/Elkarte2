@@ -94,10 +94,6 @@ class FixDatabase
 			$new_connection = false;
 			if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $this->connection)
 			{
-				// Are we in SSI mode?  If so try that username and password first
-				if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-					$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
-
 				// Fall back to the regular username and password if need be
 				if (!$new_connection)
 					$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);

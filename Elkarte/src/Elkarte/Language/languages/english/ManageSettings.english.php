@@ -40,7 +40,6 @@ $txt['pruneSpiderHitLog'] = 'Remove search engine hit logs older than';
 $txt['pruneBadbehaviorLog'] = 'Remove Bad Behavior logs older than';
 $txt['cookieTime'] = 'Default login cookies length';
 $txt['localCookies'] = 'Enable local storage of cookies';
-$txt['localCookies_note'] = '(SSI won\'t work well with this on)';
 $txt['globalCookies'] = 'Use subdomain independent cookies';
 $txt['globalCookies_note'] = '(turn off local cookies first!)';
 $txt['globalCookiesDomain'] = 'Main domain used for subdomain independent cookies';

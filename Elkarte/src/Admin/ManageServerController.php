@@ -553,8 +553,6 @@ class ManageServerController extends AbstractController
 				array('db_prefix', $txt['database_prefix'], 'file', 'text'),
 				array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
 				array('db_error_send', $txt['db_error_send'], 'file', 'check'),
-				array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
-				array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
 			'',
 				array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
 				array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
@@ -591,7 +589,7 @@ class ManageServerController extends AbstractController
 				// Cookies...
 				array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
 				array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
-				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
+				array('localCookies', $txt['localCookies'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
 				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) == 'on' || strtolower($this->_req->server->HTTPS) == '1')),

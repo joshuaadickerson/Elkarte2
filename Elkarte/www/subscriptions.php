@@ -19,7 +19,6 @@
  */
 
 // Start things rolling by getting the forum alive...
-$ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 	die('Cannot find bootstrap.php');
 

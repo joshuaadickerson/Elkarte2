@@ -470,7 +470,7 @@ class Errors
 	 */
 	protected function _setup_fatal_error_context($error_message, $error_code)
 	{
-		global $context, $txt, $ssi_on_error_method;
+		global $context, $txt;
 		static $level = 0;
 
 		// Attempt to prevent a recursive loop.
@@ -494,19 +494,6 @@ class Errors
 		// Load the template and set the sub template.
 		$GLOBALS['elk']['templates']->load('Errors');
 		$context['sub_template'] = 'fatal_error';
-
-		// If this is SSI, what do they want us to do?
-		if (ELK === 'SSI')
-		{
-			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
-				$ssi_on_error_method();
-			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				$GLOBALS['elk']['templates']->loadSubTemplate('fatal_error');
-
-			// No layers?
-			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				$this->terminate();
-		}
 
 		// We want whatever for the header, and a footer. (footer includes sub template!)
 		obExit(null, true, false, true);

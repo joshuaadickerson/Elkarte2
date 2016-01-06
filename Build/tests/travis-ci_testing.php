@@ -40,8 +40,6 @@ foreach ($tests as $test)
 	$final_return = max($final_return, $return, $results['failures'] + $results['exceptions']);
 }
 
-require_once(dirname(__FILE__) . '/../SSI.php');
-
 $db = $GLOBALS['elk']['db'];
 
 // Let's see if there is any error

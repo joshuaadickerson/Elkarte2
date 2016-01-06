@@ -200,10 +200,6 @@ class Admin
 			'default_language_versions' => array(),
 		);
 
-		// Find the version in SSI.php's file header.
-		if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
-			readFileVersions($version_info, array('file_versions' => BOARDDIR), 'SSI.php');
-
 		// Do the paid subscriptions handler?
 		if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 			readFileVersions($version_info, array('file_versions' => BOARDDIR), 'subscriptions.php');

@@ -146,7 +146,7 @@ function loadBoard(&$board)
  */
 function getThemeId($id_theme = 0)
 {
-	global $modSettings, $user_info, $board_info, $ssi_theme;
+	global $modSettings, $user_info, $board_info;
 
 	// The theme was specified by parameter.
 	if (!empty($id_theme))
@@ -174,9 +174,6 @@ function getThemeId($id_theme = 0)
 	// Always allow the board specific theme, if they are overriding.
 	if (!empty($board_info['theme']) && $board_info['override_theme'])
 		$id_theme = $board_info['theme'];
-	// If they have specified a particular theme to use with SSI allow it to be used.
-	elseif (!empty($ssi_theme) && $id_theme == $ssi_theme)
-		$id_theme = (int) $id_theme;
 	elseif (!empty($modSettings['knownThemes']) && !allowedTo('admin_forum'))
 	{
 		$themes = explode(',', $modSettings['knownThemes']);

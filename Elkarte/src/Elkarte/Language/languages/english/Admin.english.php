@@ -270,8 +270,6 @@ $txt['mailqueue_title'] = 'Mail';
 
 $txt['db_error_send'] = 'Send emails on database connection error';
 $txt['db_persist'] = 'Use a persistent connection';
-$txt['ssi_db_user'] = 'Database user name to use in SSI mode';
-$txt['ssi_db_passwd'] = 'Database password to use in SSI mode';
 
 $txt['default_language'] = 'Default forum language';
 

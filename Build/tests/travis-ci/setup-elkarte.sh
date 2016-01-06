@@ -5,7 +5,7 @@
 #    - calls the selenium install script
 #    - updates php.ini so selenium coverage results are also noted
 
-set -ex
+set -evx
 
 DB=$1
 TRAVIS_PHP_VERSION=$2

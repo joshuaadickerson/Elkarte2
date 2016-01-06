@@ -2,8 +2,7 @@
 #
 # Install selenium server for functional web testing
 
-set -e
-set -x
+set -evx
 
 # some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'

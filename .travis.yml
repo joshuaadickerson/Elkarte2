@@ -45,13 +45,13 @@ before_script:
     - if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]; then ./Build/tests/travis-ci/setup-selenium.sh; fi;
 
 script: 
-    - chmod +x /var/www/tests/travis-ci/setup-script.sh
+    - chmod ugo+x Build/tests/travis-ci/setup-script.sh
     - /var/www/Build/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
 
 after_script:
-    - chmod +x /var/www/tests/travis-ci/setup-results.sh
+    - chmod ugo+x Build/tests/travis-ci/setup-results.sh
     - /var/www/Build/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
 
 after_failure:
-    - chmod +x /var/www/tests/travis-ci/setup-failure.sh
+    - chmod ugo+x Build/tests/travis-ci/setup-failure.sh
     - /var/www/Build/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION

@@ -5,8 +5,7 @@
 # Configure and start Apache
 # Install database tables as needed
 
-set -e
-set -x
+set -evx
 
 DB=$1
 TRAVIS_PHP_VERSION=$2

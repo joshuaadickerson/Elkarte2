@@ -3,8 +3,7 @@
 # "since failure is always an option"
 # Perform various actions if things don't go as expected during the test
 
-set -e
-set -x
+set -evx
 
 DB=$1
 TRAVIS_PHP_VERSION=$2

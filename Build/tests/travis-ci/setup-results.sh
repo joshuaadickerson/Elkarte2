@@ -2,8 +2,7 @@
 #
 # If we created test coverage reports, send them to scrutinizer
 
-set -e
-set -x
+set -evx
 
 DB=$1
 TRAVIS_PHP_VERSION=$2

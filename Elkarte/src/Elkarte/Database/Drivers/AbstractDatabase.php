@@ -18,6 +18,10 @@
 
 namespace Elkarte\Elkarte\Database\Drivers;
 
+use Elkarte\Elkarte\Debug\Debug;
+use Elkarte\Elkarte\Errors\Errors;
+use Elkarte\Elkarte\Events\Hooks;
+
 /**
  * Abstract database class, implements database to control functions
  */
@@ -25,6 +29,7 @@ abstract class AbstractDatabase implements DatabaseInterface
 {
 	/**
 	 * Current connection to the database
+	 * @todo make private and only allow access through connection()
 	 * @var resource
 	 */
 	protected $connection;
@@ -57,6 +62,16 @@ abstract class AbstractDatabase implements DatabaseInterface
 	protected $errors;
 	protected $hooks;
 
+	protected $allowed_comments_from = array();
+	protected $allowed_comments_to = array();
+
+
+	public function __construct(Errors $errors, Debug $debugger, Hooks $hooks)
+	{
+		$this->errors = $errors;
+		$this->debugger = $debugger;
+		$this->hooks = $hooks;
+	}
 
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
@@ -299,7 +314,7 @@ abstract class AbstractDatabase implements DatabaseInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function escape_wildcard_string($string, $translate_human_wildcards = false)
+	public function escapeStringWildcard($string, $translate_human_wildcards = false)
 	{
 		$replacements = array(
 			'%' => '\%',
@@ -444,4 +459,14 @@ abstract class AbstractDatabase implements DatabaseInterface
 		return $fail;
 	}
 
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param object|null
+	 * @return bool
+	 */
+	protected function _validConnection()
+	{
+		return is_object($this->connection());
+	}
 }

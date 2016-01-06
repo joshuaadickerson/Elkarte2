@@ -22,16 +22,25 @@ namespace Elkarte\Elkarte\Database\Drivers\MySQL;
 
 use Elkarte\Elkarte\Database\Drivers\AbstractDatabase;
 use Elkarte\Elkarte\Database\FixDatabase;
-use Elkarte\Elkarte\Debug\Debug;
-use Elkarte\Elkarte\Errors\Errors;
-use Elkarte\Elkarte\Events\Hooks;
 
 /**
  * SQL database class, implements database class to control mysql functions
  */
 class Database extends AbstractDatabase
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	const TITLE = 'MySQL';
+
+	/**
+	 * {@inheritdoc}
+	 */
 	const DB_CASE_SENSITIVE = false;
+
+	/**
+	 * {@inheritdoc}
+	 */
 	const DB_SUPPORTS_IGNORE = true;
 
 	// Comments that are allowed in a query are preg_removed.
@@ -49,13 +58,6 @@ class Database extends AbstractDatabase
 		'',
 	);
 
-	public function __construct(Errors $errors, Debug $debugger, Hooks $hooks)
-	{
-		$this->errors = $errors;
-		$this->debugger = $debugger;
-		$this->hooks = $hooks;
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */
@@ -64,40 +66,38 @@ class Database extends AbstractDatabase
 		$this->prefix = (string) $db_prefix;
 
 		// Non-standard port
-		if (!empty($db_options['port']))
-			$db_port = (int) $db_options['port'];
+		if (!empty($db_options[self::PORT]))
+			$db_port = (int) $db_options[self::PORT];
 		else
 			$db_port = 0;
 
 		// Select the database. Maybe.
-		if (empty($db_options['dont_select_db']))
-			$this->connection = new \mysqli((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
+		if (empty($db_options[self::DONT_SELECT_DB]))
+			$this->connection = new \mysqli((!empty($db_options[self::PERSIST]) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
 		else
-			$this->connection = new \mysqli((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, '', $db_port);
+			$this->connection = new \mysqli((!empty($db_options[self::PERSIST]) ? 'p:' : '') . $db_server, $db_user, $db_passwd, '', $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$this->connection)
 		{
-			if (!empty($db_options['non_fatal']))
+			if (!empty($db_options[self::NON_FATAL]))
 				return null;
 			else
 				$this->errors->display_db_error();
 		}
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
-		if (isset($db_options['set_mode']) && $db_options['set_mode'] === true)
+		if (isset($db_options[self::SET_MODE]) && $db_options[self::SET_MODE] === true)
 		{
 			$this->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
-				array(),
-				false
+				[]
 			);
 		}
 
 		// Few databases still have not set UTF-8 as their default input charset
 		$this->query('', '
 			SET NAMES UTF8',
-			array(
-			)
+			[]
 		);
 
 		return $this;
@@ -130,7 +130,7 @@ class Database extends AbstractDatabase
 		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
 		{
 			// Pass some values to the global space for use in the callback function.
-			$db_callback = array($db_values, $this->connection);
+			$db_callback = array($db_values, $this->connection());
 
 			// Inject the values passed to this function.
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
@@ -168,13 +168,16 @@ class Database extends AbstractDatabase
 			$this->queryCheck($db_string);
 		}
 
+		/** @var \MySQLi $connection */
+		$connection = $this->connection();
+
 		if (empty($db_unbuffered))
-			$ret = $this->connection->query($db_string);
+			$ret = $connection->query($db_string);
 		else
-			$ret = $this->connection->query($db_string, MYSQLI_USE_RESULT);
+			$ret = $connection->query($db_string, MYSQLI_USE_RESULT);
 
 		if ($ret === false && !$this->_skip_error)
-			$ret = $this->error($db_string, $this->connection);
+			$ret = $this->error($db_string);
 
 		// Debugging.
 		if ($this->debug_enabled)
@@ -268,14 +271,17 @@ class Database extends AbstractDatabase
 	/**
 	 * {@inheritdoc }
 	 */
-	public function transaction($type = 'commit')
+	public function transaction($type = self::COMMIT)
 	{
+		/** @var \MySQLi $connection */
+		$connection = $this->connection();
+
 		if ($type == 'begin')
-			return $this->connection->query('BEGIN');
+			return $connection->query('BEGIN');
 		elseif ($type == 'rollback')
-			return $this->connection->query('ROLLBACK');
+			return $connection->query('ROLLBACK');
 		elseif ($type == 'commit')
-			return $this->connection->query('COMMIT');
+			return $connection->query('COMMIT');
 
 		return false;
 	}
@@ -285,8 +291,8 @@ class Database extends AbstractDatabase
 	 */
 	public function lastError()
 	{
-		if (is_object($this->connection))
-			return mysqli_error($this->connection);
+		if (is_resource($this->connection()))
+			return mysqli_error($this->connection->error);
 	}
 
 	/**
@@ -300,8 +306,8 @@ class Database extends AbstractDatabase
 		list ($file, $line) = $this->errorBacktrace('', '', 'return', __FILE__, __LINE__);
 
 		// This is the error message...
-		$query_error = mysqli_error($this->connection);
-		$query_errno = mysqli_errno($this->connection);
+		$query_error = $this->connection->error;
+		$query_errno = $this->connection->errorno;
 
 		// Error numbers:
 		//    1016: Can't open file '....MYI'
@@ -340,7 +346,7 @@ class Database extends AbstractDatabase
 		// @todo this should definitely not be here
 		if (function_exists(['Cache', 'get']) && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
-			$fixer = new FixDatabase($this, Cache::get());
+			$fixer = new FixDatabase($this, $GLOBALS['elk']['cache']);
 			$fixer->fix();
 		}
 
@@ -373,7 +379,7 @@ class Database extends AbstractDatabase
 	{
 		// With nothing to insert, simply return.
 		if (empty($data))
-			return;
+			return Result($this, null);
 
 		// Inserting data as a single row can be done as a single array.
 		if (!is_array($data[array_rand($data)]))
@@ -400,7 +406,7 @@ class Database extends AbstractDatabase
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
-			$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $this->connection);
+			$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow));
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
@@ -427,103 +433,47 @@ class Database extends AbstractDatabase
 	}
 
 	/**
-	 * Get the version number.
-	 *
-	 * @return string - the version
+	 * {@inheritdoc}
 	 */
 	public function serverVersion()
 	{
-		$request = $this->query('', '
-			SELECT VERSION()',
-			array(
-			)
-		);
-		list ($ver) = $request->fetchRow();
-		$request->free();
-
-		return $ver;
+		return $this->connection()->server_version;
 	}
 
 	/**
-	 * Get the name (title) of the database system.
-	 *
-	 * @return string
-	 */
-	public function title()
-	{
-		return 'MySQL';
-	}
-
-	/**
-	 * Whether the database system is case sensitive.
-	 *
-	 * @return false
-	 */
-	public function db_case_sensitive()
-	{
-		return false;
-	}
-
-	/**
-	 * Escape string for the database input
-	 *
-	 * @param string $string
+	 * {@inheritdoc}
 	 */
 	public function escapeString($string)
 	{
 		$string = $this->_clean_4byte_chars($string);
 
-		return mysqli_real_escape_string($this->connection, $string);
+		return mysqli_real_escape_string($this->connection(), $string);
 	}
 
 	/**
-	 * Return server info.
-	 *
-	 * @param resource|null $this->connection
-	 *
-	 * @return string
+	 * {@inheritdoc}
 	 */
-	public function db_server_info()
+	public function serverInfo()
 	{
-		return mysqli_get_server_info($this->connection);
+		return mysqli_get_server_info($this->connection());
 	}
 
 	/**
-	 *  Get the version number.
-	 *
-	 *  @return string - the version
+	 * {@inheritdoc}
 	 */
-	public function db_client_version()
+	public function clientVersion()
 	{
-		$request = $this->query('', '
-			SELECT VERSION()',
-			array(
-			)
-		);
-		list ($ver) = $request->fetchRow();
-		$request->free();
+		/** @var \MySQLi $connection */
+		$connection = $this->connection();
 
-		return $ver;
+		return $connection->client_version;
 	}
 
 	/**
-	 * Select database.
-	 *
-	 * @param string|null $dbName = null
-	 * @param resource|null 
+	 * {@inheritdoc}
 	 */
 	public function changeSchema($dbName = null)
 	{
-		return mysqli_select_db($this->connection, $dbName);
-	}
-
-	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @param object|null 
-	 */
-	protected function _validConnection()
-	{
-		return is_object($this->connection);
+		return mysqli_select_db($this->connection(), $dbName);
 	}
 }

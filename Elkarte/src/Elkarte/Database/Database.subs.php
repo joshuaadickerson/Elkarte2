@@ -30,16 +30,6 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 }
 
 /**
- * Retrieve existing instance of the active database class.
- *
- * @return Elkarte\Database\Drivers\DatabaseInterface
- */
-function database()
-{
-	return call_user_func(array('Database_' . DB_TYPE, 'db'));
-}
-
-/**
  * This function retrieves an existing instance of DbTable
  * and returns it.
  *

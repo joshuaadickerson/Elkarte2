@@ -1,10 +1,13 @@
 <?php
 
-namespace Elkarte\Database;
+namespace Elkarte\Elkarte\Database;
+
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Cache\Cache;
 
 class FixDatabase
 {
-	public function __construct(\Elkarte\Database\Drivers\DatabaseInterface $db, Cache $cache)
+	public function __construct(DatabaseInterface $db, Cache $cache)
 	{
 
 	}

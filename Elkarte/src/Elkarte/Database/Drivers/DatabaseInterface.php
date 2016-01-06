@@ -18,9 +18,34 @@ namespace Elkarte\Elkarte\Database\Drivers;
  */
 interface DatabaseInterface
 {
+	/**
+	 * Get the name (title) of the database system.
+	 *
+	 * @var string
+	 */
+	const TITLE = '';
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return boolean
+	 */
+	const DB_CASE_SENSITIVE = false;
+
+	/**
+	 * Returns whether the database system supports ignore.
+	 *
+	 * @var false
+	 */
+	const DB_SUPPORTS_IGNORE = true;
+
 	const PERSIST = 'persist';
 	const DONT_SELECT_DB = 'dont_select_db';
+	const PORT = 'port';
 	const COMMIT = 'commit';
+	const NON_FATAL = 'non_fatal';
+	const SET_MODE = 'set_mode';
+	const DISABLE_QUERY_CHECK = 'disableQueryCheck';
 
 	/**
 	 * Initializes a database connection.
@@ -135,7 +160,7 @@ interface DatabaseInterface
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource|null 
 	 */
-	public function transaction($type = 'commit');
+	public function transaction($type = self::COMMIT);
 
 	/**
 	 * Database error.
@@ -193,7 +218,7 @@ interface DatabaseInterface
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
 	 * @return string
 	 */
-	public function escape_wildcard_string($string, $translate_human_wildcards = false);
+	public function escapeStringWildcard($string, $translate_human_wildcards = false);
 
 	/**
 	 * Unescape an escaped string.
@@ -211,10 +236,27 @@ interface DatabaseInterface
 	public function lastError();
 
 	/**
-	 * Get the name (title) of the database system.
+	 * Return server info.
+	 *
+	 * @param resource|null $this->connection
+	 *
 	 * @return string
 	 */
-	public function title();
+	public function serverInfo();
+
+	/**
+	 * Get the version number.
+	 *
+	 * @return string - the version
+	 */
+	public function serverVersion();
+
+	/**
+	 * Get the version number.
+	 *
+	 * @return string - the version
+	 */
+	public function clientVersion();
 
 	/**
 	 * Select database.

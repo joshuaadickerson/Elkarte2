@@ -39,7 +39,7 @@ class Database
 
 	public function database()
 	{
-		return $this->drivers[$this->driver] . '\\Database';
+		return $this->drivers[strtolower($this->driver)] . '\\Database';
 	}
 
 	public function table()

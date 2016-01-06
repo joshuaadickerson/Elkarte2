@@ -21,12 +21,8 @@ TRAVIS_PHP_VERSION=$2
 #sudo /etc/init.d/apache2 restart
 
 # Setup a database if we are installing
-if [ "$DB" == "postgres" ]
-then
-    psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
-    psql -c "create database elkarte_test;" -U postgres
-elif [ "$DB" == "mysqli" ]
-then
-    mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
-    mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
-fi
+
+if [ "$DB" == "postgres" ]; then psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres; fi;
+if [ "$DB" == "postgres" ]; then psql -c "create database elkarte_test;" -U postgres; fi;
+if [ "$DB" == "mysqli" ]; then mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot; fi;
+if [ "$DB" == "mysqli" ]; then mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot; fi;

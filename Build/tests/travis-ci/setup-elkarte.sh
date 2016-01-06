@@ -5,8 +5,7 @@
 #    - calls the selenium install script
 #    - updates php.ini so selenium coverage results are also noted
 
-set -e
-set -x
+set -ex
 
 DB=$1
 TRAVIS_PHP_VERSION=$2
@@ -23,7 +22,7 @@ mv ./Elkarte/db_last_error.sample.txt ./Elkarte/db_last_error.txt
 #cd /var/www
 
 # Yes but its a test run
-chmod -R 777 /var/www
+#chmod -R 777 /var/www
 
 # Install the right database for this run
 if [ "$DB" == "mysqli" ]; then php ./Build/tests/travis-ci/setup_mysql.php; fi
@@ -45,9 +44,6 @@ then
     phpenv config-add /var/www/Build/tests/travis-ci/travis_php.ini
 
     # If this is a code coverage run, we need to enable selenium and capture its coverage results
-    if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]
-    then
-	    phpenv config-add /var/www/Build/tests/travis-ci/travis_webtest_php.ini
-	    ./Build/tests/travis-ci/setup-selenium.sh
-    fi
+    if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]; then phpenv config-add /var/www/Build/tests/travis-ci/travis_webtest_php.ini; fi;
+	if [ "$SHORT_PHP" == "5.5" -a "$DB" == "mysqli" ]; then ./Build/tests/travis-ci/setup-selenium.sh; fi;
 fi

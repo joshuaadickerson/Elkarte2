@@ -17,10 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
 
-class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
+class DraftsPersonalMessageModule implements ModuleInterface
 {
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
@@ -30,7 +29,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings, $context;
 

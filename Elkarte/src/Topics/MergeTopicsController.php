@@ -90,7 +90,7 @@ class MergeTopicsController extends AbstractController
 			$onlyApproved = false;
 
 		// How many topics are on this board?  (used for paging.)
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$topiccount = countTopicsByBoard($target_board, $onlyApproved);
 
 		// Make the page list.
@@ -168,7 +168,7 @@ class MergeTopicsController extends AbstractController
 		// Check the session.
 		$this->_session->check('request');
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// Handle URLs from action_mergeIndex.

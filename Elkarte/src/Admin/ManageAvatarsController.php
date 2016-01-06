@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * This is the avatars administration controller class.

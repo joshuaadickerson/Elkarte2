@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
@@ -350,7 +349,7 @@ class ManageMembergroupsController extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// A form was submitted, we can start adding.
 		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
@@ -377,7 +376,7 @@ class ManageMembergroupsController extends AbstractController
 			// Update the post groups now, if this is a post group!
 			if (isset($this->_req->post->min_posts))
 			{
-				require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 				updatePostGroupStats();
 			}
 
@@ -490,7 +489,7 @@ class ManageMembergroupsController extends AbstractController
 	{
 		$this->_session->check('get');
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		deleteMembergroups((int) $this->_req->query->group);
 
 		// Go back to the membergroup index.
@@ -519,7 +518,7 @@ class ManageMembergroupsController extends AbstractController
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// Make sure this group is editable.
 		if (!empty($current_group_id))
@@ -560,12 +559,12 @@ class ManageMembergroupsController extends AbstractController
 				'max_messages' => 'intval',
 				'min_posts' => 'intval|abs',
 				'group_type' => 'intval',
-				'group_desc' => 'trim|$GLOBALS['elk']['text']->htmlspecialchars',
-				'group_name' => 'trim|$GLOBALS['elk']['text']->htmlspecialchars',
+				'group_desc' => 'trim|htmlspecialchars',
+				'group_name' => 'trim|htmlspecialchars',
 				'group_hidden' => 'intval',
 				'group_inherit' => 'intval',
 				'icon_count' => 'intval',
-				'icon_image' => 'trim|$GLOBALS['elk']['text']->htmlspecialchars',
+				'icon_image' => 'trim|htmlspecialchars',
 				'online_color' => 'trim|valid_color',
 			));
 			$validator->input_processing(array(
@@ -683,8 +682,7 @@ class ManageMembergroupsController extends AbstractController
 					$group_moderators = array();
 					if (!empty($moderators))
 					{
-						require_once(ROOTDIR . '/Members/Members.subs.php');
-						$members = getBasicMemberData($moderators);
+										$members = getBasicMemberData($moderators);
 						foreach ($members as $member)
 							$group_moderators[] = $member['id_member'];
 					}
@@ -696,7 +694,7 @@ class ManageMembergroupsController extends AbstractController
 			}
 
 			// There might have been some post group changes.
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			updatePostGroupStats();
 
 			// We've definitely changed some group stuff.

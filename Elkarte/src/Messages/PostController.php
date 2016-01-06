@@ -55,7 +55,7 @@ class PostController extends AbstractController
 
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 	}
 
 	/**
@@ -380,7 +380,7 @@ class PostController extends AbstractController
 			}
 
 			// No check is needed, since nothing is really posted.
-			checkSubmitOnce('free');
+			$this->checkSubmitOnce('free');
 		}
 		// Editing a message...
 		elseif (isset($_REQUEST['msg']) && !empty($topic))
@@ -582,7 +582,7 @@ class PostController extends AbstractController
 		$context['current_action'] = 'post';
 
 		// Register this form in the session variables.
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 
 		// Finally, load the template.
 		if (!isset($_REQUEST['xml']))
@@ -645,7 +645,7 @@ class PostController extends AbstractController
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
 
 		// Prevent double submission of this form.
-		checkSubmitOnce('check');
+		$this->checkSubmitOnce('check');
 
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
@@ -881,8 +881,7 @@ class PostController extends AbstractController
 		if ($posterIsGuest)
 		{
 			// If user is a guest, make sure the chosen name isn't taken.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] != $msgInfo['poster_name']))
+				if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] != $msgInfo['poster_name']))
 				$this->_post_errors->addError('bad_name');
 		}
 		// If the user isn't a guest, get his or her name and email.
@@ -1264,8 +1263,7 @@ class PostController extends AbstractController
 				{
 					$query_params = array();
 					$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					$mentioned_members = membersBy('member_ids', $query_params, true);
+								$mentioned_members = membersBy('member_ids', $query_params, true);
 					$replacements = 0;
 					$actually_mentioned = array();
 					foreach ($mentioned_members as $member)

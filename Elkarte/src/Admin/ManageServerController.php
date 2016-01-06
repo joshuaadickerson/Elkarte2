@@ -19,8 +19,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * ManageServer administration pages controller.

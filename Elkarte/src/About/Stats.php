@@ -27,7 +27,7 @@ use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 class Stats
 {
@@ -39,10 +39,10 @@ class Stats
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
-	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->db = $db;
 		$this->cache = $cache;

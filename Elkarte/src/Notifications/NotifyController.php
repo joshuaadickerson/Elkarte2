@@ -156,7 +156,7 @@ class NotifyController extends AbstractController
 		global $user_info, $topic;
 
 		// Our topic functions are here
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// Attempt to turn notifications on/off.
 		setTopicNotification($user_info['id'], $topic, $this->_req->query->sa === 'on');
@@ -380,7 +380,7 @@ class NotifyController extends AbstractController
 		global $user_info, $topic;
 
 		// Our topic functions are here
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
 	}

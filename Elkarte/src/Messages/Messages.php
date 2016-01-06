@@ -27,7 +27,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\ElkArte\Database\Drivers\ResultInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 class Messages
 {
@@ -39,10 +39,10 @@ class Messages
 	protected $hooks;
 	/** @var Errors */
 	protected $errors;
-	/** @var Util */
+	/** @var StringUtil */
 	protected $text;
 
-	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->db = $db;
 		$this->cache = $cache;
@@ -582,7 +582,6 @@ class Messages
 	{
 		global $user_info, $modSettings;
 
-		
 		// Find the number of messages posted before said time...
 		$request = $this->db->query('', '
 			SELECT COUNT(*)
@@ -741,7 +740,6 @@ class Messages
 	 */
 	function mailFromMessage($id_msg)
 	{
-		
 
 		$request = $this->db->query('', '
 			SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
@@ -770,7 +768,6 @@ class Messages
 	{
 		global $modSettings;
 
-		
 
 		if ($increment === true && $max_msg_id !== null)
 			updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
@@ -806,7 +803,6 @@ class Messages
 	 */
 	function updateSubjectStats($id_topic, $subject = null)
 	{
-		
 
 		// Remove the previous subject (if any).
 		$this->db->query('', '

@@ -45,7 +45,6 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 
 				require_once(SUBSDIR . '/Mentions.subs.php');
-				require_once(ROOTDIR . '/Members/Members.subs.php');
 
 				$user_see_board = memberQuerySeeBoard($member);
 				$limit = 100;
@@ -133,8 +132,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 			$limit = 10;
 			$current_check = !empty($modSettings['mentions_member_check']) ? $modSettings['mentions_member_check'] : 0;
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			require_once(SUBSDIR . '/Mentions.subs.php');
+				require_once(SUBSDIR . '/Mentions.subs.php');
 
 			// Grab users with mentions
 			$request = $db->query('', '

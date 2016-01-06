@@ -218,7 +218,7 @@ class AuthController extends AbstractController
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
-			$ga = New GoogleAuthenticator();
+			$ga = new GoogleAuthenticator();
 
 			$ga->GetCode($user_settings['otp_secret'], $_POST['otp_timestamp']);
 			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
@@ -307,8 +307,7 @@ class AuthController extends AbstractController
 				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
 				// Update the password hash and set up the salt.
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
+						updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
 			else
@@ -336,8 +335,7 @@ class AuthController extends AbstractController
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('passwd_flood' => ''));
+				updateMemberData($user_settings['id_member'], array('passwd_flood' => ''));
 		}
 
 		// Correct password, but they've got no salt; fix it!
@@ -413,8 +411,7 @@ class AuthController extends AbstractController
 		if (!empty($user_info['id']))
 		{
 			$tokenizer = new TokenHash();
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
+				updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
 		}
 
 		// Off to the merry board index we go!

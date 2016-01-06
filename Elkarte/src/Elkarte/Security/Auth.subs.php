@@ -403,7 +403,7 @@ function resetPassword($memID, $username = null)
 	require_once(ROOTDIR . '/Mail/Mail.subs.php');
 
 	// Get some important details.
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	$result = getBasicMemberData($memID, array('preferences' => true));
 	$user = $result['member_name'];
 	$email = $result['email_address'];
@@ -426,7 +426,7 @@ function resetPassword($memID, $username = null)
 	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
 	// Do some checks on the username if needed.
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	if ($username !== null)
 	{
 		$errors = ErrorContext::context('reset_pwd', 0);
@@ -493,7 +493,6 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 
 	if ($check_reserved_name)
 	{
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		if (isReservedName($username, $memID, false, $fatal))
 			$errors->addError(array('name_in_use', array(htmlspecialchars($username, ENT_COMPAT, 'UTF-8'))));
 	}
@@ -658,7 +657,7 @@ function rebuildModCache()
 	if (!$user_info['is_guest'])
 	{
 
-		$boards_mod = boardsModerated($user_info['id']);
+		$boards_mod = $GLOBALS['elk']['boards.manager']->boardsModerated($user_info['id']);
 	}
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
@@ -719,7 +718,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 function isFirstLogin($id_member)
 {
 	// First login?
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	$member = getBasicMemberData($id_member, array('moderation' => true));
 
 	return !empty($member) && $member['last_login'] == 0;
@@ -929,8 +928,7 @@ function checkActivation()
 	{
 		if (isset($_REQUEST['undelete']))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('is_activated' => 1));
+				updateMemberData($user_settings['id_member'], array('is_activated' => 1));
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 		}
 		else
@@ -1010,7 +1008,7 @@ function doLogin()
 	$req = $GLOBALS['elk']['req'];
 
 	// You've logged in, haven't you?
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....

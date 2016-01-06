@@ -17,8 +17,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Karma;
+
 
 /**
  * KarmaController class, can give good or bad karma so watch out!

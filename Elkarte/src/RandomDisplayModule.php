@@ -11,14 +11,14 @@
  *
  */
 
-class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Random_Display_Module implements ModuleInterface
 {
 	protected static $includeUnapproved = false;
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

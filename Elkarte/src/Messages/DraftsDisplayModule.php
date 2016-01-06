@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_Display_Module implements ModuleInterface
 {
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
@@ -28,7 +28,7 @@ class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

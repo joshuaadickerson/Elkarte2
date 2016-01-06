@@ -11,15 +11,14 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Mentions;
 
-class Mentions_Post_Module extends Mentions_Module_Abstract
+class MentionsPostModule extends MentionsModuleAbstract
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		self::registerHooks('post', $eventsManager);
 

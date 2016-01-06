@@ -219,7 +219,7 @@ class MoveTopicController extends AbstractController
 			moveTopicConcurrence((int) $this->_req->query->current_board);
 
 		// Register this form and get a sequence number in $context.
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 	}
 
 	/**
@@ -239,7 +239,7 @@ class MoveTopicController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Retrieve the basic topic information for whats being moved
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$this->_topic_info = getTopicInfo($this->_topic, 'message');
 
 		if (empty($this->_topic_info))
@@ -281,12 +281,12 @@ class MoveTopicController extends AbstractController
 			$this->_errors->fatal_lang_error('movetopic_no_board', false);
 
 		// We will need this
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		if (isset($this->_req->query->current_board))
 			moveTopicConcurrence((int) $this->_req->query->current_board);
 
 		// Make sure this form hasn't been submitted before.
-		checkSubmitOnce('check');
+		$this->checkSubmitOnce('check');
 
 		// Get the basic details on this topic (again)
 		$this->_topic_info = getTopicInfo($this->_topic);
@@ -425,8 +425,7 @@ class MoveTopicController extends AbstractController
 		$board_from = boardInfo($board);
 		if ($board_from['count_posts'] != $this->_board_info['count_posts'])
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$posters = postersCount($this->_topic);
+				$posters = postersCount($this->_topic);
 
 			foreach ($posters as $id_member => $posts)
 			{

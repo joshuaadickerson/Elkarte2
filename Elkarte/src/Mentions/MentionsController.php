@@ -13,7 +13,7 @@
 
 namespace Elkarte\Mentions;
 
-use \Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * MentionsController Class:  Add mention notifications for various actions such

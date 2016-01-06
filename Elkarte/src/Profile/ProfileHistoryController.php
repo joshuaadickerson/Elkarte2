@@ -256,7 +256,6 @@ class ProfileHistoryController extends AbstractController
 			$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
 
 		// Fetch the members that are associated with the ip's
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$context['ips'] = loadMembersIPs($ip_string, $ip_var);
 
 		// Start with the user messages.

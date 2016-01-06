@@ -799,8 +799,7 @@ function loadProfileFields($force_reload = false)
 					return 'name_too_long';
 				elseif ($cur_profile['real_name'] != $value)
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					if (isReservedName($value, $context['id_member']))
+								if (isReservedName($value, $context['id_member']))
 						return 'name_taken';
 				}
 				return true;
@@ -826,8 +825,7 @@ function loadProfileFields($force_reload = false)
 
 				if (empty($value))
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					$member = getBasicMemberData($cur_profile['id_member'], array('authentication' => true));
+								$member = getBasicMemberData($cur_profile['id_member'], array('authentication' => true));
 
 					// No previous answer was saved, so that\'s all good
 					if (empty($member['secret_answer']))
@@ -1001,7 +999,7 @@ function loadProfileFields($force_reload = false)
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
 	// Hard to imagine this won't be necessary
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 
 	// For each of the above let's take out the bits which don't apply - to save memory and security!
 	foreach ($profile_fields as $key => $field)
@@ -1841,7 +1839,7 @@ function profileLoadGroups()
 {
 	global $cur_profile, $context, $user_settings;
 
-	require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 	$context['member_groups'] = getGroupsList();
 	$context['member_groups'][0]['is_primary'] = $cur_profile['id_group'] == 0;
@@ -3338,7 +3336,6 @@ function getMembersInRange($ips, $memID)
 	// And finally, fetch their names, cause of the GROUP BY doesn't like giving us that normally.
 	if (!empty($message_members))
 	{
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Get the latest activated member's display name.
 		$members_in_range = getBasicMemberData($message_members);

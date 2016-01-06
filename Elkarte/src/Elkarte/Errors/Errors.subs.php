@@ -417,7 +417,7 @@ function display_db_error()
 	$modSettings['cache_enable'] = 1;
 	$cache->enable(true)->setLevel(1);
 
-	if ($cache->getVar($temp, 'db_last_error', 600))
+	if ($cache->getVar($temp = null, 'db_last_error', 600))
 		$db_last_error = max($db_last_error, $temp);
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
@@ -492,4 +492,28 @@ function set_fatal_error_headers()
 	header('HTTP/1.1 503 Service Temporarily Unavailable');
 	header('Status: 503 Service Temporarily Unavailable');
 	header('Retry-After: 3600');
+}
+
+/**
+ * Highlight any code.
+ *
+ * What it does:
+ * - Uses PHP's highlight_string() to highlight PHP syntax
+ * - does special handling to keep the tabs in the code available.
+ * - used to parse PHP code from inside [code] and [php] tags.
+ *
+ * @param string $code The string containing php code
+ * @return string the code with highlighted HTML.
+ */
+function highlight_php_code($code)
+{
+	// Remove special characters.
+	$code = $GLOBALS['elk']['text']->un_htmlspecialchar(strtr($code, array('<br />' => "\n", "\t" => '___TAB();', '&#91;' => '[')));
+
+	$buffer = str_replace(array("\n", "\r"), '', @highlight_string($code, true));
+
+	// Yes, I know this is kludging it, but this is the best way to preserve tabs from PHP :P.
+	$buffer = preg_replace('~___TAB(?:</(?:font|span)><(?:font color|span style)="[^"]*?">)?\\(\\);~', '<pre style="display: inline;">' . "\t" . '</pre>', $buffer);
+
+	return strtr($buffer, array('\'' => '&#039;', '<code>' => '', '</code>' => ''));
 }

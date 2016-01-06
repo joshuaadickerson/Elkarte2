@@ -97,8 +97,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 				// Have some members to change?
 				if (!empty($member_changes))
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					foreach ($member_changes as $change)
+								foreach ($member_changes as $change)
 						updateMemberData($change['id'], array('warning' => $change['warning']));
 				}
 			}

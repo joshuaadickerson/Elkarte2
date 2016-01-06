@@ -11,8 +11,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * This class controls execution for Admin actions in the bans area
@@ -39,7 +39,6 @@ class ManageBansController extends AbstractController
 		global $context, $txt, $scripturl;
 
 		$this->_templates->load('ManageBans');
-		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(
 			'add' => array($this, 'action_edit', 'permission' => 'manage_bans'),
@@ -112,8 +111,6 @@ class ManageBansController extends AbstractController
 	public function action_list()
 	{
 		global $txt, $context, $scripturl, $user_info;
-
-		require_once(SUBSDIR . '/Bans.subs.php');
 
 		// User pressed the 'remove selection button'.
 		if (!empty($this->_req->post->removeBans) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
@@ -683,9 +680,9 @@ class ManageBansController extends AbstractController
 			);
 			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
 			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
-			$ban_info['reason'] = $this->_req->getPost('reason', '$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['name'] = $this->_req->getPost('ban_name', '$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = $this->_req->getPost('notes', '$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['reason'] = $this->_req->getPost('reason', 'htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['name'] = $this->_req->getPost('ban_name', 'htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['notes'] = $this->_req->getPost('notes', 'htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
 			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
 			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;

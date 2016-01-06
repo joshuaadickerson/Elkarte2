@@ -5,6 +5,7 @@ namespace Elkarte\Elkarte\Session;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Events\Hooks;
 use Elkarte\Elkarte\Http\Request;
+use Elkarte\Elkarte\TokenHash;
 use Util;
 
 class Session

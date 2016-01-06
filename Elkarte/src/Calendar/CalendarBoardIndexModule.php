@@ -17,15 +17,17 @@
  *
  */
 
+namespace Elkarte\Calendar;
+
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class Calendar_BoardIndex_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_BoardIndex_Module implements ModuleInterface
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		// Load the calendar?
 		if (allowedTo('calendar_view'))

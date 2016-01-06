@@ -17,7 +17,7 @@ use Elkarte\Elkarte\Events\EventManager;
 use Elkarte\Elkarte\Events\Hooks;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 use Elkarte\Elkarte\Http\HttpReq;
 use Elkarte\Elkarte\Session\Session;
 use Elkarte\Elkarte\Theme\TemplateLayers;
@@ -53,7 +53,7 @@ abstract class AbstractController
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
 	/**
@@ -320,5 +320,57 @@ abstract class AbstractController
 	public function db()
 	{
 		return $GLOBALS['elk']['db'];
+	}
+
+	/**
+	 * Check whether a form has been submitted twice.
+	 *
+	 * What it does:
+	 * - Registers a sequence number for a form.
+	 * - Checks whether a submitted sequence number is registered in the current session.
+	 * - Depending on the value of is_fatal shows an error or returns true or false.
+	 * - Frees a sequence number from the stack after it's been checked.
+	 * - Frees a sequence number without checking if action == 'free'.
+	 *
+	 * @param string $action
+	 * @param bool $is_fatal = true
+	 * @return bool
+	 */
+	function checkSubmitOnce($action, $is_fatal = false)
+	{
+		global $context;
+
+		if (!isset($_SESSION['forms']))
+			$_SESSION['forms'] = array();
+
+		// Register a form number and store it in the session stack. (use this on the page that has the form.)
+		if ($action == 'register')
+		{
+			$tokenizer = new TokenHash();
+			$context['form_sequence_number'] = '';
+			while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
+				$context['form_sequence_number'] = $tokenizer->generate_hash();
+		}
+		// Check whether the submitted number can be found in the session.
+		elseif ($action == 'check')
+		{
+			if (!isset($_REQUEST['seqnum']))
+				return true;
+			elseif (!in_array($_REQUEST['seqnum'], $_SESSION['forms']))
+			{
+				// Mark this one as used
+				$_SESSION['forms'][] = (string) $_REQUEST['seqnum'];
+				return true;
+			}
+			elseif ($is_fatal)
+				$GLOBALS['elk']['errors']->fatal_lang_error('error_form_already_submitted', false);
+			else
+				return false;
+		}
+		// Don't check, just free the stack number.
+		elseif ($action == 'free' && isset($_REQUEST['seqnum']) && in_array($_REQUEST['seqnum'], $_SESSION['forms']))
+			$_SESSION['forms'] = array_diff($_SESSION['forms'], array($_REQUEST['seqnum']));
+		elseif ($action != 'free')
+			trigger_error('AbstractController::checkSubmitOnce(): Invalid action \'' . $action . '\'', E_USER_WARNING);
 	}
 }

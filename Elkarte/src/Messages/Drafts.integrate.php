@@ -11,13 +11,12 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
 
 /**
  * Integration trick.
  */
-class Drafts_Integrate
+class DraftsIntegrate
 {
 	/**
 	 * Registers hooks as needed for the drafts function to work

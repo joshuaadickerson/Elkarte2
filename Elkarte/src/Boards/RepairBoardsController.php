@@ -53,8 +53,6 @@ class RepairBoardsController extends AbstractController
 
 		isAllowedTo('admin_forum');
 
-		require_once(SUBSDIR . '/RepairBoards.subs.php');
-
 		// Try secure more memory.
 		setMemoryLimit('128M');
 
@@ -131,7 +129,7 @@ class RepairBoardsController extends AbstractController
 
 			updateMessageStats();
 
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			updateTopicStats();
 
 			updateSettings(array(

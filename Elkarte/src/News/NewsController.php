@@ -276,7 +276,6 @@ class NewsController extends AbstractController
 			return array();
 
 		// Find the most recent members.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$members = recentMembers((int) $this->_limit);
 
 		// No data yet

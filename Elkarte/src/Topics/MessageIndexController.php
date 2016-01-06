@@ -492,7 +492,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		require_once(ROOTDIR . '/Notifications/Notification.subs.php');
 
 		// Process process process data.
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// Remember the last board they moved things to.
 		if (isset($this->_req->post->move_to))

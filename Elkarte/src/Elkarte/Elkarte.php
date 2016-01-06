@@ -72,6 +72,7 @@ class Elkarte extends Container
 
 	}
 
+
 	public function events()
 	{
 
@@ -98,6 +99,8 @@ class Elkarte extends Container
 		$this->register(new Boards\Provider);
 		$this->register(new Members\Provider);
 		$this->register(new Topics\Provider);
+		$this->register(new Messages\Provider);
+		$this->register(new Attachments\Provider);
 
 		return $this;
 	}

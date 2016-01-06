@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Likes;
 
 /**
  * This class contains one likable use, which allows members to like a post

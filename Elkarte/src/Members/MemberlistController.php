@@ -25,7 +25,7 @@ use Elkarte\Elkarte\Controller\AbstractController;
 /**
  * Memberlist Controller
  */
-class MemberlistController extends AbstractController
+class MemberListController extends AbstractController
 {
 	/**
 	 * The fields that we can search

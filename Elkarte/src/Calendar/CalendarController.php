@@ -20,7 +20,7 @@
 
 namespace Elkarte\Calendar;
 
-use \Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * CalendarController class, displays the calendar for the site and

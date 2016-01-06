@@ -1750,3 +1750,82 @@ function buffer_callback($matches)
 	else
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
 }
+
+
+/**
+ * Given a binary string, returns the binary string converted to a long number.
+ *
+ * @param string $str
+ * @return string
+ */
+function binary_to_long($str)
+{
+	$bytes = array_merge(unpack('C*', $str));
+
+	$n = 0;
+
+	foreach ($bytes as $byte)
+	{
+		$n = bcmul($n, 256);
+		$n = bcadd($n, $byte);
+	}
+
+	return $n;
+}
+
+/**
+ * Given a long integer, returns the number converted to a binary
+ * string.
+ *
+ * This function accepts long integer values of arbitrary
+ * magnitude.
+ *
+ * @param string $value
+ * @return string
+ */
+function long_to_binary($value)
+{
+	$cmp = bccomp($value, 0);
+	if ($cmp < 0)
+		$GLOBALS['elk']['errors']->fatal_error('Only non-negative integers allowed.');
+
+	if ($cmp == 0)
+		return "\x00";
+
+	$bytes = array();
+
+	while (bccomp($value, 0) > 0)
+	{
+		array_unshift($bytes, bcmod($value, 256));
+		$value = bcdiv($value, 256);
+	}
+
+	if ($bytes && ($bytes[0] > 127))
+		array_unshift($bytes, 0);
+
+	$return = '';
+	foreach ($bytes as $byte)
+		$return .= pack('C', $byte);
+
+	return $return;
+}
+
+/**
+ * Performs an exclusive or (^ bitwise operator) character for character on two stings.
+ *
+ * - The result of the biwise operator is 1 if and only if both bits differ.
+ *
+ * @param int $num1
+ * @param int $num2
+ * @return string a binary string representing the per character position comparison results.
+ */
+function binary_xor($num1, $num2)
+{
+	$return = '';
+
+	$str_len = strlen($num2);
+	for ($i = 0; $i < $str_len; $i++)
+		$return .= $num1[$i] ^ $num2[$i];
+
+	return $return;
+}

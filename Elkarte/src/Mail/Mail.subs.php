@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+// @todo replace with SwiftMailer
 
 /**
  * This function sends an email to the specified recipient(s).

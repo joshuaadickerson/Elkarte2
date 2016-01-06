@@ -12,11 +12,13 @@
  *
  */
 
+namespace Elkarte\Mail;
+
 /**
  * Grabs unread messages from an imap account and saves them as .eml files
  * Passes any new messages found to the postby email function for processing
  */
-class Pbe_Imap
+class PbeImap
 {
 	/**
 	 * The name of the imap host

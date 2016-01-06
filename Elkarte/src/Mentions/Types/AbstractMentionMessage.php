@@ -13,7 +13,7 @@
 
 namespace Elkarte\Mentions\Types;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 
 abstract class AbstractMentionMessage implements MentionTypeInterface
 {
@@ -27,7 +27,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	/**
 	 * The database object
 	 *
-	 * @var \Database
+	 * @var DatabaseInterface
 	 */
 	protected $_db = null;
 

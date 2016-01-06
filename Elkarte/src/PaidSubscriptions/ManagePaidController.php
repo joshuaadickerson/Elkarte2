@@ -576,7 +576,7 @@ class ManagePaidController extends AbstractController
 		}
 
 		// Load up all the groups.
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		$context['groups'] = getBasicMembergroupData(array('permission'));
 
 		// This always happens.
@@ -842,8 +842,7 @@ class ManagePaidController extends AbstractController
 			if (empty($context['log_id']))
 			{
 				// Find the user...
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				$member = getMemberByName($this->_req->post->name);
+						$member = getMemberByName($this->_req->post->name);
 
 				if (empty($member))
 					$GLOBALS['elk']['errors']->fatal_lang_error('error_member_not_found');
@@ -943,7 +942,6 @@ class ManagePaidController extends AbstractController
 
 			if (isset($this->_req->query->uid))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
 
 				// Get the latest activated member's display name.
 				$result = getBasicMemberData((int) $this->_req->query->uid);

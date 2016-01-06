@@ -17,6 +17,8 @@
  *
  */
 
+namespace Elkarte\Admin\Packages;
+
 /**
  * Coordinates the processing for all known package actions
  *

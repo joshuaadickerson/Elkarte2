@@ -140,7 +140,6 @@ class XmlPreviewController extends AbstractController
 		$errors = array();
 		if (!empty($user) && $can_change)
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			// Get the current signature
 			$member = getBasicMemberData($user, array('preferences' => true));

@@ -13,8 +13,6 @@
 
 namespace Elkarte\Mentions\Types;
 
-if (!defined('ELK'))
-	die('No access...');
 
 class BuddyMention extends AbstractMentionMessage
 {

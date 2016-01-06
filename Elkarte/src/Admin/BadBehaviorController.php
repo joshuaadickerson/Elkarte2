@@ -12,7 +12,7 @@
  *
  */
 
-namespace Elkarte\Controllers\Admin;
+namespace Elkarte\Admin;
 
 use Elkarte\Controllers\AbstractController;
 
@@ -122,8 +122,7 @@ class BadBehaviorController extends AbstractController
 		// Load any member data so we have more information available
 		if (!empty($members))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$members = getBasicMemberData($members, array('add_guest' => true));
+				$members = getBasicMemberData($members, array('add_guest' => true));
 
 			// Go through each entry and add the member data.
 			foreach ($context['bb_entries'] as $id => $dummy)

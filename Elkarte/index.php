@@ -100,7 +100,6 @@ require_once(__DIR__ . '/src/Elkarte/Subs.php');
 require_once(__DIR__ . '/src/Elkarte/Load.php');
 require_once(__DIR__ . '/src/Elkarte/Log/Logging.php');
 require_once(__DIR__ . '/src/Elkarte/Security/Security.php');
-require_once(__DIR__ . '/src/Elkarte/Cache/Cache.subs.php');
 
 require_once(VENDORDIR . '/autoload.php');
 

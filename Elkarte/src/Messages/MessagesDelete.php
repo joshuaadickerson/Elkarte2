@@ -292,8 +292,7 @@ class MessagesDelete
 					)
 				);
 
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				while ($member = $db->fetch_assoc($request2))
+						while ($member = $db->fetch_assoc($request2))
 					updateMemberData($member['id_member'], array('posts' => 'posts + ' . $member['post_count']));
 				$db->free_result($request2);
 			}
@@ -371,7 +370,7 @@ class MessagesDelete
 			if ($check === true)
 			{
 				// This needs to be included for topic functions
-				require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 				removeTopics($row['id_topic']);
 				return true;
@@ -531,7 +530,7 @@ class MessagesDelete
 				// Mark recycled topic as read.
 				if (!$user_info['is_guest'])
 				{
-					require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 					markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
 				}
 
@@ -694,7 +693,7 @@ class MessagesDelete
 
 		// Update the pesky statistics.
 		updateMessageStats();
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		updateTopicStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
@@ -899,8 +898,7 @@ class MessagesDelete
 				)
 			);
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			while ($row = $request->fetchAssoc())
+				while ($row = $request->fetchAssoc())
 				updateMemberData($row['id_member'], array('posts' => '+'));
 		}
 
@@ -971,7 +969,7 @@ class MessagesDelete
 		$topic_exists = true;
 		if ($request->numRows() == 0)
 		{
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			removeTopics($from_topic, false, true);
 			$topic_exists = false;
 		}
@@ -1037,7 +1035,7 @@ class MessagesDelete
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 		// Update stats.
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		updateTopicStats();
 
 		updateMessageStats();

@@ -1,8 +1,5 @@
 <?php
 
-// We need this for all kinds of useful functions.
-require_once(SUBSDIR . '/Calendar.subs.php');
-
 /**
  * A class to handle the basics of calendar events.
  *

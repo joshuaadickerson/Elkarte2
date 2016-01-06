@@ -21,7 +21,7 @@ namespace Elkarte\Search;
 
 use Elkarte\Database\Drivers\SearchInterface;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
@@ -196,7 +196,7 @@ class Search
 	 */
 	private $_createTemporary = true;
 
-	/** @var  Util */
+	/** @var  StringUtil */
 	protected $text;
 
 	/**

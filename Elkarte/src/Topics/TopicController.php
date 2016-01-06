@@ -74,7 +74,7 @@ class TopicController extends AbstractController
 
 		// Load up the helpers
 		require_once(SUBSDIR . '/Notification.subs.php');
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// Find out who started the topic and its current lock status
 		list ($starter, $locked) = topicStatus($topic);
@@ -143,7 +143,7 @@ class TopicController extends AbstractController
 		require_once(SUBSDIR . '/Notification.subs.php');
 
 		// And Topic subs for topic attributes.
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// Is this topic already stickied, or no?
 		$sticky = topicAttribute($topic, 'is_sticky');
@@ -195,7 +195,7 @@ class TopicController extends AbstractController
 		$template_layers->removeAll();
 
 		// Get the topic starter information.
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$topicinfo = getTopicInfo($topic, 'starter');
 
 		// Redirect to the boardindex if no valid topic id is provided.
@@ -240,7 +240,7 @@ class TopicController extends AbstractController
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($this->_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 		{
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			$context['printattach'] = messagesAttachments(array_keys($context['posts']));
 			$context['viewing_attach'] = true;
 		}

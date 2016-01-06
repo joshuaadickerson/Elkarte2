@@ -17,7 +17,7 @@
  *
  */
 
-namespace Elkarte\Controllers\Admin;
+namespace Elkarte\Admin;
 
 use Elkarte\Controllers\AbstractController;
 

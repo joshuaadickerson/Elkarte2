@@ -18,8 +18,9 @@
  *
  */
 
-use Elkarte\Elkarte\Controller\AbstractController;
+namespace Elkarte\Groups;
 
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * GroupsController class, shows group access and allows for add/remove group members
@@ -226,8 +227,7 @@ class GroupsController extends AbstractController
 		$current_group = $this->_req->getQuery('group', 'intval', 0);
 
 		// These will be needed
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
-		require_once(ROOTDIR . '/Members/Members.subs.php');
+
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
@@ -449,7 +449,7 @@ class GroupsController extends AbstractController
 			$this->_session->check('post');
 			validateToken('mod-gr');
 
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 			// Clean the values.
 			$this->_req->post->groupr = array_map('intval', $this->_req->post->groupr);
@@ -474,8 +474,7 @@ class GroupsController extends AbstractController
 			else
 			{
 				// Get the details of all the members concerned...
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				$concerned = getConcernedMembers($this->_req->post->groupr, $where, $this->_req->post->req_action === 'approve');
+						$concerned = getConcernedMembers($this->_req->post->groupr, $where, $this->_req->post->req_action === 'approve');
 
 				// Cleanup old group requests..
 				deleteGroupRequests($this->_req->post->groupr);
@@ -542,7 +541,7 @@ class GroupsController extends AbstractController
 		}
 
 		// We're going to want this for making our list.
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// This is all the information required for a group listing.
 		$listOptions = array(

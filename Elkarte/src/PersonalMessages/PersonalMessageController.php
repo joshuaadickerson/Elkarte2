@@ -99,8 +99,7 @@ class PersonalMessageController extends AbstractController
 			// Apply our rules to the new PM's
 			applyRules();
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_info['id'], array('new_pm' => 0));
+				updateMemberData($user_info['id'], array('new_pm' => 0));
 
 			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
 			toggleNewPM($user_info['id']);
@@ -413,8 +412,7 @@ class PersonalMessageController extends AbstractController
 		if (isset($this->_req->query->view))
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_info['id'], array('pm_prefs' => ($user_settings['pm_prefs'] & 252) | $context['display_mode']));
+				updateMemberData($user_info['id'], array('pm_prefs' => ($user_settings['pm_prefs'] & 252) | $context['display_mode']));
 		}
 
 		// Make sure the starting location is valid.
@@ -885,8 +883,7 @@ class PersonalMessageController extends AbstractController
 				$users = array_unique($users);
 
 				// For all the member's this is going to, get their display name.
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				$result = getBasicMemberData($users);
+						$result = getBasicMemberData($users);
 
 				foreach ($result as $row)
 				{
@@ -941,7 +938,7 @@ class PersonalMessageController extends AbstractController
 		$context['bcc_value'] = '';
 
 		// Register this form and get a sequence number in $context.
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 	}
 
 	/**
@@ -1211,7 +1208,7 @@ class PersonalMessageController extends AbstractController
 		spamProtection('pm');
 
 		// Prevent double submission of this form.
-		checkSubmitOnce('check');
+		$this->checkSubmitOnce('check');
 
 		// Finally do the actual sending of the PM.
 		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
@@ -1291,7 +1288,6 @@ class PersonalMessageController extends AbstractController
 		{
 			$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			// Get the latest activated member's display name.
 			$result = getBasicMemberData($allRecipients);
@@ -1409,10 +1405,10 @@ class PersonalMessageController extends AbstractController
 		$context['bcc_value'] = empty($named_recipients['bcc']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['bcc']) . '&quot;';
 
 		// No check for the previous submission is needed.
-		checkSubmitOnce('free');
+		$this->checkSubmitOnce('free');
 
 		// Acquire a new form sequence number.
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 	}
 
 	/**
@@ -1702,8 +1698,7 @@ class PersonalMessageController extends AbstractController
 			}
 
 			// Save the label status.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_info['id'], array('message_labels' => implode(',', $the_labels)));
+				updateMemberData($user_info['id'], array('message_labels' => implode(',', $the_labels)));
 
 			// Update all the messages currently with any label changes in them!
 			if (!empty($message_changes))
@@ -1825,8 +1820,7 @@ class PersonalMessageController extends AbstractController
 
 			if (!empty($profile_vars))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($user_info['id'], $profile_vars);
+						updateMemberData($user_info['id'], $profile_vars);
 			}
 
 			// Invalidate any cached data and reload so we show the saved values
@@ -1873,7 +1867,6 @@ class PersonalMessageController extends AbstractController
 		$context['sub_template'] = 'report_message';
 
 		// We'll query some members, we will.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// If we're here, just send the user to the template, with a few useful context bits.
 		if (isset($this->_req->post->report))
@@ -1991,7 +1984,7 @@ class PersonalMessageController extends AbstractController
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 
 		// The link tree - gotta have this :o
 		$context['linktree'][] = array(
@@ -2006,7 +1999,6 @@ class PersonalMessageController extends AbstractController
 		loadRules();
 
 		// Likely to need all the groups!
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
 		$context['groups'] = accessibleGroups();
 
 		// Applying all rules?
@@ -2085,8 +2077,7 @@ class PersonalMessageController extends AbstractController
 
 				if (!empty($members))
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					$result = getBasicMemberData(array_keys($members));
+								$result = getBasicMemberData(array_keys($members));
 					foreach ($result as $row)
 						$context['rule']['criteria'][$members[$row['id_member']]]['v'] = $row['member_name'];
 				}
@@ -2141,8 +2132,7 @@ class PersonalMessageController extends AbstractController
 				// Members need to be found.
 				if ($type === 'mid')
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					$name = trim($this->_req->post->ruledef[$ind]);
+								$name = trim($this->_req->post->ruledef[$ind]);
 					$member = getMemberByName($name, true);
 					if (empty($member))
 					{
@@ -2647,8 +2637,7 @@ class PersonalMessageController extends AbstractController
 			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
 
 			// Who matches those criteria?
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$members = membersBy('member_names', array('member_names' => $possible_users));
+				$members = membersBy('member_names', array('member_names' => $possible_users));
 
 			foreach ($possible_users as $key => $possible_user)
 				$this->_searchq_parameters ['guest_user_name_implode_' . $key] = $this->db->db_case_sensitive() ? strtolower($possible_user) : $possible_user;

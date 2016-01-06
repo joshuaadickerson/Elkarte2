@@ -1,15 +1,17 @@
 <?php
 
-namespace Elkarte;
+namespace Elkarte\Elkarte;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Cache\Cache;
+use Elkarte\Elkarte\Errors\Errors;
 
 class Settings implements \ArrayAccess
 {
 	protected $data = [];
 	protected $group_keys = array('settings' => []);
 
-	public function __construct(DatabaseInterface $db, \Cache $cache, \Errors $errors)
+	public function __construct(DatabaseInterface $db, Cache $cache, Errors $errors)
 	{
 		$this->db = $db;
 		$this->cache = $cache;

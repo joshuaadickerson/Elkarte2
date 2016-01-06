@@ -253,7 +253,6 @@ abstract class AbstractDatabase implements DatabaseInterface
 		$results = $seeds;
 		while ($row = $request->fetchAssoc())
 			$results[] = $callback($row);
-		
 		$request->free();
 
 		return $results;

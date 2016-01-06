@@ -1,5 +1,7 @@
 <?php
 
+// @todo almost every function in here should be in a seperate file.
+
 /**
  * This file concerns itself with logging, whether in the database or files.
  *
@@ -17,10 +19,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
-require_once('Logging.subs.php');
 
 /**
  * Put this user in the online log.
@@ -118,7 +116,6 @@ function writeLog($force = false)
 			$_SESSION['timeOnlineUpdated'] = time();
 
 		$user_settings['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => $user_settings['total_time_logged_in']));
 
 		if ($cache->checkLevel(2))
@@ -356,4 +353,269 @@ function logActions($logs)
 	}
 
 	return insertLogActions($inserts);
+}
+
+
+/**
+ * @todo
+ *
+ * @param string $session_id
+ */
+function deleteLogOnlineInterval($session_id)
+{
+	global $modSettings;
+
+	$db = $GLOBALS['elk']['db'];
+
+	$db->query('delete_log_online_interval', '
+		DELETE FROM {db_prefix}log_online
+		WHERE log_time < {int:log_time}
+			AND session != {string:session}',
+		array(
+			'log_time' => time() - $modSettings['lastActive'] * 60,
+			'session' => $session_id,
+		)
+	);
+}
+
+/**
+ * Update a users entry in the online log
+ *
+ * @param string $session_id
+ * @param string $serialized
+ */
+function updateLogOnline($session_id, $serialized)
+{
+	global $user_info;
+
+	$db = $GLOBALS['elk']['db'];
+
+	$result = $db->query('', '
+		UPDATE {db_prefix}log_online
+		SET
+			log_time = {int:log_time},
+			ip = {string:ip},
+			url = {string:url}
+		WHERE session = {string:session}',
+		array(
+			'log_time' => time(),
+			'ip' => $user_info['ip'],
+			'url' => $serialized,
+			'session' => $session_id,
+		)
+	);
+
+	// Guess it got deleted.
+	if ($result->numAffectedRows() == 0)
+		$_SESSION['log_time'] = 0;
+}
+
+/**
+ * Update a users entry in the online log
+ *
+ * @param string $session_id
+ * @param string $serialized
+ * @param boolean $do_delete
+ */
+function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
+{
+	global $user_info, $modSettings;
+
+	$db = $GLOBALS['elk']['db'];
+
+	if ($do_delete || !empty($user_info['id']))
+	{
+		$db->query('', '
+			DELETE FROM {db_prefix}log_online
+			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
+			array(
+				'current_member' => $user_info['id'],
+				'log_time' => time() - $modSettings['lastActive'] * 60,
+			)
+		);
+	}
+
+	$db->insert($do_delete ? 'ignore' : 'replace',
+		'{db_prefix}log_online',
+		array(
+			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'
+		),
+		array(
+			$session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), $user_info['ip'], $serialized
+		),
+		array(
+			'session'
+		)
+	);
+}
+
+/**
+ * Update the system tracking statistics
+ *
+ * - Used by trackStats
+ *
+ * @param mixed[] $update_parameters
+ * @param string $setStringUpdate
+ * @param mixed[] $insert_keys
+ * @param mixed[] $cache_stats
+ * @param string $date
+ */
+function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date)
+{
+	$db = $GLOBALS['elk']['db'];
+
+	$result = $db->query('', '
+		UPDATE {db_prefix}log_activity
+		SET ' . $setStringUpdate . '
+		WHERE date = {date:current_date}',
+		$update_parameters
+	);
+
+	if ($result->numAffectedRows() == 0)
+	{
+		$db->insert('ignore',
+			'{db_prefix}log_activity',
+			array_merge($insert_keys, array('date' => 'date')),
+			array_merge($cache_stats, array($date)),
+			array('date')
+		);
+	}
+}
+
+/**
+ * Actualize login history, for the passed member and IPs.
+ *
+ * - It will log it as entry for the current time.
+ *
+ * @param int $id_member
+ * @param string $ip
+ * @param string $ip2
+ */
+function logLoginHistory($id_member, $ip, $ip2)
+{
+	$db = $GLOBALS['elk']['db'];
+
+	$db->insert('insert',
+		'{db_prefix}member_logins',
+		array(
+			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',
+		),
+		array(
+			$id_member, time(), $ip, $ip2
+		),
+		array(
+			'id_member', 'time'
+		)
+	);
+}
+
+/**
+ * Checks if a messages or topic has been reported
+ *
+ * @param string $msg_id
+ * @param string $topic_id
+ */
+function loadLogReported($msg_id, $topic_id, $type = 'msg')
+{
+	$db = $GLOBALS['elk']['db'];
+
+	$request = $db->query('', '
+		SELECT id_report
+		FROM {db_prefix}log_reported
+		WHERE {raw:column_name} = {int:reported}
+			AND type = {string:type}
+		LIMIT 1',
+		array(
+			'column_name' => !empty($msg_id) ? 'id_msg' : 'id_topic',
+			'reported' => !empty($msg_id) ? $msg_id : $topic_id,
+			'type' => $type,
+		)
+	);
+	$num = $request->numRows();
+	$request->free();
+
+	return ($num > 0);
+}
+
+/**
+ * Log a change to the forum, such as moderation events or administrative changes.
+ *
+ * @param mixed[] $inserts
+ */
+function insertLogActions($inserts)
+{
+	$db = $GLOBALS['elk']['db'];
+
+	$result = $db->insert('',
+		'{db_prefix}log_actions',
+		array(
+			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
+			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
+		),
+		$inserts,
+		array('id_action')
+	);
+
+	return $result->insertId('{db_prefix}log_actions', 'id_action');
+}
+
+function deleteMemberLogOnline()
+{
+	global $user_info;
+
+	$db = $GLOBALS['elk']['db'];
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_online
+		WHERE id_member = {int:current_member}',
+		array(
+			'current_member' => $user_info['id'],
+		)
+	);
+}
+
+/**
+ * Delete expired/outdated session from log_online
+ *
+ * @package Authorization
+ * @param string $session
+ */
+function deleteOnline($session)
+{
+	$db = $GLOBALS['elk']['db'];
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_online
+		WHERE session = {string:session}',
+		array(
+			'session' => $session,
+		)
+	);
+}
+
+/**
+ * Set the passed users online or not, in the online log table
+ *
+ * @package Authorization
+ * @param int[]|int $ids ids of the member(s) to log
+ * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
+ */
+function logOnline($ids, $on = false)
+{
+	$db = $GLOBALS['elk']['db'];
+
+	if (!is_array($ids))
+		$ids = array($ids);
+
+	if (empty($on))
+	{
+		// set the user(s) out of log_online
+		$db->query('', '
+			DELETE FROM {db_prefix}log_online
+			WHERE id_member IN ({array_int:members})',
+			array(
+				'members' => $ids,
+			)
+		);
+	}
 }

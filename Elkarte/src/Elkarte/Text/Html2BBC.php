@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte\Text;
 
 /**
  * Converts a string of HTML to BBC

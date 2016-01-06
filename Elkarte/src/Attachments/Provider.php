@@ -11,9 +11,13 @@ class Provider implements ProviderInterface
 	{
 		$this->controllers($elk);
 
-		$elk['attachments.context'] = $elk->factory(function ($elk) {
+		$elk['attachments.file_manager'] = function ($elk) {
+			return new Attachments();
+		};
+
+		$elk['attachments.context'] = function ($elk) {
 			return new AttachmentContext;
-		});
+		};
 	}
 
 	public function boot(Container $elk)

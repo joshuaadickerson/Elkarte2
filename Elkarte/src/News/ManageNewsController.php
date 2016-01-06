@@ -287,7 +287,7 @@ class ManageNewsController extends AbstractController
 	{
 		global $txt, $context;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Setup the template
@@ -426,7 +426,6 @@ class ManageNewsController extends AbstractController
 			}
 		}
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// For progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
@@ -641,7 +640,7 @@ class ManageNewsController extends AbstractController
 		// Some functions we will need
 		require_once(ROOTDIR . '/Mail/Mail.subs.php');
 		if ($context['send_pm'])
-			require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 
 		// We are relying too much on writing to superglobals...
 		$base_subject = $this->_req->getPost('subject', 'strval', '');

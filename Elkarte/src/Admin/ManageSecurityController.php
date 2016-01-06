@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * ManageSecurity controller handles the Security and Moderation

@@ -11,6 +11,8 @@
  *
  */
 
+namespace Elkarte\Elkarte\Debug;
+
 class Query_Analysis
 {
 	/**

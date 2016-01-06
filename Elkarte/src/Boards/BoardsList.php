@@ -22,7 +22,7 @@ namespace Elkarte\Boards;
 
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 use Elkarte\Members\Member;
 use Elkarte\Members\MemberContainer;
 
@@ -119,7 +119,7 @@ class BoardsList
 	 *       'set_latest_post' => false
 	 *       'get_moderators' => true
 	 */
-	public function __construct(DatabaseInterface $db, Cache $cache, Util $text,
+	public function __construct(DatabaseInterface $db, Cache $cache, StringUtil $text,
 								BoardsContainer $board_container, MemberContainer $mem_container)
 	{
 		$this->_db = $db;

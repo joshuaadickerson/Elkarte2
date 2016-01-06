@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte\Text;
 
 /**
  * Converts HTML to Markdown text

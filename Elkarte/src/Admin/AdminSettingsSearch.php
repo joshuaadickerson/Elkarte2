@@ -17,10 +17,12 @@
  *
  */
 
+namespace Elkarte\Admin;
+
 /**
  * Perform a search in the Admin settings (and maybe other settings as well)
  */
-class AdminSettings_Search
+class AdminSettingsSearch
 {
 	/**
 	 * All the settings we have found

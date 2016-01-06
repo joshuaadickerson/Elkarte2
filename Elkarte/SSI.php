@@ -774,7 +774,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	if ($query_where === null)
 		return false;
 
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	$members_data = retrieveMemberData(array(
 		$query_where => $query_where_params,
 		'limit' => !empty($query_limit) ? (int) $query_limit : 10,
@@ -1178,7 +1178,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	static $last_board = null;
 
 	require_once(SUBSDIR . '/Poll.subs.php');
-	require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 	if ($topicID === null && isset($_REQUEST['ssi_topic']))
 		$topicID = (int) $_REQUEST['ssi_topic'];

@@ -683,14 +683,12 @@ class ProfileController extends AbstractController
 					$GLOBALS['elk']['hooks']->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd2));
 				}
 
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($this->_memID, $profile_vars);
+						updateMemberData($this->_memID, $profile_vars);
 
 				// What if this is the newest member?
 				if ($modSettings['latestMember'] == $this->_memID)
 				{
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					updateMemberStats();
+								updateMemberStats();
 				}
 				elseif (isset($profile_vars['real_name']))
 				{

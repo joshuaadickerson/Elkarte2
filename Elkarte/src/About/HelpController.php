@@ -23,7 +23,7 @@ use Elkarte\Elkarte\Controller\AbstractController;
 
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 use Pimple\Container;
 
 /**
@@ -36,10 +36,10 @@ class HelpController extends AbstractController
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
-	public function __construct(Container $elk, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(Container $elk, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->elk = $elk;
 		$this->hooks = $hooks;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Elkarte\Controller;
+
 // @todo change this to not extend ValuesContainer
 class SubAction extends \ElkArte\ValuesContainer
 {

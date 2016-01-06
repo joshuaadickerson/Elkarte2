@@ -17,8 +17,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
+
 
 /**
  * Admin and moderation log controller.

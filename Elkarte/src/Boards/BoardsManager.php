@@ -6,7 +6,7 @@ use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 use Elkarte\Members\MemberContainer;
 
 class BoardsManager
@@ -19,14 +19,14 @@ class BoardsManager
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 	/** @var BoardsContainer  */
 	protected $boards_container;
 	/** @var MemberContainer  */
 	protected $mem_container;
 
-	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, Util $text,
+	public function __construct(DatabaseInterface $db, Cache $cache, Hooks $hooks, Errors $errors, StringUtil $text,
 								BoardsContainer $boards_container, MemberContainer $mem_container)
 	{
 		$this->db = $db;
@@ -684,7 +684,6 @@ class BoardsManager
 	function createBoard($boardOptions)
 	{
 		global $boards;
-		
 		// Trigger an error if one of the required values is not set.
 		if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) == '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
 			trigger_error('createBoard(): One or more of the required options is not set', E_USER_ERROR);
@@ -776,7 +775,6 @@ class BoardsManager
 	function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	{
 		global $boards;
-		
 		// No boards to delete? Return!
 		if (empty($boards_to_remove))
 			return;
@@ -820,7 +818,7 @@ class BoardsManager
 			)
 		);
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		removeTopics($topics, false);
 
 		// Delete the board's logs.
@@ -885,7 +883,7 @@ class BoardsManager
 		// Latest message/topic might not be there anymore.
 		require_once(ROOTDIR . '/Messages/Messages.subs.php');
 		updateMessageStats();
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		updateTopicStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
@@ -1087,7 +1085,6 @@ class BoardsManager
 	{
 		global $modSettings;
 
-		
 
 		if ((isset($boardListOptions['excluded_boards']) || isset($boardListOptions['allowed_to'])) && isset($boardListOptions['included_boards']))
 			trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);
@@ -1435,7 +1432,6 @@ class BoardsManager
 	{
 		global $user_info;
 
-		
 
 		// All the boards that you have notification enabled
 		$request = $this->db->query('', '
@@ -1528,7 +1524,6 @@ class BoardsManager
 	{
 		global $modSettings, $user_info;
 
-		
 		$allowed_see = array(
 			'query_see_board',
 			'query_wanna_see_board'
@@ -1562,7 +1557,6 @@ class BoardsManager
 	 */
 	function boardInfo($board_id, $topic_id = null)
 	{
-		
 
 		if (!empty($topic_id))
 		{
@@ -1614,7 +1608,6 @@ class BoardsManager
 	 */
 	function getOtherGroups($curBoard, $new_board = false)
 	{
-		
 
 		$groups = array();
 
@@ -1658,7 +1651,6 @@ class BoardsManager
 	 */
 	function getBoardModerators($idboard, $only_id = false)
 	{
-		
 
 		$moderators = array();
 
@@ -1845,7 +1837,6 @@ class BoardsManager
 	 */
 	function sumRecentPosts()
 	{
-		
 
 		global $modSettings;
 
@@ -1890,7 +1881,6 @@ class BoardsManager
 	{
 		global $modSettings;
 
-		
 
 		// Ensure default values are set
 		$params = array_merge(array('override_permissions' => false, 'wanna_see_board' => false, 'include_recycle' => true, 'include_redirects' => true), $params);
@@ -2029,7 +2019,6 @@ class BoardsManager
 	 */
 	function incrementBoard($id_board, $values)
 	{
-		
 
 		$knownInts = array(
 			'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
@@ -2073,7 +2062,6 @@ class BoardsManager
 	 */
 	function decrementBoard($id_board, $values)
 	{
-		
 
 		$knownInts = array(
 			'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
@@ -2200,7 +2188,6 @@ class BoardsManager
 	{
 		global $modSettings;
 
-		
 
 		// Ensure default values are set
 		$params = array_merge(array('wanna_see_board' => false, 'include_recycle' => true, 'include_redirects' => true), $params);

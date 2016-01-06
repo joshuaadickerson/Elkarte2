@@ -2,14 +2,12 @@
 
 namespace Elkarte;
 
-use Elkarte\Boards\BoardsManager;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Theme\Context;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 use Elkarte\Elkarte\Theme\Templates;
 use Elkarte\Elkarte\Text\BBC\ParserWrapper;
-use \Pimple\Container;
 
 global $elk;
 
@@ -78,15 +76,35 @@ $elk['cache'] = function () {
  * @var DatabaseInterface
  * @return DatabaseInterface
  */
-$elk['db'] = function () use ($elk, $db_persist, $db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix) {
+$elk['db'] = function ($elk) use ($db_server, $db_user, $db_passwd, $db_port, $db_type, $db_name, $db_prefix) {
 	//global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 	//global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
-	$db = new Elkarte\Database\Database($db_type, $elk['errors'], $elk['debug'], $elk['hooks']);
+	// Fix the db type
+	switch (strtolower($db_type))
+	{
+		case 'mysql':
+			$class_name = 'MySQL';
+			break;
+		case 'postgresql':
+			$class_name = 'PostgreSQL';
+			break;
+		default:
+			$class_name = $db_type;
+	}
 
-	$options = array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port);
+	$class_name = '\\Elkarte\\Elkarte\\Database\\Drivers\\' . $class_name . '\\Database';
+	$class = new $class_name($elk['errors'], $elk['debug'], $elk['hooks']);
 
-	return $db->connect($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $options);
+	return $class->connect($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $elk['db.options']);
+};
+
+$elk['db.options'] = function () use ($db_persist, $db_port) {
+	return array(
+		'persist' => $db_persist,
+		'dont_select_db' => ELK === 'SSI',
+		'port' => $db_port
+	);
 };
 
 /**
@@ -165,13 +183,13 @@ $elk['action'] = function () {
 };
 
 /**
- * @var Util
- * @return Util
+ * @var StringUtil
+ * @return StringUtil
  */
 $elk['text'] = function () {
 	global $modSettings;
 
-	return new Util($modSettings);
+	return new StringUtil($modSettings);
 };
 
 $elk['context'] = function () {

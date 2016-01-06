@@ -11,12 +11,12 @@
  *
  */
 
-class RandomPostModule implements ElkArte\sources\modules\Module_Interface
+class RandomPostModule implements ModuleInterface
 {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

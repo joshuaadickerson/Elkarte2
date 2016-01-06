@@ -56,7 +56,7 @@ class TestPoll extends PHPUnit_Framework_TestCase
 	public function tearDown()
 	{
 		// remove temporary test data
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		removeTopics($this->id_topic); // it'll remove the poll too, if any
 	}
 

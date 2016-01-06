@@ -182,7 +182,7 @@ class MarkReadController extends AbstractController
 		// Make sure all the topics are integers!
 		$topics = array_map('intval', explode('-', $this->_req->query->topics));
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$logged_topics = getLoggedTopics($user_info['id'], $topics);
 
 		$markRead = array();
@@ -205,7 +205,7 @@ class MarkReadController extends AbstractController
 	{
 		global $board, $topic, $user_info;
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 
 		// Mark a topic unread.

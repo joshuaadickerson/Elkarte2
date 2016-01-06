@@ -481,7 +481,7 @@ function updatePersonalMessagesCounter()
 {
 	$db = $GLOBALS['elk']['db'];
 
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 
 	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
@@ -737,7 +737,7 @@ function updateMembersPostCount($start, $increment)
 	$total_rows = $request->numRows();
 
 	// Update the post count for this group
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	while ($row = $request->fetchAssoc())
 		updateMemberData($row['id_member'], array('posts' => $row['posts']));
 	$request->free();
@@ -802,8 +802,7 @@ function updateZeroPostMembers()
 
 			if (!empty($members))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($members, array('posts' => 0));
+						updateMemberData($members, array('posts' => 0));
 			}
 		}
 }

@@ -34,8 +34,7 @@
  *  - please include any special license in a license.txt file.
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * Class to deal with theme administration.
@@ -275,8 +274,7 @@ class ManageThemesController extends AbstractController
 
 			if ((int) $this->_req->post->theme_reset == 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData(null, array('id_theme' => (int) $this->_req->post->theme_reset));
+						updateMemberData(null, array('id_theme' => (int) $this->_req->post->theme_reset));
 			}
 
 			redirectexit('action=Admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=Admin');
@@ -983,8 +981,7 @@ class ManageThemesController extends AbstractController
 			// Save for this user.
 			if (!isset($u) || !allowedTo('admin_forum'))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($user_info['id'], array('id_theme' => $th));
+						updateMemberData($user_info['id'], array('id_theme' => $th));
 
 				// A variants to save for the user?
 				if (!empty($vrt))
@@ -1011,8 +1008,7 @@ class ManageThemesController extends AbstractController
 			// For everyone.
 			if ($u === 0)
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData(null, array('id_theme' => $th));
+						updateMemberData(null, array('id_theme' => $th));
 
 				// Remove any custom variants.
 				if (!empty($vrt))
@@ -1034,8 +1030,7 @@ class ManageThemesController extends AbstractController
 				if (isset($th) && $th == 0)
 					$th = $modSettings['theme_guests'];
 
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($u, array('id_theme' => $th));
+						updateMemberData($u, array('id_theme' => $th));
 
 				if (!empty($vrt))
 				{
@@ -1075,8 +1070,7 @@ class ManageThemesController extends AbstractController
 		{
 			$context['current_member'] = $u;
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$member = getBasicMemberData($context['current_member']);
+				$member = getBasicMemberData($context['current_member']);
 
 			$current_theme = $member['id_theme'];
 		}

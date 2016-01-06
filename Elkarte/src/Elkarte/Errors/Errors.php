@@ -573,6 +573,7 @@ class Errors
 
 		// For our purposes, we're gonna want this on if at all possible.
 		$modSettings['cache_enable'] = 1;
+		$this->cache = $GLOBALS['elk']['cache'];
 		$this->cache->enable(true)->setLevel(1);
 
 		if ($this->cache->getVar($temp, 'db_last_error', 600))

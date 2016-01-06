@@ -17,15 +17,14 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
 
-class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
+class DraftsProfileModule implements ModuleInterface
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

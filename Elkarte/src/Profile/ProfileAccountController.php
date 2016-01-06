@@ -444,8 +444,7 @@ class ProfileAccountController extends AbstractController
 				}
 
 				// Make the change.
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($this->_memID, array('warning' => $warning_level));
+						updateMemberData($this->_memID, array('warning' => $warning_level));
 
 				// Leave a lovely message.
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : $txt['profile_warning_success'];
@@ -488,7 +487,7 @@ class ProfileAccountController extends AbstractController
 			// Send the PM?
 			else
 			{
-				require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 				$from = array(
 					'id' => 0,
 					'name' => $context['forum_name'],
@@ -553,7 +552,6 @@ class ProfileAccountController extends AbstractController
 		$old_profile = &$cur_profile;
 
 		// This file is needed for our utility functions.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Too often, people remove/delete their own only administrative account.
 		if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
@@ -577,7 +575,7 @@ class ProfileAccountController extends AbstractController
 			if ($this->_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
-				require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 
 				// First off we delete any topics the member has started - if they wanted topics being done.
@@ -603,8 +601,7 @@ class ProfileAccountController extends AbstractController
 		elseif (!empty($modSettings['approveAccountDeletion']) && !allowedTo('moderate_forum'))
 		{
 			// Setup their account for deletion ;)
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($this->_memID, array('is_activated' => 4));
+				updateMemberData($this->_memID, array('is_activated' => 4));
 
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
@@ -636,7 +633,6 @@ class ProfileAccountController extends AbstractController
 			&& isset($user_profile[$this->_memID]['is_activated'])
 			&& $user_profile[$this->_memID]['is_activated'] != 1)
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			// If we are approving the deletion of an account, we do something special ;)
 			if ($user_profile[$this->_memID]['is_activated'] == 4)
@@ -656,8 +652,7 @@ class ProfileAccountController extends AbstractController
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 
 			// Make sure we update the stats too.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberStats();
+				updateMemberStats();
 		}
 
 		// Leave it be...

@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
 
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.

@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * Manage features and options administration page.
@@ -1014,8 +1013,8 @@ class ManageFeaturesController extends AbstractController
 			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
 				redirectexit($scripturl . '?action=Admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
 
-			$this->_req->post->field_name = $this->_req->getPost('field_name', '$GLOBALS['elk']['text']->htmlspecialchars');
-			$this->_req->post->field_desc = $this->_req->getPost('field_desc', '$GLOBALS['elk']['text']->htmlspecialchars');
+			$this->_req->post->field_name = $this->_req->getPost('field_name', 'htmlspecialchars');
+			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'htmlspecialchars');
 
 			// Checkboxes...
 			$show_reg = $this->_req->getPost('reg', 'intval', 0);
@@ -1228,7 +1227,7 @@ class ManageFeaturesController extends AbstractController
 		// Retrieve the current config settings
 		$config_vars = $this->_PMSettings->settings();
 
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 		loadLanguage('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
@@ -1238,7 +1237,7 @@ class ManageFeaturesController extends AbstractController
 		{
 			$this->_session->check();
 
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
 				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])

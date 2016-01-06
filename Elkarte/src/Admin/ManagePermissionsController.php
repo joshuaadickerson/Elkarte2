@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * ManagePermissions handles all possible permission stuff.
@@ -152,8 +151,7 @@ class ManagePermissionsController extends AbstractController
 	{
 		global $txt, $scripturl, $context, $user_info, $modSettings;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
-		require_once(ROOTDIR . '/Members/Members.subs.php');
+
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		$context['page_title'] = $txt['permissions_title'];
@@ -708,7 +706,7 @@ class ManagePermissionsController extends AbstractController
 
 		if ($context['group']['id'] > 0)
 		{
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 			$group = membergroupById($context['group']['id'], true);
 			$context['group']['name'] = $group['group_name'];
@@ -814,7 +812,7 @@ class ManagePermissionsController extends AbstractController
 			$parent = -2;
 		else
 		{
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			$group = membergroupById($current_group_id, true);
 			$parent = $group['id_parent'];
 		}
@@ -1077,7 +1075,7 @@ class ManagePermissionsController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('post_moderation_mapping', array(&$mappings));
 
 		// Load the groups.
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		$context['profile_groups'] = prepareMembergroupPermissions();
 
 		// What are the permissions we are querying?

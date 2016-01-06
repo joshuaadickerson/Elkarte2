@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin\Packages;
 
 /**
  * PackageServers controller handles browsing, adding and removing

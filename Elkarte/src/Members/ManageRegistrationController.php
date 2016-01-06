@@ -170,8 +170,7 @@ class ManageRegistrationController extends AbstractController
 				'auth_method' => 'password',
 			);
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$reg_errors = ErrorContext::context('register', 0);
+				$reg_errors = ErrorContext::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
 			// If there are "important" errors and you are not an Admin: log the first error
@@ -195,7 +194,7 @@ class ManageRegistrationController extends AbstractController
 		// Load the assignable member groups.
 		if (allowedTo('manage_membergroups'))
 		{
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			if (allowedTo('admin_forum'))
 				$includes = array('Admin', 'globalmod', 'member');
 			else

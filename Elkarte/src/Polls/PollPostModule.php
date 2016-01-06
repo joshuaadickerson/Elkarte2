@@ -20,14 +20,14 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Poll_Post_Module implements ModuleInterface
 {
 	protected static $_make_poll = false;
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 
@@ -110,8 +110,7 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 				isAllowedTo('poll_add_any');
 			$context['can_moderate_poll'] = true;
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
+				$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 			// Set up the poll options.
 			$context['poll'] = array(
@@ -297,8 +296,7 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 		// Make sure guests are actually allowed to vote generally.
 		if ($poll_guest_vote)
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
+				$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 			if (!in_array(-1, $allowedVoteGroups['allowed']))
 				$poll_guest_vote = 0;

@@ -142,8 +142,7 @@ class ReminderController extends AbstractController
 
 			if (empty($member['openid_uri']))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				// Set the password in the database.
+						// Set the password in the database.
 				updateMemberData($member['id_member'], array('validation_code' => substr(md5($password), 0, 10)));
 			}
 
@@ -221,7 +220,6 @@ class ReminderController extends AbstractController
 		loadLanguage('Login');
 
 		// Get the code as it should be from the database.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$member = getBasicMemberData((int) $this->_req->post->u, array('authentication' => true));
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
@@ -251,7 +249,6 @@ class ReminderController extends AbstractController
 		// User validated.  Update the database!
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $this->_req->post->passwrd1;
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		if (isset($this->_req->post->otp))
 			updateMemberData($this->_req->post->u, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
 		else
@@ -290,7 +287,6 @@ class ReminderController extends AbstractController
 		loadLanguage('Login');
 
 		// Get the information from the database.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
 		if (empty($member))
 			$this->_errors->fatal_lang_error('username_no_exist', false);
@@ -329,7 +325,6 @@ class ReminderController extends AbstractController
 		// Alright, so long as 'yer sure.
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $this->_req->post->passwrd1;
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		$GLOBALS['elk']['hooks']->hook('reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
@@ -367,7 +362,7 @@ function secretAnswerInput()
 		$this->_errors->fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
-	require_once(ROOTDIR . '/Members/Members.subs.php');
+
 	$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
 	if (empty($member))
 		$this->_errors->fatal_lang_error('username_no_exist', false);

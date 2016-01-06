@@ -622,8 +622,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 		elseif ($posterOptions['id'] != $user_info['id'])
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$result = getBasicMemberData($posterOptions['id']);
+				$result = getBasicMemberData($posterOptions['id']);
 			// Couldn't find the current poster?
 			if (empty($result))
 			{
@@ -769,7 +768,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// There's been a new topic AND a new post today.
 		trackStats(array('topics' => '+', 'posts' => '+'));
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		updateTopicStats(true);
 
 		updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
@@ -890,7 +889,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			markTopicsRead(array($posterOptions['id'], $topicOptions['id'], $msgOptions['id'], 0), false);
 		}
 	}
@@ -908,7 +907,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if ($user_info['id'] == $posterOptions['id'])
 			$user_info['posts']++;
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($posterOptions['id'], array('posts' => '+'));
 	}
 
@@ -1042,7 +1040,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		if (empty($flag))
 		{
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
@@ -1315,7 +1313,6 @@ function approvePosts($msgs, $approve = true)
 	// Post count for the members?
 	if (!empty($member_post_changes))
 	{
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		foreach ($member_post_changes as $id_member => $count_change)
 			updateMemberData($id_member, array('posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change));
 	}

@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Poll_Display_Module implements ModuleInterface
 {
 	protected static $_enabled = false;
 
@@ -29,7 +29,7 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

@@ -128,7 +128,7 @@ class PostModerationController extends AbstractController
 		{
 			$this->_session->check('request');
 
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 
 			// Handy shortcut.
@@ -481,7 +481,7 @@ class PostModerationController extends AbstractController
 
 		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		require_once(ROOTDIR . '/Messages/Post.subs.php');
 
 

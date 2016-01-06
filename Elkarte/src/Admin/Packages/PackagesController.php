@@ -17,8 +17,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin\Packages;
+
 
 /**
  * This class is the administration package manager controller.
@@ -291,7 +291,7 @@ class PackagesController extends AbstractController
 		}
 
 		$context['post_url'] = $scripturl . '?action=Admin;area=packages;sa=' . ($this->_uninstalling  ? 'uninstall' : 'Install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $this->_filename . ';pid=' . $this->install_id;
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 	}
 
 	/**
@@ -530,7 +530,7 @@ class PackagesController extends AbstractController
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Make sure we don't Install this addon twice.
-		checkSubmitOnce('check');
+		$this->checkSubmitOnce('check');
 		$this->_session->check();
 
 		// If there's no package file, what are we installing?
@@ -1067,9 +1067,9 @@ class PackagesController extends AbstractController
 			$this->_session->check('post');
 
 			updateSettings(array(
-				'package_server' => $this->_req->getPost('pack_server', 'trim|$GLOBALS['elk']['text']->htmlspecialchars'),
-				'package_port' => $this->_req->getPost('pack_port', 'trim|$GLOBALS['elk']['text']->htmlspecialchars'),
-				'package_username' => $this->_req->getPost('pack_user', 'trim|$GLOBALS['elk']['text']->htmlspecialchars'),
+				'package_server' => $this->_req->getPost('pack_server', 'trim|htmlspecialchars'),
+				'package_port' => $this->_req->getPost('pack_port', 'trim|htmlspecialchars'),
+				'package_username' => $this->_req->getPost('pack_user', 'trim|htmlspecialchars'),
 				'package_make_backups' => !empty($this->_req->post->package_make_backups),
 				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
 			));
@@ -1104,9 +1104,6 @@ class PackagesController extends AbstractController
 		// We need to know the operation key for the search and replace?
 		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
 			$GLOBALS['elk']['errors']->fatal_lang_error('operation_invalid', 'general');
-
-		// Load the required file.
-		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
 		$reverse = isset($this->_req->query->reverse) ? true : false;

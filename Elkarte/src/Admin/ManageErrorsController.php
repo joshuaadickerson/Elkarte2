@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * ManageErrors controller, administration of error log.
@@ -203,8 +202,7 @@ class ManageErrorsController extends AbstractController
 		// Load the member data.
 		if (!empty($members))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$members = getBasicMemberData($members, array('add_guest' => true));
+				$members = getBasicMemberData($members, array('add_guest' => true));
 
 			// Go through each error and tack the data on.
 			foreach ($context['errors'] as $id => $dummy)

@@ -17,8 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Admin controller class.
@@ -617,7 +618,7 @@ class AdminController extends AbstractController
 		global $txt, $scripturl, $context, $user_info, $settings;
 
 		// We need a little help
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -678,7 +679,7 @@ class AdminController extends AbstractController
 		global $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		require_once(SUBSDIR . '/Who.subs.php');
 		require_once(SUBSDIR . '/Admin.subs.php');
 

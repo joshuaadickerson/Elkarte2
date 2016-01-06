@@ -142,8 +142,7 @@ class ProfileOptionsController extends AbstractController
 
 			// Make the changes.
 			$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
@@ -176,8 +175,7 @@ class ProfileOptionsController extends AbstractController
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+						updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 			}
 
 			// Back to the buddy list!
@@ -189,8 +187,7 @@ class ProfileOptionsController extends AbstractController
 
 		if (!empty($buddiesArray))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
+				$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
 			foreach ($result as $row)
 				$buddies[] = $row['id_member'];
 		}
@@ -248,8 +245,7 @@ class ProfileOptionsController extends AbstractController
 
 			// Make the changes.
 			$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
@@ -279,8 +275,7 @@ class ProfileOptionsController extends AbstractController
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+						updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 			}
 
 			// Back to the list of pitiful people!
@@ -292,8 +287,7 @@ class ProfileOptionsController extends AbstractController
 
 		if (!empty($ignoreArray))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
+				$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
 			foreach ($result as $row)
 				$ignored[] = $row['id_member'];
 		}
@@ -511,8 +505,7 @@ class ProfileOptionsController extends AbstractController
 					$passwd = validateLoginPassword($new_pass, '', $cur_profile['member_name'], true);
 
 					// Do the important bits.
-					require_once(ROOTDIR . '/Members/Members.subs.php');
-					updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
+								updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
 						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
@@ -528,7 +521,6 @@ class ProfileOptionsController extends AbstractController
 			elseif ($this->_req->post->authenticate === 'openid' && !empty($this->_req->post->openid_identifier))
 			{
 				require_once(SUBSDIR . '/OpenID.subs.php');
-				require_once(ROOTDIR . '/Members/Members.subs.php');
 
 				$openID = new OpenID();
 				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
@@ -567,7 +559,7 @@ class ProfileOptionsController extends AbstractController
 
 		// Going to need this for the list.
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
@@ -939,7 +931,7 @@ class ProfileOptionsController extends AbstractController
 		// GID may be from a link or a form
 		$this->_session->check(isset($this->_req->query->gid) ? 'get' : 'post');
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		$old_profile = &$user_profile[$this->_memID];
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
@@ -1024,20 +1016,18 @@ class ProfileOptionsController extends AbstractController
 			require_once(ROOTDIR . '/Mail/Mail.subs.php');
 
 			// Do we have any group moderators?
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			$moderators = array_keys(getGroupModerators($group_id));
 
 			// Otherwise this is the backup!
 			if (empty($moderators))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				$moderators = membersAllowedTo('manage_membergroups');
+						$moderators = membersAllowedTo('manage_membergroups');
 			}
 
 			if (!empty($moderators))
 			{
-				require_once(ROOTDIR . '/Members/Members.subs.php');
-				$members = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+						$members = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
 
 				foreach ($members as $member)
 				{
@@ -1117,7 +1107,6 @@ class ProfileOptionsController extends AbstractController
 		else
 			updateSettings(array('settings_updated' => time()));
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($this->_memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
 
 		return $changeType;

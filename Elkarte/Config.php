@@ -62,10 +62,11 @@ class Config
 	########## Database Info ##########
 	/**
 	 * The database type
-	 * Default options: mysql, sqlite, postgresql
+	 * This option is CASE SENSITIVE!!!
+	 * Default options: MySQL, PostgreSQL
 	 * @var string
 	 */
-	public $db_type = 'mysql';
+	public $db_type = 'MySQL';
 
 	/**
 	 * The server to connect to (or a Unix socket)

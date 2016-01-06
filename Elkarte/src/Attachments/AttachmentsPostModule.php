@@ -17,9 +17,11 @@
  *
  */
 
+namespace Elkarte\Attachments;
+
 use Elkarte\Attachments\AttachmentErrorContext;
 
-class AttachmentsPostModule implements ElkArte\sources\modules\Module_Interface
+class AttachmentsPostModule implements ModuleInterface
 {
 	/**
 	 * The mode of attachments (disabled/enabled/show only).
@@ -48,7 +50,7 @@ class AttachmentsPostModule implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 

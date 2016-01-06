@@ -11,20 +11,19 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Mentions;
 
-abstract class Mentions_Module_Abstract implements ElkArte\sources\modules\Module_Interface
+abstract class MentionsModuleAbstract implements ModuleInterface
 {
 	/**
 	 * Based on the $action returns the enabled mention types to register to the
 	 * event manager.
 	 *
 	 * @param string $action
-	 * @param \Event_Manager $eventsManager
+	 * @param EventManager $eventsManager
 	 * @global $modSettings
 	 */
-	protected static function registerHooks($action, \Event_Manager $eventsManager)
+	protected static function registerHooks($action, EventManager $eventsManager)
 	{
 		global $modSettings;
 

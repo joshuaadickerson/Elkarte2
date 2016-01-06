@@ -90,7 +90,6 @@ class MembersController extends AbstractController
 		}
 
 		// Update the settings.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
 		// Redirect back to the profile
@@ -124,7 +123,6 @@ class MembersController extends AbstractController
 			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
 
 		// Update the settings.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
 		// Redirect back to the profile

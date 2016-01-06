@@ -309,7 +309,6 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _updateMenuCount($status, $member_id)
 	{
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// If its new add to our menu count
 		if ($status === 0)

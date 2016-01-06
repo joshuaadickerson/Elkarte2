@@ -11,8 +11,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
+
 
 /**
  * Draft controller.

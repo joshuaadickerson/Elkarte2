@@ -1,5 +1,7 @@
 <?php
 
+namespace Elkarte\Elkarte\Theme;
+
 class Theme
 {
 	protected $namespaces = [

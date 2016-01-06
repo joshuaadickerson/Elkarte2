@@ -622,7 +622,7 @@ class Theme extends AbstractTheme
         $menu_count['mentions'] = $context['user']['mentions'];
 
         // All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-        if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+        if (($menu_buttons = $GLOBALS['elk']['cache']->get('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
         {
             // Start things up: this is what we know by default
             require_once(ELKDIR . '/Menu/Menu.subs.php');
@@ -946,7 +946,7 @@ class Theme extends AbstractTheme
             }
 
             if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-                cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+                $GLOBALS['elk']['cache']->put('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
         }
 
         if (!empty($menu_buttons['profile']['sub_buttons']['logout']))

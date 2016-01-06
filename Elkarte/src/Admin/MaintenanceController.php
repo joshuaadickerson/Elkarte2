@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * Entry point class for all of the maintenance ,routine, members, database,
@@ -351,7 +350,7 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// Get all membergroups - for deleting members and the like.
 		$context['membergroups'] = getBasicMembergroupData(array('all'));
@@ -696,7 +695,7 @@ class MaintenanceController extends AbstractController
 
 		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// Validate the request or the loop
 		if (!isset($this->_req->query->step))
@@ -877,11 +876,10 @@ class MaintenanceController extends AbstractController
 		updateBoardsLastMessage();
 
 		// Update all the basic statistics.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberStats();
 
 		updateMessageStats();
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		updateTopicStats();
 
 		// Finally, update the latest event times.
@@ -996,8 +994,7 @@ class MaintenanceController extends AbstractController
 			$membername = $our_post['type'] == 'name' ? $our_post['from_name'] : '';
 
 			// Now call the reattribute function.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			reattributePosts($memID, $email, $membername, !$our_post['posts']);
+				reattributePosts($memID, $email, $membername, !$our_post['posts']);
 
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])),
@@ -1102,7 +1099,6 @@ class MaintenanceController extends AbstractController
 			$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
 
 			require_once(SUBSDIR . '/Maintenance.subs.php');
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			$groups = array();
 			foreach ($our_post['groups'] as $id => $dummy)
@@ -1152,7 +1148,7 @@ class MaintenanceController extends AbstractController
 		// @todo what is the minimum for maxdays? Maybe throw an error?
 		$older_than = time() - 3600 * 24 * max($this->_req->getPost('maxdays', 'intval', 0), 1);
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		removeOldTopics($boards, $delete_type, $exclude_stickies, $older_than);
 
 		// Log an action into the moderation log.
@@ -1194,7 +1190,7 @@ class MaintenanceController extends AbstractController
 
 		// These will be needed
 		require_once(SUBSDIR . '/Maintenance.subs.php');
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// How many topics are we moving?
 		if (!isset($this->_req->query->totaltopics))

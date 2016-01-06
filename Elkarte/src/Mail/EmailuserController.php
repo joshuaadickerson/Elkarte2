@@ -18,6 +18,8 @@
  *
  */
 
+namespace Elkarte\Mail;
+
 use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
@@ -70,7 +72,7 @@ class EmailuserController extends AbstractController
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
@@ -143,7 +145,7 @@ class EmailuserController extends AbstractController
 			return;
 		}
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
@@ -293,7 +295,6 @@ class EmailuserController extends AbstractController
 		$mid = '';
 		if (isset($this->_req->post->uid) || isset($this->_req->query->uid))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			// Get the latest activated member's display name.
 			$uid = $this->_req->getPost('uid', 'intval', isset($this->_req->query->uid) ? (int) $this->_req->query->uid : 0);
@@ -320,7 +321,6 @@ class EmailuserController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Does the user want to be contacted at all by you?
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		if (!canContact($row['id_member']))
 			$this->_errors->fatal_lang_error('no_access', false);
 
@@ -596,7 +596,6 @@ class EmailuserController extends AbstractController
 		$subject = $GLOBALS['elk']['text']->un_htmlspecialchar($message['subject']);
 
 		// Get a list of members with the moderate_board permission.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$moderators = membersAllowedTo('moderate_board', $board);
 		$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
 		$mod_to_notify = array();

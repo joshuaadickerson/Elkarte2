@@ -29,12 +29,6 @@ use Elkarte\Topics\MessageTopicIcons;
 class DisplayController extends AbstractController
 {
 	/**
-	 * The template layers object
-	 * @var null|object
-	 */
-	protected $_template_layers = null;
-
-	/**
 	 * The message id when in the form msg123
 	 * @var int
 	 */
@@ -58,6 +52,12 @@ class DisplayController extends AbstractController
 	 * @var int|string
 	 */
 	private $_start;
+
+	public function __construct()
+	{
+		$this->elk = $GLOBALS['elk'];
+		$this->bootstrap();
+	}
 
 	/**
 	 * Default action handler for this controller
@@ -96,8 +96,7 @@ class DisplayController extends AbstractController
 		$context['sub_template'] = 'messages';
 
 		// And the topic functions
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		require_once(ROOTDIR . '/Messages/Messages.subs.php');
+
 
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		stop_prefetching();
@@ -207,7 +206,7 @@ class DisplayController extends AbstractController
 		// When was the last time this topic was replied to?  Should we warn them about it?
 		if (!empty($modSettings['oldTopicDays']))
 		{
-			$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
+			$mgsOptions = $this->elk['messages.manager']->basicMessageInfo($topicinfo['id_last_msg'], true);
 			$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 		}
 		else
@@ -292,7 +291,7 @@ class DisplayController extends AbstractController
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($this->_req->query->reportsent);
 		if ($context['report_sent'])
-			$this->_template_layers->add('report_sent');
+			$this->_layers->add('report_sent');
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -428,11 +427,10 @@ class DisplayController extends AbstractController
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
-			require_once(ROOTDIR . '/Attachments/Attachments.subs.php');
 
 			// Fetch attachments.
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
+				$attachments = $this->elk['attachments.file_manager']->getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
 			$msg_parameters = array(
 				'message_list' => $messages,
@@ -480,7 +478,7 @@ class DisplayController extends AbstractController
 				});', true);
 			}
 
-			$messages_request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
+			$messages_request = $this->elk['messages.manager']->loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
 
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
@@ -604,7 +602,7 @@ class DisplayController extends AbstractController
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
 		{
-			checkSubmitOnce('register');
+			$this->checkSubmitOnce('register');
 			$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
 			$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
 			if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
@@ -689,7 +687,7 @@ class DisplayController extends AbstractController
 			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' . urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$topic_info = getTopicInfo($topic);
 
 		// Allowed to delete any message?
@@ -823,9 +821,8 @@ class DisplayController extends AbstractController
 		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 
 		// Compose the memory eat- I mean message array.
-		require_once(ROOTDIR . '/Attachments/Attachments.subs.php');
 		$output = array(
-			'attachment' => loadAttachmentContext($message['id_msg']),
+			'attachment' => $this->elk['attachments.file_manager']->loadAttachmentContext($message['id_msg']),
 			'alternate' => $counter % 2,
 			'id' => $message['id_msg'],
 			'href' => $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'],

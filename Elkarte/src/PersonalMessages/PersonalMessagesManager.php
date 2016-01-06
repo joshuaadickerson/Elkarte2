@@ -28,7 +28,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\ElkArte\Database\Drivers\ResultInterface;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 class PersonalMessagesManager
 {
@@ -191,7 +191,6 @@ class PersonalMessagesManager
 	{
 		global $user_info;
 
-		
 
 		if ($owner === null)
 			$owner = array($user_info['id']);
@@ -245,8 +244,7 @@ class PersonalMessagesManager
 					'pm_list' => $personal_messages !== null ? array_unique($personal_messages) : array(),
 				)
 			);
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			// ...And update the statistics accordingly - now including unread messages!.
+				// ...And update the statistics accordingly - now including unread messages!.
 			while ($row = $request->fetchAssoc())
 			{
 				if ($row['is_read'])
@@ -443,7 +441,6 @@ class PersonalMessagesManager
 
 		// Need to store all this.
 		$this->cache->put('labelCounts:' . $owner, $context['labels'], 720);
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberData($owner, array('unread_messages' => $total_unread));
 
 		// If it was for the current member, reflect this in the $user_info array too.
@@ -462,7 +459,6 @@ class PersonalMessagesManager
 	function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 	{
 		global $user_info;
-		
 		$request = $this->db->query('', '
 		SELECT
 			pm.id_member_from = {int:id_current_member} AND pm.deleted_by_sender = {int:not_deleted} AS valid_for_outbox,
@@ -519,7 +515,7 @@ class PersonalMessagesManager
 	{
 		global $scripturl, $txt, $user_info, $language, $modSettings, $webmaster_email;
 
-		/** @var Util $text */
+		/** @var StringUtil $text */
 		$text = $GLOBALS['elk']['text'];
 
 		// Make sure the PM language file is loaded, we might need something out of it.
@@ -867,8 +863,7 @@ class PersonalMessagesManager
 		$to_names = array();
 		if (count($to_list) > 1)
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$result = getBasicMemberData($to_list);
+				$result = getBasicMemberData($to_list);
 			foreach ($result as $row)
 				$to_names[] = $GLOBALS['elk']['text']->un_htmlspecialchar($row['real_name']);
 		}
@@ -924,8 +919,7 @@ class PersonalMessagesManager
 
 		if (!empty($all_to))
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($all_to, array('personal_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
+				updateMemberData($all_to, array('personal_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
 		}
 
 		return $log;
@@ -1109,7 +1103,6 @@ class PersonalMessagesManager
 	 */
 	function pmCount($id_member, $time)
 	{
-		
 
 		$request = $this->db->query('', '
 		SELECT
@@ -1141,7 +1134,6 @@ class PersonalMessagesManager
 	{
 		global $user_info, $context, $options;
 
-		
 
 		// Want this - duh!
 		loadRules();
@@ -1253,7 +1245,6 @@ class PersonalMessagesManager
 	{
 		global $user_info, $context;
 
-		
 
 		if (isset($context['rules']) && !$reload)
 			return;
@@ -1360,7 +1351,6 @@ class PersonalMessagesManager
 	 */
 	function getDiscussions($id_pms)
 	{
-		
 
 		$request = $this->db->query('', '
 		SELECT
@@ -1387,7 +1377,6 @@ class PersonalMessagesManager
 	 */
 	function getPmsFromDiscussion($pm_heads)
 	{
-		
 
 		$pms = array();
 		$request = $this->db->query('', '
@@ -1420,7 +1409,6 @@ class PersonalMessagesManager
 	{
 		global $options;
 
-		
 
 		$to_update = array();
 
@@ -1865,7 +1853,6 @@ class PersonalMessagesManager
 	{
 		global $txt, $user_info, $scripturl, $context;
 
-		
 
 		// Get the recipients for all these PM's
 		$request = $this->db->query('', '
@@ -1925,7 +1912,6 @@ class PersonalMessagesManager
 	 */
 	function loadPMSubjectRequest($pms, $orderBy)
 	{
-		
 
 		// Separate query for these bits!
 		$subjects_request = $this->db->query('', '
@@ -2115,7 +2101,6 @@ class PersonalMessagesManager
 	function loadPersonalMessage($pm_id)
 	{
 		global $user_info;
-		
 		// First, pull out the message contents, and verify it actually went to them!
 		$request = $this->db->query('', '
 		SELECT
@@ -2277,7 +2262,6 @@ class PersonalMessagesManager
 	 */
 	function loadPMSearchResults($foundMessages, $search_params)
 	{
-		
 
 		// Prepare the query for the callback!
 		$request = $this->db->query('', '

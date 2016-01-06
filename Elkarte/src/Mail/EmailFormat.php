@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Mail;
 
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message
@@ -36,7 +35,7 @@ if (!defined('ELK'))
  *
  * @package Maillist
  */
-class Email_Format
+class EmailFormat
 {
 	/**
 	 * The full message section we will return

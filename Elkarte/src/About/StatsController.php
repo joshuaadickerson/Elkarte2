@@ -22,7 +22,8 @@ namespace Elkarte\About;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Statistics Controller
@@ -37,10 +38,10 @@ class StatsController extends AbstractController
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
-	public function __construct(Container $elk, Stats $stats, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(Container $elk, Stats $stats, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->elk = $elk;
 		$this->stats = $stats;

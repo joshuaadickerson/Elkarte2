@@ -26,7 +26,7 @@ use Elkarte\Elkarte\DataValidator;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 /**
  * About Controller
@@ -41,10 +41,10 @@ class AboutController extends AbstractController
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
-	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->elk = $elk;
 		$this->credits = $credits;
@@ -110,7 +110,7 @@ class AboutController extends AbstractController
 
             // Could they get the right send topic verification code?
             require_once(ROOTDIR . '/Members/Authentication/VerificationControls.php');
-            require_once(ROOTDIR . '/Members/Members.subs.php');
+
 
             // Form validation
             $validator = new DataValidator();
@@ -202,7 +202,7 @@ class AboutController extends AbstractController
         $staff_groups = empty($modSettings['staff_groups']) ? array(1, 2) : explode(',', $modSettings['staff_groups']);
         $this->hooks->hook('staff_groups', array($staff_groups));
 
-        require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
         loadStaffList($staff_groups);
 
         loadMemberData($context['staff_ids']);

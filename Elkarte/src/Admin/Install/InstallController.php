@@ -1170,11 +1170,11 @@ class InstallController
             );
         }
 
-        require_once(ROOTDIR . '/Members/Members.subs.php');
+
         updateMemberStats();
 
         updateMessageStats();
-        require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
         updateTopicStats();
 
         $request = $db->query('', '

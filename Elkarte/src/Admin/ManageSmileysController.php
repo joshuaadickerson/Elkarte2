@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
 
 /**
  * This class is in charge with administration of smileys and message icons.
@@ -586,8 +585,8 @@ class ManageSmileysController extends AbstractController
 			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
 			$disabledFiles = array('con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php');
 
-			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '$GLOBALS['elk']['text']->htmltrim', '');
-			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '$GLOBALS['elk']['text']->htmltrim', '');
+			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'htmltrim', '');
+			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'htmltrim', '');
 			$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 			// Make sure some code was entered.
@@ -835,8 +834,8 @@ class ManageSmileysController extends AbstractController
 				// Otherwise an edit.
 				else
 				{
-					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '$GLOBALS['elk']['text']->htmltrim', '');
-					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '$GLOBALS['elk']['text']->htmltrim', '');
+					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'htmltrim', '');
+					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'htmltrim', '');
 					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 					// Make sure some code was entered.

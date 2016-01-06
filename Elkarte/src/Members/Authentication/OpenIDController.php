@@ -108,8 +108,7 @@ class OpenIDController extends AbstractController
 		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
+				updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
 			$_SESSION['openid'] = array(
@@ -175,8 +174,7 @@ class OpenIDController extends AbstractController
 			$tokenizer = new TokenHash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
+				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
 
 			// Cleanup on Aisle 5.
 			$_SESSION['openid'] = array(

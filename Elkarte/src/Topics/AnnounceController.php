@@ -74,8 +74,8 @@ class AnnounceController extends AbstractController
 	{
 		global $context, $topic, $board_info;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
+
 
 		// Build a list of groups that can see this board
 		$groups = array_merge($board_info['groups'], array(1));
@@ -132,7 +132,7 @@ class AnnounceController extends AbstractController
 			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
 
 		// Get the topic details that we are going to send
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 		$topic_info = getTopicInfo($topic, 'message');
 
 		// Prepare a plain text (markdown) body for email use, does the censoring as well
@@ -141,7 +141,6 @@ class AnnounceController extends AbstractController
 
 		// We need this in order to be able send emails.
 		require_once(ROOTDIR . '/Mail/Mail.subs.php');
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Select the email addresses for this batch.
 		$conditions = array(

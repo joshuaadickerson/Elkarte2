@@ -271,15 +271,11 @@ Class Elk_Testing_Setup
 			);
 		}
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
-		updateMemberStats();
-
-		updateMessageStats();
-
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
-		updateTopicStats();
-
 		loadLanguage('Install');
+
+		updateMemberStats();
+		updateMessageStats();
+		updateTopicStats();
 		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
 

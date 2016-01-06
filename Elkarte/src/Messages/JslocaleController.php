@@ -11,8 +11,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
+
 
 /**
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of

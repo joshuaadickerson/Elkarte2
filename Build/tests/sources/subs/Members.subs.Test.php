@@ -21,8 +21,6 @@ class TestMembers extends PHPUnit_Framework_TestCase
 
 		$txt['guest_title'] = 'Guest';
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
-
 		$regOptions = array(
 			'interface' => 'tests',
 			'username' => 'in-test user',

@@ -60,7 +60,7 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 		// Zap, you're gone
 		if (count($topics) > 0)
 		{
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			removeTopics($topics, false, true);
 		}
 

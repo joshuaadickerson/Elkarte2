@@ -17,8 +17,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Calendar;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * This class controls execution for actions in the manage calendar area

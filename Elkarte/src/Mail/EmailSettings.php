@@ -13,8 +13,7 @@
  * Handles saving of config vars in another table than settings
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Mail;
 
 /**
  * Similar in construction to saveDBSettings,
@@ -27,7 +26,7 @@ if (!defined('ELK'))
  *
  * @package Maillist
  */
-class Email_Settings extends Settings_Form
+class EmailSettings extends SettingsForm
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class

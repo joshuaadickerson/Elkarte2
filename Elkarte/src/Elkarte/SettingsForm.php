@@ -59,8 +59,7 @@
  *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte;
 
 /**
  * Settings Form class.
@@ -69,7 +68,7 @@ if (!defined('ELK'))
  * and it is available for addons administration screens.
  *
  */
-class Settings_Form
+class SettingsForm
 {
 	/**
 	 * Configuration variables and values, for this settings form.
@@ -335,8 +334,7 @@ class Settings_Form
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
 			// We'll need to initialize inline permissions sub-form
-			require_once(SUBSDIR . '/Permission.subs.php');
-			InlinePermissions_Form::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+			InlinePermissionsForm::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		}
 
 		// What about any BBC selection boxes?
@@ -619,8 +617,7 @@ class Settings_Form
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
 			// we'll need to save inline permissions
-			require_once(SUBSDIR . '/Permission.subs.php');
-			InlinePermissions_Form::save_inline_permissions($inlinePermissions);
+			InlinePermissionsForm::save_inline_permissions($inlinePermissions);
 		}
 	}
 

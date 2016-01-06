@@ -13,7 +13,7 @@
 
 namespace Elkarte\Mentions\Types;
 
-abstract class AbstractMentionBoardAccess extends Mention_Message_Abstract
+abstract class AbstractMentionBoardAccess extends MentionMessageAbstract
 {
 	/**
 	 * {@inheritdoc }

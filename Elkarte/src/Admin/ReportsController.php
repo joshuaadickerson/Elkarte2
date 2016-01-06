@@ -21,8 +21,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Admin;
+
 
 /**
  * "Report" Functions are responsible for generating data for reporting.
@@ -159,7 +159,7 @@ class ReportsController extends AbstractController
 		// Load the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		require_once(SUBSDIR . '/Reports.subs.php');
 
 		loadLanguage('ManagePermissions');
@@ -274,7 +274,7 @@ class ReportsController extends AbstractController
 
 		// Boards, first.
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// Lets get started
 		$query_boards = array();
@@ -566,9 +566,8 @@ class ReportsController extends AbstractController
 	{
 		global $txt;
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		// Fetch all the board names.
 		$boards = fetchBoardsInfo('all');

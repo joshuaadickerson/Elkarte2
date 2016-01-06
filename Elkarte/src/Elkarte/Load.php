@@ -17,8 +17,6 @@
  *
  */
 
-use Elkarte\Elkarte\Events\Hooks;
-
 // Not ready to make it autoload but I want to reduce the size of Load.php
 require_once(ELKDIR . '/Language/Language.subs.php');
 
@@ -140,7 +138,7 @@ function loadBoard()
 	return $elk['boards.manager']->load();
 }
 
-require_once(ROOTDIR . '/Members/Members.subs.php');
+
 
 /**
  * @param int|0 $id_theme
@@ -1073,8 +1071,8 @@ function doSecurityChecks()
 			$show_warnings = true;
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
-		require_once(ROOTDIR . '/Attachments/Attachments.subs.php');
-		$path = getAttachmentPath();
+		$attachments = new \Elkarte\Attachments\Attachments;
+		$path = $attachments->getAttachmentPath();
 		secureDirectory($path, true);
 		secureDirectory(CACHEDIR);
 

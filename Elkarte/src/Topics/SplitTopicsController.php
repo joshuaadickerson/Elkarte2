@@ -195,7 +195,7 @@ class SplitTopicsController extends AbstractController
 		}
 
 		// We work with them topics.
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 
 		// Make sure they can see the board they are trying to move to
@@ -253,7 +253,7 @@ class SplitTopicsController extends AbstractController
 		// Make sure the session id was passed with post.
 		$this->_session->check();
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 		// You must've selected some messages!  Can't split out none!
 		if (empty($_SESSION['split_selection'][$topic]))
@@ -312,7 +312,7 @@ class SplitTopicsController extends AbstractController
 			$this->_set_session_values();
 		}
 
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 
 
 		$context['not_selected'] = array(

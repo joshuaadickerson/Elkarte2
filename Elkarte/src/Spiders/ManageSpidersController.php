@@ -90,7 +90,7 @@ class ManageSearchEnginesController extends AbstractController
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=Admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
 		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
 		foreach ($groups as $row)

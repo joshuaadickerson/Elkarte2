@@ -10,8 +10,7 @@
  * @version 1.1 dev
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
 
 /**
  * Drafts administration controller.

@@ -226,7 +226,7 @@ class SearchController extends AbstractController
 				'href' => $scripturl . '?topic=' . $context['search_params']['topic'] . '.0',
 			);
 
-			require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 			$context['search_topic']['subject'] = getSubject($context['search_params']['topic']);
 			$context['search_topic']['link'] = '<a href="' . $context['search_topic']['href'] . '">' . $context['search_topic']['subject'] . '</a>';
 		}

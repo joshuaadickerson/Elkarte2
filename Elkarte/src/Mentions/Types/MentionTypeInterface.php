@@ -13,7 +13,7 @@
 
 namespace Elkarte\Mentions\Types;
 
-use \Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 
 interface MentionTypeInterface
 {

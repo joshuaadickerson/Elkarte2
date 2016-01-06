@@ -17,18 +17,17 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Calendar;
 
 /**
  * We like to show events associated to the topics.
  */
-class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_Display_Module implements ModuleInterface
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 

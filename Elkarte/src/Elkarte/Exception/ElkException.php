@@ -13,7 +13,7 @@
  *
  */
 
-namespace Elkarte;
+namespace Elkarte\Elkarte\Exception;
 
 class ElkException extends \Exception
 {

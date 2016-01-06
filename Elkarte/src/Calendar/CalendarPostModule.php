@@ -17,21 +17,23 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Calendar;
+
+use Elkarte\Elkarte\Events\EventManager;
+use Elkarte\Elkarte\ModuleInterface;
 
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
  * Used when from the calendar controller the poster is redirected to the post page.
  */
-class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
+class CalendarPostModule implements ModuleInterface
 {
 	protected static $_make_event = false;
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context;
 
@@ -69,7 +71,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 		$req = HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
 
-		$event = new Calendar_Event($eventid, $modSettings);
+		$event = new CalendarEvent($eventid, $modSettings);
 
 		try
 		{

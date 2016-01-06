@@ -44,7 +44,6 @@ class BanCheck
 	function isNotBanned($forceCheck = false)
 	{
 		global $modSettings, $user_info;
-		
 		// You cannot be banned if you are an Admin - doesn't help if you log out.
 		if ($user_info['is_admin'])
 			return;
@@ -88,7 +87,7 @@ class BanCheck
 			// My mistake. Next time better.
 			if (!$this->hasBan(self::CANNOT_ACCESS))
 			{
-				require_once(SUBSDIR . '/Auth.subs.php');
+				require_once(ELKDIR . '/Security/Auth.subs.php');
 				$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
 				elk_setcookie($this->getBanCookiename(), '', $_SERVER['REQUEST_TIME'] - 3600, $cookie_url[1], $cookie_url[0], false, false);
 			}
@@ -113,7 +112,6 @@ class BanCheck
 	function load()
 	{
 		global $user_info, $user_settings, $modSettings;
-		
 		// Innocent until proven guilty.  (but we know you are! :P)
 		$_SESSION['ban'] = array(
 			'last_checked' => time(),
@@ -293,7 +291,7 @@ class BanCheck
 			$user_info['mod_cache'] = $_SESSION['mc'];
 		else
 		{
-			require_once(SUBSDIR . '/Auth.subs.php');
+			require_once(ELKDIR . '/Security/Auth.subs.php');
 			rebuildModCache();
 		}
 
@@ -322,7 +320,6 @@ class BanCheck
 	function log(array $ban_ids = array(), $email = null)
 	{
 		global $user_info;
-		
 		// Don't log web accelerators, it's very confusing...
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 			return;
@@ -360,7 +357,6 @@ class BanCheck
 	public function isBannedEmail($email, $restriction, $error)
 	{
 		global $txt;
-		
 		// Can't ban an empty email
 		if (empty($email) || trim($email) == '')
 			return;

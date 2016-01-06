@@ -24,7 +24,7 @@ use Elkarte\Elkarte\Controller\Action;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
-use Elkarte\Elkarte\Util;
+use Elkarte\Elkarte\StringUtil;
 
 /**
  * This class controls execution for actions in the manage boards area
@@ -42,7 +42,7 @@ class ManageBoardsController extends AbstractController
 	protected $hooks;
 	/** @var Errors  */
 	protected $errors;
-	/** @var Util  */
+	/** @var StringUtil  */
 	protected $text;
 
 	/**
@@ -63,7 +63,7 @@ class ManageBoardsController extends AbstractController
 	 */
 	protected $_boardSettings;
 
-	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, Util $text)
+	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, StringUtil $text)
 	{
 		$this->elk = $elk;
 		$this->credits = $credits;

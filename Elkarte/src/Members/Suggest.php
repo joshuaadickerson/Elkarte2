@@ -18,8 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Members;
 
 /**
  * Suggest Controller
@@ -60,7 +59,6 @@ class Suggest
 		// Escape the search string
 		$this->_search = strtr($this->_search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Find the member.
 		$xml_data = getMember($this->_search, !empty($this->_params['buddies']) ? $user_info['buddies'] : array());

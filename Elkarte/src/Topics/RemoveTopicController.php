@@ -40,7 +40,7 @@ class RemoveTopicController extends AbstractController
 	public function pre_dispatch()
 	{
 		// This has some handy functions for topics
-		require_once(ROOTDIR . '/Topics/Topic.subs.php');
+
 	}
 
 	/**

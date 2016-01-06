@@ -739,8 +739,7 @@ function checkLogin()
 						$password_salt = substr(md5(mt_rand()), 0, 4);
 
 						// Update the password hash and set up the salt.
-						require_once(ROOTDIR . '/Members/Members.subs.php');
-						updateMemberData($id_member, array('passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => ''));
+										updateMemberData($id_member, array('passwd' => $password, 'password_salt' => $password_salt, 'passwd_flood' => ''));
 					}
 				}
 			}

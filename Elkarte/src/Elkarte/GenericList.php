@@ -15,8 +15,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte;
 
 /**
  * This class implements a standard way of displaying lists.

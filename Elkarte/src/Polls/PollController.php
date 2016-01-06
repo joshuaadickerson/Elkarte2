@@ -288,7 +288,6 @@ class PollController extends AbstractController
 		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 		// Do we enable guest voting?
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
 
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
@@ -401,7 +400,7 @@ class PollController extends AbstractController
 				$poll_errors->addError('no_question');
 
 			// No check is needed, since nothing is really posted.
-			checkSubmitOnce('free');
+			$this->checkSubmitOnce('free');
 
 			// Take a check for any errors... assuming we haven't already done so!
 			$context['poll_error'] = array(
@@ -484,7 +483,7 @@ class PollController extends AbstractController
 		);
 
 		// Register this form in the session variables.
-		checkSubmitOnce('register');
+		$this->checkSubmitOnce('register');
 	}
 
 	/**
@@ -566,7 +565,7 @@ class PollController extends AbstractController
 			$this->action_editpoll();
 
 		// Prevent double submission of this form.
-		checkSubmitOnce('check');
+		$this->checkSubmitOnce('check');
 
 		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
 		$question = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->getPost('question', 'trim'));
@@ -580,8 +579,7 @@ class PollController extends AbstractController
 		// Make sure guests are actually allowed to vote generally.
 		if ($poll_guest_vote)
 		{
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			$allowedGroups = groupsAllowedTo('poll_vote', $board);
+				$allowedGroups = groupsAllowedTo('poll_vote', $board);
 			if (!in_array(-1, $allowedGroups['allowed']))
 				$poll_guest_vote = 0;
 		}
@@ -745,7 +743,6 @@ class PollController extends AbstractController
 
 		$context['sub_template'] = 'poll_edit';
 
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 		// Set up the poll options.

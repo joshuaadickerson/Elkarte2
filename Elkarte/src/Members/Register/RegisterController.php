@@ -307,7 +307,6 @@ class RegisterController extends AbstractController
 			$this->_req->post->secret_answer = md5($this->_req->post->secret_answer);
 
 		// Needed for isReservedName() and registerMember().
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// Validation... even if we're not a mall.
 		if (isset($this->_req->post->real_name) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
@@ -788,11 +787,9 @@ class RegisterController extends AbstractController
 			return;
 
 		// Validation complete - update the database!
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		approveMembers(array('members' => array($this->_row['id_member']), 'activated_status' => $this->_row['is_activated']));
 
 		// Also do a proper member stat re-evaluation.
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberStats();
 
 		if (!isset($this->_req->post->new_email) && empty($this->_row['is_activated']))
@@ -847,8 +844,7 @@ class RegisterController extends AbstractController
 				$this->_errors->fatal_lang_error('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
 			}
 
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			updateMemberData($this->_row['id_member'], array('email_address' => $this->_req->post->new_email));
+				updateMemberData($this->_row['id_member'], array('email_address' => $this->_req->post->new_email));
 			$this->_row['email_address'] = $this->_req->post->new_email;
 
 			return true;
@@ -1037,7 +1033,6 @@ class RegisterController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Get the user details...
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		$member = getBasicMemberData((int) $this->_req->query->member, array('authentication' => true));
 
 		// If doesn't exist or not pending coppa

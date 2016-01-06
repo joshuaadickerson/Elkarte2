@@ -202,7 +202,7 @@ class ManageMembersController extends AbstractController
 		if ($context['sub_action'] == 'query')
 		{
 			// Retrieving the membergroups and postgroups.
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 			$context['membergroups'] = $groups['membergroups'];
@@ -531,7 +531,6 @@ class ManageMembersController extends AbstractController
 						'function' => function ($rowData) {
 							global $txt;
 
-							require_once(ROOTDIR . '/Members/Members.subs.php');
 
 							// Calculate number of days since last online.
 							if (empty($rowData['last_login']))
@@ -638,14 +637,13 @@ class ManageMembersController extends AbstractController
 		if ($this->_req->post->maction == 'delete' && allowedTo('profile_remove_any'))
 		{
 			// Delete all the selected members.
-			require_once(ROOTDIR . '/Members/Members.subs.php');
-			deleteMembers($members, true);
+				deleteMembers($members, true);
 		}
 
 		// Are we changing groups?
 		if (in_array($this->_req->post->maction, array('pgroup', 'agroup')) && allowedTo('manage_membergroups'))
 		{
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 			$groups = array('p', 'a');
 			foreach ($groups as $group)
@@ -670,7 +668,6 @@ class ManageMembersController extends AbstractController
 		if (in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
-			require_once(ROOTDIR . '/Members/Members.subs.php');
 
 			$ban_group_id = insertBanGroup(array(
 				'name' => $txt['admin_ban_name'],
@@ -726,7 +723,7 @@ class ManageMembersController extends AbstractController
 		global $context, $txt;
 
 		// Get a list of all the membergroups and postgroups that can be selected.
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 		$context['membergroups'] = $groups['membergroups'];
@@ -1099,7 +1096,6 @@ class ManageMembersController extends AbstractController
 		$this->_session->check();
 
 		require_once(ROOTDIR . '/Mail/Mail.subs.php');
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');
@@ -1178,13 +1174,12 @@ class ManageMembersController extends AbstractController
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
-		require_once(ROOTDIR . '/Members/Members.subs.php');
 		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
 		if (!in_array($this->_req->post->todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
 		{
-			require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 			updatePostGroupStats($this->conditions['members']);
 		}
 
@@ -1328,7 +1323,7 @@ class ManageMembersController extends AbstractController
 	{
 		global $txt;
 
-		require_once(ROOTDIR . '/Groups/Membergroups.subs.php');
+
 
 		$member_groups = getGroupsList();
 

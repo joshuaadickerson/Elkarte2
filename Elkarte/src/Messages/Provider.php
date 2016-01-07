@@ -18,6 +18,14 @@ class Provider implements ProviderInterface
 		$elk['messages.container'] = function ($elk) {
 			return new MessageContainer;
 		};
+
+		$elk['messages.post'] = function ($elk) {
+			return new Post();
+		};
+
+		$elk['editor'] = function ($elk) {
+			return new Editor;
+		};
 	}
 
 	public function boot(Container $elk)
@@ -37,6 +45,10 @@ class Provider implements ProviderInterface
 
 		$elk['messages.manage_controller'] = function ($elk) {
 			return new ManageMessagesController($elk, $elk['messages.manager'], $elk['hooks'], $elk['errors'], $elk['text']);
+		};
+
+		$elk['messages.post_controller'] = function ($elk) {
+			return new PostController($elk['hooks'], $elk['layers']);//($elk, $elk['messages.manager'], $elk['hooks'], $elk['errors'], $elk['text']);
 		};
 	}
 

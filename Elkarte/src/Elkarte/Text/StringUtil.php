@@ -19,7 +19,8 @@ namespace Elkarte\Elkarte\Text;
  */
 class StringUtil
 {
-	protected $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected $entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected $entity_check_regex_html = '~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 	protected $disable_entity_check = false;
 
 	public function __construct($disable_entity_check)
@@ -83,7 +84,7 @@ class StringUtil
 		$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
 
 		if (!$this->disable_entity_check)
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $string));
+			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $string));
 		else
 			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', $string);
 
@@ -103,7 +104,7 @@ class StringUtil
 	 */
 	public function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
-		$haystack_check = !$this->disable_entity_check ? preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $haystack) : $haystack;
+		$haystack_check = !$this->disable_entity_check ? preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (!$this->disable_entity_check ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		$count = 0;
 
@@ -122,7 +123,7 @@ class StringUtil
 		}
 		else
 		{
-			$needle_check = !$this->disable_entity_check ? preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $needle) : $needle;
+			$needle_check = !$this->disable_entity_check ? preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $needle) : $needle;
 			$needle_arr = preg_split('~(&#' . (!$this->disable_entity_check ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 			$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
 			$needle_size = count($needle_arr);
@@ -154,7 +155,7 @@ class StringUtil
 	public function substr($string, $start, $length = null)
 	{
 		if (!$this->disable_entity_check)
-			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$ent_arr = preg_split('~(&#\d{1,7};|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $string), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 		else
 			$ent_arr = preg_split('~(&#021;|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
@@ -175,8 +176,8 @@ class StringUtil
 			return mb_strtolower($string, 'UTF-8');
 		else
 		{
-			require_once(ELKDIR . '/Text/Charset.subs.php');
-			return utf8_strtolower($string);
+			$utf8 = new UTF8;
+			return $utf8->utf8_strtolower($string);
 		}
 	}
 
@@ -194,8 +195,8 @@ class StringUtil
 			return mb_strtoupper($string, 'UTF-8');
 		else
 		{
-			require_once(ELKDIR . '/Text/Charset.subs.php');
-			return utf8_strtoupper($string);
+			$utf8 = new UTF8;
+			return $utf8->utf8_strtoupper($string);
 		}
 	}
 
@@ -216,7 +217,7 @@ class StringUtil
 		$ent_list = !$this->disable_entity_check ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
 
 		if (!$this->disable_entity_check)
-			$string = preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $string);
+			$string = preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $string);
 
 		preg_match('~^(' . $ent_list . '|.){' . $this->strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 		$string = $matches[0];
@@ -438,7 +439,7 @@ class StringUtil
 			if (function_exists('mb_strlen'))
 				return mb_strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string), 'UTF-8');
 			else
-				return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback($this->_entity_check_reg, [$this, 'entity_fix'], $string)));
+				return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback($this->entity_check_reg, [$this, 'entity_fix'], $string)));
 		}
 		else
 		{

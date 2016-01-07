@@ -22,7 +22,7 @@ namespace Elkarte\Calendar;
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class Calendar_BoardIndex_Module implements ModuleInterface
+class CalendarBoardIndexModule implements ModuleInterface
 {
 	/**
 	 * {@inheritdoc }
@@ -33,8 +33,8 @@ class Calendar_BoardIndex_Module implements ModuleInterface
 		if (allowedTo('calendar_view'))
 		{
 			return array(
-				array('pre_load', array('Calendar_BoardIndex_Module', 'pre_load'), array()),
-				array('post_load', array('Calendar_BoardIndex_Module', 'post_load'), array()),
+				array('pre_load', array('CalendarBoardIndexModule', 'pre_load'), array()),
+				array('post_load', array('CalendarBoardIndexModule', 'post_load'), array()),
 			);
 		}
 

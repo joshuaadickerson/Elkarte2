@@ -51,7 +51,6 @@ class Random_Display_Module implements ModuleInterface
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/FollowUps.subs.php');
 		$context['follow_ups'] = followupTopics($messages, self::$includeUnapproved);
 	}
 
@@ -67,7 +66,6 @@ class Random_Display_Module implements ModuleInterface
 		// If this topic was derived from another, set the followup details
 		if (!empty($topicinfo['derived_from']))
 		{
-			require_once(SUBSDIR . '/FollowUps.subs.php');
 			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
 
 			// Derived from, set the link back

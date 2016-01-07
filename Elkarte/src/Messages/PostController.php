@@ -22,6 +22,9 @@
 namespace Elkarte\Messages;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Theme\TemplateLayers;
+use Elkarte\ErrorContext;
 
 /**
  * Post Controller
@@ -38,7 +41,7 @@ class PostController extends AbstractController
 	 * The template layers object
 	 * @var null|object
 	 */
-	protected $_template_layers = null;
+	protected $layers = null;
 
 	/**
 	 * An array of attributes of the topic (if not new)
@@ -46,13 +49,20 @@ class PostController extends AbstractController
 	 */
 	protected $_topic_attributes = array();
 
+	public function __construct(Hooks $hooks, TemplateLayers $layers)
+	{
+		$this->bootstrap();
+
+		$this->hooks = $hooks;
+		$this->layers = $layers;
+	}
+
 	/**
 	 * Sets up common stuff for all or most of the actions.
 	 */
 	public function pre_dispatch()
 	{
 		$this->_post_errors = ErrorContext::context('post', 1);
-		$this->_template_layers = $this->_layers;
 	}
 
 	/**
@@ -92,7 +102,7 @@ class PostController extends AbstractController
 		loadLanguage('Errors');
 
 		$context['robot_no_index'] = true;
-		$this->_template_layers->add('postarea');
+		$this->layers->add('postarea');
 		$this->_topic_attributes = array(
 			'locked' => false,
 			'notify' => false,
@@ -112,7 +122,7 @@ class PostController extends AbstractController
 			$this->_errors->fatal_lang_error('no_board', false);
 
 		// All those wonderful modifiers and attachments
-		$this->_template_layers->add('additional_options', 200);
+		$this->layers->add('additional_options', 200);
 
 		if (isset($_REQUEST['xml']))
 		{
@@ -438,7 +448,7 @@ class PostController extends AbstractController
 			else
 				$case = 4;
 
-			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
+			list ($form_subject, $form_message) = $this->elk['messages.post']->getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 		}
 
 		// Check whether this is a really old post being bumped...
@@ -499,9 +509,6 @@ class PostController extends AbstractController
 		$context['subject'] = addcslashes($form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
 
-		// Needed for the editor and message icons.
-		require_once(SUBSDIR . '/Editor.subs.php');
-
 		// Now create the editor.
 		$editorOptions = array(
 			'id' => 'message',
@@ -517,7 +524,7 @@ class PostController extends AbstractController
 		);
 
 		// Message icons - customized or not, retrieve them...
-		$context['icons'] = getMessageIcons($board);
+		$context['icons'] = $this->elk['editor']->getMessageIcons($board);
 
 		$context['icon_url'] = '';
 
@@ -553,7 +560,7 @@ class PostController extends AbstractController
 		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
 
 		// Initialize the editor
-		create_control_richedit($editorOptions);
+		$this->elk['editor']->create_control_richedit($editorOptions);
 
 		// Build the link tree.
 		if (empty($topic))

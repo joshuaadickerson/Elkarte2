@@ -1122,8 +1122,7 @@ class MembersManager extends AbstractManager
 	{
 		global $modSettings;
 
-		
-
+		// @todo stringutil
 		$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
 		$checkName = $this->text->strtolower($name);
 

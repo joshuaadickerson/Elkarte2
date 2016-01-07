@@ -19,17 +19,12 @@
 
 namespace Elkarte\Search\API;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
  *
  * @package Search
  */
-class Fulltext_Search extends SearchAPI
+class FulltextSearch extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.

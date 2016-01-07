@@ -20,15 +20,12 @@
 
 namespace Elkarte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
  *
  * @package Search
  */
-class Custom_Search extends SearchAPI
+class CustomSearch extends SearchAPI
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.

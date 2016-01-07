@@ -20,57 +20,18 @@
 
 namespace Elkarte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Sphinx.class.php, Sphinx API,
  *
  * What it does:
  * - used when a Sphinx search daemon is running
  * - Access is via the Sphinx native search API (SphinxAPI)
- * - sphinxapi.php is part of the Sphinx package, the file must be addded to SOURCDIR
+ * - sphinxapi.php is part of the Sphinx package, the file must be addded to SOURCEDIR
  *
  * @package Search
  */
-class Sphinx_Search extends SearchAPI
+class SphinxSearch extends SearchAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 * @var string
-	 */
-	public $version_compatible = 'ElkArte 1.1';
-
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 * @var string
-	 */
-	public $min_elk_version = 'ElkArte 1.0 Beta 1';
-
-	/**
-	 * Is it supported?
-	 * @var boolean
-	 */
-	public $is_supported = true;
-
-	/**
-	 * What words are banned?
-	 * @var array
-	 */
-	protected $bannedWords = array();
-
-	/**
-	 * What is the minimum word length?
-	 * @var int
-	 */
-	protected $min_word_length = 4;
-
-	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
 	/**
 	 * What databases are supported?
 	 * @var array
@@ -99,6 +60,7 @@ class Sphinx_Search extends SearchAPI
 	 *
 	 * @param string $methodName The search method
 	 * @param mixed[]|null $query_params Parameters for the query
+	 * @return bool
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -130,34 +92,6 @@ class Sphinx_Search extends SearchAPI
 	}
 
 	/**
-	 * Callback function for usort used to sort the results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
-	}
-
-	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
 	 * @param string Word(s) to index
@@ -165,7 +99,7 @@ class Sphinx_Search extends SearchAPI
 	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function prepareIndexes($word, array &$wordsSearch, array &$wordsExclude, $isExcluded)
 	{
 		$subwords = text2words($word, null, false);
 
@@ -192,7 +126,7 @@ class Sphinx_Search extends SearchAPI
 		if (!$GLOBALS['elk']['cache']->getVar($cached_results, 'search_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
 		{
 			// The API communicating with the search daemon.
-			require_once(SOURCEDIR . '/sphinxapi.php');
+			require_once('sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = new \SphinxClient();

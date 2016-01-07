@@ -17,36 +17,16 @@
  *
  */
 
-namespace Elkarte\Search\API;
+namespace Elkarte\Search\Drivers\API;
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
  *
  * @package Search
  */
-class Standard_Search extends SearchAPI
+class StandardSearch extends SearchAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 * @var string
-	 */
-	public $version_compatible = 'ElkArte 1.1';
-
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 * @var string
-	 */
-	public $min_elk_version = 'ElkArte 1.0 Beta';
-
-	/**
-	 * Standard search is supported by default.
-	 * @var boolean
-	 */
-	public $is_supported = true;
-
 	/**
 	 * Method to check whether the method can be performed by the API.
 	 *

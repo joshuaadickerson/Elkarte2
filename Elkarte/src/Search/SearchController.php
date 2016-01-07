@@ -17,8 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Search;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * SearchController class, it handle all of the searching
@@ -148,7 +149,6 @@ class SearchController extends AbstractController
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
@@ -288,8 +288,6 @@ class SearchController extends AbstractController
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		require_once(ROOTDIR . '/Packages/Package.subs.php');
-
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		$this->_search = new \ElkArte\Search\Search();
 
@@ -364,7 +362,7 @@ class SearchController extends AbstractController
 				$context['search_errors']['need_verification_code'] = true;
 			else
 			{
-				require_once(SUBSDIR . '/VerificationControls.php');
+
 				$verificationOptions = array(
 					'id' => 'search',
 				);
@@ -490,7 +488,6 @@ class SearchController extends AbstractController
 			// If we want to know who participated in what then load this now.
 			if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
 			{
-				require_once(SUBSDIR . '/MessageIndex.subs.php');
 				$topics_participated_in = topicsParticipation($user_info['id'], array_keys($participants));
 
 				foreach ($topics_participated_in as $topic)

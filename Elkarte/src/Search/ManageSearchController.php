@@ -20,6 +20,9 @@
 
 namespace Elkarte\Search;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManageSearch controller Admin class.
  *
@@ -29,7 +32,7 @@ class ManageSearchController extends AbstractController
 {
 	/**
 	 * Search settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_searchSettings;
 
@@ -163,7 +166,7 @@ class ManageSearchController extends AbstractController
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -174,7 +177,7 @@ class ManageSearchController extends AbstractController
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -184,7 +187,7 @@ class ManageSearchController extends AbstractController
 	protected function _initSearchSettingsForm()
 	{
 		// Instantiate the form
-		$this->_searchSettings = new Settings_Form();
+		$this->_searchSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

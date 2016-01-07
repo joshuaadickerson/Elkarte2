@@ -11,14 +11,14 @@
  *
  */
 
-namespace Elkarte\Search;
+namespace Elkarte\Search\Drivers;
 
 /**
- * Interface Search_Interface
+ * Interface SearchInterface
  *
  * @package Search
  */
-interface Search_Interface
+interface SearchInterface
 {
 
 }

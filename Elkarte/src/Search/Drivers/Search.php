@@ -23,178 +23,161 @@ use Elkarte\Database\Drivers\SearchInterface;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Text\StringUtil;
 
-// This defines two version types for checking the API's are compatible with this version of the software.
-$GLOBALS['search_versions'] = array(
-	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.1',
-
-	// This is the minimum version of ElkArte that an API could have been written for to work.
-	// (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0', array('+' => '.', '=' => ' ')),
-);
-
 /**
  * Actually do the searches
  */
 class Search
 {
 	/**
-	 * This is the minimum version of ElkArte that an API could have been written
-	 * for to work.
-	 * (strtr to stop accidentally updating version on release)
-	 */
-	private $_search_version = '';
-
-	/**
-	 * $_search_params will carry all settings that differ from the default search parameters.
+	 * $search_params will carry all settings that differ from the default search parameters.
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
-	private $_search_params = array();
+	protected $search_params = array();
 
 	/**
 	 * Holds the words and phrases to be searched on
 	 * @var array
 	 */
-	private $_searchArray = array();
+	protected $searchArray = array();
 
 	/**
-	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
+	 * Holds instance of the search api in use such as ElkArte\Search\API\StandardSearch
 	 * @var null|object
 	 */
-	private $_searchAPI = null;
+	protected $searchAPI;
 
 	/**
 	 * Database instance
 	 * @var DatabaseInterface
 	 */
-	private $_db = null;
+	protected $db;
 
 	/**
 	 * Search db instance
 	 * @var SearchInterface
 	 */
-	private $_db_search = null;
+	protected $db_search;
 
 	/**
 	 * Holds words that will not be search on to inform the user they were skipped
 	 * @var array
 	 */
-	private $_ignored = array();
+	protected $ignored = array();
 
 	/**
 	 * Searching for posts from a specific user(s)
 	 * @var array
 	 */
-	private $_memberlist = array();
+	protected $memberlist = array();
 
 	/**
 	 * Message "age" via ID, given bounds, needed to calculate relevance
 	 * @var int
 	 */
-	private $_recentMsg = 0;
+	protected $recentMsg = 0;
 
 	/**
 	 * The minimum message id we will search, needed to calculate relevance
 	 * @var int
 	 */
-	private $_minMsgID = 0;
+	protected $minMsgID = 0;
 
 	/**
 	 * Needed to calculate relevance
 	 * @var int
 	 */
-	private $_minMsg = 0;
+	protected $minMsg = 0;
 
 	/**
 	 * The maximum message ID we will search, needed to calculate relevance
 	 * @var int
 	 */
-	private $_maxMsgID = 0;
+	protected $maxMsgID = 0;
 
 	/**
 	 * If we are performing a boolean or simple search
 	 * @var bool
 	 */
-	private $_no_regexp = false;
+	protected $no_regexp = false;
 
 	/**
 	 * Builds the array of words for use in the db query
 	 * @var null|array
 	 */
-	private $_searchWords = null;
+	protected $searchWords;
 
 	/**
 	 * Words excluded from indexes
 	 * @var array
 	 */
-	private $_excludedIndexWords = array();
+	protected $excludedIndexWords = array();
 
 	/**
 	 * Words not be be found in the search results (-word)
 	 * @var array
 	 */
-	private $_excludedWords = array();
+	protected $excludedWords = array();
 
 	/**
 	 * Words not be be found in the subject (-word)
 	 * @var array
 	 */
-	private $_excludedSubjectWords = array();
+	protected $excludedSubjectWords = array();
 
 	/**
 	 * Phrases not to be found in the search results (-"some phrase")
 	 * @var array
 	 */
-	private $_excludedPhrases = array();
+	protected $excludedPhrases = array();
 
 	/**
 	 * If search words were found on the blacklist
 	 * @var bool
 	 */
-	private $_foundBlackListedWords = false;
+	protected $foundBlackListedWords = false;
 
 	/**
 	 * Words we do not search due to length or common terms
 	 * @var array
 	 */
-	private $_blacklisted_words = array();
+	protected $blacklisted_words = ['img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if'];
 
 	/**
 	 * The db query for brd's
 	 * @var string
 	 */
-	private $_boardQuery = '';
+	protected $boardQuery = '';
 
 	/**
 	 * the db query for members
 	 * @var string
 	 */
-	private $_userQuery = '';
+	protected $userQuery = '';
 
 	/**
 	 * The weights to associate to various areas for relevancy
 	 * @var array
 	 */
-	private $_weight_factors = array();
+	protected $weight_factors = array();
 
 	/**
 	 * Weighing factor each area, ie frequency, age, sticky, etc
 	 * @var array
 	 */
-	private $_weight = array();
+	protected $weight = array();
 
 	/**
 	 * The sum of the _weight_factors, normally but not always 100
 	 * @var int
 	 */
-	private $_weight_total = 0;
+	protected $weight_total = 0;
 
 	/**
 	 * If we are creating a tmp db table
 	 * @var bool
 	 */
-	private $_createTemporary = true;
+	protected $createTemporary = true;
 
 	/** @var  StringUtil */
 	protected $text;
@@ -205,22 +188,21 @@ class Search
 	 *
 	 * @package Search
 	 */
-	public function __construct()
+	public function _construct()
 	{
-		$this->_search_version = strtr('ElkArte 1+0', array('+' => '.', '=' => ' '));
-		$this->_db = $GLOBALS['elk']['db'];
-		$this->_db_search = db_search();
+		$this->db = $GLOBALS['elk']['db'];
+		$this->db_search = db_search();
 		$this->text = $GLOBALS['elk']['text'];
 
 		// Remove any temporary search tables that may exist
-		$this->_db_search->query('drop_tmp_log_search_messages', '
+		$this->db_search->query('drop_tmp_log_search_messages', '
 			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
 			array(
 				'db_error_skip' => true,
 			)
 		);
 
-		$this->_db_search->query('drop_tmp_log_search_topics', '
+		$this->db_search->query('drop_tmp_log_search_topics', '
 			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
 			array(
 				'db_error_skip' => true,
@@ -228,7 +210,7 @@ class Search
 		);
 
 		// Create new temporary table(s) (if we can) to store preliminary results in.
-		$this->_createTemporary = $this->_db_search->query('create_tmp_log_search_messages', '
+		$this->createTemporary = $this->db_search->query('create_tmp_log_search_messages', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
 				id_msg int(10) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_msg)
@@ -239,7 +221,7 @@ class Search
 			)
 		) !== false;
 
-		$this->_db_search->query('create_tmp_log_search_topics', '
+		$this->db_search->query('create_tmp_log_search_topics', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_topic)
@@ -258,8 +240,6 @@ class Search
 	{
 		global $modSettings, $search_versions, $txt;
 
-		require_once(ROOTDIR . '/Packages/Package.subs.php');
-
 		// Load up the search API we are going to use.
 		if (empty($modSettings['search_index']))
 			$modSettings['search_index'] = 'Standard_Search';
@@ -274,19 +254,20 @@ class Search
 		}
 
 		// Create an instance of the search API and check it is valid for this version of the software.
-		$this->_searchAPI = new $search_class_name();
+		// @todo needs a try/catch or this will fail miserably
+		$this->searchAPI = new $search_class_name();
 
 		// An invalid Search API? Log the error and set it to use the standard API
-		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($search_versions['forum_version'], $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
+		if (!$this->searchAPI)
 		{
 			// Log the error.
 			loadLanguage('Errors');
 			$GLOBALS['elk']['errors']->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
 
-			$this->_searchAPI = new \ElkArte\Search\API\Standard_Search();
+			$this->searchAPI = new \ElkArte\Search\API\StandardSearch();
 		}
 
-		return $this->_searchAPI;
+		return $this->searchAPI;
 	}
 
 	/**
@@ -298,9 +279,9 @@ class Search
 	 */
 	public function param($name)
 	{
-		if (isset($this->_search_params[$name]))
+		if (isset($this->search_params[$name]))
 		{
-			return $this->_search_params[$name];
+			return $this->search_params[$name];
 		}
 		else
 		{
@@ -315,10 +296,10 @@ class Search
 	 */
 	public function getParams()
 	{
-		return array_merge($this->_search_params, array(
-			'min_msg_id' => (int) $this->_minMsgID,
-			'max_msg_id' => (int) $this->_maxMsgID,
-			'memberlist' => $this->_memberlist,
+		return array_merge($this->search_params, array(
+			'min_msg_id' => (int) $this->minMsgID,
+			'max_msg_id' => (int) $this->maxMsgID,
+			'memberlist' => $this->memberlist,
 		));
 	}
 
@@ -327,7 +308,7 @@ class Search
 	 */
 	public function getIgnored()
 	{
-		return $this->_ignored;
+		return $this->ignored;
 	}
 
 	/**
@@ -335,7 +316,7 @@ class Search
 	 */
 	public function getExcludedIndexWords()
 	{
-		return $this->_excludedIndexWords;
+		return $this->excludedIndexWords;
 	}
 
 	/**
@@ -347,11 +328,11 @@ class Search
 	 */
 	public function setWeights($weight_factors, $weight, $weight_total)
 	{
-		$this->_weight_factors = $weight_factors;
+		$this->weight_factors = $weight_factors;
 
-		$this->_weight = $weight;
+		$this->weight = $weight;
 
-		$this->_weight_total = $weight_total;
+		$this->weight_total = $weight_total;
 	}
 
 	/**
@@ -361,7 +342,7 @@ class Search
 	 */
 	public function noRegexp()
 	{
-		return $this->_no_regexp;
+		return $this->no_regexp;
 	}
 
 	/**
@@ -371,13 +352,14 @@ class Search
 	 */
 	public function foundBlackListedWords()
 	{
-		return $this->_foundBlackListedWords;
+		return $this->foundBlackListedWords;
 	}
 
 	/**
 	 * Builds the search array
 	 *
 	 * @param bool - Force splitting of strings enclosed in double quotes
+	 * @return array
 	 */
 	public function searchArray($search_simple_fulltext = false)
 	{
@@ -393,7 +375,7 @@ class Search
 			$stripped_query = strtr($stripped_query, array('"' => ''));
 		}
 
-		$this->_no_regexp = preg_match('~&#(?:\d{1,7}|x[0-9a-fA-F]{1,6});~', $stripped_query) === 1;
+		$this->no_regexp = preg_match('~&#(?:\d{1,7}|x[0-9a-fA-F]{1,6});~', $stripped_query) === 1;
 
 		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
 		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
@@ -405,39 +387,39 @@ class Search
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
-		$phraseArray = $this->_checkExcludePhrase($matches[1], $phraseArray);
+		$phraseArray = $this->checkExcludePhrase($matches[1], $phraseArray);
 
 		// Now we look for -test, etc.... normaller.
-		$wordArray = $this->_checkExcludeWord($wordArray);
+		$wordArray = $this->checkExcludeWord($wordArray);
 
 		// The remaining words and phrases are all included.
-		$this->_searchArray = array_merge($phraseArray, $wordArray);
+		$this->searchArray = array_merge($phraseArray, $wordArray);
 
 		// Trim everything and make sure there are no words that are the same.
-		foreach ($this->_searchArray as $index => $value)
+		foreach ($this->searchArray as $index => $value)
 		{
 			// Skip anything practically empty.
-			if (($this->_searchArray[$index] = trim($value, '-_\' ')) === '')
+			if (($this->searchArray[$index] = trim($value, '-_\' ')) === '')
 			{
-				unset($this->_searchArray[$index]);
+				unset($this->searchArray[$index]);
 			}
 			// Skip blacklisted words. Make sure to note we skipped them in case we end up with nothing.
-			elseif (in_array($this->_searchArray[$index], $this->_blacklisted_words))
+			elseif (in_array($this->searchArray[$index], $this->blacklisted_words))
 			{
-				$this->_foundBlackListedWords = true;
-				unset($this->_searchArray[$index]);
+				$this->foundBlackListedWords = true;
+				unset($this->searchArray[$index]);
 			}
 			// Don't allow very, very short words.
 			elseif ($this->text->strlen($value) < 2)
 			{
-				$this->_ignored[] = $value;
-				unset($this->_searchArray[$index]);
+				$this->ignored[] = $value;
+				unset($this->searchArray[$index]);
 			}
 		}
 
-		$this->_searchArray = array_slice(array_unique($this->_searchArray), 0, 10);
+		$this->searchArray = array_slice(array_unique($this->searchArray), 0, 10);
 
-		return $this->_searchArray;
+		return $this->searchArray;
 	}
 
 	/**
@@ -449,15 +431,15 @@ class Search
 	 * @param string[] $matches
 	 * @param string[]  $phraseArray
 	 */
-	protected function _checkExcludePhrase($matches, $phraseArray)
+	protected function checkExcludePhrase($matches, $phraseArray)
 	{
 		foreach ($matches as $index => $word)
 		{
 			if ($word === '-')
 			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->blacklisted_words))
 				{
-					$this->_excludedWords[] = $word;
+					$this->excludedWords[] = $word;
 				}
 
 				unset($phraseArray[$index]);
@@ -474,16 +456,17 @@ class Search
 	 * - Prevents excluding blacklisted words since it is redundant
 	 *
 	 * @param string[] $wordArray
+	 * @return array
 	 */
-	protected function _checkExcludeWord($wordArray)
+	protected function checkExcludeWord($wordArray)
 	{
 		foreach ($wordArray as $index => $word)
 		{
 			if (strpos(trim($word), '-') === 0)
 			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->blacklisted_words))
 				{
-					$this->_excludedWords[] = $word;
+					$this->excludedWords[] = $word;
 				}
 
 				unset($wordArray[$index]);
@@ -500,30 +483,30 @@ class Search
 	{
 		global $modSettings, $context;
 
-		if ($this->_searchWords !== null)
+		if ($this->searchWords !== null)
 		{
-			return $this->_searchWords;
+			return $this->searchWords;
 		}
 
 		$orParts = array();
-		$this->_searchWords = array();
+		$this->searchWords = array();
 
 		// All words/sentences must match.
-		if (!empty($this->_searchArray) && empty($this->_search_params['searchtype']))
+		if (!empty($this->searchArray) && empty($this->search_params['searchtype']))
 		{
-			$orParts[0] = $this->_searchArray;
+			$orParts[0] = $this->searchArray;
 		}
 		// Any word/sentence must match.
 		else
 		{
-			foreach ($this->_searchArray as $index => $value)
+			foreach ($this->searchArray as $index => $value)
 				$orParts[$index] = array($value);
 		}
 
 		// Make sure the excluded words are in all or-branches.
 		foreach ($orParts as $orIndex => $andParts)
 		{
-			foreach ($this->_excludedWords as $word)
+			foreach ($this->excludedWords as $word)
 			{
 				$orParts[$orIndex][] = $word;
 			}
@@ -532,7 +515,7 @@ class Search
 		// Determine the or-branches and the fulltext search words.
 		foreach ($orParts as $orIndex => $andParts)
 		{
-			$this->_searchWords[$orIndex] = array(
+			$this->searchWords[$orIndex] = array(
 				'indexed_words' => array(),
 				'words' => array(),
 				'subject_words' => array(),
@@ -541,46 +524,46 @@ class Search
 			);
 
 			// Sort the indexed words (large words -> small words -> excluded words).
-			if ($this->_searchAPI->supportsMethod('searchSort'))
+			if ($this->searchAPI->supportsMethod('searchSort'))
 			{
-				$this->_searchAPI->setExcludedWords($this->_excludedWords);
-				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
+				$this->searchAPI->setExcludedWords($this->excludedWords);
+				usort($orParts[$orIndex], array($this->searchAPI, 'searchSort'));
 			}
 
 			foreach ($orParts[$orIndex] as $word)
 			{
-				$is_excluded = in_array($word, $this->_excludedWords);
-				$this->_searchWords[$orIndex]['all_words'][] = $word;
+				$is_excluded = in_array($word, $this->excludedWords);
+				$this->searchWords[$orIndex]['all_words'][] = $word;
 				$subjectWords = text2words($word);
 
 				if (!$is_excluded || count($subjectWords) === 1)
 				{
-					$this->_searchWords[$orIndex]['subject_words'] = array_merge($this->_searchWords[$orIndex]['subject_words'], $subjectWords);
+					$this->searchWords[$orIndex]['subject_words'] = array_merge($this->searchWords[$orIndex]['subject_words'], $subjectWords);
 
 					if ($is_excluded)
 					{
-						$this->_excludedSubjectWords = array_merge($this->_excludedSubjectWords, $subjectWords);
+						$this->excludedSubjectWords = array_merge($this->excludedSubjectWords, $subjectWords);
 					}
 				}
 				else
 				{
-					$this->_excludedPhrases[] = $word;
+					$this->excludedPhrases[] = $word;
 				}
 
 				// Have we got indexes to prepare?
-				if ($this->_searchAPI->supportsMethod('prepareIndexes'))
+				if ($this->searchAPI->supportsMethod('prepareIndexes'))
 				{
-					$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
+					$this->searchAPI->prepareIndexes($word, $this->searchWords[$orIndex], $this->excludedIndexWords, $is_excluded);
 				}
 			}
 
 			// Search_force_index requires all AND parts to have at least one fulltext word.
-			if (!empty($modSettings['search_force_index']) && empty($this->_searchWords[$orIndex]['indexed_words']))
+			if (!empty($modSettings['search_force_index']) && empty($this->searchWords[$orIndex]['indexed_words']))
 			{
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
 			}
-			elseif ($this->param('subject_only') && empty($this->_searchWords[$orIndex]['subject_words']) && empty($this->_excludedSubjectWords))
+			elseif ($this->param('subject_only') && empty($this->searchWords[$orIndex]['subject_words']) && empty($this->excludedSubjectWords))
 			{
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
@@ -588,23 +571,23 @@ class Search
 			// Make sure we aren't searching for too many indexed words.
 			else
 			{
-				$this->_searchWords[$orIndex]['indexed_words'] = array_slice($this->_searchWords[$orIndex]['indexed_words'], 0, 7);
-				$this->_searchWords[$orIndex]['subject_words'] = array_slice($this->_searchWords[$orIndex]['subject_words'], 0, 7);
-				$this->_searchWords[$orIndex]['words'] = array_slice($this->_searchWords[$orIndex]['words'], 0, 4);
+				$this->searchWords[$orIndex]['indexed_words'] = array_slice($this->searchWords[$orIndex]['indexed_words'], 0, 7);
+				$this->searchWords[$orIndex]['subject_words'] = array_slice($this->searchWords[$orIndex]['subject_words'], 0, 7);
+				$this->searchWords[$orIndex]['words'] = array_slice($this->searchWords[$orIndex]['words'], 0, 4);
 			}
 		}
 
-		return $this->_searchWords;
+		return $this->searchWords;
 	}
 
 	/**
-	 * Encodes search params ($this->_search_params) in an URL-compatible way
+	 * Encodes search params ($this->search_params) in an URL-compatible way
 	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
 	public function compileURLparams()
 	{
-		$temp_params = $this->_search_params;
+		$temp_params = $this->search_params;
 		$encoded = array();
 
 		// *** Encode all search params
@@ -656,18 +639,18 @@ class Search
 		foreach ($temp_params as $i => $data)
 		{
 			list($k, $v) = array_pad(explode('|\'|', $data), 2, '');
-			$this->_search_params[$k] = $v;
+			$this->search_params[$k] = $v;
 		}
 
-		if (isset($this->_search_params['brd']))
+		if (isset($this->search_params['brd']))
 		{
-			$this->_search_params['brd'] = empty($this->_search_params['brd']) ? array() : explode(',', $this->_search_params['brd']);
+			$this->search_params['brd'] = empty($this->search_params['brd']) ? array() : explode(',', $this->search_params['brd']);
 		}
 	}
 
 	/**
 	 * Merge search params extracted with Search::searchParamsFromString
-	 * with those present in the $param array (usually $_REQUEST['params'])
+	 * with those present in the $param array (usually $REQUEST['params'])
 	 *
 	 * @param mixed[] $params - An array of search parameters
 	 * @param int $recentPercentage - A coefficient to calculate the lowest
@@ -680,57 +663,57 @@ class Search
 		global $user_info, $modSettings, $context;
 
 		// Store whether simple search was used (needed if the user wants to do another query).
-		if (!isset($this->_search_params['advanced']))
+		if (!isset($this->search_params['advanced']))
 		{
-			$this->_search_params['advanced'] = empty($params['advanced']) ? 0 : 1;
+			$this->search_params['advanced'] = empty($params['advanced']) ? 0 : 1;
 		}
 
 		// 1 => 'allwords' (default, don't set as param) / 2 => 'anywords'.
-		if (!empty($this->_search_params['searchtype']) || (!empty($params['searchtype']) && $params['searchtype'] == 2))
+		if (!empty($this->search_params['searchtype']) || (!empty($params['searchtype']) && $params['searchtype'] == 2))
 		{
-			$this->_search_params['searchtype'] = 2;
+			$this->search_params['searchtype'] = 2;
 		}
 
 		// Minimum age of messages. Default to zero (don't set param in that case).
-		if (!empty($this->_search_params['minage']) || (!empty($params['minage']) && $params['minage'] > 0))
+		if (!empty($this->search_params['minage']) || (!empty($params['minage']) && $params['minage'] > 0))
 		{
-			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? (int) $this->_search_params['minage'] : (int) $params['minage'];
+			$this->search_params['minage'] = !empty($this->search_params['minage']) ? (int) $this->search_params['minage'] : (int) $params['minage'];
 		}
 
 		// Maximum age of messages. Default to infinite (9999 days: param not set).
-		if (!empty($this->_search_params['maxage']) || (!empty($params['maxage']) && $params['maxage'] < 9999))
+		if (!empty($this->search_params['maxage']) || (!empty($params['maxage']) && $params['maxage'] < 9999))
 		{
-			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $params['maxage'];
+			$this->search_params['maxage'] = !empty($this->search_params['maxage']) ? (int) $this->search_params['maxage'] : (int) $params['maxage'];
 		}
 
 		// Searching a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
 		{
-			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : (isset($params['sd_topic']) ? (int) $params['sd_topic'] : '');
-			$this->_search_params['show_complete'] = true;
+			$this->search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : (isset($params['sd_topic']) ? (int) $params['sd_topic'] : '');
+			$this->search_params['show_complete'] = true;
 		}
-		elseif (!empty($this->_search_params['topic']))
+		elseif (!empty($this->search_params['topic']))
 		{
-			$this->_search_params['topic'] = (int) $this->_search_params['topic'];
+			$this->search_params['topic'] = (int) $this->search_params['topic'];
 		}
 
-		if (!empty($this->_search_params['minage']) || !empty($this->_search_params['maxage']))
+		if (!empty($this->search_params['minage']) || !empty($this->search_params['maxage']))
 		{
-			$request = $this->_db->query('', '
-				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'IFNULL(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'IFNULL(MAX(id_msg), -1)') . '
+			$request = $this->db->query('', '
+				SELECT ' . (empty($this->search_params['maxage']) ? '0, ' : 'IFNULL(MIN(id_msg), -1), ') . (empty($this->search_params['minage']) ? '0' : 'IFNULL(MAX(id_msg), -1)') . '
 				FROM {db_prefix}messages
 				WHERE 1=1' . ($modSettings['postmod_active'] ? '
-					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
-					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
+					AND approved = {int:is_approved_true}' : '') . (empty($this->search_params['minage']) ? '' : '
+					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->search_params['maxage']) ? '' : '
 					AND poster_time >= {int:timestamp_maximum_age}'),
 				array(
-					'timestamp_minimum_age' => empty($this->_search_params['minage']) ? 0 : time() - 86400 * $this->_search_params['minage'],
-					'timestamp_maximum_age' => empty($this->_search_params['maxage']) ? 0 : time() - 86400 * $this->_search_params['maxage'],
+					'timestamp_minimum_age' => empty($this->search_params['minage']) ? 0 : time() - 86400 * $this->search_params['minage'],
+					'timestamp_maximum_age' => empty($this->search_params['maxage']) ? 0 : time() - 86400 * $this->search_params['maxage'],
 					'is_approved_true' => 1,
 				)
 			);
-			list ($this->_minMsgID, $this->_maxMsgID) = $request->fetchRow();
-			if ($this->_minMsgID < 0 || $this->_maxMsgID < 0)
+			list ($this->minMsgID, $this->maxMsgID) = $request->fetchRow();
+			if ($this->minMsgID < 0 || $this->maxMsgID < 0)
 			{
 				$context['search_errors']['no_messages_in_time_frame'] = true;
 			}
@@ -738,19 +721,19 @@ class Search
 		}
 
 		// Default the user name to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($params['userspec']) && $params['userspec'] != '*'))
+		if (!empty($this->search_params['userspec']) || (!empty($params['userspec']) && $params['userspec'] != '*'))
 		{
-			$this->_search_params['userspec'] = isset($this->_search_params['userspec']) ? $this->_search_params['userspec'] : $params['userspec'];
+			$this->search_params['userspec'] = isset($this->search_params['userspec']) ? $this->search_params['userspec'] : $params['userspec'];
 		}
 
 		// If there's no specific user, then don't mention it in the main query.
-		if (empty($this->_search_params['userspec']))
+		if (empty($this->search_params['userspec']))
 		{
-			$this->_userQuery = '';
+			$this->userQuery = '';
 		}
 		else
 		{
-			$userString = strtr($this->text->htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr($this->text->htmlspecialchars($this->search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -769,7 +752,7 @@ class Search
 			// Create a list of database-escaped search names.
 			$realNameMatches = array();
 			foreach ($possible_users as $possible_user)
-				$realNameMatches[] = $this->_db->quote(
+				$realNameMatches[] = $this->db->quote(
 					'{string:possible_user}',
 					array(
 						'possible_user' => $possible_user
@@ -777,7 +760,7 @@ class Search
 				);
 
 			// Retrieve a list of possible members.
-			$request = $this->_db->query('', '
+			$request = $this->db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE {raw:match_possible_users}',
@@ -789,11 +772,11 @@ class Search
 			// Simply do nothing if there're too many members matching the criteria.
 			if ($request->numRows() > $maxMembersToSearch)
 			{
-				$this->_userQuery = '';
+				$this->userQuery = '';
 			}
 			elseif ($request->numRows() == 0)
 			{
-				$this->_userQuery = $this->_db->quote(
+				$this->userQuery = $this->db->quote(
 					'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
 					array(
 						'id_member_guest' => 0,
@@ -805,13 +788,13 @@ class Search
 			{
 				while ($row = $request->fetchAssoc())
 				{
-					$this->_memberlist[] = $row['id_member'];
+					$this->memberlist[] = $row['id_member'];
 				}
 
-				$this->_userQuery = $this->_db->quote(
+				$this->userQuery = $this->db->quote(
 					'(m.id_member IN ({array_int:matched_members}) OR (m.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})))',
 					array(
-						'matched_members' => $this->_memberlist,
+						'matched_members' => $this->memberlist,
 						'id_member_guest' => 0,
 						'match_possible_guest_names' => 'm.poster_name LIKE ' . implode(' OR m.poster_name LIKE ', $realNameMatches),
 					)
@@ -821,9 +804,9 @@ class Search
 		}
 
 		// Ensure that boards are an array of integers (or nothing).
-		if (!empty($this->_search_params['brd']) && is_array($this->_search_params['brd']))
+		if (!empty($this->search_params['brd']) && is_array($this->search_params['brd']))
 		{
-			$query_boards = array_map('intval', $this->_search_params['brd']);
+			$query_boards = array_map('intval', $this->search_params['brd']);
 		}
 		elseif (!empty($params['brd']) && is_array($params['brd']))
 		{
@@ -847,9 +830,9 @@ class Search
 		}
 
 		// Special case for boards: searching just one topic?
-		if (!empty($this->_search_params['topic']))
+		if (!empty($this->search_params['topic']))
 		{
-			$request = $this->_db->query('', '
+			$request = $this->db->query('', '
 				SELECT b.id_board
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -858,7 +841,7 @@ class Search
 					AND t.approved = {int:is_approved_true}' : '') . '
 				LIMIT 1',
 				array(
-					'search_topic_id' => $this->_search_params['topic'],
+					'search_topic_id' => $this->search_params['topic'],
 					'is_approved_true' => 1,
 				)
 			);
@@ -868,56 +851,56 @@ class Search
 				$GLOBALS['elk']['errors']->fatal_lang_error('topic_gone', false);
 			}
 
-			$this->_search_params['brd'] = array();
-			list ($this->_search_params['brd'][0]) = $request->fetchRow();
+			$this->search_params['brd'] = array();
+			list ($this->search_params['brd'][0]) = $request->fetchRow();
 			$request->free();
 		}
 		// Select all boards you've selected AND are allowed to see.
-		elseif ($user_info['is_admin'] && (!empty($this->_search_params['advanced']) || !empty($query_boards)))
+		elseif ($user_info['is_admin'] && (!empty($this->search_params['advanced']) || !empty($query_boards)))
 		{
-			$this->_search_params['brd'] = $query_boards;
+			$this->search_params['brd'] = $query_boards;
 		}
 		else
 		{
 
-			$this->_search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('include_recycle' => false, 'include_redirects' => false, 'wanna_see_board' => empty($this->_search_params['advanced']))));
+			$this->search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('include_recycle' => false, 'include_redirects' => false, 'wanna_see_board' => empty($this->search_params['advanced']))));
 
 			// This error should pro'bly only happen for hackers.
-			if (empty($this->_search_params['brd']))
+			if (empty($this->search_params['brd']))
 			{
 				$context['search_errors']['no_boards_selected'] = true;
 			}
 		}
 
-		if (count($this->_search_params['brd']) != 0)
+		if (count($this->search_params['brd']) != 0)
 		{
-			foreach ($this->_search_params['brd'] as $k => $v)
-				$this->_search_params['brd'][$k] = (int) $v;
+			foreach ($this->search_params['brd'] as $k => $v)
+				$this->search_params['brd'][$k] = (int) $v;
 
 			// If we've selected all boards, this parameter can be left empty.
 
 			$num_boards = countBoards();
 
-			if (count($this->_search_params['brd']) == $num_boards)
+			if (count($this->search_params['brd']) == $num_boards)
 			{
-				$this->_boardQuery = '';
+				$this->boardQuery = '';
 			}
-			elseif (count($this->_search_params['brd']) == $num_boards - 1 && !empty($modSettings['recycle_board']) && !in_array($modSettings['recycle_board'], $this->_search_params['brd']))
+			elseif (count($this->search_params['brd']) == $num_boards - 1 && !empty($modSettings['recycle_board']) && !in_array($modSettings['recycle_board'], $this->search_params['brd']))
 			{
-				$this->_boardQuery = '!= ' . $modSettings['recycle_board'];
+				$this->boardQuery = '!= ' . $modSettings['recycle_board'];
 			}
 			else
 			{
-				$this->_boardQuery = 'IN (' . implode(', ', $this->_search_params['brd']) . ')';
+				$this->boardQuery = 'IN (' . implode(', ', $this->search_params['brd']) . ')';
 			}
 		}
 		else
 		{
-			$this->_boardQuery = '';
+			$this->boardQuery = '';
 		}
 
-		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($params['show_complete']);
-		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($params['subject_only']);
+		$this->search_params['show_complete'] = !empty($this->search_params['show_complete']) || !empty($params['show_complete']);
+		$this->search_params['subject_only'] = !empty($this->search_params['subject_only']) || !empty($params['subject_only']);
 
 		// Get the sorting parameters right. Default to sort by relevance descending.
 		$sort_columns = array(
@@ -929,48 +912,48 @@ class Search
 		// Allow integration to add additional sort columns
 		$GLOBALS['elk']['hooks']->hook('search_sort_columns', array(&$sort_columns));
 
-		if (empty($this->_search_params['sort']) && !empty($params['sort']))
+		if (empty($this->search_params['sort']) && !empty($params['sort']))
 		{
-			list ($this->_search_params['sort'], $this->_search_params['sort_dir']) = array_pad(explode('|', $params['sort']), 2, '');
+			list ($this->search_params['sort'], $this->search_params['sort_dir']) = array_pad(explode('|', $params['sort']), 2, '');
 		}
 
-		$this->_search_params['sort'] = !empty($this->_search_params['sort']) && in_array($this->_search_params['sort'], $sort_columns) ? $this->_search_params['sort'] : 'relevance';
+		$this->search_params['sort'] = !empty($this->search_params['sort']) && in_array($this->search_params['sort'], $sort_columns) ? $this->search_params['sort'] : 'relevance';
 
-		if (!empty($this->_search_params['topic']) && $this->_search_params['sort'] === 'num_replies')
+		if (!empty($this->search_params['topic']) && $this->search_params['sort'] === 'num_replies')
 		{
-			$this->_search_params['sort'] = 'id_msg';
+			$this->search_params['sort'] = 'id_msg';
 		}
 
 		// Sorting direction: descending unless stated otherwise.
-		$this->_search_params['sort_dir'] = !empty($this->_search_params['sort_dir']) && $this->_search_params['sort_dir'] === 'asc' ? 'asc' : 'desc';
+		$this->search_params['sort_dir'] = !empty($this->search_params['sort_dir']) && $this->search_params['sort_dir'] === 'asc' ? 'asc' : 'desc';
 
 		// Determine some values needed to calculate the relevance.
-		$this->_minMsg = (int) ((1 - $recentPercentage) * $modSettings['maxMsgID']);
-		$this->_recentMsg = $modSettings['maxMsgID'] - $this->_minMsg;
+		$this->minMsg = (int) ((1 - $recentPercentage) * $modSettings['maxMsgID']);
+		$this->recentMsg = $modSettings['maxMsgID'] - $this->minMsg;
 
 		// *** Parse the search query
-		$GLOBALS['elk']['hooks']->hook('search_params', array(&$this->_search_params));
+		$GLOBALS['elk']['hooks']->hook('search_params', array(&$this->search_params));
 
 		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
 		// @todo Setting to add more here?
 		// @todo Maybe only blacklist if they are the only word, or "any" is used?
-		$this->_blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
-		$GLOBALS['elk']['hooks']->hook('search_blacklisted_words', array(&$this->_blacklisted_words));
+		$this->blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
+		$GLOBALS['elk']['hooks']->hook('search_blacklisted_words', array(&$this->blacklisted_words));
 
 		// What are we searching for?
-		if (empty($this->_search_params['search']))
+		if (empty($this->search_params['search']))
 		{
-			if (isset($_GET['search']))
+			if (isset($GET['search']))
 			{
-				$this->_search_params['search'] = $this->text->un_htmlspecialchar($_GET['search']);
+				$this->search_params['search'] = $this->text->un_htmlspecialchar($GET['search']);
 			}
-			elseif (isset($_POST['search']))
+			elseif (isset($POST['search']))
 			{
-				$this->_search_params['search'] = $_POST['search'];
+				$this->search_params['search'] = $POST['search'];
 			}
 			else
 			{
-				$this->_search_params['search'] = '';
+				$this->search_params['search'] = '';
 			}
 		}
 	}
@@ -980,7 +963,7 @@ class Search
 	 */
 	public function isCompact()
 	{
-		return empty($this->_search_params['show_complete']);
+		return empty($this->search_params['show_complete']);
 	}
 
 	/**
@@ -1012,7 +995,7 @@ class Search
 
 		$did_you_mean = array('search' => array(), 'display' => array());
 		$found_misspelling = false;
-		foreach ($this->_searchArray as $word)
+		foreach ($this->searchArray as $word)
 		{
 			if (empty($pspell_link))
 			{
@@ -1074,7 +1057,7 @@ class Search
 		{
 			// Don't spell check excluded words, but add them still...
 			$temp_excluded = array('search' => array(), 'display' => array());
-			foreach ($this->_excludedWords as $word)
+			foreach ($this->excludedWords as $word)
 			{
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
@@ -1103,7 +1086,7 @@ class Search
 	 */
 	public function clearCacheResults($id_search)
 	{
-		$this->_db_search->query('delete_log_search_results', '
+		$this->db_search->query('delete_log_search_results', '
 			DELETE FROM {db_prefix}log_search_results
 			WHERE id_search = {int:search_id}',
 			array(
@@ -1126,7 +1109,7 @@ class Search
 		global $modSettings;
 
 		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
-		foreach ($this->_searchWords as $words)
+		foreach ($this->searchWords as $words)
 		{
 			$subject_query_params = array();
 			$subject_query = array(
@@ -1147,7 +1130,7 @@ class Search
 			foreach ($words['subject_words'] as $subjectWord)
 			{
 				$numTables++;
-				if (in_array($subjectWord, $this->_excludedSubjectWords))
+				if (in_array($subjectWord, $this->excludedSubjectWords))
 				{
 					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
@@ -1163,41 +1146,41 @@ class Search
 				$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->userQuery))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-				$subject_query['where'][] = $this->_userQuery;
+				$subject_query['where'][] = $this->userQuery;
 			}
 
-			if (!empty($this->_search_params['topic']))
+			if (!empty($this->search_params['topic']))
 			{
-				$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
+				$subject_query['where'][] = 't.id_topic = ' . $this->search_params['topic'];
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->minMsgID))
 			{
-				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
+				$subject_query['where'][] = 't.id_first_msg >= ' . $this->minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->maxMsgID))
 			{
-				$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
+				$subject_query['where'][] = 't.id_last_msg <= ' . $this->maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->boardQuery))
 			{
-				$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
+				$subject_query['where'][] = 't.id_board ' . $this->boardQuery;
 			}
 
-			if (!empty($this->_excludedPhrases))
+			if (!empty($this->excludedPhrases))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 
 				$count = 0;
-				foreach ($this->_excludedPhrases as $phrase)
+				foreach ($this->excludedPhrases as $phrase)
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
-					$subject_query_params['excluded_phrases_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query_params['excluded_phrases_' . $count++] = $this->searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 
@@ -1205,15 +1188,15 @@ class Search
 			$subject_query['select'] = array(
 				'id_search' => '{int:id_search}',
 				'id_topic' => 't.id_topic',
-				'relevance' => $this->_build_relevance(),
-				'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+				'relevance' => $this->build_relevance(),
+				'id_msg' => empty($this->userQuery) ? 't.id_first_msg' : 'm.id_msg',
 				'num_matches' => 1,
 			);
 
 			$subject_query['parameters'] = array_merge($subject_query_params, array(
 				'id_search' => $id_search,
-				'min_msg' => $this->_minMsg,
-				'recent_message' => $this->_recentMsg,
+				'min_msg' => $this->minMsg,
+				'recent_message' => $this->recentMsg,
 				'huge_topic_posts' => $humungousTopicPosts,
 				'is_approved' => 1,
 				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
@@ -1221,7 +1204,7 @@ class Search
 
 			$GLOBALS['elk']['hooks']->hook('subject_only_search_query', array(&$subject_query, &$subject_query_params));
 
-			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+			$numSubjectResults += $this->build_search_results_log($subject_query, 'insert_log_search_results_subject');
 
 			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
 			{
@@ -1261,20 +1244,20 @@ class Search
 			'where' => array(),
 			'group_by' => array(),
 			'parameters' => array(
-				'min_msg' => $this->_minMsg,
-				'recent_message' => $this->_recentMsg,
+				'min_msg' => $this->minMsg,
+				'recent_message' => $this->recentMsg,
 				'huge_topic_posts' => $humungousTopicPosts,
 				'is_approved' => 1,
 				'limit' => $modSettings['search_max_results'],
 			),
 		);
 
-		if (empty($this->_search_params['topic']) && empty($this->_search_params['show_complete']))
+		if (empty($this->search_params['topic']) && empty($this->search_params['show_complete']))
 		{
 			$main_query['select']['id_topic'] = 't.id_topic';
 			$main_query['select']['id_msg'] = 'MAX(m.id_msg) AS id_msg';
 			$main_query['select']['num_matches'] = 'COUNT(*) AS num_matches';
-			$main_query['weights'] = $this->_weight_factors;
+			$main_query['weights'] = $this->weight_factors;
 			$main_query['group_by'][] = 't.id_topic';
 		}
 		else
@@ -1293,35 +1276,35 @@ class Search
 				),
 			);
 
-			if (!empty($this->_search_params['topic']))
+			if (!empty($this->search_params['topic']))
 			{
 				$main_query['where'][] = 't.id_topic = {int:topic}';
 				$main_query['parameters']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->_search_params['show_complete']))
+			if (!empty($this->search_params['show_complete']))
 			{
 				$main_query['group_by'][] = 'm.id_msg, t.id_first_msg, t.id_last_msg';
 			}
 		}
 
 		// *** Get the subject results.
-		$numSubjectResults = $this->_log_search_subjects($id_search);
+		$numSubjectResults = $this->log_search_subjects($id_search);
 
 		if ($numSubjectResults !== 0)
 		{
 			$main_query['weights']['subject']['search'] = 'CASE WHEN MAX(lst.id_topic) IS NULL THEN 0 ELSE 1 END';
-			$main_query['left_join'][] = '{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (' . ($this->_createTemporary ? '' : 'lst.id_search = {int:id_search} AND ') . 'lst.id_topic = t.id_topic)';
-			if (!$this->_createTemporary)
+			$main_query['left_join'][] = '{db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (' . ($this->createTemporary ? '' : 'lst.id_search = {int:id_search} AND ') . 'lst.id_topic = t.id_topic)';
+			if (!$this->createTemporary)
 			{
 				$main_query['parameters']['id_search'] = $id_search;
 			}
 		}
 
 		// We building an index?
-		if ($this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if ($this->searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
-			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
+			$indexedResults = $this->prepare_word_index($id_search, $maxMessageResults);
 
 			if (empty($indexedResults) && empty($numSubjectResults) && !empty($modSettings['search_force_index']))
 			{
@@ -1329,9 +1312,9 @@ class Search
 			}
 			elseif (!empty($indexedResults))
 			{
-				$main_query['inner_join'][] = '{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages AS lsm ON (lsm.id_msg = m.id_msg)';
+				$main_query['inner_join'][] = '{db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_messages AS lsm ON (lsm.id_msg = m.id_msg)';
 
-				if (!$this->_createTemporary)
+				if (!$this->createTemporary)
 				{
 					$main_query['where'][] = 'lsm.id_search = {int:id_search}';
 					$main_query['parameters']['id_search'] = $id_search;
@@ -1343,17 +1326,17 @@ class Search
 		{
 			$orWhere = array();
 			$count = 0;
-			foreach ($this->_searchWords as $words)
+			foreach ($this->searchWords as $words)
 			{
 				$where = array();
 				foreach ($words['all_words'] as $regularWord)
 				{
-					$where[] = 'm.body' . (in_array($regularWord, $this->_excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
-					if (in_array($regularWord, $this->_excludedWords))
+					$where[] = 'm.body' . (in_array($regularWord, $this->excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
+					if (in_array($regularWord, $this->excludedWords))
 					{
 						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
 					}
-					$main_query['parameters']['all_word_body_' . $count++] = $this->_searchAPI->prepareWord($regularWord, $this->noRegexp());
+					$main_query['parameters']['all_word_body_' . $count++] = $this->searchAPI->prepareWord($regularWord, $this->noRegexp());
 				}
 
 				if (!empty($where))
@@ -1367,44 +1350,44 @@ class Search
 				$main_query['where'][] = count($orWhere) > 1 ? '(' . implode(' OR ', $orWhere) . ')' : $orWhere[0];
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->userQuery))
 			{
 				$main_query['where'][] = '{raw:user_query}';
-				$main_query['parameters']['user_query'] = $this->_userQuery;
+				$main_query['parameters']['user_query'] = $this->userQuery;
 			}
 
-			if (!empty($this->_search_params['topic']))
+			if (!empty($this->search_params['topic']))
 			{
 				$main_query['where'][] = 'm.id_topic = {int:topic}';
 				$main_query['parameters']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->minMsgID))
 			{
 				$main_query['where'][] = 'm.id_msg >= {int:min_msg_id}';
-				$main_query['parameters']['min_msg_id'] = $this->_minMsgID;
+				$main_query['parameters']['min_msg_id'] = $this->minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->maxMsgID))
 			{
 				$main_query['where'][] = 'm.id_msg <= {int:max_msg_id}';
-				$main_query['parameters']['max_msg_id'] = $this->_maxMsgID;
+				$main_query['parameters']['max_msg_id'] = $this->maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->boardQuery))
 			{
 				$main_query['where'][] = 'm.id_board {raw:board_query}';
-				$main_query['parameters']['board_query'] = $this->_boardQuery;
+				$main_query['parameters']['board_query'] = $this->boardQuery;
 			}
 		}
 		$GLOBALS['elk']['hooks']->hook('main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (!empty($indexedResults) || !$this->searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
 		{
-			$relevance = $this->_build_relevance($main_query['weights']);
+			$relevance = $this->build_relevance($main_query['weights']);
 			$main_query['select']['relevance'] = $relevance;
-			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
+			$num_results += $this->build_search_results_log($main_query, 'insert_log_search_results_no_index');
 		}
 
 		// Insert subject-only matches.
@@ -1414,27 +1397,27 @@ class Search
 				'select' => array(
 					'id_search' => '{int:id_search}',
 					'id_topic' => 't.id_topic',
-					'relevance' => $this->_build_relevance(),
+					'relevance' => $this->build_relevance(),
 					'id_msg' => 't.id_first_msg',
 					'num_matches' => 1,
 				),
 				'from' => '{db_prefix}topics AS t',
 				'inner_join' => array(
-					'{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
+					'{db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
 				),
 				'where' => array(
-					$this->_createTemporary ? '1=1' : 'lst.id_search = {int:id_search}',
+					$this->createTemporary ? '1=1' : 'lst.id_search = {int:id_search}',
 				),
 				'parameters' => array(
 					'id_search' => $id_search,
-					'min_msg' => $this->_minMsg,
-					'recent_message' => $this->_recentMsg,
+					'min_msg' => $this->minMsg,
+					'recent_message' => $this->recentMsg,
 					'huge_topic_posts' => $humungousTopicPosts,
 					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $num_results,
 				),
 			);
 
-			$num_results += $this->_build_search_results_log($subject_query, 'insert_log_search_results_sub_only', true);
+			$num_results += $this->build_search_results_log($subject_query, 'insert_log_search_results_sub_only', true);
 		}
 		elseif ($num_results == -1)
 		{
@@ -1458,8 +1441,8 @@ class Search
 	{
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
-		$request = $this->_db_search->query('', '
-			SELECT ' . (empty($this->_search_params['topic']) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
+		$request = $this->db_search->query('', '
+			SELECT ' . (empty($this->search_params['topic']) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->param('sort') === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}
@@ -1499,7 +1482,7 @@ class Search
 	public function loadPosters($msg_list, $limit)
 	{
 		// Load the posters...
-		$request = $this->_db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_member
 			FROM {db_prefix}messages
 			WHERE id_member != {int:no_member}
@@ -1531,7 +1514,7 @@ class Search
 	{
 		global $modSettings;
 
-		$request = $this->_db->query('', '
+		$request = $this->db->query('', '
 			SELECT
 				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time, m.id_member,
 				m.icon, m.poster_ip, m.body, m.smileys_enabled, m.modified_time, m.modified_name,
@@ -1573,7 +1556,7 @@ class Search
 	 */
 	public function noMessages($messages_request)
 	{
-		return $this->_db->num_rows($messages_request) == 0;
+		return $this->db->num_rows($messages_request) == 0;
 	}
 
 	/**
@@ -1583,11 +1566,11 @@ class Search
 	 *
 	 * @return array - the number of search results and if a temporary table has been created
 	 */
-	protected function _log_search_subjects($id_search)
+	protected function log_search_subjects($id_search)
 	{
 		global $modSettings;
 
-		if (empty($this->_search_params['topic']))
+		if (empty($this->search_params['topic']))
 		{
 			return array(0, false);
 		}
@@ -1596,9 +1579,9 @@ class Search
 		$numSubjectResults = 0;
 
 		// Clean up some previous cache.
-		if (!$this->_createTemporary)
+		if (!$this->createTemporary)
 		{
-			$this->_db_search->query('delete_log_search_topics', '
+			$this->db_search->query('delete_log_search_topics', '
 				DELETE FROM {db_prefix}log_search_topics
 				WHERE id_search = {int:search_id}',
 				array(
@@ -1607,7 +1590,7 @@ class Search
 			);
 		}
 
-		foreach ($this->_searchWords as $words)
+		foreach ($this->searchWords as $words)
 		{
 			$subject_query = array(
 				'from' => '{db_prefix}topics AS t',
@@ -1623,7 +1606,7 @@ class Search
 			foreach ($words['subject_words'] as $subjectWord)
 			{
 				$numTables++;
-				if (in_array($subjectWord, $this->_excludedSubjectWords))
+				if (in_array($subjectWord, $this->excludedSubjectWords))
 				{
 					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
@@ -1631,7 +1614,7 @@ class Search
 
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
-					$subject_query['params']['body_not_' . $count++] = $this->_searchAPI->prepareWord($subjectWord, $this->noRegexp());
+					$subject_query['params']['body_not_' . $count++] = $this->searchAPI->prepareWord($subjectWord, $this->noRegexp());
 				}
 				else
 				{
@@ -1642,46 +1625,46 @@ class Search
 				}
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->userQuery))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 				$subject_query['where'][] = '{raw:user_query}';
-				$subject_query['params']['user_query'] = $this->_userQuery;
+				$subject_query['params']['user_query'] = $this->userQuery;
 			}
 
-			if (!empty($this->_search_params['topic']))
+			if (!empty($this->search_params['topic']))
 			{
 				$subject_query['where'][] = 't.id_topic = {int:topic}';
 				$subject_query['params']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->minMsgID))
 			{
 				$subject_query['where'][] = 't.id_first_msg >= {int:min_msg_id}';
-				$subject_query['params']['min_msg_id'] = $this->_minMsgID;
+				$subject_query['params']['min_msg_id'] = $this->minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->maxMsgID))
 			{
 				$subject_query['where'][] = 't.id_last_msg <= {int:max_msg_id}';
-				$subject_query['params']['max_msg_id'] = $this->_maxMsgID;
+				$subject_query['params']['max_msg_id'] = $this->maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->boardQuery))
 			{
 				$subject_query['where'][] = 't.id_board {raw:board_query}';
-				$subject_query['params']['board_query'] = $this->_boardQuery;
+				$subject_query['params']['board_query'] = $this->boardQuery;
 			}
 
-			if (!empty($this->_excludedPhrases))
+			if (!empty($this->excludedPhrases))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 				$count = 0;
-				foreach ($this->_excludedPhrases as $phrase)
+				foreach ($this->excludedPhrases as $phrase)
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-					$subject_query['params']['exclude_phrase_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query['params']['exclude_phrase_' . $count++] = $this->searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 
@@ -1693,10 +1676,10 @@ class Search
 				continue;
 			}
 
-			$ignoreRequest = $this->_db_search->query('insert_log_search_topics', ($this->_db->support_ignore() ? ('
-				INSERT IGNORE INTO {db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics
-					(' . ($this->_createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
-				SELECT ' . ($this->_createTemporary ? '' : $id_search . ', ') . 't.id_topic
+			$ignoreRequest = $this->db_search->query('insert_log_search_topics', ($this->db->support_ignore() ? ('
+				INSERT IGNORE INTO {db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_topics
+					(' . ($this->createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
+				SELECT ' . ($this->createTemporary ? '' : $id_search . ', ') . 't.id_topic
 				FROM ' . $subject_query['from'] . (empty($subject_query['inner_join']) ? '' : '
 					INNER JOIN ' . implode('
 					INNER JOIN ', array_unique($subject_query['inner_join']))) . (empty($subject_query['left_join']) ? '' : '
@@ -1709,11 +1692,11 @@ class Search
 			);
 
 			// Don't do INSERT IGNORE? Manually fix this up!
-			if (!$this->_db->support_ignore())
+			if (!$this->db->support_ignore())
 			{
 				while ($row = $ignoreRequest->fetchRow())
 				{
-					$ind = $this->_createTemporary ? 0 : 1;
+					$ind = $this->createTemporary ? 0 : 1;
 
 					// No duplicates!
 					if (isset($inserts[$row[$ind]]))
@@ -1740,11 +1723,11 @@ class Search
 		// Got some non-MySQL data to plonk in?
 		if (!empty($inserts))
 		{
-			$this->_db->insert('',
-				('{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics'),
-				$this->_createTemporary ? array('id_topic' => 'int') : array('id_search' => 'int', 'id_topic' => 'int'),
+			$this->db->insert('',
+				('{db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_topics'),
+				$this->createTemporary ? array('id_topic' => 'int') : array('id_search' => 'int', 'id_topic' => 'int'),
 				$inserts,
-				$this->_createTemporary ? array('id_topic') : array('id_search', 'id_topic')
+				$this->createTemporary ? array('id_topic') : array('id_search', 'id_topic')
 			);
 		}
 
@@ -1759,15 +1742,15 @@ class Search
 	 *
 	 * @return int - the number of indexed results
 	 */
-	protected function _prepare_word_index($id_search, $maxMessageResults)
+	protected function prepare_word_index($id_search, $maxMessageResults)
 	{
 		$indexedResults = 0;
 		$inserts = array();
 
 		// Clear, all clear!
-		if (!$this->_createTemporary)
+		if (!$this->createTemporary)
 		{
-			$this->_db_search->query('delete_log_search_messages', '
+			$this->db_search->query('delete_log_search_messages', '
 				DELETE FROM {db_prefix}log_search_messages
 				WHERE id_search = {int:id_search}',
 				array(
@@ -1776,34 +1759,34 @@ class Search
 			);
 		}
 
-		foreach ($this->_searchWords as $words)
+		foreach ($this->searchWords as $words)
 		{
 			// Search for this word, assuming we have some words!
 			if (!empty($words['indexed_words']))
 			{
 				// Variables required for the search.
 				$search_data = array(
-					'insert_into' => ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages',
+					'insert_into' => ($this->createTemporary ? 'tmp_' : '') . 'log_search_messages',
 					'no_regexp' => $this->noRegexp(),
 					'max_results' => $maxMessageResults,
 					'indexed_results' => $indexedResults,
 					'params' => array(
-						'id_search' => !$this->_createTemporary ? $id_search : 0,
-						'excluded_words' => $this->_excludedWords,
-						'user_query' => !empty($this->_userQuery) ? $this->_userQuery : '',
-						'board_query' => !empty($this->_boardQuery) ? $this->_boardQuery : '',
-						'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
-						'min_msg_id' => (int) $this->_minMsgID,
-						'max_msg_id' => (int) $this->_maxMsgID,
-						'excluded_phrases' => $this->_excludedPhrases,
-						'excluded_index_words' => $this->_excludedIndexWords,
-						'excluded_subject_words' => $this->_excludedSubjectWords,
+						'id_search' => !$this->createTemporary ? $id_search : 0,
+						'excluded_words' => $this->excludedWords,
+						'user_query' => !empty($this->userQuery) ? $this->userQuery : '',
+						'board_query' => !empty($this->boardQuery) ? $this->boardQuery : '',
+						'topic' => !empty($this->search_params['topic']) ? $this->param('topic') : 0,
+						'min_msg_id' => (int) $this->minMsgID,
+						'max_msg_id' => (int) $this->maxMsgID,
+						'excluded_phrases' => $this->excludedPhrases,
+						'excluded_index_words' => $this->excludedIndexWords,
+						'excluded_subject_words' => $this->excludedSubjectWords,
 					),
 				);
 
-				$ignoreRequest = $this->_searchAPI->indexedWordQuery($words, $search_data);
+				$ignoreRequest = $this->searchAPI->indexedWordQuery($words, $search_data);
 
-				if (!$this->_db->support_ignore())
+				if (!$this->db->support_ignore())
 				{
 					while ($row = $ignoreRequest->fetchRow())
 					{
@@ -1833,11 +1816,11 @@ class Search
 		// More non-MySQL stuff needed?
 		if (!empty($inserts))
 		{
-			$this->_db->insert('',
-				'{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages',
-				$this->_createTemporary ? array('id_msg' => 'int') : array('id_msg' => 'int', 'id_search' => 'int'),
+			$this->db->insert('',
+				'{db_prefix}' . ($this->createTemporary ? 'tmp_' : '') . 'log_search_messages',
+				$this->createTemporary ? array('id_msg' => 'int') : array('id_msg' => 'int', 'id_search' => 'int'),
 				$inserts,
-				$this->_createTemporary ? array('id_msg') : array('id_msg', 'id_search')
+				$this->createTemporary ? array('id_msg') : array('id_msg', 'id_search')
 			);
 		}
 
@@ -1849,11 +1832,11 @@ class Search
 	 *
 	 * @param null|int[] $factors - is factors are specified that array will
 	 * be used to build the relevance value, otherwise the function will use
-	 * $this->_weight_factors
+	 * $this->weight_factors
 	 *
 	 * @return string
 	 */
-	protected function _build_relevance($factors = null)
+	protected function build_relevance($factors = null)
 	{
 		$relevance = '1000 * (';
 
@@ -1862,24 +1845,24 @@ class Search
 			$weight_total = 0;
 			foreach ($factors as $type => $value)
 			{
-				$relevance .= $this->_weight[$type];
+				$relevance .= $this->weight[$type];
 				if (!empty($value['search']))
 				{
 					$relevance .= ' * ' . $value['search'];
 				}
 
 				$relevance .= ' + ';
-				$weight_total += $this->_weight[$type];
+				$weight_total += $this->weight[$type];
 			}
 		}
 		else
 		{
-			$weight_total = $this->_weight_total;
-			foreach ($this->_weight_factors as $type => $value)
+			$weight_total = $this->weight_total;
+			foreach ($this->weight_factors as $type => $value)
 			{
 				if (isset($value['results']))
 				{
-					$relevance .= $this->_weight[$type];
+					$relevance .= $this->weight[$type];
 					if (!empty($value['results']))
 					{
 						$relevance .= ' * ' . $value['results'];
@@ -1913,11 +1896,11 @@ class Search
 	 *
 	 * @return int - the number of rows affected by the query
 	 */
-	protected function _build_search_results_log($main_query, $query_identifier, $use_old_ids = false)
+	protected function build_search_results_log($main_query, $query_identifier, $use_old_ids = false)
 	{
 		static $usedIDs;
 
-		$ignoreRequest = $this->_db_search->query($query_identifier, ($this->_db->support_ignore() ? ('
+		$ignoreRequest = $this->db_search->query($query_identifier, ($this->db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}log_search_results
 				(' . implode(', ', array_keys($main_query['select'])) . ')') : '') . '
 			SELECT
@@ -1936,7 +1919,7 @@ class Search
 		);
 
 		// If the database doesn't support IGNORE to make this fast we need to do some tracking.
-		if (!$this->_db->support_ignore())
+		if (!$this->db->support_ignore())
 		{
 			$inserts = array();
 
@@ -1971,7 +1954,7 @@ class Search
 				foreach ($main_query['select'] as $k => $v)
 					$query_columns[$k] = 'int';
 
-				$this->_db->insert('',
+				$this->db->insert('',
 					'{db_prefix}log_search_results',
 					$query_columns,
 					$inserts,

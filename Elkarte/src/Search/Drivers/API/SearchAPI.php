@@ -12,7 +12,7 @@
 
 namespace Elkarte\Search\API;
 
-use Elkarte\Search\SearchInterface;
+use Elkarte\Search\Drivers\SearchInterface;
 
 /**
  * Abstract class that defines the methods any search API shall implement
@@ -23,22 +23,16 @@ use Elkarte\Search\SearchInterface;
 abstract class SearchAPI implements SearchInterface
 {
 	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 * @var string
+	 * What words are banned?
+	 * @var array
 	 */
-	public $version_compatible;
+	protected $bannedWords = [];
 
 	/**
-	 * This won't work with versions of ElkArte less than this.
-	 * @var string
+	 * Any word excluded from the search?
+	 * @var array
 	 */
-	public $min_elk_version;
-
-	/**
-	 * Standard search is supported by default.
-	 * @var boolean
-	 */
-	public $is_supported;
+	protected $excludedWords = [];
 
 	/**
 	 * Method to check whether the method can be performed by the API.
@@ -72,5 +66,33 @@ abstract class SearchAPI implements SearchInterface
 		global $modSettings;
 
 		return empty($modSettings['search_match_words']) || $no_regexp ? '%' . strtr($phrase, array('_' => '\\_', '%' => '\\%')) . '%' : '[[:<:]]' . addcslashes(preg_replace(array('/([\[\]$.+*?|{}()])/'), array('[$1]'), $phrase), '\\\'') . '[[:>:]]';
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words
+	 */
+	public function setExcludedWords(array $words)
+	{
+		$this->excludedWords = $words;
+	}
+
+	/**
+	 * Callback function for usort used to sort the results.
+	 *
+	 * - The order of sorting is: large words, small words, large words that
+	 * are excluded from the search, small words that are excluded.
+	 *
+	 * @param string $a Word A
+	 * @param string $b Word B
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
+	 */
+	public function searchSort($a, $b)
+	{
+		$x = strlen($a) - (in_array($a, $this->excludedWords) ? 1000 : 0);
+		$y = strlen($b) - (in_array($b, $this->excludedWords) ? 1000 : 0);
+
+		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
 }

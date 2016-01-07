@@ -20,9 +20,6 @@
 
 namespace Elkarte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *
@@ -33,7 +30,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-class Sphinxql_Search extends SearchAPI
+class SphinxqlSearch extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -99,6 +96,7 @@ class Sphinxql_Search extends SearchAPI
 	 *
 	 * @param string $methodName The search method
 	 * @param string|null $query_params Parameters for the query
+	 * @return bool
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -152,7 +150,7 @@ class Sphinxql_Search extends SearchAPI
 	 *
 	 * @param string[] $words An array of words
 	 */
-	public function setExcludedWords($words)
+	public function setExcludedWords(array $words)
 	{
 		$this->_excludedWords = $words;
 	}
@@ -165,7 +163,7 @@ class Sphinxql_Search extends SearchAPI
 	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function prepareIndexes($word, array &$wordsSearch, array &$wordsExclude, $isExcluded)
 	{
 		$subwords = text2words($word, null, false);
 

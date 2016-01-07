@@ -1,7 +1,5 @@
 <?php
 
-namespace Elkarte\Subscriptions\twoCheckOut;
-
 /**
  * Payment Gateway: twoCheckOut
  *
@@ -17,12 +15,14 @@ namespace Elkarte\Subscriptions\twoCheckOut;
  *
  */
 
+namespace Elkarte\PaidSubscriptions\Drivers\twoCheckOut;
+
 /**
  * The available form data for the gateway
  *
  * @package Subscriptions
  */
-class twoCheckOut_Display
+class Display
 {
 	/**
 	 * Name of this payment gateway

@@ -1,7 +1,5 @@
 <?php
 
-namespace Elkarte\Subscriptions\Authorize;
-
 /**
  * Payment Gateway: Authorize
  *
@@ -17,9 +15,7 @@ namespace Elkarte\Subscriptions\Authorize;
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
+namespace Elkarte\Subscriptions\Drivers\Authorize;
 
 /**
  * Class of functions to validate a authorize_payment response and provide details of the payment

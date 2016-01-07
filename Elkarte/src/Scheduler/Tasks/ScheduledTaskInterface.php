@@ -13,9 +13,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 interface ScheduledTaskInterface
 {
 	public function run();

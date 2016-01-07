@@ -17,9 +17,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
+namespace Elkarte\News;
+use Elkarte\Elkarte\Controller\AbstractController;
 /**
  * ManageNews controller, for news administration screens.
  *
@@ -29,7 +28,7 @@ class ManageNewsController extends AbstractController
 {
 	/**
 	 * News settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_newsSettings;
 
@@ -380,7 +379,7 @@ class ManageNewsController extends AbstractController
 
 		if (isset($context['preview']))
 		{
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 			$context['recipients']['members'] = !empty($this->_req->post->members) ? explode(',', $this->_req->post->members) : array();
 			$context['recipients']['exclude_members'] = !empty($this->_req->post->exclude_members) ? explode(',', $this->_req->post->exclude_members) : array();
 			$context['recipients']['groups'] = !empty($this->_req->post->groups) ? explode(',', $this->_req->post->groups) : array();
@@ -638,7 +637,7 @@ class ManageNewsController extends AbstractController
 			return;
 
 		// Some functions we will need
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 		if ($context['send_pm'])
 
 
@@ -905,14 +904,14 @@ class ManageNewsController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_news_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=news;sa=settings');
 		}
 
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -921,7 +920,7 @@ class ManageNewsController extends AbstractController
 	protected function _initNewsSettingsForm()
 	{
 		// Instantiate the form
-		$this->_newsSettings = new Settings_Form();
+		$this->_newsSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

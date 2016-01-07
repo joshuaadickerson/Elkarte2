@@ -101,7 +101,7 @@ class BoardNotifications extends AbstractManager
 
 		$db = $GLOBALS['elk']['db'];
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 		require_once(ROOTDIR . '/Mail/Emailpost.subs.php');
 
 		// Do we have one or lots of topics?

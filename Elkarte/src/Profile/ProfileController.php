@@ -22,6 +22,7 @@
 namespace Elkarte\Profile;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Security\OpenID;
 
 /**
  * ProfileController class has the job of showing and editing people's profiles.
@@ -71,9 +72,10 @@ class ProfileController extends AbstractController
 	public function pre_dispatch()
 	{
 		require_once(ELKDIR . '/Menu/Menu.subs.php');
-		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
-		$this->_memID = currentMemberID();
+		$this->bootstrap();
+
+		$this->_memID = $this->elk['profile']->currentMemberID();
 	}
 
 	/**
@@ -100,7 +102,7 @@ class ProfileController extends AbstractController
 		$cur_profile = $user_profile[$this->_memID];
 
 		// Let's have some information about this member ready, too.
-		loadMemberContext($this->_memID);
+		$this->elk['members.manager']->loadMemberContext($this->_memID);
 		$context['member'] = $memberContext[$this->_memID];
 
 		// Is this the profile of the user himself or herself?
@@ -181,8 +183,8 @@ class ProfileController extends AbstractController
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
 
 		// Let go to the right place
-		if (isset($this->_profile_include_data['file']))
-			require_once($this->_profile_include_data['file']);
+		//if (isset($this->_profile_include_data['file']))
+		//	require_once($this->_profile_include_data['file']);
 
 		callMenu($this->_profile_include_data);
 
@@ -752,7 +754,6 @@ class ProfileController extends AbstractController
 			// If we're using OpenID try to re-validate.
 			if (!empty($user_settings['openid_uri']))
 			{
-				require_once(SUBSDIR . '/OpenID.subs.php');
 				$openID = new OpenID();
 				$openID->revalidate();
 			}
@@ -769,9 +770,6 @@ class ProfileController extends AbstractController
 
 				// Does the integration want to check passwords?
 				$good_password = in_array(true, $GLOBALS['elk']['hooks']->hook('verify_password', array($cur_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
-
-				// Start up the password checker, we have work to do
-				require_once(SUBSDIR . '/Auth.subs.php');
 
 				// Bad password!!!
 				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $user_info['passwd'], $user_profile[$this->_memID]['member_name']))

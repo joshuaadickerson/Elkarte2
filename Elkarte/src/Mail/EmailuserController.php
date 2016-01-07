@@ -209,7 +209,7 @@ class EmailuserController extends AbstractController
 		global $scripturl, $topic, $txt;
 
 		// This is needed for sendmail().
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// Time to check and clean what was placed in the form
 		$validator = new DataValidator();
@@ -348,7 +348,7 @@ class EmailuserController extends AbstractController
 			// Don't let them send too many!
 			spamProtection('sendmail');
 
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 			// We will need to do some data checking
 			$validator = new DataValidator();
@@ -474,7 +474,7 @@ class EmailuserController extends AbstractController
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
+
 			$verificationOptions = array(
 				'id' => 'report',
 			);
@@ -533,7 +533,7 @@ class EmailuserController extends AbstractController
 		// Make sure they aren't spamming.
 		spamProtection('reporttm');
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// No errors, yet.
 		$report_errors = ErrorContext::context('report', 1);
@@ -564,7 +564,7 @@ class EmailuserController extends AbstractController
 		// Could they get the right verification code?
 		if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
+
 			$verificationOptions = array(
 				'id' => 'report',
 			);

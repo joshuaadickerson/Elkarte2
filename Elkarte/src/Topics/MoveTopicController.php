@@ -169,7 +169,7 @@ class MoveTopicController extends AbstractController
 			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
 
 		// Notify people that this topic has been moved?
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 		sendNotifications($this->_topic, 'move');
 
 		// Why not go back to the original board in case they want to keep moving?

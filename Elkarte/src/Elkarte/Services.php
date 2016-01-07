@@ -3,6 +3,7 @@
 namespace Elkarte;
 
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Elkarte\Security\BansManager;
 use Elkarte\Elkarte\Theme\Context;
 use Elkarte\Elkarte\Text\StringUtil;
 use Elkarte\Elkarte\Theme\TemplateLayers;
@@ -191,6 +192,10 @@ $elk['text'] = function () {
 
 $elk['context'] = function () {
 	return new Context();
+};
+
+$elk['bans.manager'] = function () {
+	return new BansManager();
 };
 
 return $elk;

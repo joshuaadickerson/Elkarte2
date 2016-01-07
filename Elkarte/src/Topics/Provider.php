@@ -21,7 +21,7 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['topics.list'] = function ($elk) {
-			return new TopicsList($elk['db'], $elk['cache'], $elk['text'], $elk['topics.container'], $elk['members.container']);
+			return new MessageIndex;//($elk['db'], $elk['cache'], $elk['text'], $elk['topics.container'], $elk['members.container']);
 		};
 
 		// @todo this should check settings/hooks to see if the topics have a separate BBC parser

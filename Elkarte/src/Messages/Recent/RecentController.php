@@ -17,8 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Messages\Recent;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Recent Post Controller, retrieve information about recent posts
@@ -27,7 +28,7 @@ class RecentController extends AbstractController
 {
 	/**
 	 * The object that will retrieve the data
-	 * @var Recent_Class
+	 * @var Recent
 	 */
 	private $_grabber;
 
@@ -81,10 +82,6 @@ class RecentController extends AbstractController
 		// Prefetching + lots of MySQL work = bad mojo.
 		stop_prefetching();
 
-		// Some common method dependencies
-		require_once(SUBSDIR . '/Recent.subs.php');
-
-
 		// There might be - and are - different permissions between any and own.
 		$this->_permissions = array(
 			'own' => array(
@@ -120,8 +117,7 @@ class RecentController extends AbstractController
 		global $txt, $scripturl, $context, $modSettings, $board, $user_info;
 
 		// Start up a new recent posts grabber
-		require_once(SUBSDIR . '/Recent.php');
-		$this->_grabber = new Recent_Class($user_info['id']);
+		$this->_grabber = new Recent($user_info['id']);
 
 		// Set or use a starting point for pagination
 		$this->_start = $this->_req->getPost('start', 'intval', 0);
@@ -217,7 +213,6 @@ class RecentController extends AbstractController
 
 		if (count($categories) === 1)
 		{
-			require_once(SUBSDIR . '/Categories.subs.php');
 			$name = categoryName($categories[0]);
 
 			if (empty($name))

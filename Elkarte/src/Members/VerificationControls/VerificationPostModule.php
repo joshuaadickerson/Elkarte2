@@ -32,7 +32,7 @@ class VerificationPostModule implements ModuleInterface
 
 		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
+
 
 			return array(
 				array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),

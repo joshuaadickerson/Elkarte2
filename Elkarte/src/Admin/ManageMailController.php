@@ -31,7 +31,7 @@ class ManageMailController extends AbstractController
 {
 	/**
 	 * Mail settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_mailSettings;
 
@@ -86,7 +86,7 @@ class ManageMailController extends AbstractController
 	{
 		global $scripturl, $context, $txt;
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 		$this->_templates->load('ManageMail');
 
 		// First, are we deleting something from the queue?
@@ -266,7 +266,7 @@ class ManageMailController extends AbstractController
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			Settings_Form::save_db($config_vars, (object) $postobj);
+			SettingsForm::save_db($config_vars, (object) $postobj);
 			redirectexit('action=Admin;area=mailqueue;sa=settings');
 		}
 
@@ -274,7 +274,7 @@ class ManageMailController extends AbstractController
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
 		// Prepare the config form
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 
 		// Build a little JS so the birthday mail can be seen
 		$javascript = '
@@ -308,7 +308,7 @@ class ManageMailController extends AbstractController
 	protected function _initMailSettingsForm()
 	{
 		// Instantiate the form
-		$this->_mailSettings = new Settings_Form();
+		$this->_mailSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
@@ -386,7 +386,7 @@ class ManageMailController extends AbstractController
 		$this->_session->check('get');
 
 		// This is certainly needed!
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// Set a number to send each loop
 		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];

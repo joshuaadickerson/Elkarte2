@@ -1,6 +1,6 @@
 <?php
 
-// @todo these should be moved to their respective controllers
+// @todo these should be moved to their respective controllers and replaced with JSON
 
 /**
  * Handles xml requests

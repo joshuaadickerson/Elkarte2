@@ -22,7 +22,6 @@ namespace Elkarte\Messages;
 
 class Editor
 {
-
 	/**
 	 * Retrieves a list of message icons.
 	 * - Based on the settings, the array will either contain a list of default

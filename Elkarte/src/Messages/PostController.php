@@ -19,8 +19,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Messages;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Post Controller
@@ -52,10 +53,6 @@ class PostController extends AbstractController
 	{
 		$this->_post_errors = ErrorContext::context('post', 1);
 		$this->_template_layers = $this->_layers;
-
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
-
-
 	}
 
 	/**
@@ -1039,7 +1036,7 @@ class PostController extends AbstractController
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
 		{
-			require_once(SUBSDIR . '/Notification.subs.php');
+
 			if ($newTopic)
 			{
 				$notifyData = array(

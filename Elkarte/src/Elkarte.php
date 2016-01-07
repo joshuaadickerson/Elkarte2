@@ -104,6 +104,7 @@ class Elkarte extends Container
 		$this->register(new OnlineLog\Provider);
 		$this->register(new Groups\Provider);
 		$this->register(new Notifications\Provider);
+		$this->register(new Profile\Provider);
 
 		return $this;
 	}

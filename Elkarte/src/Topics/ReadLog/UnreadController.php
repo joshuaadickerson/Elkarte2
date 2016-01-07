@@ -428,7 +428,7 @@ class UnreadController extends AbstractController
 
 		if ($this->_is_topics && !empty($modSettings['enableParticipation']) && !empty($topic_ids))
 		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+
 			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
 
 			foreach ($topics_participated_in as $topic)

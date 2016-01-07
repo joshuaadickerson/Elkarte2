@@ -28,7 +28,7 @@ class ManageMembergroupsController extends AbstractController
 {
 	/**
 	 * Groups Settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_groupSettings;
 
@@ -800,7 +800,7 @@ class ManageMembergroupsController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_membergroup_settings');
 
 			// Yeppers, saving this...
-			Settings_Form::save_db($config_vars);
+			SettingsForm::save_db($config_vars);
 			redirectexit('action=Admin;area=membergroups;sa=settings');
 		}
 
@@ -811,7 +811,7 @@ class ManageMembergroupsController extends AbstractController
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -820,7 +820,7 @@ class ManageMembergroupsController extends AbstractController
 	protected function _initGroupSettingsForm()
 	{
 		// Instantiate the form
-		$this->_groupSettings = new Settings_Form();
+		$this->_groupSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

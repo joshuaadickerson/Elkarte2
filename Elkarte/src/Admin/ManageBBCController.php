@@ -23,7 +23,7 @@ class ManageBBCController extends AbstractController
 	/**
 	 * BBC settings form
 	 *
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_bbcSettings;
 
@@ -105,7 +105,7 @@ class ManageBBCController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_bbc_settings', array($bbcTags));
 
 			// Save the result
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			// And we're out of here!
 			redirectexit('action=Admin;area=postsettings;sa=bbc');
@@ -117,7 +117,7 @@ class ManageBBCController extends AbstractController
 		$context['post_url'] = $scripturl . '?action=Admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -126,7 +126,7 @@ class ManageBBCController extends AbstractController
 	protected function _initBBCSettingsForm()
 	{
 		// Instantiate the form
-		$this->_bbcSettings = new Settings_Form();
+		$this->_bbcSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

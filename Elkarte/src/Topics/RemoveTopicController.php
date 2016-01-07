@@ -78,7 +78,7 @@ class RemoveTopicController extends AbstractController
 		}
 
 		// This file needs to be included for sendNotifications().
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 
 		// Check if its been recycled
 		removeDeleteConcurrence();

@@ -841,11 +841,12 @@ function securityOptionsHeader($override = null)
 
 /**
  * Stop some browsers pre fetching activity to reduce server load
+ * @todo split to HttpRequest::isPrefetch() and AbstractController::stopPrefetching()
  */
 function stop_prefetching()
 {
-	if (isset($_SERVER["HTTP_X_PURPOSE"]) && in_array($_SERVER["HTTP_X_PURPOSE"], array("preview", "instant"))
-		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === "prefetch"))
+	if (isset($_SERVER['HTTP_X_PURPOSE']) && in_array($_SERVER['HTTP_X_PURPOSE'], array('preview', 'instant'))
+		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch'))
 	{
 		@ob_end_clean();
 		header('HTTP/1.1 403 Forbidden');
@@ -879,7 +880,15 @@ function checkSecurityFiles()
 
 	$has_files = false;
 
-	$securityFiles = array('Install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+	$securityFiles = array(
+		'Install.php',
+		'upgrade.php',
+		'convert.php',
+		'repair_paths.php',
+		'repair_settings.php',
+		'Settings.php~',
+		'Settings_bak.php~',
+	);
 	$GLOBALS['elk']['hooks']->hook('security_files', array(&$securityFiles));
 
 	foreach ($securityFiles as $securityFile)

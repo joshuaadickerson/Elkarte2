@@ -92,6 +92,7 @@ abstract class AbstractController
 
 	public function bootstrap()
 	{
+		$this->elk = $GLOBALS['elk'];
 		$elk = $this->elk;
 
 		// @todo inject these in the constructor arguments

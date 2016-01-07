@@ -25,7 +25,7 @@ class ManageAvatarsController extends AbstractController
 	/**
 	 * Avatars settings form
 	 *
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_avatarSettings;
 
@@ -92,7 +92,7 @@ class ManageAvatarsController extends AbstractController
 			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
 				$this->_req->post->custom_avatar_enabled = 0;
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=manageattachments;sa=avatars');
 		}
 
@@ -104,7 +104,7 @@ class ManageAvatarsController extends AbstractController
 
 		// Prepare the context.
 		$context['post_url'] = $scripturl . '?action=Admin;area=manageattachments;save;sa=avatars';
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 
 		$context['sub_template'] = 'show_settings';
 	}
@@ -118,7 +118,7 @@ class ManageAvatarsController extends AbstractController
 	protected function _initAvatarSettingsForm()
 	{
 		// Instantiate the form
-		$this->_avatarSettings = new Settings_Form();
+		$this->_avatarSettings = new SettingsForm();
 
 		// Initialize settings
 		$config_vars = $this->_settings();

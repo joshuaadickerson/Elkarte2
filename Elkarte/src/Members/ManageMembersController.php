@@ -1095,7 +1095,7 @@ class ManageMembersController extends AbstractController
 		// First, check our session.
 		$this->_session->check();
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// We also need to the login languages here - for emails.
 		loadLanguage('Login');

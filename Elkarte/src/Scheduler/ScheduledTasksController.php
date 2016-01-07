@@ -11,8 +11,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Scheduler;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * This controller class action handlers are automatically called.
@@ -40,9 +40,6 @@ class ScheduledTasksController extends AbstractController
 	 */
 	public function action_autotask()
 	{
-		// Include the ScheduledTasks subs worker.
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-
 		// The mail queue is also called from here.
 		if ($this->_req->getQuery('scheduled') === 'mailq')
 			$this->action_reducemailqueue();
@@ -86,8 +83,6 @@ class ScheduledTasksController extends AbstractController
 		// Lets not waste our time or resources.
 		if (empty($modSettings['mail_queue_use_cron']))
 		{
-			// This does the hard work, it does.
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
 			reduceMailQueue();
 		}
 	}

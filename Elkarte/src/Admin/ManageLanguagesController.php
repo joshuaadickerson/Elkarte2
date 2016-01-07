@@ -28,7 +28,7 @@ class ManageLanguagesController extends AbstractController
 {
 	/**
 	 * Language settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_languageSettings;
 
@@ -180,7 +180,7 @@ class ManageLanguagesController extends AbstractController
 
 			if ($this->_req->post->def_language != $language && $lang_exists)
 			{
-				Settings_Form::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
+				SettingsForm::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
 				$language = $this->_req->post->def_language;
 			}
 		}
@@ -1014,7 +1014,7 @@ class ManageLanguagesController extends AbstractController
 	protected function _initLanguageSettingsForm()
 	{
 		// Make it happen!
-		$this->_languageSettings = new Settings_Form();
+		$this->_languageSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

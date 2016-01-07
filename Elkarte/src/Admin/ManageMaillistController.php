@@ -27,19 +27,19 @@ class ManageMaillistController extends AbstractController
 {
 	/**
 	 * Basic feature settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_maillistSettings;
 
 	/**
 	 * Basic filter settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_filtersSettings;
 
 	/**
 	 * Parsers settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_parsersSettings;
 
@@ -489,7 +489,7 @@ class ManageMaillistController extends AbstractController
 			validateToken('Admin-ml', 'get');
 		}
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// We should have been sent an email ID
 		if (isset($this->_req->query->item))
@@ -1512,7 +1512,7 @@ class ManageMaillistController extends AbstractController
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				SettingsForm::save_db($config_vars, $this->_req->post);
 				writeLog();
 				redirectexit('action=Admin;area=maillist;sa=emailsettings;saved');
 			}
@@ -1541,7 +1541,7 @@ class ManageMaillistController extends AbstractController
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=Admin;area=maillist;sa=emailsettings;save';
 		$context['sub_template'] = 'show_settings';
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -1550,7 +1550,7 @@ class ManageMaillistController extends AbstractController
 	protected function _initMaillistSettingsForm()
 	{
 		// Instantiate the form
-		$this->_maillistSettings = new Settings_Form();
+		$this->_maillistSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

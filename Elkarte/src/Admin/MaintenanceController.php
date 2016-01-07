@@ -665,7 +665,7 @@ class MaintenanceController extends AbstractController
 		$context['num_tables_optimized'] = count($context['optimized_tables']);
 
 		// Check that we don't auto optimise again too soon!
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		calculateNextTrigger('auto_optimize', true);
 	}
 
@@ -883,7 +883,7 @@ class MaintenanceController extends AbstractController
 		updateTopicStats();
 
 		// Finally, update the latest event times.
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		calculateNextTrigger();
 
 		// Ta-da

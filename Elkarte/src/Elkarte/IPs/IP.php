@@ -1,6 +1,6 @@
 <?php
 
-namespace Elkarte\Elkarte;
+namespace Elkarte\Elkarte\Ips;
 
 class IP
 {
@@ -10,10 +10,15 @@ class IP
 
 	protected $ip;
 	protected $hostname;
+	protected $id = 0;
 
-	public function __construct($ip)
+	public function __construct($ip, $id = 0)
 	{
 		$this->ip = $ip;
+		// IPs are huge numbers. Even large forums will never see even a fraction of all of the possible ones;
+		// especially if we're talking about IPv6. Those big numbers use a lot of space and we want to be able to track
+		// users by their IP - every IP they use.
+		$this->id = $id;
 	}
 
 	public function isValid($version = self::IP_ANY)
@@ -64,5 +69,10 @@ class IP
 	public function between($start, $end)
 	{
 
+	}
+
+	public function __toString()
+	{
+		return (string) $this->ip;
 	}
 }

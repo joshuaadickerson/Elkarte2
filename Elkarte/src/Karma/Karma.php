@@ -13,12 +13,11 @@
 
 namespace Elkarte\Karma;
 
-class KarmaManager
+class Karma
 {
 	/**
 	 * Remove old karma from the log
 	 *
-	 * @package Karma
 	 * @param int $karmaWaitTime
 	 */
 	function clearKarma($karmaWaitTime)
@@ -39,9 +38,9 @@ class KarmaManager
 	/**
 	 * Last action this user has done
 	 *
-	 * @package Karma
 	 * @param int $id_executor
 	 * @param int $id_target
+	 * @return null|string
 	 */
 	function lastActionOn($id_executor, $id_target)
 	{

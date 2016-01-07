@@ -27,7 +27,7 @@ class ManageSmileysController extends AbstractController
 {
 	/**
 	 * Smileys configuration settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_smileySettings;
 
@@ -158,7 +158,7 @@ class ManageSmileysController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_smiley_settings');
 
 			// Save away
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			// Flush the cache so the new settings take effect
 			$this->clearSmileyCache();
@@ -169,7 +169,7 @@ class ManageSmileysController extends AbstractController
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -178,7 +178,7 @@ class ManageSmileysController extends AbstractController
 	protected function _initSmileySettingsForm()
 	{
 		// Instantiate the form
-		$this->_smileySettings = new Settings_Form();
+		$this->_smileySettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

@@ -17,8 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Polls;
+
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Poll Controller.

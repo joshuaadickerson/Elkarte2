@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Schedule birthday emails.
  * (aka "Happy birthday!!")
@@ -40,7 +37,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		loadEssentialThemeData();
 
 		// Going to need this to send the emails.
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
 

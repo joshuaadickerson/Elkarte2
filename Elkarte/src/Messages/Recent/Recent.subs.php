@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Topics;
 
 /**
  * Get the latest posts of a forum.

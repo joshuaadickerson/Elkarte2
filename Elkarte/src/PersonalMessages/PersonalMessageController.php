@@ -1393,7 +1393,7 @@ class PersonalMessageController extends AbstractController
 		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'] && !isset($this->_req->query->xml))
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
+
 			$verificationOptions = array(
 				'id' => 'pm',
 			);

@@ -18,8 +18,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\PaidSubscriptions;
+
 
 /**
  * ManagePaid controller, administration controller for paid subscriptions.
@@ -30,7 +30,7 @@ class ManagePaidController extends AbstractController
 {
 	/**
 	 * Paid subscriptions settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_paidSettings;
 
@@ -196,13 +196,13 @@ class ManagePaidController extends AbstractController
 				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				SettingsForm::save_db($config_vars, $this->_req->post);
 				redirectexit('action=Admin;area=paidsubscribe;sa=settings');
 			}
 		}
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -211,7 +211,7 @@ class ManagePaidController extends AbstractController
 	protected function _init_paidSettingsForm()
 	{
 		// Instantiate the form
-		$this->_paidSettings = new Settings_Form();
+		$this->_paidSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

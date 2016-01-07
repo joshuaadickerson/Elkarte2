@@ -32,7 +32,7 @@ class VerificationPersonalMessageModule implements ModuleInterface
 
 		if (!$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
-			require_once(SUBSDIR . '/VerificationControls.php');
+
 
 			return array(
 				array('prepare_send_context', array('Verification_PersonalMessage_Module', 'prepare_send_context'), array()),

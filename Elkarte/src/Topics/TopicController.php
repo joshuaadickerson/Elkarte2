@@ -73,7 +73,7 @@ class TopicController extends AbstractController
 		$this->_session->check('get');
 
 		// Load up the helpers
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 
 
 		// Find out who started the topic and its current lock status
@@ -140,7 +140,7 @@ class TopicController extends AbstractController
 		$this->_session->check('get');
 
 		// We need this for the sendNotifications() function.
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 
 		// And Topic subs for topic attributes.
 

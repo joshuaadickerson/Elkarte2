@@ -37,7 +37,7 @@ class ManageRegistrationController extends AbstractController
 {
 	/**
 	 * Registration settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_registerSettings;
 
@@ -355,7 +355,7 @@ class ManageRegistrationController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_registration_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			redirectexit('action=Admin;area=regcenter;sa=settings');
 		}
@@ -380,7 +380,7 @@ class ManageRegistrationController extends AbstractController
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -389,7 +389,7 @@ class ManageRegistrationController extends AbstractController
 	protected function _init_registerSettingsForm()
 	{
 		// Instantiate the form
-		$this->_registerSettings = new Settings_Form();
+		$this->_registerSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

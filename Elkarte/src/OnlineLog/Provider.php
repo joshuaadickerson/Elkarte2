@@ -20,7 +20,8 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['onlinelog.viewing'] = function ($elk) {
-			return new Who();
+			// DatabaseInterface $db, Cache $cache, MembersManager $member_manager, BoardsManager $boards_manager)
+			return new Who($elk['db'], $elk['cache'], $elk['members.manager'], $elk['boards.manager'], $elk['boards.list']);
 		};
 	}
 

@@ -32,7 +32,7 @@ class AddonSettingsController extends AbstractController
 {
 	/**
 	 * General addon settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_addonSettings;
 
@@ -99,12 +99,12 @@ class AddonSettingsController extends AbstractController
 
 			$this->_hook->hook('save_general_mod_settings');
 
-			Settings_Form::save_db($config_vars);
+			SettingsForm::save_db($config_vars);
 
 			redirectexit('action=Admin;area=addonsettings;sa=general');
 		}
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -115,7 +115,7 @@ class AddonSettingsController extends AbstractController
 		global $context, $txt, $scripturl;
 
 		// instantiate the form
-		$this->_addonSettings = new Settings_Form();
+		$this->_addonSettings = new SettingsForm();
 
 		// initialize it with our existing settings. If any.
 		$config_vars = $this->_settings();

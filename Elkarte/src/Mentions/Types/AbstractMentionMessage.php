@@ -189,7 +189,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	{
 		global $user_info;
 
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		$lang = $user_info['language'];
 		$langs = array();

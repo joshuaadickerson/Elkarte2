@@ -92,7 +92,7 @@ class ManageScheduledTasksController extends AbstractController
 		global $context, $txt, $scripturl;
 
 		// We'll need to recalculate dates and stuff like that.
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 
 		// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 		// ... ironically I don't like pickle. </grudge>
@@ -267,7 +267,7 @@ class ManageScheduledTasksController extends AbstractController
 		$context['server_time'] = standardTime(time(), false, 'server');
 
 		// We'll need this to calculate the next event.
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 
 		// Cleaning...
 		if (!isset($this->_req->query->tid))
@@ -330,7 +330,7 @@ class ManageScheduledTasksController extends AbstractController
 	{
 		global $scripturl, $context, $txt;
 
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 
 		// Lets load the language just in case we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');

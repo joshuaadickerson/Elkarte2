@@ -24,7 +24,8 @@
 	},
 	"require": {
 		"php": ">=5.3.3",
-	    "pimple/pimple": "~3.0"
+	    "pimple/pimple": "~3.0",
+		"foolz/sphinxql-query-builder": "^1.0"
 	},
 	"require-dev": {
 		"phpunit/dbunit": "1.3.*",

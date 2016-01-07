@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Auto optimize the database.
  *

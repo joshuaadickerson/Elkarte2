@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Function to sending out approval notices to moderators.
  *
@@ -165,7 +162,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 		$request->free();
 
 		// Get the mailing stuff.
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// Need the below for loadLanguage to work!
 		loadEssentialThemeData();

@@ -13,8 +13,24 @@
 
 namespace Elkarte\OnlineLog;
 
+use Elkarte\Boards\BoardsList;
+use Elkarte\Boards\BoardsManager;
+use Elkarte\Elkarte\Cache\Cache;
+use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
+use Elkarte\Members\MembersManager;
+
 class Who
 {
+	public function __construct(DatabaseInterface $db, Cache $cache, MembersManager $member_manager,
+								BoardsManager $boards_manager, BoardsList $boards_list)
+	{
+		$this->db = $db;
+		$this->cache = $cache;
+		$this->members_manager = $member_manager;
+		$this->boards_manager = $boards_manager;
+		$this->boards_list = $boards_list;
+	}
+
 	/**
 	 * Checks, who is viewing a topic or board
 	 *
@@ -327,10 +343,9 @@ class Who
 		}
 
 		// Load board names.
-		if (!empty($board_ids)) {
-
-
-			$boards_list = getBoardList(array('included_boards' => array_keys($board_ids)), true);
+		if (!empty($board_ids))
+		{
+			$boards_list = $this->boards_list->getBoardList(array('included_boards' => array_keys($board_ids)), true);
 			foreach ($boards_list as $board) {
 				// Put the board name into the string for each member...
 				foreach ($board_ids[$board['id_board']] as $k => $session_text)
@@ -339,9 +354,11 @@ class Who
 		}
 
 		// Load member names for the profile.
-		if (!empty($profile_ids) && (allowedTo('profile_view_any') || allowedTo('profile_view_own'))) {
-				$result = getBasicMemberData(array_keys($profile_ids));
-			foreach ($result as $row) {
+		if (!empty($profile_ids) && (allowedTo('profile_view_any') || allowedTo('profile_view_own')))
+		{
+				$result = $this->members_manager->getBasicMemberData(array_keys($profile_ids));
+			foreach ($result as $row)
+			{
 				// If they aren't allowed to view this person's profile, skip it.
 				if (!allowedTo('profile_view_any') && $user_info['id'] != $row['id_member'])
 					continue;

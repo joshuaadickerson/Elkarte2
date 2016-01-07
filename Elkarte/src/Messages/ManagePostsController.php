@@ -28,7 +28,7 @@ class ManagePostsController extends AbstractController
 {
 	/**
 	 * Posts settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_postSettings;
 
@@ -264,7 +264,7 @@ class ManagePostsController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_post_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=postsettings;sa=posts');
 		}
 
@@ -273,7 +273,7 @@ class ManagePostsController extends AbstractController
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -282,7 +282,7 @@ class ManagePostsController extends AbstractController
 	protected function _initPostSettingsForm()
 	{
 		// Instantiate the form
-		$this->_postSettings = new Settings_Form();
+		$this->_postSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

@@ -1,7 +1,5 @@
 <?php
 
-namespace Elkarte\Subscriptions\Authorize;
-
 /**
  * Payment Gateway: Authorize
  *
@@ -17,8 +15,7 @@ namespace Elkarte\Subscriptions\Authorize;
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Subscriptions\Drivers\Authorize;
 
 /**
  * Class for returning available form data for this gateway
@@ -114,6 +111,7 @@ class Authorizes
 	 *
 	 * @param int $key
 	 * @param string $data
+	 * @string
 	 */
 	protected function _md5_hmac($key, $data)
 	{

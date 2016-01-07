@@ -1013,7 +1013,7 @@ class ProfileOptionsController extends AbstractController
 				$this->_errors->fatal_lang_error('profile_error_already_requested_group');
 
 			// Send an email to all group moderators etc.
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 			// Do we have any group moderators?
 

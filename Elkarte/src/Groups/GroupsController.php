@@ -484,7 +484,7 @@ class GroupsController extends AbstractController
 
 				if (!empty($concerned['email_details']))
 				{
-					require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 					// They are being approved?
 					if ($this->_req->post->req_action === 'approve')

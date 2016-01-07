@@ -30,7 +30,7 @@ class ManageCalendarModuleController extends AbstractController
 {
 	/**
 	 * Calendar settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_calendarSettings;
 
@@ -322,7 +322,7 @@ class ManageCalendarModuleController extends AbstractController
 	/**
 	 * Show and allow to modify calendar settings.
 	 *
-	 * - The method uses a Settings_Form to do the work.
+	 * - The method uses a SettingsForm to do the work.
 	 */
 	public function action_calendarSettings_display()
 	{
@@ -342,7 +342,7 @@ class ManageCalendarModuleController extends AbstractController
 		{
 			$this->_session->check();
 			$GLOBALS['elk']['hooks']->hook('save_calendar_settings');
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			// Update the stats in case.
 			updateSettings(array(
@@ -356,7 +356,7 @@ class ManageCalendarModuleController extends AbstractController
 		createToken('Admin-mp');
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -367,7 +367,7 @@ class ManageCalendarModuleController extends AbstractController
 		global $txt, $context;
 
 		// Instantiate the form
-		$this->_calendarSettings = new Settings_Form();
+		$this->_calendarSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

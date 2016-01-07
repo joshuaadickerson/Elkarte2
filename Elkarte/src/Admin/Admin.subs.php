@@ -21,7 +21,9 @@
 
 namespace Elkarte\Admin;
 
-class Admin
+use Elkarte\Elkarte\AbstractManager;
+
+class Admin extends AbstractManager
 {
 	/**
 	 * Get a list of versions that are currently installed on the server.
@@ -48,7 +50,7 @@ class Admin
 
 		// Why not have a look at ImageMagick? If it is, we should show version information for it too.
 		if (in_array('imagick', $checkFor) && class_exists('Imagick')) {
-			$temp = new Imagick;
+			$temp = new \Imagick;
 			$temp2 = $temp->getVersion();
 			$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
 		}
@@ -309,7 +311,7 @@ class Admin
 	 * Saves the time of the last db error for the error log
 	 *
 	 * What it does:
-	 * - Done separately from Settings_Form::save_file() to avoid race conditions
+	 * - Done separately from SettingsForm::save_file() to avoid race conditions
 	 * which can occur during a db error
 	 * - If it fails Settings.php will assume 0
 	 *
@@ -367,11 +369,6 @@ class Admin
 	function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 	{
 		global $language, $modSettings;
-
-		$db = $GLOBALS['elk']['db'];
-
-		// We certainly want this.
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
 
 		// Load all groups which are effectively admins.
 		$groups = $db->fetchQuery('
@@ -466,7 +463,6 @@ class Admin
 	 */
 	function subscriptions_toggle_callback($value)
 	{
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		toggleTaskStatusByName('paid_subscriptions', $value);
 
 		// Should we calculate next trigger?
@@ -484,7 +480,6 @@ class Admin
 	 */
 	function postbyemail_toggle_callback($value)
 	{
-		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		toggleTaskStatusByName('maillist_fetch_IMAP', $value);
 
 		// Should we calculate next trigger?

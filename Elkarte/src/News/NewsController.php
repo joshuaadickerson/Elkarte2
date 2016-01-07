@@ -18,8 +18,8 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\News;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * News Controller

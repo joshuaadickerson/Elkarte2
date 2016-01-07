@@ -17,10 +17,9 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Polls;
 
-class Poll_Post_Module implements ModuleInterface
+class PollPostModule implements ModuleInterface
 {
 	protected static $_make_poll = false;
 

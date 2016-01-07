@@ -142,7 +142,7 @@ class AnnounceController extends AbstractController
 		pbe_prepare_text($topic_info['body'], $topic_info['subject']);
 
 		// We need this in order to be able send emails.
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// Select the email addresses for this batch.
 		$conditions = array(

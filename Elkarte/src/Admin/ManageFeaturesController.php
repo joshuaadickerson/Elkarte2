@@ -29,43 +29,43 @@ class ManageFeaturesController extends AbstractController
 {
 	/**
 	 * Basic feature settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_basicSettings;
 
 	/**
 	 * Karma settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_karmaSettings;
 
 	/**
 	 * Likes settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_likesSettings;
 
 	/**
 	 * Layout settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_layoutSettings;
 
 	/**
 	 * Signature settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_signatureSettings;
 
 	/**
 	 * Mentions settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_notificationsSettings;
 
 	/**
 	 * Mentions settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_PMSettings;
 
@@ -215,7 +215,7 @@ class ManageFeaturesController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_basic_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			writeLog();
 			redirectexit('action=Admin;area=featuresettings;sa=basic');
@@ -227,7 +227,7 @@ class ManageFeaturesController extends AbstractController
 		// Show / hide custom jquery fields as required
 		theme()->addInlineJavascript('showhideJqueryOptions();', true);
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -236,7 +236,7 @@ class ManageFeaturesController extends AbstractController
 	protected function _initBasicSettingsForm()
 	{
 		// Instantiate the form
-		$this->_basicSettings = new Settings_Form();
+		$this->_basicSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_basicSettings();
@@ -282,7 +282,7 @@ class ManageFeaturesController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_layout_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			writeLog();
 
 			redirectexit('action=Admin;area=featuresettings;sa=layout');
@@ -291,7 +291,7 @@ class ManageFeaturesController extends AbstractController
 		$context['post_url'] = $scripturl . '?action=Admin;area=featuresettings;save;sa=layout';
 		$context['settings_title'] = $txt['mods_cat_layout'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -300,7 +300,7 @@ class ManageFeaturesController extends AbstractController
 	protected function _initLayoutSettingsForm()
 	{
 		// Instantiate the form
-		$this->_layoutSettings = new Settings_Form();
+		$this->_layoutSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_layoutSettings();
@@ -330,14 +330,14 @@ class ManageFeaturesController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_karma_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=karma');
 		}
 
 		$context['post_url'] = $scripturl . '?action=Admin;area=featuresettings;save;sa=karma';
 		$context['settings_title'] = $txt['karma'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -346,7 +346,7 @@ class ManageFeaturesController extends AbstractController
 	protected function _initKarmaSettingsForm()
 	{
 		// Instantiate the form
-		$this->_karmaSettings = new Settings_Form();
+		$this->_karmaSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_karmaSettings();
@@ -376,14 +376,14 @@ class ManageFeaturesController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_likes_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=likes');
 		}
 
 		$context['post_url'] = $scripturl . '?action=Admin;area=featuresettings;save;sa=likes';
 		$context['settings_title'] = $txt['likes'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -392,7 +392,7 @@ class ManageFeaturesController extends AbstractController
 	protected function _initLikesSettingsForm()
 	{
 		// Instantiate the form
-		$this->_likesSettings = new Settings_Form();
+		$this->_likesSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_likesSettings();
@@ -463,7 +463,7 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			// Let's just keep it active, there are too many reasons it should be.
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 			toggleTaskStatusByName('user_access_mentions', true);
 
 			// Disable or enable modules as needed
@@ -484,13 +484,13 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=mention');
 		}
 
 		// Prepare the settings for display
 		$context['post_url'] = $scripturl . '?action=Admin;area=featuresettings;save;sa=mention';
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -503,7 +503,7 @@ class ManageFeaturesController extends AbstractController
 		loadLanguage('Mentions');
 
 		// Instantiate the form
-		$this->_notificationsSettings = new Settings_Form();
+		$this->_notificationsSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_notificationsSettings();
@@ -618,7 +618,7 @@ class ManageFeaturesController extends AbstractController
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
-			Settings_Form::save_db($save_vars, $this->_req->post);
+			SettingsForm::save_db($save_vars, $this->_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=sig');
 		}
 
@@ -626,7 +626,7 @@ class ManageFeaturesController extends AbstractController
 		$context['settings_title'] = $txt['signature_settings'];
 		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=Admin;area=featuresettings;sa=sig;apply;' . $context['session_var'] . '=' . $context['session_id']);
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -635,7 +635,7 @@ class ManageFeaturesController extends AbstractController
 	protected function _initSignatureSettingsForm()
 	{
 		// Instantiate the form
-		$this->_signatureSettings = new Settings_Form();
+		$this->_signatureSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_signatureSettings();
@@ -1246,7 +1246,7 @@ class ManageFeaturesController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_pmsettings_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=pmsettings');
 		}
 
@@ -1256,7 +1256,7 @@ class ManageFeaturesController extends AbstractController
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -1269,7 +1269,7 @@ class ManageFeaturesController extends AbstractController
 		$context['permissions_excluded'] = array(-1);
 
 		// Instantiate the form
-		$this->_PMSettings = new Settings_Form();
+		$this->_PMSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_pmSettings();

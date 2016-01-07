@@ -28,7 +28,7 @@ class AdminLogController extends AbstractController
 {
 	/**
 	 * Pruning Settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_pruningSettings;
 
@@ -186,7 +186,7 @@ class AdminLogController extends AbstractController
 			else
 				$_POST['pruningOptions'] = '';
 
-			Settings_Form::save_db($savevar);
+			SettingsForm::save_db($savevar);
 			redirectexit('action=Admin;area=logs;sa=pruning');
 		}
 
@@ -200,7 +200,7 @@ class AdminLogController extends AbstractController
 		else
 			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -209,7 +209,7 @@ class AdminLogController extends AbstractController
 	protected function _initPruningSettingsForm()
 	{
 		// instantiate the form
-		$this->_pruningSettings = new Settings_Form();
+		$this->_pruningSettings = new SettingsForm();
 
 		// Initialize settings
 		$config_vars = $this->_settings();

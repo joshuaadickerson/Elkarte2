@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Paid_Subscriptions - Perform the standard checks on expiring/near expiring subscriptions:
  *
@@ -79,7 +76,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 			// If this is the first one load the important bits.
 			if (empty($subs_reminded))
 			{
-				require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 				// Need the below for loadLanguage to work!
 				loadEssentialThemeData();
 			}

@@ -17,15 +17,14 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Packages;
 
 /**
  * Simple FTP protocol implementation.
  *
  * http://www.faqs.org/rfcs/rfc959.html
  */
-class Ftp_Connection
+class FtpConnection
 {
 	/**
 	 * Holds the connection response

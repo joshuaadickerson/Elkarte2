@@ -125,7 +125,7 @@ class ReminderController extends AbstractController
 			// Randomly generate a new password, with only alpha numeric characters that is a max length of 10 chars.
 			$password = generateValidationCode();
 
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 			$replacements = array(
 				'REALNAME' => $member['real_name'],
 				'REMINDLINK' => $scripturl . '?action=reminder;sa=setpassword;u=' . $member['id_member'] . ';code=' . $password,

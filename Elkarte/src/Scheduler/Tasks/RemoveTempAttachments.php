@@ -22,9 +22,6 @@ namespace Elkarte\Scheduler\Tasks;
 use FilesystemIterator;
 use UnexpectedValueException;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Remove_Temp_Attachments - Check for un-posted attachments is something we can do once in a while :P
  *

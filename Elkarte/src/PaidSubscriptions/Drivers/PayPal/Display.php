@@ -1,7 +1,5 @@
 <?php
 
-namespace Elkarte\Subscriptions\PayPal;
-
 /**
  * Payment Gateway: PayPal
  *
@@ -17,8 +15,7 @@ namespace Elkarte\Subscriptions\PayPal;
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Subscriptions\Drivers\PayPal;
 
 /**
  * Class for returning available form data for this gateway

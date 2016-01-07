@@ -23,7 +23,7 @@ class ManageTopicsController extends AbstractController
 {
 	/**
 	 * Topic settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_topicSettings;
 
@@ -100,7 +100,7 @@ class ManageTopicsController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_topic_settings');
 
 			// Save the result!
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			// We're done here, pal.
 			redirectexit('action=Admin;area=postsettings;sa=topics');
@@ -111,7 +111,7 @@ class ManageTopicsController extends AbstractController
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class ManageTopicsController extends AbstractController
 	protected function _initTopicSettingsForm()
 	{
 		// Instantiate the form
-		$this->_topicSettings = new Settings_Form();
+		$this->_topicSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

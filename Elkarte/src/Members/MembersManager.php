@@ -30,6 +30,7 @@ class MembersManager extends AbstractManager
 		$this->cache = $elk['cache'];
 		$this->hooks = $elk['hooks'];
 		$this->errors = $elk['errors'];
+		$this->text = $elk['text'];
 	}
 
 	/**
@@ -288,14 +289,14 @@ class MembersManager extends AbstractManager
 				'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
 				'online' => array(
 					'is_online' => $profile['is_online'],
-					'text' => $GLOBALS['elk']['text']->htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
-					'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $GLOBALS['elk']['text']->htmlspecialchars($profile['real_name'])),
+					'text' => $this->text->htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+					'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $this->text->htmlspecialchars($profile['real_name'])),
 					'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 					'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 					'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 					'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 				),
-				'language' => $GLOBALS['elk']['text']->ucwords(strtr($profile['lngfile'], array('_' => ' '))),
+				'language' => $this->text->ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 				'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 				'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 				'options' => $profile['options'],
@@ -800,7 +801,7 @@ class MembersManager extends AbstractManager
 
 		// We'll need some external functions.
 		require_once(SUBSDIR . '/Auth.subs.php');
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 		// Put any errors in here.
 		$reg_errors = ErrorContext::context($error_context, 0);
@@ -1066,7 +1067,7 @@ class MembersManager extends AbstractManager
 				}
 
 				// Send Admin their notification.
-				require_once(SUBSDIR . '/Notification.subs.php');
+
 				sendAdminNotifications('standard', $memberID, $regOptions['username']);
 			} // Need to activate their account - or fall under COPPA.
 			elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa') {
@@ -1089,7 +1090,7 @@ class MembersManager extends AbstractManager
 				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 				// Admin gets informed here...
-				require_once(SUBSDIR . '/Notification.subs.php');
+
 				sendAdminNotifications('approval', $memberID, $regOptions['username']);
 			}
 
@@ -1124,7 +1125,7 @@ class MembersManager extends AbstractManager
 		
 
 		$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
-		$checkName = $GLOBALS['elk']['text']->strtolower($name);
+		$checkName = $this->text->strtolower($name);
 
 		// Administrators are never restricted ;).
 		if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name)) {
@@ -1142,10 +1143,10 @@ class MembersManager extends AbstractManager
 
 				// Case sensitive name?
 				if (empty($modSettings['reserveCase']))
-					$reservedCheck = $GLOBALS['elk']['text']->strtolower($reservedCheck);
+					$reservedCheck = $this->text->strtolower($reservedCheck);
 
 				// If it's not just entire word, check for it in there somewhere...
-				if ($checkMe == $reservedCheck || ($GLOBALS['elk']['text']->strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
+				if ($checkMe == $reservedCheck || ($this->text->strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 					if ($fatal)
 						$this->errors->fatal_lang_error('username_reserved', 'password', array($reserved));
 					else
@@ -1348,8 +1349,6 @@ class MembersManager extends AbstractManager
 	 */
 	function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
 	{
-		
-
 		// Firstly, if email and username aren't passed find out the members email address and name.
 		if ($email === false && $membername === false) {
 				$result = getBasicMemberData($memID);
@@ -1427,11 +1426,10 @@ class MembersManager extends AbstractManager
 	 * @param string $where
 	 * @param mixed[] $where_params
 	 * @param boolean $get_duplicates
+	 * @return array
 	 */
 	function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 	{
-		
-
 		$members = $this->db->fetchQuery('
 			SELECT
 				mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.member_ip, mem.member_ip2, mem.last_login,
@@ -1450,7 +1448,7 @@ class MembersManager extends AbstractManager
 
 		// If we want duplicates pass the members array off.
 		if ($get_duplicates)
-			populateDuplicateMembers($members);
+			$this->populateDuplicateMembers($members);
 
 		return $members;
 	}
@@ -1495,8 +1493,6 @@ class MembersManager extends AbstractManager
 	 */
 	function populateDuplicateMembers(&$members)
 	{
-		
-
 		// This will hold all the ip addresses.
 		$ips = array();
 		foreach ($members as $key => $member) {
@@ -1520,7 +1516,8 @@ class MembersManager extends AbstractManager
 
 		$duplicate_members = array();
 		$duplicate_ids = array();
-		foreach ($members as $row) {
+		foreach ($members as $row)
+		{
 			//$duplicate_ids[] = $row['id_member'];
 
 			$member_context = array(
@@ -1603,8 +1600,6 @@ class MembersManager extends AbstractManager
 	 */
 	function membersByIP($ip1, $match = 'exact', $ip2 = false)
 	{
-		
-
 		$ip_params = array('ips' => array());
 		$ip_query = array();
 		foreach (array($ip1, $ip2) as $id => $ip) {
@@ -1687,8 +1682,6 @@ class MembersManager extends AbstractManager
 	 */
 	function membersBy($query, $query_params, $details = false, $only_active = true)
 	{
-		
-
 		$query_where = prepareMembersByQuery($query, $query_params, $only_active);
 
 		// Lets see who we can find that meets the built up conditions
@@ -1728,9 +1721,7 @@ class MembersManager extends AbstractManager
 	 */
 	function countMembersBy($query, $query_params, $only_active = true)
 	{
-		
-
-		$query_where = prepareMembersByQuery($query, $query_params, $only_active);
+		$query_where = $this->prepareMembersByQuery($query, $query_params, $only_active);
 
 		$request = $this->db->query('', '
 			SELECT COUNT(*)
@@ -1784,8 +1775,10 @@ class MembersManager extends AbstractManager
 		if (is_array($query)) {
 			$query_parts = array('or' => array(), 'and' => array());
 			foreach ($query as $type => $query_conditions) {
-				if (is_array($query_conditions)) {
-					foreach ($query_conditions as $condition => $query_condition) {
+				if (is_array($query_conditions))
+				{
+					foreach ($query_conditions as $condition => $query_condition)
+					{
 						if ($query_condition == 'member_names')
 							$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
 						else
@@ -1831,14 +1824,11 @@ class MembersManager extends AbstractManager
 	 * - The function returns basic information: name, language file.
 	 * - It is used in personal messages reporting.
 	 *
-	 * @package Members
 	 * @param int $id_admin = 0 if requested, only data about a specific Admin is retrieved
 	 * @return array
 	 */
 	function admins($id_admin = 0)
 	{
-		
-
 		// Now let's get out and loop through the admins.
 		$request = $this->db->query('', '
 			SELECT id_member, real_name, lngfile
@@ -1866,8 +1856,6 @@ class MembersManager extends AbstractManager
 	 */
 	function maxMemberID()
 	{
-		
-
 		$request = $this->db->query('', '
 			SELECT MAX(id_member)
 			FROM {db_prefix}members',
@@ -1897,8 +1885,6 @@ class MembersManager extends AbstractManager
 	function getBasicMemberData($member_ids, $options = array())
 	{
 		global $txt, $language;
-
-		
 
 		$members = array();
 
@@ -1960,8 +1946,6 @@ class MembersManager extends AbstractManager
 	 */
 	function countInactiveMembers()
 	{
-		
-
 		$inactive_members = array();
 
 		$request = $this->db->query('', '
@@ -1987,12 +1971,10 @@ class MembersManager extends AbstractManager
 	 * @package Members
 	 * @param string $name
 	 * @param bool $flexible if true searches for both real_name and member_name (default false)
-	 * @return integer
+	 * @return integer|false
 	 */
 	function getMemberByName($name, $flexible = false)
 	{
-		
-
 		$request = $this->db->query('', '
 			SELECT id_member, id_group
 			FROM {db_prefix}members
@@ -2000,7 +1982,7 @@ class MembersManager extends AbstractManager
 				OR {raw:member_name} LIKE {string:name}' : '') . '
 			LIMIT 1',
 			array(
-				'name' => $GLOBALS['elk']['text']->strtolower($name),
+				'name' => $this->text->strtolower($name),
 				'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 				'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 			)
@@ -2018,14 +2000,12 @@ class MembersManager extends AbstractManager
 	 *
 	 * - Optionally will only search/find the member in a buddy list
 	 *
-	 * @package Members
 	 * @param string $search string to search real_name for like finds
 	 * @param int[]|null $buddies
+	 * @return array
 	 */
 	function getMember($search, $buddies = array())
 	{
-		
-
 		$xml_data = array(
 			'items' => array(
 				'identifier' => 'item',
@@ -2044,9 +2024,9 @@ class MembersManager extends AbstractManager
 			array(
 				'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 				'buddy_list' => $buddies,
-				'search' => $GLOBALS['elk']['text']->strtolower($search),
+				'search' => $this->text->strtolower($search),
 				'activation_status' => array(1, 12),
-				'limit' => $GLOBALS['elk']['text']->strlen($search) <= 2 ? 100 : 200,
+				'limit' => $this->text->strlen($search) <= 2 ? 100 : 200,
 			),
 			function ($row) {
 				$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
@@ -2084,9 +2064,8 @@ class MembersManager extends AbstractManager
 		global $modSettings, $language;
 
 		// We badly need this
+		// @todo uhh... do we need assert() in runtime?
 		assert(isset($conditions['activated_status']));
-
-		
 
 		$available_conditions = array(
 			'time_before' => '
@@ -2163,11 +2142,10 @@ class MembersManager extends AbstractManager
 	 * - activated_status (boolean) must be present
 	 * - time_before (integer)
 	 * - members (array of integers)
+	 * @return bool
 	 */
 	function approveMembers($conditions)
 	{
-		
-
 		// This shall be present
 		assert(isset($conditions['activated_status']));
 
@@ -2217,7 +2195,6 @@ class MembersManager extends AbstractManager
 	/**
 	 * Set these members for activation
 	 *
-	 * @package Members
 	 * @param mixed[] $conditions associative array holding the conditions for the  WHERE clause of the query.
 	 * Possible keys:
 	 * - selected_member (integer) must be present
@@ -2228,8 +2205,6 @@ class MembersManager extends AbstractManager
 	 */
 	function enforceReactivation($conditions)
 	{
-		
-
 		// We need all of these
 		assert(isset($conditions['activated_status']));
 		assert(isset($conditions['selected_member']));
@@ -2261,14 +2236,11 @@ class MembersManager extends AbstractManager
 	/**
 	 * Count members of a given group
 	 *
-	 * @package Members
 	 * @param int $id_group
 	 * @return int
 	 */
 	function countMembersInGroup($id_group = 0)
 	{
-		
-
 		// Determine the number of ungrouped members.
 		$request = $this->db->query('', '
 			SELECT COUNT(*)
@@ -2287,14 +2259,11 @@ class MembersManager extends AbstractManager
 	/**
 	 * Get the total amount of members online.
 	 *
-	 * @package Members
 	 * @param string[] $conditions
 	 * @return int
 	 */
 	function countMembersOnline($conditions)
 	{
-		
-
 		$request = $this->db->query('', '
 			SELECT COUNT(*)
 			FROM {db_prefix}log_online AS lo
@@ -2311,7 +2280,6 @@ class MembersManager extends AbstractManager
 	/**
 	 * Look for people online, provided they don't mind if you see they are.
 	 *
-	 * @package Members
 	 * @param string[] $conditions
 	 * @param string $sort_method
 	 * @param string $sort_direction
@@ -2321,8 +2289,6 @@ class MembersManager extends AbstractManager
 	function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 	{
 		global $modSettings;
-
-		
 
 		return $this->db->fetchQuery('
 			SELECT
@@ -2348,14 +2314,11 @@ class MembersManager extends AbstractManager
 	/**
 	 * Check if the OpenID URI is already registered for an existing member
 	 *
-	 * @package Members
 	 * @param string $url
 	 * @return array
 	 */
 	function memberExists($url)
 	{
-		
-
 		$request = $this->db->query('', '
 			SELECT mem.id_member, mem.member_name
 			FROM {db_prefix}members AS mem
@@ -2375,11 +2338,10 @@ class MembersManager extends AbstractManager
 	 *
 	 * @package Members
 	 * @param int $limit
+	 * @return array
 	 */
 	function recentMembers($limit)
 	{
-		
-
 		// Find the most recent members.
 		return $this->db->fetchQuery('
 			SELECT id_member, member_name, real_name, date_registered, last_login
@@ -2395,20 +2357,21 @@ class MembersManager extends AbstractManager
 	/**
 	 * Assign membergroups to members.
 	 *
-	 * @package Members
 	 * @param int $member
 	 * @param int $primary_group
 	 * @param int[] $additional_groups
 	 */
 	function assignGroupsToMember($member, $primary_group, $additional_groups)
 	{
-		updateMemberData($member, array('id_group' => $primary_group, 'additional_groups' => implode(',', $additional_groups)));
+		$this->updateMemberData($member, array(
+			'id_group' => $primary_group,
+			'additional_groups' => implode(',', $additional_groups)
+		));
 	}
 
 	/**
 	 * Get a list of members from a membergroups request.
 	 *
-	 * @package Members
 	 * @param int[] $groups
 	 * @param string $where
 	 * @param boolean $change_groups = false
@@ -2417,8 +2380,6 @@ class MembersManager extends AbstractManager
 	function getConcernedMembers($groups, $where, $change_groups = false)
 	{
 		global $modSettings, $language;
-
-		
 
 		// Get the details of all the members concerned...
 		$request = $this->db->query('', '
@@ -2491,14 +2452,12 @@ class MembersManager extends AbstractManager
 	/**
 	 * Determine if the current user ($user_info) can contact another user ($who)
 	 *
-	 * @package Members
 	 * @param int $who The id of the user to contact
+	 * @return bool
 	 */
 	function canContact($who)
 	{
 		global $user_info;
-
-		
 
 		$request = $this->db->query('', '
 			SELECT receive_from, buddy_list, pm_ignore_list
@@ -2525,7 +2484,7 @@ class MembersManager extends AbstractManager
 			return ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)));
 		// 3 = Admin only
 		else
-			return (bool)$user_info['is_admin'];
+			return (bool) $user_info['is_admin'];
 	}
 
 	/**
@@ -2535,15 +2494,12 @@ class MembersManager extends AbstractManager
 	 * - It also only counts approved members when approval is on,
 	 * but is much more efficient with it off.
 	 *
-	 * @package Members
 	 * @param integer|null $id_member = null If not an integer reload from the database
 	 * @param string|null $real_name = null
 	 */
 	function updateMemberStats($id_member = null, $real_name = null)
 	{
 		global $modSettings;
-
-		
 
 		$changes = array(
 			'memberlist_updated' => time(),
@@ -2595,14 +2551,14 @@ class MembersManager extends AbstractManager
 	/**
 	 * Builds the 'query_see_board' element for a certain member
 	 *
-	 * @package Members
 	 * @param integer $id_member a valid member id
+	 * @return string
 	 */
 	function memberQuerySeeBoard($id_member)
 	{
 		global $modSettings;
 
-		$member = getBasicMemberData($id_member, array('moderation' => true));
+		$member = $this->getBasicMemberData($id_member, array('moderation' => true));
 
 		if (empty($member['additional_groups']))
 			$groups = array($member['id_group'], $member['id_post_group']);
@@ -2613,15 +2569,14 @@ class MembersManager extends AbstractManager
 			);
 
 		foreach ($groups as $k => $v)
-			$groups[$k] = (int)$v;
+			$groups[$k] = (int) $v;
+
 		$groups = array_unique($groups);
 
 		if (in_array(1, $groups))
 			return '1=1';
 		else {
-
-
-			$boards_mod = boardsModerated($id_member);
+			$boards_mod = $this->elk['boards.manager']->boardsModerated($id_member);
 			$mod_query = empty($boards_mod) ? '' : ' OR b.id_board IN (' . implode(',', $boards_mod) . ')';
 
 			return '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $groups) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $groups) . ', b.deny_member_groups) = 0)' : '') . $mod_query . ')';
@@ -2645,8 +2600,6 @@ class MembersManager extends AbstractManager
 	function updateMemberData($members, $data)
 	{
 		global $modSettings, $user_info;
-
-		
 
 		$parameters = array();
 		if (is_array($members)) {
@@ -2750,17 +2703,15 @@ class MembersManager extends AbstractManager
 			$parameters
 		);
 
-
 		$GLOBALS['elk']['groups.manager']->updatePostGroupStats($members, array_keys($data));
-
-		$cache = $GLOBALS['elk']['cache'];
 
 		// Clear any caching?
 		if ($this->cache->checkLevel(2) && !empty($members)) {
 			if (!is_array($members))
 				$members = array($members);
 
-			foreach ($members as $member) {
+			foreach ($members as $member)
+			{
 				if ($this->cache->checkLevel(3)) {
 					$this->cache->remove('member_data-profile-' . $member);
 					$this->cache->remove('member_data-normal-' . $member);
@@ -2777,12 +2728,11 @@ class MembersManager extends AbstractManager
 	 *
 	 * @param string $ip_string raw value to use in where clause
 	 * @param string $ip_var
+	 * @return string[]
 	 */
 	function loadMembersIPs($ip_string, $ip_var)
 	{
 		global $scripturl;
-
-		
 
 		$request = $this->db->query('', '
 			SELECT
@@ -2850,13 +2800,11 @@ class MembersManager extends AbstractManager
 	{
 		global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
-		
-		$cache = $GLOBALS['elk']['cache'];
-		$hooks = $this->hooks;
 		$req = $GLOBALS['elk']['req'];
 
 		// Check first the integration, then the cookie, and last the session.
-		if (count($integration_ids = $hooks->hook('verify_user')) > 0) {
+		if (count($integration_ids = $this->hooks->hook('verify_user')) > 0)
+		{
 			$id_member = 0;
 			foreach ($integration_ids as $integration_id) {
 				$integration_id = (int)$integration_id;
@@ -2898,7 +2846,7 @@ class MembersManager extends AbstractManager
 				);
 
 				// Make the ID specifically an integer
-				$user_settings['id_member'] = (int)$user_settings['id_member'];
+				$user_settings['id_member'] = (int) $user_settings['id_member'];
 
 				if ($this->cache->checkLevel(2))
 					$this->cache->put('user_settings-' . $id_member, $user_settings, 60);
@@ -2926,7 +2874,8 @@ class MembersManager extends AbstractManager
 		}
 
 		// Found 'im, let's set up the variables.
-		if ($id_member != 0) {
+		if ($id_member != 0)
+		{
 			// Let's not update the last visit time in these cases...
 			// 1. SSI doesn't count as visiting the forum.
 			// 2. RSS feeds and XMLHTTP requests don't count either.
@@ -2941,8 +2890,9 @@ class MembersManager extends AbstractManager
 				$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
 
 				// If it was *at least* five hours ago...
-				if ($visitOpt['poster_time'] < time() - 5 * 3600) {
-								updateMemberData($id_member, array('id_msg_last_visit' => (int)$modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
+				if ($visitOpt['poster_time'] < time() - 5 * 3600)
+				{
+					$this->updateMemberData($id_member, array('id_msg_last_visit' => (int)$modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
 					$user_settings['last_login'] = time();
 
 					if ($this->cache->checkLevel(2))
@@ -2991,7 +2941,6 @@ class MembersManager extends AbstractManager
 
 			// Do we perhaps think this is a search robot? Check every five minutes just in case...
 			if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300)) {
-				require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
 				$user_info['possibly_robot'] = spiderCheck();
 			} elseif (!empty($modSettings['spider_mode']))
 				$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
@@ -3081,8 +3030,6 @@ class MembersManager extends AbstractManager
 	 */
 	function memberByOpenID($claimed_id)
 	{
-		
-
 		$result = $this->db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri
@@ -3098,4 +3045,74 @@ class MembersManager extends AbstractManager
 
 		return $member_found;
 	}
+
+	/**
+	 * This function loads many settings of a user given by name or email.
+	 *
+	 * @param string $name
+	 * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
+	 * @return mixed[]|false false if nothing is found
+	 */
+	function loadExistingMember($name, $is_id = false)
+	{
+		$db = $GLOBALS['elk']['db'];
+
+		if ($is_id)
+		{
+			$request = $db->query('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood, otp_secret, enable_otp
+			FROM {db_prefix}members
+			WHERE id_member = {int:id_member}
+			LIMIT 1',
+				array(
+					'id_member' => (int) $name,
+				)
+			);
+		}
+		else
+		{
+			// Try to find the user, assuming a member_name was passed...
+			$request = $db->query('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood, otp_secret, enable_otp
+			FROM {db_prefix}members
+			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+			LIMIT 1',
+				array(
+					'user_name' => defined('DB_CASE_SENSITIVE') ? strtolower($name) : $name,
+				)
+			);
+			// Didn't work. Try it as an email address.
+			if ($request->numRows() == 0 && strpos($name, '@') !== false)
+			{
+				$request->free();
+
+				$request = $db->query('', '
+				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+				passwd_flood, otp_secret, enable_otp
+				FROM {db_prefix}members
+				WHERE email_address = {string:user_name}
+				LIMIT 1',
+					array(
+						'user_name' => $name,
+					)
+				);
+			}
+		}
+
+		// Nothing? Ah the horror...
+		if ($request->numRows() == 0)
+			$user_settings = false;
+		else
+		{
+			$user_settings = $request->fetchAssoc();
+			$user_settings['id_member'] = (int) $user_settings['id_member'];
+		}
+
+		$request->free();
+
+		return $user_settings;
+	}
+
 }

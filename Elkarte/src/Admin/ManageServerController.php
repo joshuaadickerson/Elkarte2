@@ -32,31 +32,31 @@ class ManageServerController extends AbstractController
 {
 	/**
 	 * Database settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_databaseSettingsForm;
 
 	/**
 	 * General settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_generalSettingsForm;
 
 	/**
 	 * Cache settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_cacheSettingsForm;
 
 	/**
 	 * Cookies settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_cookieSettingsForm;
 
 	/**
 	 * Load balancing settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_balancingSettingsForm;
 
@@ -179,7 +179,7 @@ class ManageServerController extends AbstractController
 	protected function _initGeneralSettingsForm()
 	{
 		// Start the form
-		$this->_generalSettingsForm = new Settings_Form();
+		$this->_generalSettingsForm = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_generalSettings();
@@ -232,7 +232,7 @@ class ManageServerController extends AbstractController
 	protected function _initDatabaseSettingsForm()
 	{
 		// instantiate the form
-		$this->_databaseSettingsForm = new Settings_Form();
+		$this->_databaseSettingsForm = new SettingsForm();
 		$config_vars = $this->_databaseSettings();
 
 		// Set them vars for our settings form
@@ -267,7 +267,7 @@ class ManageServerController extends AbstractController
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
 				$GLOBALS['elk']['errors']->fatal_lang_error('invalid_cookie_domain', false);
 
-			//Settings_Form::save_db($config_vars);
+			//SettingsForm::save_db($config_vars);
 			$this->_cookieSettingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
@@ -309,7 +309,7 @@ class ManageServerController extends AbstractController
 	protected function _initCookieSettingsForm()
 	{
 		// Start a new form
-		$this->_cookieSettingsForm = new Settings_Form();
+		$this->_cookieSettingsForm = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_cookieSettings();
@@ -377,7 +377,7 @@ class ManageServerController extends AbstractController
 	protected function _initCacheSettingsForm()
 	{
 		// We need a setting form
-		$this->_cacheSettingsForm = new Settings_Form();
+		$this->_cacheSettingsForm = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_cacheSettings();
@@ -425,7 +425,7 @@ class ManageServerController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_loadavg_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -440,7 +440,7 @@ class ManageServerController extends AbstractController
 	protected function _initBalancingSettingsForm()
 	{
 		// Forms, we need them
-		$this->_balancingSettingsForm = new Settings_Form();
+		$this->_balancingSettingsForm = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_balancingSettings();

@@ -1268,7 +1268,7 @@ function approvePosts($msgs, $approve = true)
 	// Finally, least importantly, notifications!
 	if ($approve)
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 
 		if (!empty($notification_topics))
 			sendBoardNotifications($notification_topics);

@@ -17,8 +17,11 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Spiders;
+
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+use Elkarte\Elkarte\SettingsForm;
 
 /**
  * ManageSearchEngines Admin controller. This class handles all search engines
@@ -28,9 +31,11 @@ if (!defined('ELK'))
  */
 class ManageSearchEnginesController extends AbstractController
 {
+	/** @var  Spiders */
+	protected $spiders;
 	/**
 	 * Search engines settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_engineSettings;
 
@@ -89,10 +94,7 @@ class ManageSearchEnginesController extends AbstractController
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=Admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
-		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
-
-
-		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		$groups = $this->elk['groups.manager']->getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
 		foreach ($groups as $row)
 		{
 			// Unfortunately, regular members have to be 1 because 0 is for disabled.
@@ -120,10 +122,10 @@ class ManageSearchEnginesController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_search_engine_settings');
 
 			// save the results!
-			Settings_Form::save_db($config_vars);
+			SettingsForm::save_db($config_vars);
 
 			// make sure to rebuild the cache with updated results
-			recacheSpiderNames();
+			$this->spiders->recacheSpiderNames();
 
 			// We're done with this.
 			redirectexit('action=Admin;area=sengines;sa=settings');
@@ -153,7 +155,7 @@ class ManageSearchEnginesController extends AbstractController
 		theme()->addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -162,7 +164,7 @@ class ManageSearchEnginesController extends AbstractController
 	protected function _initEngineSettingsForm()
 	{
 		// Instantiate the form
-		$this->_engineSettings = new Settings_Form();
+		$this->_engineSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
@@ -185,7 +187,7 @@ class ManageSearchEnginesController extends AbstractController
 		);
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
-		$GLOBALS['elk']['hooks']->hook('modify_search_engine_settings', array(&$config_vars));
+		$this->hooks->hook('modify_search_engine_settings', array(&$config_vars));
 
 		return $config_vars;
 	}
@@ -205,12 +207,9 @@ class ManageSearchEnginesController extends AbstractController
 	{
 		global $context, $txt, $scripturl;
 
-		// We'll need to do hard work here.
-		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
-
 		if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
 		{
-			consolidateSpiderStats();
+			$this->spiders->consolidateSpiderStats();
 			$_SESSION['spider_stat'] = time();
 		}
 
@@ -227,14 +226,14 @@ class ManageSearchEnginesController extends AbstractController
 			$toRemove = array_map('intval', $this->_req->post->remove);
 
 			// Delete them all!
-			removeSpiders($toRemove);
+			$this->spiders->removeSpiders($toRemove);
 
-			$GLOBALS['elk']['cache']->remove('spider_search');
-			recacheSpiderNames();
+			$this->cache->remove('spider_search');
+			$this->spiders->recacheSpiderNames();
 		}
 
 		// Get the last seen's.
-		$context['spider_last_seen'] = spidersLastSeen();
+		$context['spider_last_seen'] = $this->spiders->spidersLastSeen();
 
 		// Token for the ride
 		createToken('Admin-ser');
@@ -357,7 +356,6 @@ class ManageSearchEnginesController extends AbstractController
 		$context['id_spider'] = $this->_req->getQuery('sid', 'intval', 0);
 		$context['page_title'] = $context['id_spider'] ? $txt['spiders_edit'] : $txt['spiders_add'];
 		$context['sub_template'] = 'spider_edit';
-		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
 
 		// Are we saving?
 		if (!empty($this->_req->post->save))
@@ -377,13 +375,13 @@ class ManageSearchEnginesController extends AbstractController
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
+			$this->spiders->updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
 			// Order by user agent length.
-			sortSpiderTable();
+			$this->spiders->sortSpiderTable();
 
 			$GLOBALS['elk']['cache']->remove('spider_search');
-			recacheSpiderNames();
+			$this->spiders->recacheSpiderNames();
 
 			redirectexit('action=Admin;area=sengines;sa=spiders');
 		}
@@ -398,7 +396,7 @@ class ManageSearchEnginesController extends AbstractController
 
 		// An edit?
 		if ($context['id_spider'])
-			$context['spider'] = getSpiderDetails($context['id_spider']);
+			$context['spider'] = $this->spiders->getSpiderDetails($context['id_spider']);
 
 		createToken('Admin-ses');
 	}
@@ -424,8 +422,7 @@ class ManageSearchEnginesController extends AbstractController
 			$deleteTime = time() - ($since * 24 * 60 * 60);
 
 			// Delete the entries.
-			require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
-			removeSpiderOldLogs($deleteTime);
+			$this->spiders->removeSpiderOldLogs($deleteTime);
 		}
 
 		// Build out the spider log list
@@ -531,13 +528,10 @@ class ManageSearchEnginesController extends AbstractController
 	{
 		global $context, $txt, $scripturl;
 
-		// We'll need to do hard work here.
-		require_once(ROOTDIR . '/Spiders/Spiders.subs.php');
-
 		// Force an update of the stats every 60 seconds.
 		if (!isset($_SESSION['spider_stat']) || $_SESSION['spider_stat'] < time() - 60)
 		{
-			consolidateSpiderStats();
+			$this->spiders->consolidateSpiderStats();
 			$_SESSION['spider_stat'] = time();
 		}
 
@@ -550,11 +544,11 @@ class ManageSearchEnginesController extends AbstractController
 			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);
 
 			// Delete the entries.
-			removeSpiderOldStats($deleteTime);
+			$this->spiders->removeSpiderOldStats($deleteTime);
 		}
 
 		// Prepare the dates for the drop down.
-		$date_choices = spidersStatsDates();
+		$date_choices = $this->spiders->spidersStatsDates();
 		end($date_choices);
 		$max_date = key($date_choices);
 
@@ -585,7 +579,7 @@ class ManageSearchEnginesController extends AbstractController
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 
-			$_REQUEST['start'] = getNumSpiderStats($date_query);
+			$_REQUEST['start'] = $this->spiders->getNumSpiderStats($date_query);
 		}
 
 		$listOptions = array(

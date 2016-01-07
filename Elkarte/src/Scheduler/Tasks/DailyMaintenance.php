@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Daily_Maintenance - This function does daily cleaning up:
  *

@@ -1,7 +1,5 @@
 <?php
 
-namespace Elkarte\Subscriptions\PayPal;
-
 /**
  * Payment Gateway: PayPal
  *
@@ -17,12 +15,14 @@ namespace Elkarte\Subscriptions\PayPal;
  *
  */
 
+namespace Elkarte\Subscriptions\Drivers\PayPal;
+
 /**
  * Class of functions to validate a IPN response and provide details of the payment
  *
  * @package Subscriptions
  */
-class PayPal_Payment
+class Payment
 {
 	/**
 	 * Holds the IPN response data

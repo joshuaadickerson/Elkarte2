@@ -13,9 +13,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Re-syncs if a user can access a mention,
  *
@@ -119,7 +116,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 			// If there are no more users, scheduleTaskImmediate can be stopped
 			if (empty($user_access_mentions))
 			{
-				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 				removeScheduleTaskImmediate('user_access_mentions', false);
 			}
 
@@ -169,7 +166,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 			// Remember where we are
 			updateSettings(array('mentions_member_check' => $current_check + $limit));
 
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 
 			while ($row = $request->fetchAssoc())
 			{

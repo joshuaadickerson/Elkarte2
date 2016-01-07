@@ -46,7 +46,7 @@ class VerificationDisplayModule implements ModuleInterface
 		global $context;
 
 		// Do we need to show the visual verification image?
-		require_once(SUBSDIR . '/VerificationControls.php');
+
 		$verificationOptions = array(
 			'id' => 'post',
 		);

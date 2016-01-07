@@ -999,16 +999,18 @@ class BansManager
 	 * @param int $memID
 	 * @param string $hostname
 	 * @param string $email
+	 * @return array
 	 */
 	function BanCheckUser($memID, $hostname = '', $email = '')
 	{
 		global $memberContext, $scripturl, $txt;
 
 		$db = $GLOBALS['elk']['db'];
+		$members_manager = $GLOBALS['elk']['members.manager'];
 		$bans = array();
 
 		// This is a valid member id, we at least need that
-		if (loadMemberContext($memID) && isset($memberContext[$memID])) {
+		if ($members_manager->loadMemberContext($memID) && isset($memberContext[$memID])) {
 			$ban_query = array();
 			$ban_query_vars = array(
 				'time' => time(),

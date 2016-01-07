@@ -794,7 +794,7 @@ class RegisterController extends AbstractController
 
 		if (!isset($this->_req->post->new_email) && empty($this->_row['is_activated']))
 		{
-			require_once(SUBSDIR . '/Notification.subs.php');
+
 			sendAdminNotifications('activation', $this->_row['id_member'], $this->_row['member_name']);
 		}
 
@@ -870,7 +870,7 @@ class RegisterController extends AbstractController
 			&& ($this->_row['is_activated'] == 0 || $this->_row['is_activated'] == 2)
 			&& $this->_req->getPost('code', 'trim', '') === '')
 		{
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 			$replacements = array(
 				'REALNAME' => $this->_row['real_name'],

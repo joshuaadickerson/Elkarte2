@@ -472,7 +472,6 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// but only if it's going to be approved
 	if ($becomesApproved)
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topic_info['id_topic'], 'reply', array(), array(), $pbe);
 	}
 
@@ -638,7 +637,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	// Notify members who have notification turned on for this, (if it's approved)
 	if ($becomesApproved)
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 		sendNotifications($topicOptions['id'], 'reply', array(), array(), $pbe);
 	}
 

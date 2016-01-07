@@ -59,7 +59,7 @@ class ManageBoardsController extends AbstractController
 
 	/**
 	 * Boards settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_boardSettings;
 
@@ -820,7 +820,7 @@ class ManageBoardsController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_board_settings');
 
-			Settings_Form::save_db($config_vars);
+			SettingsForm::save_db($config_vars);
 			redirectexit('action=Admin;area=manageboards;sa=settings');
 		}
 
@@ -828,7 +828,7 @@ class ManageBoardsController extends AbstractController
 		createToken('Admin-mp');
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -838,7 +838,7 @@ class ManageBoardsController extends AbstractController
 	protected function _initBoardSettingsForm()
 	{
 		// Instantiate the form
-		$this->_boardSettings = new Settings_Form();
+		$this->_boardSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

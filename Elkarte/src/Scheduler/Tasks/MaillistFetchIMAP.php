@@ -11,19 +11,16 @@
  *
  */
 
-namespace Elkarte\sources\subs\ScheduledTask;
-
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Scheduler\Tasks;
 
 /**
- * Class Maillist_Fetch_IMAP - Fetch emails from an imap box and process them
+ * Class MaillistFetchIMAP - Fetch emails from an imap box and process them
  *
  * - If we can't run this via cron, run it as a task instead
  *
  * @package ScheduledTasks
  */
-class MaillistFetchIMAP implements Scheduled_Task_Interface
+class MaillistFetchIMAP implements ScheduledTaskInterface
 {
 	public function run()
 	{

@@ -19,9 +19,6 @@
 
 namespace Elkarte\Scheduler\Tasks;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Daily_Digest - Send out a daily email of all subscribed topics, to members.
  *
@@ -54,7 +51,7 @@ class DailyDigest implements ScheduledTaskInterface
 		$db = $GLOBALS['elk']['db'];
 
 		// We'll want this...
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 		loadEssentialThemeData();
 
 		// If the maillist function is on then so is the enhanced digest

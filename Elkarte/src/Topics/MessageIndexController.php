@@ -308,15 +308,11 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		// Nosey, nosey - who's viewing this board?
 		if (!empty($settings['display_who_viewing']))
 		{
-
 			formatViewers($board, 'board');
 		}
 
-		// And now, what we're here for: topics!
-		require_once(ROOTDIR . '/Topics/MessageIndex.subs.php');
-
 		// Known sort methods.
-		$sort_methods = messageIndexSort();
+		$sort_methods = $this->elk['topics.list']->messageIndexSort();
 
 		// They didn't pick one, default to by last post descending.
 		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
@@ -371,7 +367,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		// Allow integration to modify / add to the $indexOptions
 		$this->hooks->hook('messageindex_topics', array(&$sort_column, &$indexOptions));
 
-		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
+		$topics_info = $this->elk['topics.list']->messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
 		$topic_util = new TopicUtil;
 		$context['topics'] = $topic_util->prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
@@ -387,7 +383,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'] && !empty($topic_ids))
 		{
-			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
+			$topics_participated_in = $this->elk['topics.manager']->topicsParticipation($user_info['id'], $topic_ids);
 			foreach ($topics_participated_in as $participated)
 			{
 				$context['topics'][$participated['id_topic']]['is_posted_in'] = true;

@@ -80,7 +80,7 @@ class ManageAttachmentsController extends AbstractController
 
 	/**
 	 * Attachments settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_attachSettingsForm;
 
@@ -237,12 +237,12 @@ class ManageAttachmentsController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_attachment_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=manageattachments;sa=attachments');
 		}
 
 		$context['post_url'] = $scripturl . '?action=Admin;area=manageattachments;save;sa=attachments';
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 
 		$context['sub_template'] = 'show_settings';
 	}
@@ -255,7 +255,7 @@ class ManageAttachmentsController extends AbstractController
 	protected function _initAttachSettingsForm()
 	{
 		// Instantiate the form
-		$this->_attachSettingsForm = new Settings_Form();
+		$this->_attachSettingsForm = new SettingsForm();
 
 		// Initialize settings
 		$config_vars = $this->_settings();

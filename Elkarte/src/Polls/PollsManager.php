@@ -16,7 +16,9 @@
 
 namespace Elkarte\Polls;
 
-class PollsManager
+use Elkarte\Elkarte\AbstractManager;
+
+class PollsManager extends AbstractManager
 {
 
 	/**

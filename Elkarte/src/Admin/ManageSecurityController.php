@@ -30,25 +30,25 @@ class ManageSecurityController extends AbstractController
 {
 	/**
 	 * Bad Behavior settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_bbSettings;
 
 	/**
 	 * Security settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_securitySettings;
 
 	/**
 	 * Moderation settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_moderationSettings;
 
 	/**
 	 * Spam settings form.
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_spamSettings;
 
@@ -125,7 +125,7 @@ class ManageSecurityController extends AbstractController
 		{
 			$this->_session->check();
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			$GLOBALS['elk']['hooks']->hook('save_general_security_settings');
 
@@ -136,7 +136,7 @@ class ManageSecurityController extends AbstractController
 		$context['post_url'] = $scripturl . '?action=Admin;area=securitysettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_security_general'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -145,7 +145,7 @@ class ManageSecurityController extends AbstractController
 	protected function _initSecuritySettingsForm()
 	{
 		// Instantiate the form
-		$this->_securitySettings = new Settings_Form();
+		$this->_securitySettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_securitySettings();
@@ -198,7 +198,7 @@ class ManageSecurityController extends AbstractController
 
 			$GLOBALS['elk']['hooks']->hook('save_moderation_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=securitysettings;sa=moderation');
 		}
 
@@ -209,7 +209,7 @@ class ManageSecurityController extends AbstractController
 		$context['settings_title'] = $txt['moderation_settings'];
 		$context['settings_message'] = $txt['warning_enable'];
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -220,7 +220,7 @@ class ManageSecurityController extends AbstractController
 	protected function _initModerationSettingsForm()
 	{
 		// Instantiate the form
-		$this->_moderationSettings = new Settings_Form();
+		$this->_moderationSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_moderationSettings();
@@ -262,7 +262,7 @@ class ManageSecurityController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_spam_settings');
 
 			// Now save.
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			$GLOBALS['elk']['cache']->remove('verificationQuestionIds');
 			redirectexit('action=Admin;area=securitysettings;sa=spam');
 		}
@@ -280,7 +280,7 @@ class ManageSecurityController extends AbstractController
 
 		$context['post_url'] = $scripturl . '?action=Admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -289,7 +289,7 @@ class ManageSecurityController extends AbstractController
 	protected function _initSpamSettingsForm()
 	{
 		// Instantiate the form
-		$this->_spamSettings = new Settings_Form();
+		$this->_spamSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_spamSettings();
@@ -363,7 +363,7 @@ class ManageSecurityController extends AbstractController
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=securitysettings;sa=badbehavior');
 		}
 
@@ -382,7 +382,7 @@ class ManageSecurityController extends AbstractController
 			'oIpOptionsdd' => '{name: \'badbehavior_ip_wl[]\', class: \'input_text\'}'
 		));
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -393,7 +393,7 @@ class ManageSecurityController extends AbstractController
 	protected function _initBBSettingsForm()
 	{
 		// Instantiate the form
-		$this->_bbSettings = new Settings_Form();
+		$this->_bbSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_bbSettings();
@@ -499,7 +499,6 @@ class ManageSecurityController extends AbstractController
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
-		require_once(SUBSDIR . '/VerificationControls.php');
 		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)

@@ -400,7 +400,7 @@ function resetPassword($memID, $username = null)
 
 	// Language... and a required file.
 	loadLanguage('Login');
-	require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 	// Get some important details.
 
@@ -819,77 +819,6 @@ function generateValidationCode()
 }
 
 /**
- * This function loads many settings of a user given by name or email.
- *
- * @package Authorization
- * @param string $name
- * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
- * @return mixed[]|false false if nothing is found
- */
-function loadExistingMember($name, $is_id = false)
-{
-	$db = $GLOBALS['elk']['db'];
-
-	if ($is_id)
-	{
-		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp
-			FROM {db_prefix}members
-			WHERE id_member = {int:id_member}
-			LIMIT 1',
-			array(
-				'id_member' => (int) $name,
-			)
-		);
-	}
-	else
-	{
-		// Try to find the user, assuming a member_name was passed...
-		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp
-			FROM {db_prefix}members
-			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
-			LIMIT 1',
-			array(
-				'user_name' => defined('DB_CASE_SENSITIVE') ? strtolower($name) : $name,
-			)
-		);
-		// Didn't work. Try it as an email address.
-		if ($request->numRows() == 0 && strpos($name, '@') !== false)
-		{
-			$request->free();
-
-			$request = $db->query('', '
-				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-				passwd_flood, otp_secret, enable_otp
-				FROM {db_prefix}members
-				WHERE email_address = {string:user_name}
-				LIMIT 1',
-				array(
-					'user_name' => $name,
-				)
-			);
-		}
-	}
-
-	// Nothing? Ah the horror...
-	if ($request->numRows() == 0)
-		$user_settings = false;
-	else
-	{
-		$user_settings = $request->fetchAssoc();
-		$user_settings['id_member'] = (int) $user_settings['id_member'];
-	}
-
-	$request->free();
-
-	return $user_settings;
-}
-
-
-/**
  * Check activation status of the current user.
  *
  * What it does:
@@ -962,9 +891,6 @@ function doLogin()
 {
 	global $user_info, $user_settings, $maintenance, $modSettings, $context;
 
-	// Load authentication stuffs.
-	require_once(SUBSDIR . '/Auth.subs.php');
-
 	// Call login integration functions.
 	$GLOBALS['elk']['hooks']->hook('login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
@@ -1012,7 +938,6 @@ function doLogin()
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
-	require_once(SUBSDIR . '/Logging.subs.php');
 	deleteOnline('ip' . $user_info['ip']);
 	$_SESSION['log_time'] = 0;
 
@@ -1039,60 +964,4 @@ function md5_hmac($data, $key)
 {
 	$key = str_pad(strlen($key) <= 64 ? $key : pack('H*', md5($key)), 64, chr(0x00));
 	return md5(($key ^ str_repeat(chr(0x5c), 64)) . pack('H*', md5(($key ^ str_repeat(chr(0x36), 64)) . $data)));
-}
-
-/**
- * Custom encryption for phpBB3 based passwords.
- *
- * @package Authorization
- * @param string $passwd
- * @param string $passwd_hash
- * @return string
- */
-function phpBB3_password_check($passwd, $passwd_hash)
-{
-	// Too long or too short?
-	if (strlen($passwd_hash) != 34)
-		return;
-
-	// Range of characters allowed.
-	$range = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-	// Tests
-	$strpos = strpos($range, $passwd_hash[3]);
-	$count = 1 << $strpos;
-	$salt = substr($passwd_hash, 4, 8);
-
-	$hash = md5($salt . $passwd, true);
-	for (; $count != 0; --$count)
-		$hash = md5($hash . $passwd, true);
-
-	$output = substr($passwd_hash, 0, 12);
-	$i = 0;
-	while ($i < 16)
-	{
-		$value = ord($hash[$i++]);
-		$output .= $range[$value & 0x3f];
-
-		if ($i < 16)
-			$value |= ord($hash[$i]) << 8;
-
-		$output .= $range[($value >> 6) & 0x3f];
-
-		if ($i++ >= 16)
-			break;
-
-		if ($i < 16)
-			$value |= ord($hash[$i]) << 16;
-
-		$output .= $range[($value >> 12) & 0x3f];
-
-		if ($i++ >= 16)
-			break;
-
-		$output .= $range[($value >> 18) & 0x3f];
-	}
-
-	// Return now.
-	return $output;
 }

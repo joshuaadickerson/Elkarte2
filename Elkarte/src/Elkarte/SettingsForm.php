@@ -485,7 +485,7 @@ class SettingsForm
 
 		// Save the relevant settings in the Settings.php file.
 		require_once(SUBSDIR . '/Admin.subs.php');
-		Settings_Form::save_file($new_settings);
+		SettingsForm::save_file($new_settings);
 
 		// Now loop through the remaining (database-based) settings.
 		$new_settings = array();
@@ -501,7 +501,7 @@ class SettingsForm
 
 		// Save the new database-based settings, if any.
 		if (!empty($new_settings))
-			Settings_Form::save_db($new_settings);
+			SettingsForm::save_db($new_settings);
 	}
 
 	/**
@@ -789,7 +789,7 @@ class SettingsForm
 	 * Method which retrieves or sets new configuration variables.
 	 *
 	 * If the $config_vars parameter is sent, the method tries to update
-	 * the internal configuration of the Settings_Form instance.
+	 * the internal configuration of the SettingsForm instance.
 	 *
 	 * If the $config_vars parameter is not sent (is null), the method
 	 * simply returns the current configuration set.

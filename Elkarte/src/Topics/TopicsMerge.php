@@ -397,7 +397,7 @@ class TopicsMerge
 		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
 
 		// Notify people that these topics have been merged?
-		require_once(SUBSDIR . '/Notification.subs.php');
+
 		sendNotifications($id_topic, 'merge');
 
 		// Grab the response prefix (like 'Re: ') in the default forum language.

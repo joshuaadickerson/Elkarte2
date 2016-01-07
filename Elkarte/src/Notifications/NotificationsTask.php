@@ -14,7 +14,9 @@
 
 namespace Elkarte\Notifications;
 
-class Notifications_Task extends \ElkArte\Elkarte\ValuesContainer
+use Elkarte\Elkarte\ValuesContainer;
+
+class NotificationsTask extends ValuesContainer
 {
 	/**
 	 * Data of the members to notify.

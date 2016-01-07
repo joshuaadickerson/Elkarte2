@@ -29,7 +29,7 @@ class ManagePermissionsController extends AbstractController
 {
 	/**
 	 * Permissions settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_permSettings;
 
@@ -905,7 +905,7 @@ class ManagePermissionsController extends AbstractController
 		{
 			$this->_session->check('post');
 			$GLOBALS['elk']['hooks']->hook('save_permission_settings');
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
@@ -921,7 +921,7 @@ class ManagePermissionsController extends AbstractController
 		// We need this for the in-line permissions
 		createToken('Admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -930,7 +930,7 @@ class ManagePermissionsController extends AbstractController
 	protected function _initPermSettingsForm()
 	{
 		// Instantiate the form
-		$this->_permSettings = new Settings_Form();
+		$this->_permSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

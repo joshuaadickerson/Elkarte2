@@ -22,7 +22,7 @@ class ManageDraftsModuleController extends AbstractController
 {
 	/**
 	 * Drafts settings form
-	 * @var Settings_Form
+	 * @var SettingsForm
 	 */
 	protected $_draftSettings;
 
@@ -43,7 +43,7 @@ class ManageDraftsModuleController extends AbstractController
 				'drafts_show_saved_enabled' => 2,
 			),
 			'setting_callback' => function ($value) {
-				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 				toggleTaskStatusByName('remove_old_drafts', $value);
 
 				$modules = array('post', 'display', 'profile', 'personalmessage');
@@ -263,7 +263,7 @@ class ManageDraftsModuleController extends AbstractController
 			// Protect them from themselves.
 			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->_req->post);
 			redirectexit('action=Admin;area=managedrafts');
 		}
 
@@ -287,7 +287,7 @@ class ManageDraftsModuleController extends AbstractController
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
+		SettingsForm::prepare_db($config_vars);
 	}
 
 	/**
@@ -296,7 +296,7 @@ class ManageDraftsModuleController extends AbstractController
 	protected function _initDraftSettingsForm()
 	{
 		// Instantiate the form
-		$this->_draftSettings = new Settings_Form();
+		$this->_draftSettings = new SettingsForm();
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

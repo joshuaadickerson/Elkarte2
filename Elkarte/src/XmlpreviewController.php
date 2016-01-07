@@ -101,7 +101,7 @@ class XmlPreviewController extends AbstractController
 		global $context, $txt;
 
 		// Needed to create the preview
-		require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 		loadLanguage('Errors');
 
 		$context['post_error']['errors'] = array();

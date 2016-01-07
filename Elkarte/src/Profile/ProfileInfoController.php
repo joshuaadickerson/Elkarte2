@@ -21,6 +21,7 @@
 namespace Elkarte\Profile;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+
 /**
  * ProfileInfoController class, access all profile summary areas for a user
  * including overall summary, post listing, attachment listing, user statistics
@@ -49,7 +50,9 @@ class ProfileInfoController extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		$this->_memID = currentMemberID();
+		$this->bootstrap();
+
+		$this->_memID = $this->elk['profile']->currentMemberID();
 	}
 
 	/**
@@ -74,7 +77,7 @@ class ProfileInfoController extends AbstractController
 		global $context, $memberContext, $txt, $modSettings, $user_profile, $scripturl;
 
 		// Attempt to load the member's profile data.
-		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
+		if (!$this->elk['members.manager']->loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
 			$this->_errors->fatal_lang_error('not_a_user', false);
 
 		$this->_templates->load('ProfileInfo');
@@ -191,8 +194,7 @@ class ProfileInfoController extends AbstractController
 
 		if (!empty($modSettings['who_enabled']) && $context['member']['online']['is_online'])
 		{
-			include_once(SUBSDIR . '/Who.subs.php');
-			$action = determineActions($user_profile[$this->_memID]['url']);
+			$action = $this->elk['onlinelog.viewing']->determineActions($user_profile[$this->_memID]['url']);
 			loadLanguage('index');
 
 			if ($action !== false)
@@ -218,10 +220,9 @@ class ProfileInfoController extends AbstractController
 		// How about, are they banned?
 		if (allowedTo('moderate_forum'))
 		{
-			require_once(ELKDIR . '/Security/Bans.subs.php');
 			$hostname = !empty($context['member']['hostname']) ? $context['member']['hostname'] : '';
 			$email = !empty($context['member']['email']) ? $context['member']['email'] : '';
-			$context['member']['bans'] = BanCheckUser($this->_memID, $hostname, $email);
+			$context['member']['bans'] = $this->elk['bans.manager']->BanCheckUser($this->_memID, $hostname, $email);
 
 			// Can they edit the ban?
 			$context['can_edit_ban'] = allowedTo('manage_bans');
@@ -234,8 +235,7 @@ class ProfileInfoController extends AbstractController
 		$this->_load_recent_topics();
 
 		// To finish this off, custom profile fields.
-		require_once(ROOTDIR . '/Profile/Profile.subs.php');
-		loadCustomFields($this->_memID);
+		$this->elk['profile']->loadCustomFields($this->_memID);
 
 		// To make tabs work, we need jQueryUI
 		$modSettings['jquery_include_ui'] = true;
@@ -261,7 +261,7 @@ class ProfileInfoController extends AbstractController
 			else
 			{
 				// Set up to get the last 10 topics of this member
-				$topicCount = count_user_topics($this->_memID);
+				$topicCount = $this->elk['profile']->count_user_topics($this->_memID);
 				$range_limit = '';
 				$maxIndex = 10;
 				$start = $this->_req->getQuery('start', 'intval', 0);
@@ -269,14 +269,14 @@ class ProfileInfoController extends AbstractController
 				// If they are a frequent topic starter we guess the range to help the query
 				if ($topicCount > 1000)
 				{
-					list ($min_topic_member, $max_topic_member) = findMinMaxUserTopic($this->_memID);
+					list ($min_topic_member, $max_topic_member) = $this->elk['profile']->findMinMaxUserTopic($this->_memID);
 					$margin = floor(($max_topic_member - $min_topic_member) * (($start + $modSettings['defaultMaxMessages']) / $topicCount) + .1 * ($max_topic_member - $min_topic_member));
 					$margin *= 5;
 					$range_limit = 't.id_first_msg > ' . ($max_topic_member - $margin);
 				}
 
 				// Find this user's most recent topics
-				$rows = load_user_topics($this->_memID, 0, $maxIndex, $range_limit);
+				$rows = $this->elk['profile']->load_user_topics($this->_memID, 0, $maxIndex, $range_limit);
 				$context['topics'] = array();
 				$bbc_parser = $GLOBALS['elk']['bbc'];
 
@@ -329,7 +329,7 @@ class ProfileInfoController extends AbstractController
 			else
 			{
 				// Set up to get the last 10 posts of this member
-				$msgCount = count_user_posts($this->_memID);
+				$msgCount = $this->elk['profile']->count_user_posts($this->_memID);
 				$range_limit = '';
 				$maxIndex = 10;
 				$start = $this->_req->getQuery('start', 'intval', 0);
@@ -337,13 +337,13 @@ class ProfileInfoController extends AbstractController
 				// If they are a frequent poster, we guess the range to help minimize what the query work
 				if ($msgCount > 1000)
 				{
-					list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($this->_memID);
+					list ($min_msg_member, $max_msg_member) = $this->elk['profile']->findMinMaxUserMessage($this->_memID);
 					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
 					$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
 				}
 
 				// Find this user's most recent posts
-				$rows = load_user_posts($this->_memID, 0, $maxIndex, $range_limit);
+				$rows = $this->elk['profile']->load_user_posts($this->_memID, 0, $maxIndex, $range_limit);
 				$bbc_parser = $GLOBALS['elk']['bbc'];
 				$context['posts'] = array();
 				foreach ($rows as $row)
@@ -391,12 +391,12 @@ class ProfileInfoController extends AbstractController
 			&& in_array('buddies', $this->_summary_areas))
 		{
 			$context['buddies'] = array();
-			loadMemberData($user_info['buddies'], false, 'profile');
+			$this->elk['members.manager']->loadMemberData($user_info['buddies'], false, 'profile');
 
 			// Get the info for this buddy
 			foreach ($user_info['buddies'] as $buddy)
 			{
-				loadMemberContext($buddy, true);
+				$this->elk['members.manager']->loadMemberContext($buddy, true);
 				$context['buddies'][$buddy] = $memberContext[$buddy];
 			}
 		}
@@ -543,11 +543,11 @@ class ProfileInfoController extends AbstractController
 		}
 
 		if ($context['is_topics'])
-			$msgCount = count_user_topics($this->_memID, $board);
+			$msgCount = $this->elk['profile']->count_user_topics($this->_memID, $board);
 		else
-			$msgCount = count_user_posts($this->_memID, $board);
+			$msgCount = $this->elk['profile']->count_user_posts($this->_memID, $board);
 
-		list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($this->_memID, $board);
+		list ($min_msg_member, $max_msg_member) = $this->elk['profile']->findMinMaxUserMessage($this->_memID, $board);
 		$range_limit = '';
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -581,9 +581,9 @@ class ProfileInfoController extends AbstractController
 
 		// Find this user's posts or topics started
 		if ($context['is_topics'])
-			$rows = load_user_topics($this->_memID, $start, $maxIndex, $range_limit, $reverse, $board);
+			$rows = $this->elk['profile']->load_user_topics($this->_memID, $start, $maxIndex, $range_limit, $reverse, $board);
 		else
-			$rows = load_user_posts($this->_memID, $start, $maxIndex, $range_limit, $reverse, $board);
+			$rows = $this->elk['profile']->load_user_posts($this->_memID, $start, $maxIndex, $range_limit, $reverse, $board);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
@@ -953,8 +953,6 @@ class ProfileInfoController extends AbstractController
 	{
 		global $txt, $context, $user_profile, $modSettings;
 
-		require_once(SUBSDIR . '/Stats.subs.php');
-
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$this->_memID]['real_name'];
 
 		// Is the load average too high to allow searching just now?
@@ -1018,7 +1016,6 @@ class ProfileInfoController extends AbstractController
 		$this->_templates->load('ProfileInfo');
 
 		// Load all the permission profiles.
-		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
 		$context['member']['id'] = $this->_memID;
@@ -1203,7 +1200,7 @@ class ProfileInfoController extends AbstractController
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
-		return profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $this->_memID);
+		return $this->elk['profile']->profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $this->_memID);
 	}
 
 	/**
@@ -1215,7 +1212,7 @@ class ProfileInfoController extends AbstractController
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
-		return getNumAttachments($boardsAllowed, $this->_memID);
+		return $this->elk['profile']->getNumAttachments($boardsAllowed, $this->_memID);
 	}
 
 	/**

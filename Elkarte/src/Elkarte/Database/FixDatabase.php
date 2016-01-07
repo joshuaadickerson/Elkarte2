@@ -63,7 +63,7 @@ class FixDatabase
 			// subs/Admin.subs.php for updateDbLastError(), subs/Mail.subs.php for sendmail().
 			// @todo this should go somewhere else, not into the db-mysql layer I think
 			require_once(SUBSDIR . '/Admin.subs.php');
-			require_once(ROOTDIR . '/Mail/Mail.subs.php');
+
 
 			// Make a note of the REPAIR...
 			$GLOBALS['elk']['cache']->put('db_last_error', time(), 600);

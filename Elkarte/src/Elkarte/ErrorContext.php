@@ -23,35 +23,35 @@ class ErrorContext
 	 *
 	 * @var string
 	 */
-	private $_name = null;
+	protected $name;
 
 	/**
 	 * An array that holds all the errors occurred separated by severity.
 	 *
 	 * @var array
 	 */
-	private $_errors = null;
+	protected $errors;
 
 	/**
 	 * The default severity code.
 	 *
 	 * @var mixed
 	 */
-	private $_default_severity = 0;
+	protected $default_severity = 0;
 
 	/**
 	 * A list of all severity code from the less important to the most serious.
 	 *
 	 * @var array|mixed
 	 */
-	private $_severity_levels = array(0);
+	protected $severity_levels = [0];
 
 	/**
 	 * Certain errors may need some specific language file...
 	 *
 	 * @var array
 	 */
-	private $_language_files = array();
+	protected $language_files = [];
 
 	/**
 	 * Multiton. This is an array of instances of error_context.
@@ -59,7 +59,7 @@ class ErrorContext
 	 *
 	 * @var array of error_context
 	 */
-	private static $_contexts = null;
+	protected static $contexts;
 
 	const MINOR = 0;
 	const SERIOUS = 1;
@@ -73,18 +73,18 @@ class ErrorContext
 	protected function __construct($id = 'default', $default_severity = null)
 	{
 		if (!empty($id))
-			$this->_name = $id;
+			$this->name = $id;
 
 		// Initialize severity levels... waiting for details!
-		$this->_severity_levels = array(ErrorContext::MINOR, ErrorContext::SERIOUS);
+		$this->severity_levels = array(ErrorContext::MINOR, ErrorContext::SERIOUS);
 
 		// Initialize default severity (not sure this is needed)
-		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
-			$this->_default_severity = ErrorContext::MINOR;
+		if ($default_severity === null || !in_array($default_severity, $this->severity_levels))
+			$this->default_severity = ErrorContext::MINOR;
 		else
-			$this->_default_severity = $default_severity;
+			$this->default_severity = $default_severity;
 
-		$this->_errors = array();
+		$this->errors = array();
 	}
 
 	/**
@@ -96,18 +96,18 @@ class ErrorContext
 	 */
 	public function addError($error, $severity = null, $lang_file = null)
 	{
-		$severity = $severity !== null && in_array($severity, $this->_severity_levels) ? $severity : $this->_default_severity;
+		$severity = $severity !== null && in_array($severity, $this->severity_levels) ? $severity : $this->default_severity;
 
 		if (!empty($error))
 		{
 			if (is_array($error))
-				$this->_errors[$severity][$error[0]] = $error;
+				$this->errors[$severity][$error[0]] = $error;
 			else
-				$this->_errors[$severity][$error] = $error;
+				$this->errors[$severity][$error] = $error;
 		}
 
-		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
-			$this->_language_files[$lang_file] = false;
+		if (!empty($lang_file) && !isset($this->language_files[$lang_file]))
+			$this->language_files[$lang_file] = false;
 	}
 
 	/**
@@ -122,12 +122,12 @@ class ErrorContext
 			if (is_array($error))
 				$error = $error[0];
 
-			foreach ($this->_errors as $severity => $errors)
+			foreach ($this->errors as $severity => $errors)
 			{
 				if (array_key_exists($error, $errors))
-					unset($this->_errors[$severity][$error]);
-				if (empty($this->_errors[$severity]))
-					unset($this->_errors[$severity]);
+					unset($this->errors[$severity][$error]);
+				if (empty($this->errors[$severity]))
+					unset($this->errors[$severity]);
 			}
 		}
 	}
@@ -137,13 +137,14 @@ class ErrorContext
 	 *
 	 * @todo is it needed at all?
 	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
+	 * @return false|array
 	 */
 	public function getErrors($severity = null)
 	{
-		if ($severity !== null && in_array($severity, $this->_severity_levels) && !empty($this->_errors[$severity]))
-			return $this->_errors[$severity];
-		elseif ($severity === null && !empty($this->_errors))
-			return $this->_errors;
+		if ($severity !== null && in_array($severity, $this->severity_levels) && !empty($this->errors[$severity]))
+			return $this->errors[$severity];
+		elseif ($severity === null && !empty($this->errors))
+			return $this->errors;
 		else
 			return false;
 	}
@@ -156,10 +157,8 @@ class ErrorContext
 	 */
 	public function getError($error = null)
 	{
-		if (isset($this->_errors[$error]))
-			return $this->_errors[$error];
-		else
-			return null;
+		if (isset($this->errors[$error]))
+			return $this->errors[$error];
 	}
 
 	/**
@@ -170,10 +169,10 @@ class ErrorContext
 	 */
 	public function hasErrors($severity = null)
 	{
-		if ($severity !== null && in_array($severity, $this->_severity_levels))
-			return !empty($this->_errors[$severity]);
+		if ($severity !== null && in_array($severity, $this->severity_levels))
+			return !empty($this->errors[$severity]);
 		elseif ($severity === null)
-			return !empty($this->_errors);
+			return !empty($this->errors);
 		else
 			return false;
 	}
@@ -182,6 +181,7 @@ class ErrorContext
 	 * Check if a particular error exists.
 	 *
 	 * @param string $errors the error
+	 * @return bool
 	 */
 	public function hasError($errors)
 	{
@@ -192,7 +192,7 @@ class ErrorContext
 			$errors = is_array($errors) ? $errors : array($errors);
 			foreach ($errors as $error)
 			{
-				foreach ($this->_errors as $current_errors)
+				foreach ($this->errors as $current_errors)
 					if (isset($current_errors[$error]))
 						return true;
 			}
@@ -205,12 +205,12 @@ class ErrorContext
 	 */
 	public function getErrorType()
 	{
-		$levels = array_reverse($this->_severity_levels);
+		$levels = array_reverse($this->severity_levels);
 		$level = null;
 
 		foreach ($levels as $level)
 		{
-			if (!empty($this->_errors[$level]))
+			if (!empty($this->errors[$level]))
 				return $level;
 		}
 
@@ -228,22 +228,22 @@ class ErrorContext
 	{
 		global $txt;
 
-		if (empty($this->_errors))
+		if (empty($this->errors))
 			return array();
 
-		$this->_loadLang();
+		$this->loadLang();
 
-		$GLOBALS['elk']['hooks']->hook('' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
+		$GLOBALS['elk']['hooks']->hook('' . $this->name . '_errors', array(&$this->errors, &$this->severity_levels));
 
 		$errors = array();
 		$returns = array();
 		if ($severity === null)
 		{
-			foreach ($this->_errors as $err)
+			foreach ($this->errors as $err)
 				$errors = array_merge($errors, $err);
 		}
-		elseif (in_array($severity, $this->_severity_levels) && !empty($this->_errors[$severity]))
-			$errors = $this->_errors[$severity];
+		elseif (in_array($severity, $this->severity_levels) && !empty($this->errors[$severity]))
+			$errors = $this->errors[$severity];
 
 		foreach ($errors as $error_val)
 		{
@@ -267,14 +267,14 @@ class ErrorContext
 		loadLanguage('Errors');
 
 		// Any custom one?
-		if (!empty($this->_language_files))
-			foreach ($this->_language_files as $language => $loaded)
+		if (!empty($this->language_files))
+			foreach ($this->language_files as $language => $loaded)
 				if (!$loaded)
 				{
 					loadLanguage($language);
 
 					// Remember this file has been loaded already
-					$this->_language_files[$language] = true;
+					$this->language_files[$language] = true;
 				}
 	}
 
@@ -288,12 +288,12 @@ class ErrorContext
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
-		if (self::$_contexts === null)
-			self::$_contexts = array();
+		if (self::$contexts === null)
+			self::$contexts = array();
 
-		if (!array_key_exists($id, self::$_contexts))
-			self::$_contexts[$id] = new ErrorContext($id, $default_severity);
+		if (!array_key_exists($id, self::$contexts))
+			self::$contexts[$id] = new ErrorContext($id, $default_severity);
 
-		return self::$_contexts[$id];
+		return self::$contexts[$id];
 	}
 }

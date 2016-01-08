@@ -17,8 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+// @todo replace with Menu class
 
 /**
  * Create a menu.

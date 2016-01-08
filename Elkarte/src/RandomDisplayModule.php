@@ -11,7 +11,7 @@
  *
  */
 
-class Random_Display_Module implements ModuleInterface
+class RandomDisplayModule implements ModuleInterface
 {
 	protected static $includeUnapproved = false;
 

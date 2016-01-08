@@ -3,6 +3,7 @@
 namespace Themes\DefaultTheme;
 
 use Elkarte\Elkarte\Theme\AbstractTheme;
+use Elkarte\Members\Moderator;
 
 /**
  * The default theme
@@ -92,8 +93,7 @@ class Theme extends AbstractTheme
         // Put in the version...
         $forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
 
-        echo '
-					', $forum_copyright;
+        echo $forum_copyright;
     }
 
     /**
@@ -117,7 +117,7 @@ class Theme extends AbstractTheme
             $settings['theme_dir'] = $settings['actual_theme_dir'];
         }
 
-        foreach ($this->layers->reverseLayers() as $layer)
+        foreach ($this->layers->reverse() as $layer)
 			$this->templates->loadSubTemplate($layer . '_below', 'ignore');
 
     }
@@ -614,8 +614,9 @@ class Theme extends AbstractTheme
         if ($context['allow_moderation_center'])
         {
             // Get the numbers for the menu ...
-            require_once(ROOTDIR . '/Messages/Moderation.subs.php');
-            $menu_count = loadModeratorMenuCounts();
+            // @todo wrong place to be doing this
+			$moderator = new Moderator();
+            $menu_count = $moderator->loadModeratorMenuCounts();
         }
 
         $menu_count['unread_messages'] = $context['user']['unread_messages'];

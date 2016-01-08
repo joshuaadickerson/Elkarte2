@@ -18,8 +18,6 @@ use Elkarte\Elkarte\Debug\Debug;
  */
 class Templates
 {
-    protected static $instance = null;
-
     public $dirs        = array();
     protected $delayed  = array();
     protected $templates = array();

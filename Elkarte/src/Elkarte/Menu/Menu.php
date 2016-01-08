@@ -17,8 +17,13 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Elkarte\Menu;
+
+use Elkarte\Elkarte\Theme\Templates;
+use Elkarte\Elkarte\Theme\TemplateLayers;
+use Elkarte\Elkarte\Http\HttpReq;
+use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Events\EventManager;
 
 class Menu
 {
@@ -304,7 +309,8 @@ class Menu
 						$this->menu['sections'][$section_id]['areas'][$area_id]['icon'] = '';
 
 					// Did it have subsections?
-					if (!empty($area['subsections'])) {
+					if (!empty($area['subsections']))
+					{
 						$this->menu['sections'][$section_id]['areas'][$area_id]['subsections'] = array();
 						$first_sa = $last_sa = null;
 						foreach ($area['subsections'] as $sa => $sub)
@@ -313,7 +319,8 @@ class Menu
 						}
 
 						// Set which one is first, last and selected in the group.
-						if (!empty($this->menu['sections'][$section_id]['areas'][$area_id]['subsections'])) {
+						if (!empty($this->menu['sections'][$section_id]['areas'][$area_id]['subsections']))
+						{
 							$this->menu['sections'][$section_id]['areas'][$area_id]['subsections'][$context['right_to_left'] ? $last_sa : $first_sa]['is_first'] = true;
 							$this->menu['sections'][$section_id]['areas'][$area_id]['subsections'][$context['right_to_left'] ? $first_sa : $last_sa]['is_last'] = true;
 

@@ -25,18 +25,18 @@ class TemplateLayers extends Priority
 	/**
 	 * Layers not removed in case of errors
 	 */
-	private $_error_safe_layers = null;
+	protected $error_safe_layers;
 
 	/**
 	 * Are we handling an error?
 	 * Hopefully not, so default is false
 	 */
-	private $_is_error = false;
+	protected $is_error = false;
 
 	/**
 	 * The layers added when this is true will be used in the error screen
 	 */
-	private $_error_safe = false;
+	protected $error_safe = false;
 
 	/**
 	 * Add a new layer to the pile
@@ -48,8 +48,8 @@ class TemplateLayers extends Priority
 	{
 		parent::add($layer, $priority);
 
-		if ($this->_error_safe)
-			$this->_error_safe_layers[] = $layer;
+		if ($this->error_safe)
+			$this->error_safe_layers[] = $layer;
 	}
 
 	/**
@@ -62,8 +62,8 @@ class TemplateLayers extends Priority
 	{
 		parent::addBefore($layer, $following);
 
-		if ($this->_error_safe)
-			$this->_error_safe_layers[] = $layer;
+		if ($this->error_safe)
+			$this->error_safe_layers[] = $layer;
 	}
 
 	/**
@@ -76,8 +76,8 @@ class TemplateLayers extends Priority
 	{
 		parent::addAfter($layer, $previous);
 
-		if ($this->_error_safe)
-			$this->_error_safe_layers[] = $layer;
+		if ($this->error_safe)
+			$this->error_safe_layers[] = $layer;
 	}
 
 	/**
@@ -90,8 +90,8 @@ class TemplateLayers extends Priority
 	{
 		parent::addEnd($layer, $priority);
 
-		if ($this->_error_safe)
-			$this->_error_safe_layers[] = $layer;
+		if ($this->error_safe)
+			$this->error_safe_layers[] = $layer;
 	}
 
 	/**
@@ -104,14 +104,14 @@ class TemplateLayers extends Priority
 	{
 		parent::addBegin($layer, $priority);
 
-		if ($this->_error_safe)
-			$this->_error_safe_layers[] = $layer;
+		if ($this->error_safe)
+			$this->error_safe_layers[] = $layer;
 	}
 
 	/**
 	 * Prepares the layers so that they are usable by the template
 	 * The function sorts the layers according to the priority and saves the
-	 * result in $_sorted_entities
+	 * result in $sorted_entities
 	 *
 	 * @return array the sorted layers
 	 */
@@ -120,22 +120,22 @@ class TemplateLayers extends Priority
 		$all_layers = $this->sort();
 
 		// If we are dealing with an error page (fatal_error) then we have to prune all the unwanted layers
-		if ($this->_is_error)
+		if ($this->is_error)
 		{
 			$dummy = $all_layers;
 			$all_layers = array();
 
 			foreach ($dummy as $key => $val)
 			{
-				if (in_array($key, $this->_error_safe_layers))
+				if (in_array($key, $this->error_safe_layers))
 					$all_layers[$key] = $val;
 			}
 		}
 
 		asort($all_layers);
-		$this->_sorted_entities = array_keys($all_layers);
+		$this->sorted_entities = array_keys($all_layers);
 
-		return $this->_sorted_entities;
+		return $this->sorted_entities;
 	}
 
 	/**
@@ -143,12 +143,12 @@ class TemplateLayers extends Priority
 	 *
 	 * @return array the reverse ordered layers
 	 */
-	public function reverseLayers()
+	public function reverse()
 	{
-		if ($this->_sorted_entities === null)
+		if ($this->sorted_entities === null)
 			$this->prepareContext();
 
-		return array_reverse($this->_sorted_entities);
+		return array_reverse($this->sorted_entities);
 	}
 
 	/**
@@ -161,9 +161,9 @@ class TemplateLayers extends Priority
 	public function hasLayers($base = false)
 	{
 		if (!$base)
-			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+			return (!empty($this->all_general) || !empty($this->all_begin) || !empty($this->all_end));
 		else
-			return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), array('body' => 0, 'html' => 0));
+			return array_diff_key(array_merge($this->all_general, $this->all_begin, $this->all_end), array('body' => 0, 'html' => 0));
 	}
 
 	/**
@@ -171,7 +171,7 @@ class TemplateLayers extends Priority
 	 */
 	public function getLayers()
 	{
-		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before));
+		return array_keys(array_merge($this->all_general, $this->all_begin, $this->all_end, $this->all_after, $this->all_before));
 	}
 
 	/**
@@ -179,12 +179,12 @@ class TemplateLayers extends Priority
 	 */
 	public function isError()
 	{
-		$this->_is_error = true;
+		$this->is_error = true;
 	}
 
 	public function setErrorSafe($error_safe)
 	{
-		$this->_error_safe = (bool) $error_safe;
+		$this->error_safe = (bool) $error_safe;
 		return $this;
 	}
 }

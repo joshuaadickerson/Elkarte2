@@ -11,8 +11,7 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Packages;
 
 /**
  * Utility class to unzip package files

@@ -50,7 +50,7 @@ function pbe_email_to_bbc($text, $html)
 		// Run the parsers on the html
 		$text = pbe_run_parsers($text);
 
-		$bbc_converter = new Html_2_BBC($text);
+		$bbc_converter = new Html2BBC($text);
 		$bbc_converter->skip_tags(array('font', 'span'));
 		$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
 		$text = $bbc_converter->get_bbc();
@@ -75,7 +75,7 @@ function pbe_email_to_bbc($text, $html)
 		$text = str_replace(array('&gt;blockquote>','&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		$bbc_converter = new Html_2_BBC($text, false);
+		$bbc_converter = new Html2BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
@@ -976,7 +976,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	$mark_down = new Html_2_Md($message);
+	$mark_down = new Html2Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text

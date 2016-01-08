@@ -17,7 +17,7 @@ namespace Elkarte\Elkarte\Text;
  * Converts a string of HTML to BBC
  *
  * Initiate
- *    $bbc_converter = new Html_2_BBC($html);
+ *    $bbc_converter = new Html2BBC($html);
  *    where $html is a string of html we want to convert to bbc
  *
  * Override

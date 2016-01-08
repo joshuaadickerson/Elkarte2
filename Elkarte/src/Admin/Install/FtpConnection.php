@@ -5,7 +5,7 @@
  *
  * http://www.faqs.org/rfcs/rfc959.html
  */
-class Ftp_Connection
+class FtpConnection
 {
 	/**
 	 * holds the connection response

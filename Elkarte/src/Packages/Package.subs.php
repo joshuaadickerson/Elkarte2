@@ -17,8 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
@@ -83,7 +81,6 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnTgz.php');
 	$untgz = new UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	// Choose the right method for the file
@@ -110,7 +107,6 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnZip.php');
 	$unzip = new UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	return $unzip->read_zip_data();
@@ -256,7 +252,7 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an Xml_Array.
-	$packageInfo = new Xml_Array($packageInfo);
+	$packageInfo = new \Elkarte\Elkarte\XmlArray($packageInfo);
 
 	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
@@ -415,7 +411,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		// Check for a valid connection
 		if ($package_ftp->error !== false)
@@ -2622,7 +2618,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] == 'ftp')
 	{
 		// Establish a connection and attempt to enable passive mode.
-		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
 			return false;
 

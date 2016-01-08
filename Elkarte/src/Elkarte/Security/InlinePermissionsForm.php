@@ -1,6 +1,6 @@
 <?php
 
-namespace Elkarte\ElkArte\Security;
+namespace Elkarte\Elkarte\Security;
 
 /**
  * Class to initialize inline permissions sub-form and save its settings

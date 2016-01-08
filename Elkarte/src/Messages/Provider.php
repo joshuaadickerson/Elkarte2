@@ -48,7 +48,7 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['messages.post_controller'] = function ($elk) {
-			return new PostController($elk['hooks'], $elk['layers']);//($elk, $elk['messages.manager'], $elk['hooks'], $elk['errors'], $elk['text']);
+			return new PostController($elk['hooks'], $elk['layers'], $elk['topics.manager'], $elk['messages.post']);//($elk, $elk['messages.manager'], $elk['hooks'], $elk['errors'], $elk['text']);
 		};
 	}
 

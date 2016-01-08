@@ -56,12 +56,12 @@ class CalendarController extends AbstractController
 		// Permissions, permissions, permissions.
 		isAllowedTo('calendar_view');
 
-		// This is gonna be needed...
-		$this->_templates->load('Calendar');
-
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
 			$this->_errors->fatal_lang_error('calendar_off', false);
+
+		// This is gonna be needed...
+		$this->_templates->load('Calendar');
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
@@ -75,7 +75,6 @@ class CalendarController extends AbstractController
 			$context['robot_no_index'] = true;
 
 		// Get the current day of month...
-		require_once(SUBSDIR . '/Calendar.subs.php');
 		$today = getTodayInfo();
 
 		// If the month and year are not passed in, use today's date as a starting point.

@@ -9,7 +9,7 @@ class PrepaseBBC extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		$this->bbPreparse_tests = array(
 			array(

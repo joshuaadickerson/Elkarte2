@@ -3,7 +3,9 @@
 namespace Elkarte\Elkarte\Controller;
 
 // @todo change this to not extend ValuesContainer
-class SubAction extends \ElkArte\ValuesContainer
+use Elkarte\Elkarte\ValuesContainer;
+
+class SubAction extends ValuesContainer
 {
 	public $name;
 	public $callback;

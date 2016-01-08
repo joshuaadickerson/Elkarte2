@@ -598,7 +598,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	}
 
 	// If we get to this point ... then its time to play, lets start a topic !
-	require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 	// Setup the topic variables.
 	$msgOptions = array(
@@ -687,7 +687,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		preparsecode($text);
 	}
 

@@ -960,7 +960,7 @@ class Attachments
 
 				$thumb_filename = $attachmentOptions['name'] . '_thumb';
 				$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
-				$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
+				$thumb_file_hash = $this->getHash($thumb_filename);
 				$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 				// We should check the file size and count here since thumbs are added to the existing totals.
@@ -1016,7 +1016,7 @@ class Attachments
 						)
 					);
 
-					rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $modSettings['currentAttachmentUploadDir'], false, $thumb_file_hash));
+					rename($thumb_path, getAttachmentFilename($attachmentOptions['thumb'], $thumb_file_hash, $modSettings['currentAttachmentUploadDir']));
 				}
 			}
 		}
@@ -1163,7 +1163,7 @@ class Attachments
 		removeAttachments(array('id_member' => $memID));
 
 		$id_folder = getAttachmentPathID();
-		$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
+		$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? $this->getHash($destName) : '';
 		$result = $db->insert('',
 			'{db_prefix}attachments',
 			array(
@@ -1332,6 +1332,8 @@ class Attachments
 	 *  - if the forum is using multiple attachments directories,
 	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
 	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+	 *
+	 * @todo rename to getCurrentDir()
 	 *
 	 * @package Attachments
 	 * @return string
@@ -1582,7 +1584,7 @@ class Attachments
 				$thumb_mime = 'image/' . $thumb_ext;
 
 			$thumb_filename = $filename . '_thumb';
-			$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
+			$thumb_hash = $this->getHash($thumb_filename);
 
 			$db = $GLOBALS['elk']['db'];
 
@@ -1607,7 +1609,7 @@ class Attachments
 					)
 				);
 
-				$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
+				$thumb_realname = getAttachmentFilename($attachment['id_thumb'], $thumb_hash, $id_folder_thumb);
 				rename($filename . '_thumb', $thumb_realname);
 
 				// Do we need to remove an old thumbnail?
@@ -1904,20 +1906,12 @@ class Attachments
 	 * @param bool $new If this is a new attachment, if so just returns a hash
 	 * @param string $file_hash The file hash
 	 * @return string
+	 *
+	 * @todo rename to getFullPath()
 	 */
-	function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
+	function getAttachmentFilename($attachment_id, $file_hash, $dir = null)
 	{
 		global $modSettings;
-
-		// Just make up a nice hash...
-		if ($new)
-			return $this->getHash($filename);
-
-		// In case of files from the old system, do a legacy call.
-		if (empty($file_hash))
-		{
-			return $this->getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
-		}
 
 		// Are we using multiple directories?
 		if (!empty($modSettings['currentAttachmentUploadDir']))

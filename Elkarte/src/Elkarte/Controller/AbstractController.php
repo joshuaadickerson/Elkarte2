@@ -13,6 +13,7 @@
 
 namespace Elkarte\Elkarte\Controller;
 
+use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Events\EventManager;
 use Elkarte\Elkarte\Events\Hooks;
 use Pimple\Container;
@@ -46,6 +47,7 @@ abstract class AbstractController
 	protected $_errors;
 	/** @var Session */
 	protected $_session;
+
 	/** @var array */
 	protected $context;
 	/** @var Container  */
@@ -56,39 +58,16 @@ abstract class AbstractController
 	protected $errors;
 	/** @var StringUtil  */
 	protected $text;
-
-	/**
-	 * Constructor...
-	 * Requires the name of the controller we want to instantiate, lowercase and
-	 * without the "Controller" part.
-	 *
-	 * @param Container $elk
-	 * @param null|EventManager $eventManager - The event manager
-	 */
-	/*
-	public function __construct(Container $elk, EventManager $eventManager = null)
-	{
-		$this->elk = $elk;
-
-		// @todo inject these in the constructor arguments
-		$this->_layers = $elk['layers'];
-		$this->_templates = $elk['templates'];
-		$this->_errors = $elk['errors'];
-		$this->_req = $elk['http_req'];
-		$this->_session = $elk['session'];
-		$this->hooks = $elk['hooks'];
-
-		// A safety-net to remain backward compatibility
-		if ($eventManager === null)
-		{
-			$eventManager = new EventManager();
-		}
-
-		$this->_events = $eventManager;
-
-		// Initialize the events associated with this controller
-		$this->_initEventManager();
-	}*/
+	/** @var TemplateLayers The template layers */
+	protected $layers;
+	/** @var HttpReq instance of HttpReq object */
+	protected $req;
+	/** @var EventManager The event manager. */
+	protected $events;
+	/** @var Cache */
+	protected $cache;
+	/** @var  Templates */
+	protected $templates;
 
 	public function bootstrap()
 	{

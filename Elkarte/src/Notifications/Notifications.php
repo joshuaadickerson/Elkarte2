@@ -598,7 +598,7 @@ class Notifications extends AbstractModel
 				'members_only' => is_array($members_only) ? $members_only : array($members_only),
 			)
 		);
-		while ($row = $db->fetch_assoc($members))
+		while ($row = $members->fetchAssoc())
 		{
 			// Don't do the excluded...
 			if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
@@ -614,7 +614,7 @@ class Notifications extends AbstractModel
 				continue;
 
 			$email_perm = true;
-			if (validateNotificationAccess($row, $maillist, $email_perm) === false)
+			if ($this->validateNotificationAccess($row, $maillist, $email_perm) === false)
 				continue;
 
 			$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
@@ -663,7 +663,7 @@ class Notifications extends AbstractModel
 				$sent++;
 			}
 		}
-		$db->free_result($members);
+		$members->free();
 
 		if (isset($current_language) && $current_language != $user_language)
 			loadLanguage('Post');

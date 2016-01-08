@@ -34,17 +34,6 @@ use Elkarte\Elkarte\Text\StringUtil;
  */
 class ManageBoardsController extends AbstractController
 {
-	/** @var Container  */
-	protected $elk;
-	/** @var Credits  */
-	protected $credits;
-	/** @var Hooks  */
-	protected $hooks;
-	/** @var Errors  */
-	protected $errors;
-	/** @var StringUtil  */
-	protected $text;
-
 	/**
 	 * Category being worked on
 	 * @var int
@@ -63,14 +52,17 @@ class ManageBoardsController extends AbstractController
 	 */
 	protected $_boardSettings;
 
-	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, StringUtil $text)
+	/** @var BoardsManager  */
+	protected $boards_manager;
+
+	public function __construct(Container $elk, Hooks $hooks, Errors $errors, StringUtil $text, BoardsManager $boardsManager)
 	{
 		$this->elk = $elk;
-		$this->credits = $credits;
 
 		$this->hooks = $hooks;
 		$this->errors = $errors;
 		$this->text = $text;
+		$this->boards_manager = $boardsManager;
 	}
 
 
@@ -172,8 +164,6 @@ class ManageBoardsController extends AbstractController
 		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
 
 		$this->_templates->load('ManageBoards');
-
-
 
 		// Moving a board, child of, before, after, top
 		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
@@ -480,7 +470,7 @@ class ManageBoardsController extends AbstractController
 
 		$this->_templates->load('ManageBoards');
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -656,7 +646,7 @@ class ManageBoardsController extends AbstractController
 		validateToken('Admin-be-' . $this->_req->post->boardid);
 
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// Mode: modify aka. don't delete.
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))

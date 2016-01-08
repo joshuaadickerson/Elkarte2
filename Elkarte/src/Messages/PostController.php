@@ -25,6 +25,7 @@ use Elkarte\Elkarte\Controller\AbstractController;
 use Elkarte\Elkarte\Events\Hooks;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 use Elkarte\ErrorContext;
+use Elkarte\Topics\TopicsManager;
 
 /**
  * Post Controller
@@ -49,12 +50,19 @@ class PostController extends AbstractController
 	 */
 	protected $_topic_attributes = array();
 
-	public function __construct(Hooks $hooks, TemplateLayers $layers)
+	/** @var TopicsManager */
+	protected $topic_manager;
+	/** @var  Post */
+	protected $post_manager;
+
+	public function __construct(Hooks $hooks, TemplateLayers $layers, TopicsManager $topic_manager, Post $post_manager)
 	{
 		$this->bootstrap();
 
 		$this->hooks = $hooks;
 		$this->layers = $layers;
+		$this->topic_manager = $topic_manager;
+		$this->post_manager = $post_manager;
 	}
 
 	/**
@@ -144,7 +152,7 @@ class PostController extends AbstractController
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$this->_topic_attributes = topicUserAttributes($topic, $user_info['id']);
+			$this->_topic_attributes = $this->topic_manager->topicUserAttributes($topic, $user_info['id']);
 			$context['notify'] = $this->_topic_attributes['notify'];
 			$context['topic_last_message'] = $this->_topic_attributes['id_last_msg'];
 
@@ -240,7 +248,7 @@ class PostController extends AbstractController
 		{
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
-				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+				$context['new_replies'] = $this->topic_manager->countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
 				{
@@ -314,11 +322,11 @@ class PostController extends AbstractController
 			{
 				// Set up the preview message and subject
 				$context['preview_message'] = $form_message;
-				preparsecode($form_message, true);
+				$this->post_manager->preparsecode($form_message, true);
 
 				// Do all bulletin board code thing on the message
 				$bbc_parser = $GLOBALS['elk']['bbc'];
-				preparsecode($context['preview_message']);
+				$this->post_manager->preparsecode($context['preview_message']);
 				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 				$context['preview_message'] = censor($context['preview_message']);
 
@@ -383,7 +391,7 @@ class PostController extends AbstractController
 				else
 					$case = 4;
 
-				list ($form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
+				list ($form_subject,) = $this->post_manager->getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 			}
 
 			// No check is needed, since nothing is really posted.
@@ -394,7 +402,7 @@ class PostController extends AbstractController
 		{
 			$msg_id = (int) $_REQUEST['msg'];
 
-			$message = getFormMsgSubject(1, $topic, '', $msg_id);
+			$message = $this->post_manager->getFormMsgSubject(1, $topic, '', $msg_id);
 
 			// The message they were trying to edit was most likely deleted.
 			if ($message === false)
@@ -490,7 +498,7 @@ class PostController extends AbstractController
 			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
 
 			$counter = 0;
-			$context['previous_posts'] = empty($limit) ? array() : selectMessages($topic, 0, $limit, $before, $only_approved);
+			$context['previous_posts'] = empty($limit) ? array() : $this->topic_manager->selectMessages($topic, 0, $limit, $before, $only_approved);
 			foreach ($context['previous_posts'] as &$post)
 			{
 				$post['is_new'] = !empty($context['new_replies']);
@@ -654,7 +662,7 @@ class PostController extends AbstractController
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
 		{
-			$topic_info = getTopicInfo($topic);
+			$topic_info = $this->topic_manager->getTopicInfo($topic);
 
 			// Though the topic should be there, it might have vanished.
 			if (empty($topic_info))
@@ -873,7 +881,7 @@ class PostController extends AbstractController
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
 				$user_info['name'] = $_POST['guestname'];
-			preparsecode($_POST['message']);
+			$this->elk['messages.post']->preparsecode($_POST['message']);
 
 			$bbc_parser = $GLOBALS['elk']['bbc'];
 
@@ -1002,7 +1010,7 @@ class PostController extends AbstractController
 				$posterOptions['update_post_count'] = !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'];
 			}
 
-			createPost($msgOptions, $topicOptions, $posterOptions);
+			$this->post_manager->createPost($msgOptions, $topicOptions, $posterOptions);
 
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
@@ -1014,21 +1022,21 @@ class PostController extends AbstractController
 		// (You just posted and they will be unread.)
 		if (!$user_info['is_guest'])
 		{
-			$board_list = $board_info->parentBoards() !== array() ? array_keys($board_info->parentBoards()) : array();
+			$board_list = $board_info->parentBoards($this->elk['boards.manager']) !== array() ? array_keys($board_info->parentBoards($this->elk['boards.manager'])) : array();
 
 			// Returning to the topic?
 			if (!empty($_REQUEST['goback']))
 				$board_list[] = $board;
 
 			if (!empty($board_list))
-				markBoardsRead($board_list, false, false);
+				$this->elk['boards.readlog']->markBoardsRead($board_list, false, false);
 		}
 
 		// Turn notification on or off.
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
-			setTopicNotification($user_info['id'], $topic, true);
+			$this->topic_manager->setTopicNotification($user_info['id'], $topic, true);
 		elseif (!$newTopic)
-			setTopicNotification($user_info['id'], $topic, false);
+			$this->topic_manager->setTopicNotification($user_info['id'], $topic, false);
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
@@ -1043,7 +1051,6 @@ class PostController extends AbstractController
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
 		{
-
 			if ($newTopic)
 			{
 				$notifyData = array(
@@ -1062,9 +1069,9 @@ class PostController extends AbstractController
 			{
 				// Only send it to everyone if the topic is approved, otherwise just to the topic starter if they want it.
 				if ($topic_info['approved'])
-					sendNotifications($topic, 'reply');
+					$this->elk['notifications.manager']->sendNotifications($topic, 'reply');
 				else
-					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
+					$this->elk['notifications.manager']->sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
 		}
 

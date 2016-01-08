@@ -869,7 +869,7 @@ function prepareMailingForPreview()
 	global $context, $modSettings, $scripturl, $user_info, $txt;
 
 	loadLanguage('Errors');
-	require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 	$processing = array(
 		'preview_subject' => 'subject',

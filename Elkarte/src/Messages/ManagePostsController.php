@@ -166,7 +166,7 @@ class ManagePostsController extends AbstractController
 		// Testing a word to see how it will be censored?
 		if (isset($this->_req->post->censortest))
 		{
-			require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;

@@ -308,7 +308,7 @@ function template_post_page()
 							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" />';
 
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
-	if (empty($context['make_poll']) && $context['can_add_poll'])
+	if (empty($context['make_poll']) && !empty($context['can_add_poll']))
 		echo '
 							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 
@@ -337,7 +337,7 @@ function template_additional_options_below()
 					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' class="hide"', '>';
 
 	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
-	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
+	if (!empty($context['attachments']['can']['post']) || !empty($context['attachments']['current']))
 		$context['attachments']['template']();
 
 	// Display the check boxes for all the standard options - if they are available to the user!

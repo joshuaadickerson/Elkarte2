@@ -708,7 +708,7 @@ class ModerationCenterController extends AbstractController
 			validateToken('mod-wt');
 
 			// To check the BBC is pretty good...
-			require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 			// Bit of cleaning!
 			$template_body = trim($this->_req->post->template_body);

@@ -158,7 +158,7 @@ class Messages extends AbstractManager
 		if (empty($id_msg))
 			return false;
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		$moderate_boards = boardsAllowedTo('moderate_board');
 

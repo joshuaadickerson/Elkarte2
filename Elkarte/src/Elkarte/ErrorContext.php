@@ -261,7 +261,7 @@ class ErrorContext
 	/**
 	 * Load the default error language and any other language file needed
 	 */
-	protected function _loadLang()
+	protected function loadLang()
 	{
 		// Errors is always needed
 		loadLanguage('Errors');

@@ -136,8 +136,6 @@ class MoveTopicController extends AbstractController
 		$this->_check_access_2();
 
 		$this->_session->check();
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
-
 
 		// The destination board must be numeric.
 		$this->_toboard = (int) $this->_req->post->toboard;

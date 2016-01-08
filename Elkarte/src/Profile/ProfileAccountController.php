@@ -362,7 +362,7 @@ class ProfileAccountController extends AbstractController
 
 			if (!empty($this->_req->post->warn_body))
 			{
-				require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 				$bbc_parser = $GLOBALS['elk']['bbc'];
 				preparsecode($warning_body);

@@ -41,7 +41,7 @@ class Post
 		$message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $message);
 
 		// Clean up after nobbc ;).
-		$message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', 'preparsecode_nobbc_callback', $message);
+		$message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', [$this, 'preparsecode_nobbc_callback'], $message);
 
 		// Remove \r's... they're evil!
 		$message = strtr($message, array("\r" => ''));
@@ -95,7 +95,7 @@ class Post
 		for ($i = 0, $n = count($parts); $i < $n; $i++) {
 			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 			if ($i % 4 == 0) {
-				fixTags($parts[$i]);
+				$this->fixTags($parts[$i]);
 
 				// Replace /me.+?\n with [me=name]dsf[/me]\n.
 				if (preg_match('~[\[\]\\"]~', $user_info['name']) !== false) {
@@ -107,7 +107,7 @@ class Post
 				}
 
 				// Make sure all tags are lowercase.
-				$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', 'preparsecode_lowertags_callback', $parts[$i]);
+				$parts[$i] = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', [$this, 'preparsecode_lowertags_callback'], $parts[$i]);
 
 				$list_open = substr_count($parts[$i], '[list]') + substr_count($parts[$i], '[list ');
 				$list_close = substr_count($parts[$i], '[/list]');
@@ -174,7 +174,7 @@ class Post
 				$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 
 				// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-				$parts[$i] = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', 'preparsecode_font_callback', $parts[$i]);
+				$parts[$i] = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', [$this, 'preparsecode_font_callback'], $parts[$i]);
 			}
 
 			$GLOBALS['elk']['hooks']->hook('preparse_code', array(&$parts[$i], $i, $previewing));
@@ -187,7 +187,7 @@ class Post
 			$message = strtr(implode('', $parts), array('  ' => '&nbsp; ', "\xC2\xA0" => '&nbsp;'));
 
 		// Now we're going to do full scale table checking...
-		$message = preparsetable($message);
+		$message = $this->preparsetable($message);
 
 		// Now let's quickly clean up things that will slow our parser (which are common in posted code.)
 		$message = strtr($message, array('[]' => '&#91;]', '[&#039;' => '&#91;&#039;'));
@@ -375,14 +375,14 @@ class Post
 
 		// Fix each type of tag.
 		foreach ($fixArray as $param)
-			fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
+			$this->fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
 
 		// Now fix possible security problems with images loading links automatically...
-		$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', 'fixTags_img_callback', $message);
+		$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', [$this, 'fixTags_img_callback'], $message);
 
 		// Limit the size of images posted?
 		if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
-			resizeBBCImages($message);
+			$this->resizeBBCImages($message);
 	}
 
 	/**
@@ -404,12 +404,12 @@ class Post
 	 * @package Posts
 	 * @param string $message
 	 * @param string $myTag - the tag
-	 * @param string $protocols - http or ftp
+	 * @param string[] $protocols - http or ftp
 	 * @param bool $embeddedUrl = false - whether it *can* be set to something
 	 * @param bool $hasEqualSign = false, whether it *is* set to something
 	 * @param bool $hasExtra = false - whether it can have extra cruft after the begin tag.
 	 */
-	function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false)
+	function fixTag(&$message, $myTag, array $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false)
 	{
 		global $boardurl, $scripturl;
 
@@ -828,7 +828,7 @@ class Post
 		if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest']) {
 			// Since it's likely they *read* it before replying, let's try an UPDATE first.
 			if (!$new_topic) {
-				$db->query('', '
+				$result = $db->query('', '
 					UPDATE {db_prefix}log_topics
 					SET id_msg = {int:id_msg}
 					WHERE id_member = {int:current_member}
@@ -840,7 +840,7 @@ class Post
 					)
 				);
 
-				$flag = $db->affected_rows() != 0;
+				$flag = $result->numAffectedRows() != 0;
 			}
 
 			if (empty($flag)) {
@@ -850,8 +850,7 @@ class Post
 		}
 
 		// If there's a custom search index, it may need updating...
-		require_once(SUBSDIR . '/Search.subs.php');
-		$searchAPI = findSearchAPI();
+		$searchAPI = $GLOBALS['elk']['search.manager']->findSearchAPI();
 		if (is_callable(array($searchAPI, 'postCreated')))
 			$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
 
@@ -861,7 +860,7 @@ class Post
 			if ($user_info['id'] == $posterOptions['id'])
 				$user_info['posts']++;
 
-			updateMemberData($posterOptions['id'], array('posts' => '+'));
+			$GLOBALS['elk']['members.manager']->updateMemberData($posterOptions['id'], array('posts' => '+'));
 		}
 
 		// They've posted, so they can make the view count go up one if they really want. (this is to keep views >= replies...)
@@ -873,11 +872,11 @@ class Post
 
 		// Update all the stats so everyone knows about this new topic and message.
 
-		updateMessageStats(true, $msgOptions['id']);
+		$GLOBALS['elk']['messages.manager']->updateMessageStats(true, $msgOptions['id']);
 
 		// Update the last message on the board assuming it's approved AND the topic is.
 		if ($msgOptions['approved'])
-			updateLastMessages($topicOptions['board'], $new_topic || !empty($topicOptions['is_approved']) ? $msgOptions['id'] : 0);
+			$GLOBALS['elk']['boards.manager']->updateLastMessages($topicOptions['board'], $new_topic || !empty($topicOptions['is_approved']) ? $msgOptions['id'] : 0);
 
 		// Alright, done now... we can abort now, I guess... at least this much is done.
 		ignore_user_abort($previous_ignore_user_abort);

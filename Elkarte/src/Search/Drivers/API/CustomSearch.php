@@ -18,7 +18,7 @@
  *
  */
 
-namespace Elkarte\Search\API;
+namespace Elkarte\Search\Drivers\API;
 
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used

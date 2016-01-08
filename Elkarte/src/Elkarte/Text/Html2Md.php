@@ -837,7 +837,7 @@ class Html2Md
 	{
 		if ($this->_parser)
 		{
-			$doc = new DOMDocument();
+			$doc = new \DOMDocument();
 			$doc->appendChild($doc->importNode($node, true));
 			$html = trim($doc->saveHTML());
 			$tag = $node->nodeName;
@@ -857,25 +857,7 @@ class Html2Md
 	{
 		if ($this->_parser)
 		{
-			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
-				return htmlspecialchars_decode($this->doc->saveHTML($node));
-			else
-			{
-				// @todo remove when 5.3.6 min
-				$doc = new DOMDocument();
-				$doc->appendChild($doc->importNode($node, true));
-				$html = $doc->saveHTML();
-
-				// We just want the html of the inserted node, it *may* be wrapped
-				if (preg_match('~<body>(.*)</body>~s', $html, $body))
-					$html = $body[1];
-				elseif (preg_match('~<html>(.*)</html>~s', $html, $body))
-					$html = $body[1];
-
-				// Clean it up
-				$html = rtrim($html, "\n");
-				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-			}
+			return htmlspecialchars_decode($this->doc->saveHTML($node));
 		}
 		else
 			return $node->outertext;
@@ -888,6 +870,7 @@ class Html2Md
 	 * be converted by md to html as <strong>stuff</strong>
 	 *
 	 * @param string $value
+	 * @return string
 	 */
 	protected function _escape_text($value)
 	{

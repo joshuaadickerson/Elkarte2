@@ -32,9 +32,13 @@ use Elkarte\Elkarte\Errors\Errors;
  */
 class BoardIndexController extends AbstractController implements FrontpageInterface
 {
+	/** @var BoardsManager  */
 	protected $manager;
+	/** @var Categories */
+	protected $cat_manager;
 
-	public function __construct(Container $elk, BoardsManager $manager, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+	public function __construct(Container $elk, BoardsManager $manager, Hooks $hooks, Errors $errors, TemplateLayers $layers,
+								Categories $cat_manager)
 	{
 		$this->elk = $elk;
 
@@ -42,8 +46,9 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 
 		$this->hooks = $hooks;
 		$this->errors = $errors;
-		$this->_layers = $layers;
+		$this->layers = $layers;
 		$this->manager = $manager;
+		$this->cat_manager = $cat_manager;
 	}
 
 	/**
@@ -82,14 +87,12 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 	{
 		global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
-		$this->_templates->load('BoardIndex');
-
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;
-		$this->_layers->add('boardindex_outer');
+		$this->layers->add('boardindex_outer');
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
-		if (!empty($this->_req->query))
+		if (!empty($this->req->query))
 			$context['robot_no_index'] = true;
 
 		// Retrieve the categories and boards.
@@ -101,7 +104,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
 
-		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
+		$this->events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
 
 		$boardlist = $this->elk['boards.list'];
 		$boardlist->setOptions($boardIndexOptions);
@@ -122,7 +125,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 
 		// Are we showing all membergroups on the board index?
 		if (!empty($settings['show_group_key']))
-			$context['membergroups'] = $this->cache->get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
+			$context['membergroups'] = $this->cache->quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
 
 		// Track most online statistics? (subs/Members.subs.phpOnline.php)
 		if (!empty($modSettings['trackStats']))
@@ -134,7 +137,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 			$latestPostOptions = array(
 				'number_posts' => $settings['number_recent_posts'],
 			);
-			$context['latest_posts'] = $this->cache->get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+			$context['latest_posts'] = $this->cache->quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 		}
 
 		// Let the template know what the members can do if the theme enables these options
@@ -154,7 +157,7 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 
 		$context['info_center_callbacks'][] = 'show_users';
 
-		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
+		$this->events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
 
 		// Mark read button
 		$context['mark_read_button'] = array(
@@ -163,6 +166,8 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 
 		// Allow mods to add additional buttons here
 		$this->hooks->hook('mark_read_button');
+
+		$this->templates->load('BoardIndex');
 	}
 
 	/**
@@ -177,17 +182,16 @@ class BoardIndexController extends AbstractController implements FrontpageInterf
 		// Just in case, no need, no need.
 		$context['robot_no_index'] = true;
 
-		$this->_session->check('request');
+		$this->session->check('request');
 
-		if (!isset($this->_req->query->sa))
-			$this->_errors->fatal_lang_error('no_access', false);
+		if (!isset($this->req->query->sa))
+			$this->errors->fatal_lang_error('no_access', false);
 
 		// Check if the input values are correct.
-		if (in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->_req->query->c))
+		if (in_array($this->req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->req->query->c))
 		{
 			// And collapse/expand/toggle the category.
-			$categories = new Categories($this->db(), $this->hooks);
-			$categories->collapse(array((int) $this->_req->query->c), $this->_req->query->sa, array($user_info['id']));
+			$this->cat_manager->collapse(array((int) $this->req->query->c), $this->req->query->sa, array($user_info['id']));
 		}
 
 		// And go back to the board index.

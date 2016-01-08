@@ -34,7 +34,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		);
 
 		// Lets start by ensuring a topic exists by creating one
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		// Post variables

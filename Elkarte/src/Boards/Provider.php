@@ -39,6 +39,10 @@ class Provider implements ProviderInterface
 		$elk['boards.readlog'] = function ($elk) {
 			return new ReadLog\BoardReadLog($elk['db'], $elk['cache'], $elk['hooks'], $elk['errors'], $elk['text']);
 		};
+
+		$elk['category.manager'] = function ($elk) {
+			return new Categories($elk['boards.manager'], $elk['db'], $elk['hooks']);
+		};
 	}
 
 	public function boot(Container $elk)
@@ -50,12 +54,12 @@ class Provider implements ProviderInterface
 	protected function controllers(Container $elk)
 	{
 		$elk['boards.index_controller'] = function ($elk) {
-			return new BoardIndexController($elk, $elk['boards.manager'], $elk['hooks'], $elk['errors'], $elk['layers']);
-			// (Container $elk, Hooks $hooks, Errors $errors, TemplateLayers $layers)
+			return new BoardIndexController($elk, $elk['boards.manager'], $elk['hooks'], $elk['errors'], $elk['layers'],
+				$elk['category.manager']);
 		};
 
 		$elk['boards.manage_controller'] = function ($elk) {
-			return new ManageBoardsController($elk, $elk['boards.manager'], $elk['hooks'], $elk['errors'], $elk['text']);
+			return new ManageBoardsController($elk, $elk['boards.manager'], $elk['hooks'], $elk['errors'], $elk['text'], $elk['boards.manager']);
 		};
 
 		$elk['boards.repair_controller'] = function ($elk) {
@@ -65,6 +69,7 @@ class Provider implements ProviderInterface
 
 	protected function actions()
 	{
+		//'collapse' 				=> ['boards.index_controller', 'action_collapse'],
 
 	}
 }

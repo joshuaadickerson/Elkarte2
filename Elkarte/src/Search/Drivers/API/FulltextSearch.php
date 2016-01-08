@@ -17,7 +17,7 @@
  *
  */
 
-namespace Elkarte\Search\API;
+namespace Elkarte\Search\Drivers\API;
 
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used

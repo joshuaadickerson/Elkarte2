@@ -494,7 +494,7 @@ class Moderator
 		$request->free();
 
 		if (!empty($msgs)) {
-			require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 			approvePosts($msgs);
 			$GLOBALS['elk']['cache']->remove('num_menu_errors');
 		}

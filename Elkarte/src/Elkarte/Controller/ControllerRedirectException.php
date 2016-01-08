@@ -11,8 +11,7 @@
  *
  */
 
-namespace Elkarte\Controller;
-
+namespace Elkarte\Elkarte\Controller;
 /**
  * In certain cases a module of a controller may want to "redirect" to another
  * controller (e.g. from Calendar to Post).

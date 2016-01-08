@@ -1825,6 +1825,8 @@ class MembersManager extends AbstractManager
 	 *
 	 * @param int $id_admin = 0 if requested, only data about a specific Admin is retrieved
 	 * @return array
+	 *
+	 * @todo change to getting getMembersByGroup(Groups::ADMIN_GROUP)
 	 */
 	function admins($id_admin = 0)
 	{

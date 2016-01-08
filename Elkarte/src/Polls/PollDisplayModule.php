@@ -19,6 +19,9 @@
 
 namespace Elkarte\Polls;
 
+use Elkarte\Elkarte\ModuleInterface;
+use Elkarte\Elkarte\Events\EventManager;
+
 class PollDisplayModule implements ModuleInterface
 {
 	protected static $_enabled = false;
@@ -69,7 +72,6 @@ class PollDisplayModule implements ModuleInterface
 		if ($context['is_poll'])
 		{
 			$template_layers->add('display_poll');
-			require_once(SUBSDIR . '/Poll.subs.php');
 
 			loadPollContext($this->_id_poll);
 

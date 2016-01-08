@@ -199,9 +199,6 @@ class AttachmentController extends AbstractController
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
 			$this->_errors->fatal_lang_error('no_access', false);
 
-		// We need to do some work on attachments and avatars.
-
-
 		$id_attach = isset($this->_req->query->attach)
 			? (int) $this->_req->query->attach
 			: (int) $this->_req->query->id;
@@ -233,14 +230,17 @@ class AttachmentController extends AbstractController
 		if (empty($is_avatar) || $attachment_type != 3)
 			increaseDownloadCounter($id_attach);
 
-		$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		$filename = getAttachmentFilename($id_attach, $file_hash, $id_folder);
 
 		// This is done to clear any output that was made before now.
 		while (ob_get_level() > 0)
 			@ob_end_clean();
 
-		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
+		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304
+			&& in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
+		{
 			ob_start('ob_gzhandler');
+		}
 		else
 		{
 			ob_start();
@@ -410,7 +410,7 @@ class AttachmentController extends AbstractController
 				if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 					isAllowedTo('approve_posts');
 
-				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+				$filename = getAttachmentFilename($id_attach, $file_hash, $id_folder);
 			}
 		}
 		catch (\Exception $e)

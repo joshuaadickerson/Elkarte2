@@ -18,10 +18,7 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+namespace Elkarte\Topics;
 
 /**
  * Remove Topic Controller

@@ -268,7 +268,7 @@ class PackageActions extends AbstractController
 		{
 			$bbc_parser = $GLOBALS['elk']['bbc'];
 
-			require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 			preparsecode($context[$type]);
 
 			$context[$type] = $bbc_parser->parsePackage($context[$type]);

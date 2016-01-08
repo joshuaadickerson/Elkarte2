@@ -196,16 +196,34 @@ class PostModerationController extends AbstractController
 			if (!empty($toAction))
 			{
 				if ($curAction === 'approve')
+				{
 					approveMessages($toAction, $details, $context['current_view']);
+				}
 				else
-					removeMessages($toAction, $details, $context['current_view']);
+				{
+					if ($context['current_view'] === 'topics') {
+						removeTopics($toAction);
+
+						// and tell the world about it
+						foreach ($toAction as $topic) {
+							// Note, only log topic ID in native form if it's not gone forever.
+							logAction('remove', [
+								empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $details[$topic]['board'] ? 'topic' : 'old_topic_id' => $topic,
+								'subject' => $details[$topic]['subject'],
+								'member' => $details[$topic]['member'],
+								'board' => $details[$topic]['board'],
+							]);
+						}
+					}
+					else
+						removeMessages($toAction, $details, $context['current_view']);
+				}
 
 				$GLOBALS['elk']['cache']->remove('num_menu_errors');
 			}
 		}
 
 		// Get the moderation values for the board level
-		require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 		$mod_count = loadModeratorMenuCounts($this->_brd);
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
@@ -482,7 +500,7 @@ class PostModerationController extends AbstractController
 		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
 
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 
 		isAllowedTo('approve_posts');

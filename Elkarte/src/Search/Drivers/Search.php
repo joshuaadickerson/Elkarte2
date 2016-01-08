@@ -242,13 +242,13 @@ class Search
 
 		// Load up the search API we are going to use.
 		if (empty($modSettings['search_index']))
-			$modSettings['search_index'] = 'Standard_Search';
+			$modSettings['search_index'] = 'StandardSearch';
 		elseif (in_array($modSettings['search_index'], array('custom', 'fulltext')))
-			$modSettings['search_index'] = ucfirst($modSettings['search_index']) . '_Search';
+			$modSettings['search_index'] = ucfirst($modSettings['search_index']) . 'Search';
 
-		$search_class_name = '\\ElkArte\\Search\\API\\' . $modSettings['search_index'];
+		$search_class_name = '\\Elkarte\\Search\\Drivers\\API\\' . $modSettings['search_index'];
 
-		if (!class_implements($search_class_name, 'Search_Interface'))
+		if (!class_exists($search_class_name) || !class_implements($search_class_name, 'SearchInterface'))
 		{
 			$GLOBALS['elk']['errors']->fatal_lang_error('search_api_missing');
 		}
@@ -264,7 +264,7 @@ class Search
 			loadLanguage('Errors');
 			$GLOBALS['elk']['errors']->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
 
-			$this->searchAPI = new \ElkArte\Search\API\StandardSearch();
+			$this->searchAPI = new \Elkarte\Search\Drivers\API\StandardSearch();
 		}
 
 		return $this->searchAPI;

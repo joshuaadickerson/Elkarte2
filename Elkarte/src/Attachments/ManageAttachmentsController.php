@@ -1661,7 +1661,7 @@ class ManageAttachmentsController extends AbstractController
 				$dir_size = empty($dir_size) ? 0 : $dir_size;
 				foreach ($tomove as $row)
 				{
-					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$source = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
 
 					// Size and file count check

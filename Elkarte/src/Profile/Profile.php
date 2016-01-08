@@ -1839,7 +1839,7 @@ class Profile extends AbstractManager
 	{
 		global $modSettings, $txt;
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// Admins can do whatever they hell they want!
 		if (!allowedTo('admin_forum')) {
@@ -2053,7 +2053,7 @@ class Profile extends AbstractManager
 
 			if ($contents != false) {
 				// Create a hashed name to save
-				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+				$new_avatar_name = $uploadDir . '/' . $this->elk['attachments.file_manager']->getHash('avatar_tmp_' . $memID);
 				if (file_put_contents($new_avatar_name, $contents) !== false) {
 					$downloadedExternalAvatar = true;
 					$_FILES['attachment']['tmp_name'] = $new_avatar_name;
@@ -2137,7 +2137,7 @@ class Profile extends AbstractManager
 						$GLOBALS['elk']['errors']->fatal_lang_error('attachments_no_write', 'critical');
 					}
 
-					$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+					$new_avatar_name = $uploadDir . '/' . $this->elk['attachments.file_manager']->getHash('avatar_tmp_' . $memID);
 					if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 						$GLOBALS['elk']['errors']->fatal_lang_error('attach_timeout', 'critical');
 
@@ -2224,7 +2224,7 @@ class Profile extends AbstractManager
 					$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
 					$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
 					list ($width, $height) = getimagesize($_FILES['attachment']['tmp_name']);
-					$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+					$file_hash = empty($modSettings['custom_avatar_enabled']) ? $this->elk['attachments.file_manager']->getHash($destName) : '';
 
 					// Remove previous attachments this member might have had.
 					removeAttachments(array('id_member' => $memID));

@@ -29,7 +29,7 @@ class Provider implements ProviderInterface
 	{
 		$elk['about.controller'] = function ($elk) {
 			//Container $elk, Credits $credits, Hooks $hooks, Errors $errors, Util $text
-			return new AboutController($elk, $elk['about.credits'], $elk['hooks'], $elk['errors'], $elk['text']);
+			return new AboutController($elk, $elk['about.credits'], $elk['hooks'], $elk['errors'], $elk['text'], $elk['members.manager'], $elk['groups.manager']);
 		};
 
 		$elk['about.stats_controller'] = function ($elk) {
@@ -37,7 +37,7 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['about.help_controller'] = function ($elk) {
-			return new HelpController($elk, $elk['hooks'], $elk['errors'], $elk['text']);
+			return new HelpController($elk, $elk['hooks'], $elk['errors'], $elk['text'], $elk['templates'], $elk['http_req']);
 		};
 	}
 

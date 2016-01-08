@@ -23,6 +23,8 @@ namespace Elkarte\About;
 use Elkarte\Elkarte\Controller\AbstractController;
 use Elkarte\Elkarte\Controller\Action;
 use Elkarte\Elkarte\DataValidator;
+use Elkarte\Groups\GroupsManager;
+use Elkarte\Members\MembersManager;
 use Pimple\Container;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
@@ -33,18 +35,23 @@ use Elkarte\Elkarte\Text\StringUtil;
  */
 class AboutController extends AbstractController
 {
-	/** @var Container  */
+	/** @var Container */
 	protected $elk;
-	/** @var Credits  */
+	/** @var Credits */
 	protected $credits;
-	/** @var Hooks  */
+	/** @var Hooks */
 	protected $hooks;
-	/** @var Errors  */
+	/** @var Errors */
 	protected $errors;
-	/** @var StringUtil  */
+	/** @var StringUtil */
 	protected $text;
+    /** @var MembersManager */
+    protected $mem_manager;
+	/** @var GroupsManager */
+	protected $group_manager;
 
-	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, StringUtil $text)
+	public function __construct(Container $elk, Credits $credits, Hooks $hooks, Errors $errors, StringUtil $text,
+								MembersManager $mem_manager, GroupsManager $group_manager)
 	{
 		$this->elk = $elk;
 		$this->credits = $credits;
@@ -52,6 +59,8 @@ class AboutController extends AbstractController
 		$this->hooks = $hooks;
 		$this->errors = $errors;
 		$this->text = $text;
+        $this->mem_manager = $mem_manager;
+		$this->group_manager = $group_manager;
 	}
 
     /**
@@ -108,10 +117,6 @@ class AboutController extends AbstractController
             $context['errors'] = array();
             loadLanguage('Errors');
 
-            // Could they get the right send topic verification code?
-            require_once(ROOTDIR . '/Members/Authentication/VerificationControls.php');
-
-
             // Form validation
             $validator = new DataValidator();
             $validator->sanitation_rules(array(
@@ -140,7 +145,7 @@ class AboutController extends AbstractController
             // No errors, then send the PM to the admins
             if (empty($context['errors']))
             {
-                $admins = admins();
+                $admins = $this->mem_manager->admins();
                 if (!empty($admins))
                 {
                     $this->elk['pm']->sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $this->_req->post->contactmessage, false, array('id' => 0, 'name' => $this->_req->post->emailaddress, 'username' => $this->_req->post->emailaddress));
@@ -202,14 +207,13 @@ class AboutController extends AbstractController
         $staff_groups = empty($modSettings['staff_groups']) ? array(1, 2) : explode(',', $modSettings['staff_groups']);
         $this->hooks->hook('staff_groups', array($staff_groups));
 
+        $this->group_manager->loadStaffList($staff_groups);
 
-        loadStaffList($staff_groups);
-
-        loadMemberData($context['staff_ids']);
+        $this->mem_manager->loadMemberData($context['staff_ids']);
 
         foreach ($context['staff_ids'] as $member)
         {
-            loadMemberContext($member);
+            $this->mem_manager->loadMemberContext($member);
         }
     }
 }

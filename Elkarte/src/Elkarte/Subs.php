@@ -527,7 +527,7 @@ function redirectexit($setLocation = '', $refresh = false)
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
-	Notifications::getInstance()->send();
+	$GLOBALS['elk']['notifications.manager']->send();
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 

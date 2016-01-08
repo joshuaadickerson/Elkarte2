@@ -131,7 +131,7 @@ class LikesController extends AbstractController
 		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
 
 		// We like these
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 
 
 		// Have to be able to access it to like it
@@ -230,7 +230,7 @@ class LikesController extends AbstractController
 		isAllowedTo('like_posts');
 
 		// Load up the helpers
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 
 		// Maintain our log
 		clearLikes(empty($modSettings['likeWaitTime']) ? 0 : $modSettings['likeWaitTime']);
@@ -264,7 +264,7 @@ class LikesController extends AbstractController
 	public function action_showProfileLikes()
 	{
 		// Load in our helper functions
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 
 		if ($this->_req->getQuery('sa') === 'received')
 			$this->_action_showReceived();
@@ -486,7 +486,7 @@ class LikesController extends AbstractController
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 		loadLanguage('Profile');
 
 		// Get the message in question
@@ -625,7 +625,7 @@ class LikesController extends AbstractController
 	{
 		global $context, $modSettings;
 
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
@@ -667,7 +667,7 @@ class LikesController extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))

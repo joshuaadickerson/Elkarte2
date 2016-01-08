@@ -616,7 +616,7 @@ class MessagesDelete
 		if (!$recycle)
 		{
 			// Update the like counts
-			require_once(ROOTDIR . '/Likes/Likes.subs.php');
+
 			decreaseLikeCounts($message);
 
 			// Remove the likes!
@@ -700,7 +700,7 @@ class MessagesDelete
 		));
 
 		// And now to update the last message of each board we messed with.
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		if ($recycle)
 			updateLastMessages(array($row['id_board'], $this->_recycle_board));
 		else
@@ -1032,7 +1032,7 @@ class MessagesDelete
 		));
 
 		// Need it to update some stats.
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// Update stats.
 

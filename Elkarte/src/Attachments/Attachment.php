@@ -22,10 +22,16 @@ class Attachment extends Entity
 			return '';
 		}
 
-		$hash = hash('sha1', hash('md5', $this->offsetGet('filename') . time()) . mt_rand());
+		// @todo maybe we should increase this size?
+		$hash = hash('sha1', $this->offsetGet('filename') . time() . mt_rand());
 		$this->offsetSet('hash', $hash);
 		$this->offsetSet('new_hash', true);
 
 		return $hash;
+	}
+
+	public function canCompress()
+	{
+		return @filesize($this->filename) <= 4194304 && in_array($this->fileext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 	}
 }

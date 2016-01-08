@@ -192,7 +192,7 @@ class AttachmentsManager
 				// @todo look again at this.
 				@unlink($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
 			} else {
-				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+				$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 				@unlink($filename);
 
 				// If this was a thumb, the parent attachment should know about it.
@@ -201,7 +201,7 @@ class AttachmentsManager
 
 				// If this attachments has a thumb, remove it as well.
 				if (!empty($row['id_thumb']) && $autoThumbRemoval) {
-					$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
+					$thumb_filename = getAttachmentFilename($row['id_thumb'], $row['thumb_file_hash'], $row['thumb_folder']);
 					@unlink($thumb_filename);
 					$attach[] = $row['id_thumb'];
 				}
@@ -559,7 +559,7 @@ class AttachmentsManager
 
 					// If we are repairing remove the file from disk now.
 					if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix)) {
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+						$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 						@unlink($filename);
 					}
 				}
@@ -671,7 +671,7 @@ class AttachmentsManager
 			if ($row['attachment_type'] == 1)
 				$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
 			else
-				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+				$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 
 			// File doesn't exist?
 			if (!file_exists($filename)) {
@@ -787,7 +787,7 @@ class AttachmentsManager
 					if ($row['attachment_type'] == 1)
 						$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
 					else
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+						$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 					@unlink($filename);
 				}
 
@@ -841,7 +841,7 @@ class AttachmentsManager
 			function ($row) use ($fix_errors, $to_fix) {
 				// If we are repairing remove the file from disk now.
 				if ($fix_errors && in_array('attachment_no_msg', $to_fix)) {
-					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 					@unlink($filename);
 				}
 
@@ -1474,7 +1474,7 @@ class AttachmentsManager
 		);
 		$updatedAvatars = array();
 		while ($row = $request->fetchAssoc()) {
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+			$filename = getAttachmentFilename($row['id_attach'], $row['file_hash'], $row['id_folder']);
 
 			if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
 				$updatedAvatars[] = $row['id_attach'];

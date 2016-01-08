@@ -16,7 +16,7 @@ class TestPoll extends PHPUnit_Framework_TestCase
 	{
 		// make sure a topic exists
 		require_once(SUBSDIR . '/Poll.subs.php');
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// post variables
 		$msgOptions = array(

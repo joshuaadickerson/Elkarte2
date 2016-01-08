@@ -134,7 +134,7 @@ class ManageNewsController extends AbstractController
 	{
 		global $txt, $modSettings, $context, $scripturl;
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// The 'remove selected' button was pressed.
 		if (!empty($this->_req->post->delete_selection) && !empty($this->_req->post->remove))

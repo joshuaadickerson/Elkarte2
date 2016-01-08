@@ -10,7 +10,7 @@
  * @version 1.1 dev Release Candidate 1
  */
 
-namespace Elkarte\Search\API;
+namespace Elkarte\Search\Drivers\API;
 
 use Elkarte\Search\Drivers\SearchInterface;
 

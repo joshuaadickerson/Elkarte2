@@ -2,7 +2,6 @@
 
 /**
  * A template comprised of subtemplates
- * @todo include methods like javascript_escape()
  */
 abstract class AbstractTemplate
 {
@@ -46,7 +45,7 @@ abstract class AbstractTemplate
 	{
 		$args = func_get_args();
 		$name = array_shift($args);
-		$hook = 'subtemplate_' . $this->class . '_' . $name;
+		$hook = 'template_' . $this->class . '_' . $name;
 
 		call_integration_hook($hook . '_before', $args);
 
@@ -58,32 +57,32 @@ abstract class AbstractTemplate
 	}
 
 	/**
-	 * Shortcut function to register a subtemplate as a global subtemplate
+	 * Shortcut function to register a template as a global template
 	 * @param string $name
 	 */
-	public function registerSubtemplate($name)
+	public function registerTemplate($name)
 	{
-		return $this->theme->registerGlobalSubtemplate($name, array($this, $name));
+		return $this->theme->registerGlobalTemplate($name, array($this, $name));
 	}
 
 	/**
-	 * Shortcut function to subtemplate
+	 * Shortcut function to template
 	 */
-	public function subtemplate($subtemplate, $template = '*')
+	public function template($template, $namespace = '*')
 	{
-		return call_user_func_array(array($this->theme, 'subtemplate'), func_get_args());
+		return call_user_func_array(array($this->theme, 'template'), func_get_args());
 	}
 
 	/**
-	 * Shortcut to get a global subtemplate
+	 * Shortcut to get a global template
 	 * 
-	 * @param string $name The subtemplate alias
+	 * @param string $name The template alias
 	 * @param array $args Arguments
 	 * @return mixed
-	 * @throws \Exception when the global subtemplate cannot be found
+	 * @throws \Exception when the global template cannot be found
 	 */
 	public function __call($name, $args)
 	{
-		return call_user_func_array(array($this->theme, 'globalSubtemplate'), array_unshift($args, $name));
+		return call_user_func_array(array($this->theme, 'globalTemplate'), array_unshift($args, $name));
 	}
 }

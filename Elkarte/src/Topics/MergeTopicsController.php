@@ -20,6 +20,8 @@
  */
 
 namespace Elkarte\Topics;
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
 
 
 /**
@@ -169,7 +171,7 @@ class MergeTopicsController extends AbstractController
 		$this->_session->check('request');
 
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// Handle URLs from action_mergeIndex.
 		if (!empty($this->_req->query->from) && !empty($this->_req->query->to))

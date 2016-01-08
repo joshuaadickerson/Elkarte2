@@ -1587,7 +1587,7 @@ class ManageSmileysController extends AbstractController
 
 				if (!empty($action['parse_bbc']))
 				{
-					require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 					preparsecode($context[$type]);
 					$context[$type] = $bbc_parser->parsePackage($context[$type]);
 				}

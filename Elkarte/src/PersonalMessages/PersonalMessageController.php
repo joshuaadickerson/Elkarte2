@@ -950,7 +950,7 @@ class PersonalMessageController extends AbstractController
 
 		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		loadLanguage('PersonalMessage', '', false);
 

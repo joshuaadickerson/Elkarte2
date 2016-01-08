@@ -17,7 +17,7 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['topics.container'] = function ($elk) {
-			return new TopicsContainer;
+			return new TopicContainer;
 		};
 
 		$elk['topics.list'] = function ($elk) {
@@ -30,10 +30,14 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['topics.context'] = function ($elk) {
-			return new BoardContext([
+			return new TopicContext([
 				'elk' => $elk,
 				'bbc_parser' => $elk['topics.bbc_parser'],
 			]);
+		};
+
+		$elk['topics.split'] = function ($elk) {
+			return new SplitTopic();
 		};
 	}
 
@@ -51,7 +55,7 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['topics.manage_controller'] = function ($elk) {
-			return new ManageTopicsController();
+			return new ManageTopicsController($elk, $elk['boards.manager'], $elk['hooks'], $elk['errors'], $elk['layers']);
 		};
 
 		$elk['topics.remove_controller'] = function ($elk) {
@@ -59,11 +63,11 @@ class Provider implements ProviderInterface
 		};
 
 		$elk['topics.split_controller'] = function ($elk) {
-			return new SplitTopicController();
+			return new SplitTopicsController();
 		};
 
 		$elk['topics.merge_controller'] = function ($elk) {
-			return new MergeTopicController();
+			return new MergeTopicsController();
 		};
 	}
 

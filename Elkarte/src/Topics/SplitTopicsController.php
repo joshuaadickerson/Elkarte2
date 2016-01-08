@@ -18,8 +18,7 @@
  * Original module by Mach8 - We'll never forget you.
  */
 
-if (!defined('ELK'))
-	die('No access...');
+namespace Elkarte\Topics;
 
 /**
  * SplitTopics Controller.
@@ -69,7 +68,7 @@ class SplitTopicsController extends AbstractController
 			$this->_templates->load('SplitTopics');
 
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// The things we know to do
 		$subActions = array(

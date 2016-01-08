@@ -478,7 +478,7 @@ class CalendarManager
 		global $scripturl, $modSettings;
 
 		// Get todays date.
-		$today = getTodayInfo();
+		$today = $this->getTodayInfo();
 
 		// What is the actual "start date" for the passed day.
 		$calendarOptions['start_day'] = empty($calendarOptions['start_day']) ? 0 : (int)$calendarOptions['start_day'];
@@ -519,9 +519,9 @@ class CalendarManager
 		// Fetch the arrays for birthdays, posted events, and holidays.
 		$startDate = strftime('%Y-%m-%d', $curTimestamp);
 		$endDate = strftime('%Y-%m-%d', $nextWeekTimestamp);
-		$bday = $calendarOptions['show_birthdays'] ? getBirthdayRange($startDate, $endDate) : array();
-		$events = $calendarOptions['show_events'] ? getEventRange($startDate, $endDate) : array();
-		$holidays = $calendarOptions['show_holidays'] ? getHolidayRange($startDate, $endDate) : array();
+		$bday = $calendarOptions['show_birthdays'] ? $this->getBirthdayRange($startDate, $endDate) : array();
+		$events = $calendarOptions['show_events'] ? $this->getEventRange($startDate, $endDate) : array();
+		$holidays = $calendarOptions['show_holidays'] ? $this->getHolidayRange($startDate, $endDate) : array();
 
 		// An adjustment value to apply to all calculated week numbers.
 		if (!empty($calendarOptions['show_week_num'])) {

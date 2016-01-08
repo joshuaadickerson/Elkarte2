@@ -15,10 +15,6 @@ class TestLikes extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		// Lets make sure a topic exists by creating one
-		require_once(ROOTDIR . '/Likes/Likes.subs.php');
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
-
 		// post variables
 		$msgOptions = array(
 			'id' => 0,

@@ -3,7 +3,7 @@
 return [
 	'attachapprove' 		=> ['Elkarte\\Attachments\\ModerateAttachmentsController', 'action_attachapprove'],
 	'buddy' 				=> ['Elkarte\\Members\\MembersController', 'action_buddy'],
-	'collapse' 				=> ['Elkarte\\Boards\\BoardIndexController', 'action_collapse'],
+	'collapse' 				=> ['boards.index_controller', 'action_collapse'],
 	'deletemsg' 			=> ['Elkarte\\Topics\\RemoveTopicController', 'action_deletemsg'],
 	// @todo: move this to attachment action also
 	'dlattach' 				=> ['Elkarte\\Attachments\\AttachmentController', 'action_index'],

@@ -63,7 +63,7 @@ class XmlPreviewController extends AbstractController
 		global $context;
 
 		// Needed for parse bbc
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		$errors = array();
 		$news = !isset($this->_req->post->news) ? '' : $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->news, ENT_QUOTES);
@@ -210,7 +210,7 @@ class XmlPreviewController extends AbstractController
 	{
 		global $context, $txt, $user_info, $scripturl, $mbname;
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		loadLanguage('Errors');
 		loadLanguage('ModerationCenter');
 
@@ -279,7 +279,7 @@ class XmlPreviewController extends AbstractController
 	{
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		loadLanguage('Errors');
 		loadLanguage('ModerationCenter');
 

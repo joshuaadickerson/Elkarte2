@@ -23,7 +23,9 @@ use Elkarte\Elkarte\Controller\AbstractController;
 
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Http\HttpReq;
 use Elkarte\Elkarte\Text\StringUtil;
+use Elkarte\Elkarte\Theme\Templates;
 use Pimple\Container;
 
 /**
@@ -38,13 +40,19 @@ class HelpController extends AbstractController
 	protected $errors;
 	/** @var StringUtil  */
 	protected $text;
+	/** @var  Templates */
+	protected $templates;
+	/** @var HttpReq */
+	protected $http_req;
 
-	public function __construct(Container $elk, Hooks $hooks, Errors $errors, StringUtil $text)
+	public function __construct(Container $elk, Hooks $hooks, Errors $errors, StringUtil $text, Templates $templates, HttpReq $http_req)
 	{
 		$this->elk = $elk;
 		$this->hooks = $hooks;
 		$this->errors = $errors;
 		$this->text = $text;
+		$this->templates = $templates;
+		$this->http_req = $http_req;
 	}
 
 	/**
@@ -75,7 +83,7 @@ class HelpController extends AbstractController
 	{
 		global $scripturl, $context, $txt;
 
-		$this->_templates->load('Help');
+		$this->templates->load('Help');
 		loadLanguage('Manual');
 
 		// We need to know where our wiki is.
@@ -120,13 +128,13 @@ class HelpController extends AbstractController
 	{
 		global $txt, $helptxt, $context, $scripturl;
 
-		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
+		if (!isset($this->http_req->query->help) || !is_string($this->http_req->query->help))
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help_str = $this->text->htmlspecialchars($this->_req->query->help);
+		$help_str = $this->text->htmlspecialchars($this->http_req->query->help);
 
 		// Load the Admin help language file and template.
 		loadLanguage('Help');
@@ -136,10 +144,10 @@ class HelpController extends AbstractController
 			loadLanguage('ManagePermissions');
 
 		// Load our template
-		$this->_templates->load('Help');
+		$this->templates->load('Help');
 
 		// Allow addons to load their own language file here.
-		$this->_hook->hook('quickhelp');
+		$this->hooks->hook('quickhelp');
 
 		// Set the page title to something relevant.
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];

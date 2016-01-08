@@ -523,7 +523,7 @@ class PersonalMessagesManager
 
 		// Needed for our email and post functions
 
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 		// Initialize log array.
 		$log = array(

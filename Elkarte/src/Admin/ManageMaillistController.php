@@ -1804,7 +1804,7 @@ class ManageMaillistController extends AbstractController
 			validateToken('mod-mlt');
 
 			// To check the BBC is good...
-			require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 
 			// Bit of cleaning!
 			$template_body = trim($this->_req->post->template_body);

@@ -23,6 +23,7 @@ namespace Elkarte\Elkarte\Errors;
 use Elkarte\Elkarte\Cache\Cache;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Theme\TemplateLayers;
 use Pimple\Container;
 
 /**
@@ -467,6 +468,7 @@ class Errors
 	 * @uses Errors template, fatal_error sub template
 	 * @param string $error_message
 	 * @param string $error_code string or int code
+	 * @return false|null
 	 */
 	protected function _setup_fatal_error_context($error_message, $error_code)
 	{
@@ -479,7 +481,7 @@ class Errors
 			return false;
 
 		// Maybe they came from dlattach or similar?
-		if (ELK !== 'SSI' && empty($context['theme_loaded']))
+		if (empty($context['theme_loaded']))
 			loadTheme();
 
 		// Don't bother indexing errors mate...
@@ -657,6 +659,9 @@ class Errors
 		return $this->elk['hooks'];
 	}
 
+	/**
+	 * @return TemplateLayers
+	 */
 	protected function loadTemplateLayers()
 	{
 		return $this->elk['layers'];

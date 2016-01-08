@@ -487,7 +487,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			$_SESSION['topicseen_cache'] = array();
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
-		require_once(ROOTDIR . '/Messages/Post.subs.php');
+
 		require_once(ROOTDIR . '/Notifications/Notification.subs.php');
 
 		// Process process process data.

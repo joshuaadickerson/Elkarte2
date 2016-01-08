@@ -51,7 +51,7 @@ class DisplayController extends AbstractController
 	 * Start viewing the topics from ... (page, all, other)
 	 * @var int|string
 	 */
-	private $_start;
+	protected $_start;
 
 	public function __construct()
 	{
@@ -95,9 +95,6 @@ class DisplayController extends AbstractController
 		$this->_templates->load('Display');
 		$context['sub_template'] = 'messages';
 
-		// And the topic functions
-
-
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		stop_prefetching();
 
@@ -136,10 +133,13 @@ class DisplayController extends AbstractController
 			$this->_start = 'new';
 		}
 
+		// @todo this should be stopped if the load is too high.
+		// @todo this shouldn't increase more often than once per session unless the last_msg_id changes or a post is edited
+		// @todo this should also have a hook to allow cache versions of this
 		// Add 1 to the number of views of this topic (except for robots).
 		if (!$user_info['possibly_robot'] && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
 		{
-			increaseViewCounter($topic);
+			$this->elk['topics.manager']->increaseViewCounter($topic);
 			$_SESSION['last_read_topic'] = $topic;
 		}
 
@@ -296,7 +296,6 @@ class DisplayController extends AbstractController
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
 		{
-
 			formatViewers($topic, 'topic');
 		}
 
@@ -426,7 +425,6 @@ class DisplayController extends AbstractController
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
-
 			// Fetch attachments.
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 				$attachments = $this->elk['attachments.file_manager']->getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
@@ -665,8 +663,6 @@ class DisplayController extends AbstractController
 
 		// Check the session = get or post.
 		$this->_session->check('request');
-
-
 
 		if (empty($this->_req->post->msgs))
 			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));

@@ -213,9 +213,9 @@ class WhoController extends AbstractController
 
 		$url_data = determineActions($url_data);
 
-		// Setup the linktree and page title (do it down here because the language files are now loaded..)
+		// Setup the breadcrumbs and page title (do it down here because the language files are now loaded..)
 		$context['page_title'] = $txt['who_title'];
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=who',
 			'name' => $txt['who_title']
 		);

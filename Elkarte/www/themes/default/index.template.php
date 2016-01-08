@@ -21,7 +21,7 @@
  * the forum, namely with body_above and body_below. It also contains the
  * menu sub template, which appropriately displays the menu; the init sub
  * template, which is there to set the theme up; (init can be missing.) and
- * the linktree sub template, which sorts out the link tree.
+ * the breadcrumbs sub template, which sorts out the link tree.
  *
  * The init sub template should load any data and set any hardcoded options.
  *
@@ -31,8 +31,8 @@
  * The body_below sub template, conversely, is shown after the main content.
  * It should probably contain the copyright statement and some other things.
  *
- * The linktree sub template should display the link tree, using the data
- * in the $context['linktree'] variable.
+ * The breadcrumbs sub template should display the link tree, using the data
+ * in the $context['breadcrumbs'] variable.
  *
  * The menu sub template should display all the relevant buttons the user
  * wants and or needs.
@@ -263,7 +263,7 @@ function template_body_above()
 		</div>';
 
 	// Show the navigation tree.
-	theme_linktree();
+	theme_breadcrumbs();
 
 	// The main content should go here.
 	echo '
@@ -444,17 +444,17 @@ function template_html_below()
 }
 
 /**
- * Show a linktree. This is that thing that shows
+ * Show a breadcrumbs. This is that thing that shows
  * "My Community | General Category | General Discussion"..
  *
  * @param string $default a string representing the index in $context where
- *               the linktree is stored (default value is 'linktree')
+ *               the breadcrumbs is stored (default value is 'breadcrumbs')
  */
-function theme_linktree($default = 'linktree')
+function theme_breadcrumbs($default = 'breadcrumbs')
 {
 	global $context, $settings;
 
-	// If linktree is empty, just return - also allow an override.
+	// If breadcrumbs is empty, just return - also allow an override.
 	if (empty($context[$default]))
 		return;
 
@@ -463,11 +463,11 @@ function theme_linktree($default = 'linktree')
 				<ul class="navigate_section">';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
-	// Added a linktree class to make targeting dividers easy.
+	// Added a breadcrumbs class to make targeting dividers easy.
 	foreach ($context[$default] as $pos => $tree)
 	{
 		echo '
-					<li class="linktree">
+					<li class="breadcrumbs">
 						<span>';
 
 		// Dividers moved to pseudo-elements in CSS.
@@ -476,7 +476,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="fa fa-home fa-lg"></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['breadcrumbs_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="fa fa-home fa-lg"></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))

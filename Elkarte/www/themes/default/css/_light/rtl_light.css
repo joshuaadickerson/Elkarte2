@@ -235,16 +235,16 @@ legend {
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
+/* The navigation list (i.e. breadcrumbs) */
 /* Wrapper/background. */
 .navigate_section {
 	box-shadow: -1px 2px 3px #eee;
 }
-/* Color for linktree items. */
-.linktree:after {
+/* Color for breadcrumbs items. */
+.breadcrumbs:after {
 	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
 }
-.linktree {
+.breadcrumbs {
 	box-shadow: 0 2px 0 -1px #ccc, -3px 2px 0 -1px #ccc, -3px -1px 0 -1px #ccc;
 }
 
@@ -556,7 +556,7 @@ legend {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
-	.linktree:after {
+	.breadcrumbs:after {
 		content: "";
 	}
 }

@@ -51,8 +51,6 @@ class ModlogController extends AbstractController
 	{
 		global $txt, $context, $scripturl;
 
-		require_once(SUBSDIR . '/Modlog.subs.php');
-
 		// Are we looking at the moderation log or the administration log.
 		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa == 'adminlog' ? 3 : 1;
 

@@ -15,6 +15,11 @@
  *
  */
 
+function template_Stats_init()
+{
+	loadJavascriptFile('stats.js');
+}
+
 /**
  * Stats page.
  */

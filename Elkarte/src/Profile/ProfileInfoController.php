@@ -80,8 +80,6 @@ class ProfileInfoController extends AbstractController
 		if (!$this->elk['members.manager']->loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
 			$this->_errors->fatal_lang_error('not_a_user', false);
 
-		$this->_templates->load('ProfileInfo');
-
 		// Set up the context stuff and load the user.
 		$context += array(
 			'page_title' => sprintf($txt['profile_of_username'], $memberContext[$this->_memID]['name']),
@@ -237,10 +235,7 @@ class ProfileInfoController extends AbstractController
 		// To finish this off, custom profile fields.
 		$this->elk['profile']->loadCustomFields($this->_memID);
 
-		// To make tabs work, we need jQueryUI
-		$modSettings['jquery_include_ui'] = true;
-		theme()->addInlineJavascript('
-		$(function() {$( "#tabs" ).tabs();});', true);
+		$this->_templates->load('ProfileInfo');
 	}
 
 	/**

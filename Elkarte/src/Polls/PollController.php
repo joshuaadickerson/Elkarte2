@@ -475,11 +475,11 @@ class PollController extends AbstractController
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
 			'name' => $pollinfo['subject'],
 		);
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'name' => $context['page_title'],
 		);
 

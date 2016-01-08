@@ -1188,7 +1188,7 @@ a.bbc_link {
 /* ------------------------------------------------------- */
 /*	$LINKTREE                                              */
 /* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree, breadcrumbs) */
+/* The navigation list (i.e. breadcrumbs, breadcrumbs) */
 .navigate_section {
 	overflow: hidden;
 	margin: 3px 0 0 0;
@@ -1199,7 +1199,7 @@ a.bbc_link {
 	margin: 12px 0 6px 0;
 }
 
-.linktree {
+.breadcrumbs {
 	position: relative;
 	display: inline-block;
 	float: left;
@@ -1209,39 +1209,39 @@ a.bbc_link {
 	font-size: 0.929em;
 	line-height: 2em;
 }
-.linktree:first-child a {
+.breadcrumbs:first-child a {
 	height: 2em;
 	padding: 0 6px;
 }
-.linktree:last-child {
+.breadcrumbs:last-child {
 	max-width: 25em;
 }
 
-.linktree a {
+.breadcrumbs a {
 	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.linktree:last-child > span > a {
+.breadcrumbs:last-child > span > a {
 	display: inline;
 }
 
-.linktree:last-child > span {
+.breadcrumbs:last-child > span {
 	display: block;
 	overflow: hidden;
 	max-width: 25em;
 	text-overflow: ellipsis;
 }
 
-.linktree a {
+.breadcrumbs a {
 	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 /* Nifty indicators. */
-.linktree:after {
+.breadcrumbs:after {
 	position: absolute;
 	top: 0;
 	right: -1em;
@@ -1256,7 +1256,7 @@ a.bbc_link {
 	transform: scale(0.7071) rotate(45deg);
 }
 
-.linktree:first-child {
+.breadcrumbs:first-child {
 	padding-left: 1em;
 }
 
@@ -1707,7 +1707,7 @@ a.bbc_link {
 /* ------------------------------------------------------- */
 /*	$BOARDS		                                           */
 /* ------------------------------------------------------- */
-/* The small stats, under upper linktree.                  */
+/* The small stats, under upper breadcrumbs.                  */
 #index_common_stats {
 	margin: 0 8px 6px 8px;
 	font-size: 0.857em;
@@ -4811,7 +4811,7 @@ a.help .icon {
 		min-width: 98%;
 	}
 
-	.linktree {
+	.breadcrumbs {
 		max-width: 95%;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -5370,7 +5370,7 @@ a.help .icon {
 		padding: 2px;
 	}
 
-	.linktree .board_moderators {
+	.breadcrumbs .board_moderators {
 		display: none;
 	}
 

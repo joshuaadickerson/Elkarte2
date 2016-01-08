@@ -230,7 +230,7 @@ legend {
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
-.linktree:not(:last-child):after {
+.breadcrumbs:not(:last-child):after {
 	transform: scale(1) rotate(-135deg);
 	-webkit-transform: scale(1) rotate(-135deg);
 }

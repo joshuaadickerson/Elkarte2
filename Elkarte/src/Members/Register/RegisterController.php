@@ -159,7 +159,7 @@ class RegisterController extends AbstractController
 		theme()->addInlineJavascript('disableAutoComplete();', true);
 
 		// Add the register chain to the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=register',
 			'name' => $txt['register'],
 		);

@@ -138,7 +138,7 @@ class SearchController extends AbstractController
 		isAllowedTo('search_posts');
 
 		// Link tree....
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=search',
 			'name' => $txt['search']
 		);
@@ -156,7 +156,7 @@ class SearchController extends AbstractController
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
-		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
+		// If you got back from search;sa=results by using the breadcrumbs, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
 			Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
@@ -382,12 +382,12 @@ class SearchController extends AbstractController
 		$context['params'] = $this->_search->compileURLparams();
 
 		// ... and add the links to the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=search;params=' . $context['params'],
 			'name' => $txt['search']
 		);
 
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
 			'name' => $txt['search_results']
 		);

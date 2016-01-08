@@ -258,7 +258,7 @@ class PackagesController extends AbstractController
 		$context['actions'] = $pka->ourActions;
 
 		// Change our last link tree item for more information on this Packages area.
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		$context['breadcrumbs'][count($context['breadcrumbs']) - 1] = array(
 			'url' => $scripturl . '?action=Admin;area=packages;sa=browse',
 			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
@@ -624,8 +624,8 @@ class PackagesController extends AbstractController
 		// Fetch the Install status and action log
 		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
-		// Set up the details for the sub template, linktree, etc
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		// Set up the details for the sub template, breadcrumbs, etc
+		$context['breadcrumbs'][count($context['breadcrumbs']) - 1] = array(
 			'url' => $scripturl . '?action=Admin;area=packages;sa=browse',
 			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
 		);
@@ -772,7 +772,7 @@ class PackagesController extends AbstractController
 		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=Admin;area=packages');
 
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=Admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['list_file']
 		);
@@ -817,7 +817,7 @@ class PackagesController extends AbstractController
 			obExit(false);
 		}
 
-		$context['linktree'][count($context['linktree']) - 1] = array(
+		$context['breadcrumbs'][count($context['breadcrumbs']) - 1] = array(
 			'url' => $scripturl . '?action=Admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['package_examine_file']
 		);

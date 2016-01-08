@@ -925,17 +925,17 @@ a.active {
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
+/* The navigation list (i.e. breadcrumbs) */
 .navigate_section {
 	margin: 4px 0 0 0;
 	border: 1px solid #EEEEEE;
 }
 
-.linktree {
+.breadcrumbs {
 	border: none;
 }
 
-.linktree:not(:last-child):after {
+.breadcrumbs:not(:last-child):after {
 	top: 0.25em;
 	width: 1.5em;
 	height: 1.5em;

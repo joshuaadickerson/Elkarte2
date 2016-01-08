@@ -315,22 +315,22 @@ h2 a.collapse {
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
+/* The navigation list (i.e. breadcrumbs) */
 .navigate_section {
 	padding-left: 1em;
 	padding-right: 0;
 }
-.linktree {
+.breadcrumbs {
 	float: right;
 	padding: 0 2em 0 1.1em;
 }
 
 /* Nifty indicators. */
-.linktree:after {
+.breadcrumbs:after {
 	right: auto;
 	left: -1em;
 }
-.linktree:first-child {
+.breadcrumbs:first-child {
 	padding-right: 1em;
 	padding-left: 1.1em;
 }

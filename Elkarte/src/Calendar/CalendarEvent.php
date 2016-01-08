@@ -45,7 +45,7 @@ class CalendarEvent
 	 *
 	 * @param null|int $event_id Obviously the id of the event.
 	 *                  If null or -1 the event is considered new
-	 *                  @see Calendar_Event::isNew
+	 *                  @see CalendarEvent::isNew
 	 * @param mixed[] $settings An array of settings ($modSettings is the current one)
 	 */
 	public function __construct($event_id, $settings = array())

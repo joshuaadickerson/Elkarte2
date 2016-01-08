@@ -123,13 +123,13 @@ class UnreadController extends AbstractController
 			require_once(SUBSDIR . '/Categories.subs.php');
 			$name = categoryName((int) $this->_req->query->c[0]);
 
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '#c' . (int) $this->_req->query->c[0],
 				'name' => $name
 			);
 		}
 
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=' . $this->_action . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'],
 			'name' => $this->_action_unread ? $txt['unread_topics_visit'] : $txt['unread_replies']
 		);
@@ -449,7 +449,7 @@ class UnreadController extends AbstractController
 
 		if ($context['showing_all_topics'])
 		{
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=' . $this->_action . ';all' . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'],
 				'name' => $txt['unread_topics_all']
 			);

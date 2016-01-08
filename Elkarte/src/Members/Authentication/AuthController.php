@@ -72,7 +72,7 @@ class AuthController extends AbstractController
 		$context['never_expire'] = false;
 
 		// Add the login chain to the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=login',
 			'name' => $txt['login'],
 		);
@@ -144,7 +144,7 @@ class AuthController extends AbstractController
 		$context['page_title'] = $txt['login'];
 
 		// Add the login chain to the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=login',
 			'name' => $txt['login'],
 		);

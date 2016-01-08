@@ -8,7 +8,7 @@ class IndexTemplate extends Template implements TemplateEventsInterface
 {
 	public function postRegister($theme)
 	{
-		$this->registerSubtemplate('linktree');
+		$this->registerSubtemplate('breadcrumbs');
 		$this->registerSubtemplate('menu');
 		$this->registerSubtemplate('button_strip');
 		$this->registerSubtemplate('show_error');

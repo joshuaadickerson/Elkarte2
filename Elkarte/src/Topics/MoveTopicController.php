@@ -192,11 +192,11 @@ class MoveTopicController extends AbstractController
 		$context['sub_template'] = 'move_topic';
 
 		// Breadcrumbs
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?topic=' . $this->_topic . '.0',
 			'name' => $context['subject'],
 		);
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => '#',
 			'name' => $txt['move_topic'],
 		);

@@ -20,7 +20,65 @@
  */
 function template_Display_init()
 {
+	global $modSettings, $txt, $context;
+
 	$GLOBALS['elk']['templates']->load('GenericMessages');
+
+	// Load up the Quick ModifyTopic and Quick Reply scripts
+	loadJavascriptFile('topic.js');
+
+	// Auto video embedding enabled?
+	if (!empty($modSettings['enableVideoEmbeding']))
+	{
+		theme()->addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+		);
+	}
+
+	if (!empty($messages) && !empty($modSettings['likes_enabled']))
+	{
+		// ajax controller for likes
+		loadJavascriptFile('like_posts.js', array('defer' => true));
+		theme()->addJavascriptVar(array(
+			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
+		));
+
+		// Initiate likes and the tooltips for likes
+		theme()->addInlineJavascript('
+				$(document).ready(function () {
+					var likePostInstance = likePosts.prototype.init({
+						oTxt: ({
+							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
+							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
+							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
+						}),
+					});
+
+					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
+						hoverIntent: {
+							sensitivity: 10,
+							interval: 150,
+							timeout: 50
+						}
+					});
+				});', true);
+	}
+
+	theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+	if ($context['can_send_topic'])
+	{
+		theme()->addJavascriptVar(array(
+			'sendtopic_cancel' => $txt['modify_cancel'],
+			'sendtopic_back' => $txt['back'],
+			'sendtopic_close' => $txt['find_close'],
+			'sendtopic_error' => $txt['send_error_occurred'],
+			'required_field' => $txt['require_field']), true);
+	}
+
+	if ($context['show_spellchecking'])
+		loadJavascriptFile('spellcheck.js', array('defer' => true));
 }
 
 /**
@@ -796,7 +854,7 @@ function template_pages_and_buttons_below()
 	template_pagesection('normal_buttons', 'right');
 
 	// Show the lower breadcrumbs.
-	theme_linktree();
+	theme_breadcrumbs();
 
 	if (can_see_button_strip($context['mod_buttons']))
 	{

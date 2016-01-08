@@ -108,11 +108,9 @@ class StatsController extends AbstractController
 
 		// Stats it is
 		loadLanguage('Stats');
-		$this->_templates->load('Stats');
-		loadJavascriptFile('stats.js');
 
 		// Build the link tree......
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=stats',
 			'name' => $txt['stats_center']
 		);
@@ -132,8 +130,7 @@ class StatsController extends AbstractController
 		$this->loadTopStatistics();
 		$this->loadMontlyActivity();
 
-		// Custom stats (just add a template_layer or another callback to add it to the page!)
-		$this->hooks->hook('forum_stats');
+		$this->_templates->load('Stats');
 	}
 
 	/**
@@ -142,8 +139,6 @@ class StatsController extends AbstractController
 	public function loadGeneralStatistics()
 	{
 		global $scripturl, $modSettings, $context;
-
-
 
 		// Get averages...
 		$averages = $this->stats->getAverages();

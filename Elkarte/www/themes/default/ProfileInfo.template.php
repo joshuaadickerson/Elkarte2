@@ -30,6 +30,11 @@ function template_ProfileInfo_init()
 	$settings['attachments_on_summary'] = 10;
 
 	$GLOBALS['elk']['templates']->load('GenericMessages');
+
+	// To make tabs work, we need jQueryUI
+	$modSettings['jquery_include_ui'] = true;
+	theme()->addInlineJavascript('
+		$(function() {$( "#tabs" ).tabs();});', true);
 }
 
 /**

@@ -319,7 +319,7 @@ function template_topic_listing_below()
 	template_pagesection('normal_buttons', 'right');
 
 	// Show breadcrumbs at the bottom too.
-	theme_linktree();
+	theme_breadcrumbs();
 
 	echo '
 	<div id="topic_icons" class="description">

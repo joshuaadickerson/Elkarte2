@@ -549,19 +549,19 @@ class AdminController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
 		// Build the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=Admin',
 			'name' => $txt['admin_center'],
 		);
 
 		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=Admin;area=' . $admin_include_data['current_area'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => $admin_include_data['label'],
 			);
 
 		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']][0] != $admin_include_data['label'])
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=Admin;area=' . $admin_include_data['current_area'] . ';sa=' . $admin_include_data['current_subsection'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
 			);

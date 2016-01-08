@@ -142,7 +142,7 @@ class RecentController extends AbstractController
 		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), 10, !empty($this->_flex_start));
 
 		// Linktree
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
 			'name' => $context['page_title']
 		);
@@ -218,7 +218,7 @@ class RecentController extends AbstractController
 			if (empty($name))
 				$this->_errors->fatal_lang_error('no_access', false);
 
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '#c' . $categories[0],
 				'name' => $name
 			);

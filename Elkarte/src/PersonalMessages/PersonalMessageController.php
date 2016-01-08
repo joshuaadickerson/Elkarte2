@@ -126,8 +126,8 @@ class PersonalMessageController extends AbstractController
 		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($this->_req->query->start) ? ';start=' . $this->_req->query->start : '') . (isset($this->_req->query->l) ? ';l=' . $this->_req->query->l : '');
 		$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
-		// Build the linktree for all the actions...
-		$context['linktree'][] = array(
+		// Build the breadcrumbs for all the actions...
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm',
 			'name' => $txt['personal_messages']
 		);
@@ -470,7 +470,7 @@ class PersonalMessageController extends AbstractController
 		// Now, build the link tree!
 		if ($context['current_label_id'] === -1)
 		{
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=pm;f=' . $context['folder'],
 				'name' => $pmbox
 			);
@@ -479,7 +479,7 @@ class PersonalMessageController extends AbstractController
 		// Build it further if we also have a label.
 		if ($context['current_label_id'] !== -1)
 		{
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=pm;f=' . $context['folder'] . ';l=' . $context['current_label_id'],
 				'name' => $txt['pm_current_label'] . ': ' . $context['current_label']
 			);
@@ -910,7 +910,7 @@ class PersonalMessageController extends AbstractController
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
 
 		// And build the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=send',
 			'name' => $txt['new_message']
 		);
@@ -1358,7 +1358,7 @@ class PersonalMessageController extends AbstractController
 		}
 
 		// Build the link tree....
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=send',
 			'name' => $txt['new_message']
 		);
@@ -1579,7 +1579,7 @@ class PersonalMessageController extends AbstractController
 		}
 
 		// Build the link tree elements.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=prune',
 			'name' => $txt['pm_prune']
 		);
@@ -1595,7 +1595,7 @@ class PersonalMessageController extends AbstractController
 		global $txt, $context, $user_info, $scripturl;
 
 		// Build the link tree elements...
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=manlabels',
 			'name' => $txt['pm_manage_labels']
 		);
@@ -1798,8 +1798,8 @@ class PersonalMessageController extends AbstractController
 		$context['menu_item_selected'] = 'settings';
 		$context['submit_button_text'] = $txt['pm_settings'];
 
-		// Add our position to the linktree.
-		$context['linktree'][] = array(
+		// Add our position to the breadcrumbs.
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=settings',
 			'name' => $txt['pm_settings']
 		);
@@ -1987,7 +1987,7 @@ class PersonalMessageController extends AbstractController
 
 
 		// The link tree - gotta have this :o
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=manrules',
 			'name' => $txt['pm_manage_rules']
 		);
@@ -2523,7 +2523,7 @@ class PersonalMessageController extends AbstractController
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search_results';
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'search';
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=search',
 			'name' => $txt['pm_search_bar_title'],
 		);
@@ -2873,7 +2873,7 @@ class PersonalMessageController extends AbstractController
 
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm;sa=search',
 			'name' => $txt['pm_search_bar_title'],
 		);

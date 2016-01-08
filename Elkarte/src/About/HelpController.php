@@ -104,7 +104,7 @@ class HelpController extends AbstractController
 		);
 
 		// Build the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=help',
 			'name' => $txt['help'],
 		);

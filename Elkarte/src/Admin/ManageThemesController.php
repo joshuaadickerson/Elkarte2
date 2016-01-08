@@ -947,7 +947,7 @@ class ManageThemesController extends AbstractController
 		$this->_templates->load('ManageThemes');
 
 		// Build the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=theme;sa=pick;u=' . (!empty($this->_req->query->u) ? (int) $this->_req->query->u : 0),
 			'name' => $txt['theme_pick'],
 		);

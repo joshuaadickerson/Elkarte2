@@ -188,7 +188,7 @@ function template_settings()
 		),
 		'',
 		array(
-			'id' => 'linktree_link',
+			'id' => 'breadcrumbs_link',
 			'label' => $txt['current_pos_text_img'],
 		),
 		array(

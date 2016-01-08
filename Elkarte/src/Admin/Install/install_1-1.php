@@ -2650,7 +2650,7 @@ class InstallInstructions_install_1_1
 				array(1, 'show_blurb', '1'),
 				array(1, 'show_gender', '0'),
 				array(1, 'number_recent_posts', '0'),
-				array(1, 'linktree_link', '1'),
+				array(1, 'breadcrumbs_link', '1'),
 				array(1, 'show_profile_buttons', '1'),
 				array(1, 'show_mark_read', '1'),
 				array(1, 'show_stats_index', '1'),

@@ -202,8 +202,6 @@ class AboutController extends AbstractController
         if (empty($modSettings['staff_page']))
             redirectexit();
 
-        $context['sub_template'] = 'staff';
-
         $staff_groups = empty($modSettings['staff_groups']) ? array(1, 2) : explode(',', $modSettings['staff_groups']);
         $this->hooks->hook('staff_groups', array($staff_groups));
 
@@ -215,5 +213,7 @@ class AboutController extends AbstractController
         {
             $this->mem_manager->loadMemberContext($member);
         }
+
+        $context['sub_template'] = 'staff';
     }
 }

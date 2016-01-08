@@ -91,10 +91,6 @@ class DisplayController extends AbstractController
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('no_board', false);
 
-		// Load the template
-		$this->_templates->load('Display');
-		$context['sub_template'] = 'messages';
-
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		stop_prefetching();
 
@@ -271,8 +267,6 @@ class DisplayController extends AbstractController
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
-		if ($context['show_spellchecking'])
-			loadJavascriptFile('spellcheck.js', array('defer' => true));
 
 		// Are we showing signatures - or disabled fields?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
@@ -335,7 +329,7 @@ class DisplayController extends AbstractController
 		}
 
 		// Build the link tree.
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
 			'name' => $topicinfo['subject'],
 		);
@@ -446,32 +440,7 @@ class DisplayController extends AbstractController
 			{
 				$context['likes'] = $this->elk['likes.manager']->loadLikes($messages, true);
 
-				// ajax controller for likes
-				loadJavascriptFile('like_posts.js', array('defer' => true));
-				theme()->addJavascriptVar(array(
-					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
-				));
 				loadLanguage('Errors');
-
-				// Initiate likes and the tooltips for likes
-				theme()->addInlineJavascript('
-				$(document).ready(function () {
-					var likePostInstance = likePosts.prototype.init({
-						oTxt: ({
-							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
-							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
-							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
-						}),
-					});
-
-					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
-						hoverIntent: {
-							sensitivity: 10,
-							interval: 150,
-							timeout: 50
-						}
-					});
-				});', true);
 			}
 
 			$messages_request = $this->elk['messages.manager']->loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
@@ -566,19 +535,6 @@ class DisplayController extends AbstractController
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
-		// Load up the Quick ModifyTopic and Quick Reply scripts
-		loadJavascriptFile('topic.js');
-
-		// Auto video embedding enabled?
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			theme()->addInlineJavascript('
-		$(document).ready(function() {
-			$().linkifyvideo(oEmbedtext);
-		});'
-			);
-		}
-
 		// Now create the editor.
 		$editorOptions = array(
 			'id' => 'message',
@@ -608,17 +564,6 @@ class DisplayController extends AbstractController
 
 				create_control_richedit($editorOptions);
 			}
-		}
-
-		theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
-		if ($context['can_send_topic'])
-		{
-			theme()->addJavascriptVar(array(
-				'sendtopic_cancel' => $txt['modify_cancel'],
-				'sendtopic_back' => $txt['back'],
-				'sendtopic_close' => $txt['find_close'],
-				'sendtopic_error' => $txt['send_error_occurred'],
-				'required_field' => $txt['require_field']), true);
 		}
 
 		// Build the normal button array.
@@ -651,6 +596,10 @@ class DisplayController extends AbstractController
 		// Allow adding new buttons easily.
 		$this->hooks->hook('display_buttons');
 		$this->hooks->hook('mod_buttons');
+
+		// Load the template
+		$this->_templates->load('Display');
+		$context['sub_template'] = 'messages';
 	}
 
 	/**

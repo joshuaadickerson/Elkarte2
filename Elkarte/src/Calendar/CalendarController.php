@@ -60,9 +60,6 @@ class CalendarController extends AbstractController
 		if (empty($modSettings['cal_enabled']))
 			$this->_errors->fatal_lang_error('calendar_off', false);
 
-		// This is gonna be needed...
-		$this->_templates->load('Calendar');
-
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
 		$context['sub_template'] = 'show_calendar';
@@ -143,32 +140,37 @@ class CalendarController extends AbstractController
 		// Set the page title to mention the month or week, too
 		$context['page_title'] .= ' - ' . ($context['view_week'] ? sprintf($txt['calendar_week_title'], $context['calendar_grid_main']['week_number'], ($context['calendar_grid_main']['week_number'] == 53 ? $context['current_year'] - 1 : $context['current_year'])) : $txt['months'][$context['current_month']] . ' ' . $context['current_year']);
 
-		// Load up the linktree!
-		$context['linktree'][] = array(
+		// Load up the breadcrumbs!
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=calendar',
 			'name' => $txt['calendar']
 		);
 
-		// Add the current month to the linktree.
-		$context['linktree'][] = array(
+		// Add the current month to the breadcrumbs.
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=calendar;year=' . $context['current_year'] . ';month=' . $context['current_month'],
 			'name' => $txt['months'][$context['current_month']] . ' ' . $context['current_year']
 		);
 
-		// If applicable, add the current week to the linktree.
+		// If applicable, add the current week to the breadcrumbs.
 		if ($context['view_week'])
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=calendar;viewweek;year=' . $context['current_year'] . ';month=' . $context['current_month'] . ';day=' . $context['current_day'],
 				'name' => $txt['calendar_week'] . ' ' . $context['calendar_grid_main']['week_number']
 			);
 
 		// Build the calendar button array.
 		$context['calendar_buttons'] = array(
-			'post_event' => array('test' => 'can_post', 'text' => 'calendar_post_event', 'image' => 'calendarpe.png', 'lang' => true, 'url' => $scripturl . '?action=calendar;sa=post;month=' . $context['current_month'] . ';year=' . $context['current_year'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+			'post_event' => array(
+				'test' => 'can_post',
+				'text' => 'calendar_post_event',
+				'image' => 'calendarpe.png',
+				'lang' => true,
+				'url' => $scripturl . '?action=calendar;sa=post;month=' . $context['current_month'] . ';year=' . $context['current_year'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			),
 		);
 
-		// Allow mods to add additional buttons here
-		$GLOBALS['elk']['hooks']->hook('calendar_buttons');
+		$this->_templates->load('Calendar');
 	}
 
 	/**
@@ -207,7 +209,7 @@ class CalendarController extends AbstractController
 			return $this->_returnToPost();
 		}
 
-		$event = new Calendar_Event($event_id, $modSettings);
+		$event = new CalendarEvent($event_id, $modSettings);
 
 		$context['event'] = $event->load($_REQUEST, $user_info['id']);
 
@@ -233,7 +235,7 @@ class CalendarController extends AbstractController
 		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'name' => $context['page_title'],
 		);
 	}
@@ -251,7 +253,7 @@ class CalendarController extends AbstractController
 		// Cast this for safety...
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
 
-		$event = new Calendar_Event($event_id, $modSettings);
+		$event = new CalendarEvent($event_id, $modSettings);
 
 		// Validate the post...
 		if (!isset($_POST['link_to_board']))
@@ -337,9 +339,6 @@ class CalendarController extends AbstractController
 		// Goes without saying that this is required.
 		if (!isset($_REQUEST['eventid']))
 			$this->_errors->fatal_lang_error('no_access', false);
-
-		// This is kinda wanted.
-		require_once(SUBSDIR . '/Calendar.subs.php');
 
 		// Load up the event in question and check it exists.
 		$event = getEventProperties($_REQUEST['eventid']);

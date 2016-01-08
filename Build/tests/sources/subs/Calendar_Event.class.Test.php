@@ -1,9 +1,9 @@
 <?php
 
 /**
- * TestCase class for the Calendar_Event class.
+ * TestCase class for the CalendarEvent class.
  */
-class TestCalendar_Event extends PHPUnit_Framework_TestCase
+class TestCalendarEvent extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
@@ -27,7 +27,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	{
 		global $context, $user_info;
 
-		$context['linktree'] = array();
+		$context['breadcrumbs'] = array();
 		// Faking an Admin
 		$user_info['is_admin'] = true;
 	}
@@ -37,19 +37,19 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testNew()
 	{
-		$event = new Calendar_Event(null, array());
+		$event = new CalendarEvent(null, array());
 		$this->assertTrue($event->isNew());
 
-		$event = new Calendar_Event(-1, array());
+		$event = new CalendarEvent(-1, array());
 		$this->assertTrue($event->isNew());
 
-		$event = new Calendar_Event(1, array());
+		$event = new CalendarEvent(1, array());
 		$this->assertFalse($event->isNew());
 	}
 
 	public function testStarter()
 	{
-		$event = new Calendar_Event(1, array());
+		$event = new CalendarEvent(1, array());
 
 		// Guest means not the starter
 		$this->assertFalse($event->isStarter(0));
@@ -65,7 +65,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testRemove()
 	{
-		$event = new Calendar_Event(1, array());
+		$event = new CalendarEvent(1, array());
 		$event->remove();
 	}
 
@@ -75,7 +75,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNoSpan()
 	{
-		$event = new Calendar_Event(1, array());
+		$event = new CalendarEvent(1, array());
 		$event->validate(array('span' => 1));
 	}
 
@@ -85,7 +85,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateInvalidSpan1()
 	{
-		$event = new Calendar_Event(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
+		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => -1));
 	}
 
@@ -95,7 +95,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateInvalidSpan2()
 	{
-		$event = new Calendar_Event(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
+		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => 5));
 	}
 
@@ -105,7 +105,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete1()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No month passed => Elk_Exception
 		$event->validate(array());
 	}
@@ -116,7 +116,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete2()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No year passed => Elk_Exception
 		$event->validate(array('month' => 1));
 	}
@@ -127,7 +127,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete3()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// Negative months are not allowed
 		$event->validate(array('month' => -1, 'year' => 2013));
 	}
@@ -138,7 +138,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete4()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// Zero is not a month
 		$event->validate(array('month' => 0, 'year' => 2013));
 	}
@@ -149,7 +149,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete5()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// An years haz only 12 months...
 		$event->validate(array('month' => 13, 'year' => 2013));
 	}
@@ -160,7 +160,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete6()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// Too low year
 		$event->validate(array('month' => 1, 'year' => 2011));
 	}
@@ -171,7 +171,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete7()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// Too far away in the future
 		$event->validate(array('month' => 1, 'year' => 2017));
 	}
@@ -182,7 +182,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete8()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No day => Elk_Exception
 		$event->validate(array('month' => 1, 'year' => 2013));
 	}
@@ -193,7 +193,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete9()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No title => Elk_Exception
 		$event->validate(array('month' => 1, 'year' => 2013, 'day' => 1));
 	}
@@ -204,7 +204,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete10()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No need to test the PHP checkdata function, so just one single bad date
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 30, 'evtitle' => 'string', 'subject' => 'string'));
 	}
@@ -215,7 +215,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	 */
 	public function testValidateNotDelete11()
 	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// A evtitle made up of spaces should be trimmed and result in an empty string
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 1, 'evtitle' => '    ', 'subject' => 'string'));
 	}
@@ -227,7 +227,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	{
 		$input = array('month' => 1, 'year' => 2013, 'day' => 1, 'subject' => 'string');
 
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 
 		// If no evtitle, but subject present, then evtitle == subject
 		$result = $event->validate($input);

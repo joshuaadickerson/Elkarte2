@@ -368,8 +368,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	$GLOBALS['elk']['browser'];
 
-	// Set the top level linktree up.
-	array_unshift($context['linktree'], array(
+	// Set the top level breadcrumbs up.
+	array_unshift($context['breadcrumbs'], array(
 		'url' => $scripturl,
 		'name' => $context['forum_name']
 	));
@@ -595,8 +595,8 @@ function fixThemeUrls($detected_url)
 		}
 	}
 
-	foreach ($context['linktree'] as $k => $dummy)
-		$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
+	foreach ($context['breadcrumbs'] as $k => $dummy)
+		$context['breadcrumbs'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
 }
 
 /**

@@ -39,8 +39,8 @@ class BoardsManager extends AbstractManager
 		$user_info['is_moderator'] = false;
 		$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
-		// Start the linktree off empty..
-		$context['linktree'] = array();
+		// Start the breadcrumbs off empty..
+		$context['breadcrumbs'] = array();
 
 		// Have they by chance specified a message id but nothing else?
 		if (empty($_REQUEST['action']) && empty($topic) && empty($board_id) && !empty($_REQUEST['msg']))
@@ -233,9 +233,9 @@ class BoardsManager extends AbstractManager
 			if (!empty($modSettings['deny_boards_access']) && count(array_intersect($user_info['groups'], $board_info['deny_groups'])) != 0 && !$user_info['is_admin'])
 				$board_info['error'] = 'access';
 
-			// Build up the linktree.
-			$context['linktree'] = array_merge(
-				$context['linktree'],
+			// Build up the breadcrumbs.
+			$context['breadcrumbs'] = array_merge(
+				$context['breadcrumbs'],
 				array(array(
 					'url' => $scripturl . '#c' . $board_info['cat']['id'],
 					'name' => $board_info['cat']['name']
@@ -264,8 +264,8 @@ class BoardsManager extends AbstractManager
 			$_GET['board'] = '';
 			$_GET['topic'] = '';
 
-			// The linktree should not give the game away mate!
-			$context['linktree'] = array(
+			// The breadcrumbs should not give the game away mate!
+			$context['breadcrumbs'] = array(
 				array(
 					'url' => $scripturl,
 					'name' => $context['forum_name_html_safe']

@@ -55,7 +55,7 @@ class GroupsController extends AbstractController
 		{
 			isAllowedTo('view_mlist');
 
-			$context['linktree'][] = array(
+			$context['breadcrumbs'][] = array(
 				'url' => $scripturl . '?action=groups',
 				'name' => $txt['groups'],
 			);
@@ -245,7 +245,7 @@ class GroupsController extends AbstractController
 		$context['group']['can_moderate'] = allowedTo('manage_membergroups') && (allowedTo('admin_forum') || $context['group']['group_type'] != 1);
 
 		// The template is very needy
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=groups;sa=members;group=' . $context['group']['id'],
 			'name' => $context['group']['name'],
 		);

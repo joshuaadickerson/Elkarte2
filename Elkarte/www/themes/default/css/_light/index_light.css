@@ -887,7 +887,7 @@ div.bbc_footnotes .meaction {
 /* ------------------------------------------------------- */
 /*	$LINKTREE	                                           */
 /* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
+/* The navigation list (i.e. breadcrumbs) */
 /* Wrapper/background. */
 .navigate_section {
 	border: 1px solid #CCCCCC;
@@ -896,39 +896,39 @@ div.bbc_footnotes .meaction {
 	box-shadow: 1px 2px 3px #EEEEEE;
 }
 
-/* Color for linktree items. */
-.linktree a {
+/* Color for breadcrumbs items. */
+.breadcrumbs a {
 	color: #585858;
 }
 
-.linktree {
+.breadcrumbs {
 	border-bottom: 1px solid #CCCCCC;
 	box-shadow: 0 -2px 0 -1px #CCCCCC, 3px -2px 0 -1px #CCCCCC, 3px 1px 0 -1px #CCCCCC;
 }
 
-.linktree:hover a, .linktree > a:hover,
-.linktree:last-child, .linktree:last-child > span > a,
-.linktree:last-child > span > a:hover, .linktree:last-child strong {
+.breadcrumbs:hover a, .breadcrumbs > a:hover,
+.breadcrumbs:last-child, .breadcrumbs:last-child > span > a,
+.breadcrumbs:last-child > span > a:hover, .breadcrumbs:last-child strong {
 	color: #FEFEFE;
 	text-decoration: none;
 }
 
-.linktree:after {
+.breadcrumbs:after {
 	background: #FEFEFE;
 	box-shadow: 2px -2px 0 1px rgba(200, 204, 204, 0.9);
 }
 
-.linktree:hover, .linktree:last-child {
+.breadcrumbs:hover, .breadcrumbs:last-child {
 	background: #5BA048;
 	background-image: linear-gradient(0deg, #4B863C, #5BA048);
 }
 
-.linktree:hover:after, .linktree:last-child:after {
+.breadcrumbs:hover:after, .breadcrumbs:last-child:after {
 	background: #5BA048;
 	background-image: linear-gradient(315deg, #4B863C, #5BA048);
 }
 
-.linktree:last-child:hover, .linktree:last-child:hover:after {
+.breadcrumbs:last-child:hover, .breadcrumbs:last-child:hover:after {
 	background: #4B863C;
 }
 

@@ -18,6 +18,8 @@
  *
  */
 
+namespace Elkarte\Members\Authentication;
+
 use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
@@ -37,6 +39,7 @@ class AuthController extends AbstractController
 	 */
 	public function action_index()
 	{
+		$this->bootstrap();
 		// What can we do? login page!
 		$this->action_login();
 	}
@@ -54,15 +57,14 @@ class AuthController extends AbstractController
 	{
 		global $txt, $context, $scripturl, $user_info;
 
+		$this->bootstrap();
+
 		// You are already logged in, go take a tour of the boards
 		if (!empty($user_info['id']))
 			redirectexit();
 
 		// Load the Login template/language file.
 		loadLanguage('Login');
-		$this->_templates->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
-		$context['sub_template'] = 'login';
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
@@ -85,6 +87,9 @@ class AuthController extends AbstractController
 
 		// Create a one time token.
 		createToken('login');
+
+		$this->templates->load('Login');
+		$context['sub_template'] = 'login';
 	}
 
 	/**
@@ -103,15 +108,14 @@ class AuthController extends AbstractController
 	{
 		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
 
-		// Load cookie authentication and all stuff.
-		require_once(SUBSDIR . '/Auth.subs.php');
-
 		// Beyond this point you are assumed to be a guest trying to login.
 		if (!$user_info['is_guest'])
 			redirectexit();
 
+		$this->bootstrap();
+
 		// Are you guessing with a script?
-		$this->_session->check('post');
+		$GLOBALS['elk']['session']->check('post');
 		validateToken('login');
 		spamProtection('login');
 
@@ -133,7 +137,6 @@ class AuthController extends AbstractController
 
 		// Load the template stuff
 		$this->_templates->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
@@ -206,7 +209,7 @@ class AuthController extends AbstractController
 		}
 
 		// Find them... if we can
-		$user_settings = loadExistingMember($_POST['user']);
+		$user_settings = $this->elk['members.manager']->loadExistingMember($_POST['user']);
 
 		// User using 2FA for login? Let's validate the token...
 		if (!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
@@ -239,6 +242,7 @@ class AuthController extends AbstractController
 		// Figure out if the password is using Elk's encryption - if what they typed is right.
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
+			require_once ELKDIR . '/Security/Auth.subs.php';
 			// Challenge what was passed
 			$valid_password = validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']);
 
@@ -372,8 +376,6 @@ class AuthController extends AbstractController
 		if (!$internal)
 			$this->_session->check('get');
 
-		require_once(SUBSDIR . '/Auth.subs.php');
-
 		if (isset($_SESSION['pack_ftp']))
 			$_SESSION['pack_ftp'] = null;
 
@@ -391,7 +393,6 @@ class AuthController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('logout', array($user_settings['member_name']));
 
 			// If you log out, you aren't online anymore :P.
-			require_once(SUBSDIR . '/Logging.subs.php');
 			logOnline($user_info['id'], false);
 		}
 
@@ -446,8 +447,6 @@ class AuthController extends AbstractController
 		global $txt, $context;
 
 		loadLanguage('Login');
-		$this->_templates->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Never redirect to an attachment
@@ -456,6 +455,8 @@ class AuthController extends AbstractController
 
 		$context['sub_template'] = 'kick_guest';
 		$context['page_title'] = $txt['login'];
+
+		$this->_templates->load('Login');
 	}
 
 	/**
@@ -470,8 +471,6 @@ class AuthController extends AbstractController
 		global $txt, $mtitle, $mmessage, $context;
 
 		loadLanguage('Login');
-		$this->_templates->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
@@ -482,6 +481,8 @@ class AuthController extends AbstractController
 		$context['title'] = &$mtitle;
 		$context['description'] = &$mmessage;
 		$context['page_title'] = $txt['maintain_mode'];
+
+		$this->_templates->load('Login');
 	}
 
 	/**

@@ -129,7 +129,7 @@ class PersonalMessageController extends AbstractController
 		// Build the breadcrumbs for all the actions...
 		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=pm',
-			'name' => $txt['personal_messages']
+			'name' => txt('personal_messages'),
 		);
 
 		// Preferences...
@@ -155,7 +155,7 @@ class PersonalMessageController extends AbstractController
 				'allowed' => $context['message_limit'],
 				'percent' => $bar,
 				'bar' => min(100, (int) $bar),
-				'text' => sprintf($txt['pm_currently_using'], $user_info['messages'], round($bar, 1)),
+				'text' => sprintf(txt('pm_currently_using'), $user_info['messages'], round($bar, 1)),
 			);
 		}
 	}
@@ -182,7 +182,7 @@ class PersonalMessageController extends AbstractController
 		// The default inbox is always available
 		$context['labels'][-1] = array(
 			'id' => -1,
-			'name' => $txt['pm_msg_label_inbox'],
+			'name' => txt('pm_msg_label_inbox'),
 			'messages' => 0,
 			'unread_messages' => 0,
 		);

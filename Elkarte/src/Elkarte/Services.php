@@ -198,4 +198,8 @@ $elk['bans.manager'] = function () {
 	return new BansManager();
 };
 
+$elk['ip.manager'] = function () {
+	return new Elkarte\Ips\IPs();
+};
+
 return $elk;

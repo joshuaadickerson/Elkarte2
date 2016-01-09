@@ -3,6 +3,7 @@
 namespace Elkarte\Members;
 
 use Elkarte\Elkarte\ProviderInterface;
+use Elkarte\Members\Authentication\AuthController;
 use Pimple\Container;
 
 class Provider implements ProviderInterface
@@ -17,6 +18,14 @@ class Provider implements ProviderInterface
 
 		$elk['members.container'] = function ($elk) {
 			return new MemberContainer;
+		};
+
+		$elk['auth.controller'] = function ($elk) {
+			return new AuthController();
+		};
+
+		$elk['members.moderator'] = function ($elk) {
+			return new Moderator();
 		};
 	}
 

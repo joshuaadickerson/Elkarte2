@@ -15,6 +15,11 @@
  *
  */
 
+function template_Login_init()
+{
+	loadJavascriptFile('sha256.js', array('defer' => true));
+}
+
 /**
  * This is just the basic "login" form.
  */

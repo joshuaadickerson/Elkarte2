@@ -1771,3 +1771,10 @@ function binary_xor($num1, $num2)
 
 	return $return;
 }
+
+function txt($key)
+{
+	global $txt;
+
+	return isset($txt[$key]) ? $txt[$key] : trigger_error('Missing $txt key' . $key);
+}

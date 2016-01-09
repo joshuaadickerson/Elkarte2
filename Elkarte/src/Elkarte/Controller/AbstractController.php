@@ -76,13 +76,13 @@ abstract class AbstractController
 
 		// @todo inject these in the constructor arguments
 		$this->_layers = $elk['layers'];
-		$this->_templates = $elk['templates'];
+		$this->_templates = $this->templates = $elk['templates'];
 		$this->_errors = $elk['errors'];
 		$this->_req = $elk['http_req'];
 		$this->_session = $elk['session'];
 		$this->hooks = $elk['hooks'];
 
-		$this->_events = new EventManager();
+		$this->_events = $this->events = new EventManager();
 
 		// Initialize the events associated with this controller
 		$this->_initEventManager();

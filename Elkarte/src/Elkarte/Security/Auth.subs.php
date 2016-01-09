@@ -102,7 +102,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 		session_destroy();
 
 		// Recreate and restore the new session.
-		loadSession();
+		$GLOBALS['elk']['session']->load();
 
 		// Get a new session id, and load it with the data
 		session_regenerate_id();
@@ -711,12 +711,13 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  *
  * @package Authorization
  * @param int $id_member the id of the member to check for
+ * @return bool
  */
 function isFirstLogin($id_member)
 {
 	// First login?
 
-	$member = getBasicMemberData($id_member, array('moderation' => true));
+	$member = $GLOBALS['elk']['members.manager']->getBasicMemberData($id_member, array('moderation' => true));
 
 	return !empty($member) && $member['last_login'] == 0;
 }
@@ -771,36 +772,6 @@ function findUser($where, $where_params, $fatal = true)
 	$request->free();
 
 	return $member;
-}
-
-/**
- * Find users by their email address.
- *
- * @package Authorization
- * @param string $email
- * @param string|null $username
- * @return boolean
- */
-function userByEmail($email, $username = null)
-{
-	$db = $GLOBALS['elk']['db'];
-
-	$request = $db->query('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
-			OR email_address = {string:username}') . '
-		LIMIT 1',
-		array(
-			'email_address' => $email,
-			'username' => $username,
-		)
-	);
-
-	$return = $request->numRows() != 0;
-	$request->free();
-
-	return $return;
 }
 
 /**

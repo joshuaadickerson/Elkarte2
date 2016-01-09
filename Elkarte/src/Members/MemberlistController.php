@@ -49,7 +49,6 @@ class MemberListController extends AbstractController
 		);
 
 		// Are there custom fields they can search?
-		require_once(ROOTDIR . '/Members/Memberlist.subs.php');
 		ml_findSearchableCustomFields();
 
 		// These are handy later
@@ -74,10 +73,6 @@ class MemberListController extends AbstractController
 
 		// Make sure they can view the memberlist.
 		isAllowedTo('view_mlist');
-
-		$this->_templates->load('Memberlist');
-		$context['sub_template'] = 'memberlist';
-		$this->_layers->add('mlsearch');
 
 		$context['listing_by'] = $this->_req->getQuery('sa', 'trim', 'all');
 
@@ -185,7 +180,7 @@ class MemberListController extends AbstractController
 			$context['colspan'] += isset($column['colspan']) ? $column['colspan'] : 1;
 		}
 
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=memberlist',
 			'name' => $txt['members_list']
 		);
@@ -223,6 +218,10 @@ class MemberListController extends AbstractController
 			$this->{$subActions[$context['listing_by']][1]}();
 		else
 			$this->{$subActions['all'][1]}();
+
+		$this->_templates->load('Memberlist');
+		$context['sub_template'] = 'memberlist';
+		$this->_layers->add('mlsearch');
 	}
 
 	/**
@@ -238,8 +237,6 @@ class MemberListController extends AbstractController
 		// The chunk size for the cached index.
 		$cache_step_size = 500;
 		$memberlist_cache = '';
-
-		require_once(SUBSDIR . '/Memberlist.subs.php');
 
 		// Some handy short cuts
 		$start = $this->_req->getQuery('start', '', null);
@@ -321,7 +318,7 @@ class MemberListController extends AbstractController
 		$context['end'] = min($start + $modSettings['defaultMaxMembers'], $context['num_members']);
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['page_title'] = sprintf($txt['viewing_members'], $context['start'], $context['end']);
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=memberlist;sort=' . $sort . ';start=' . $start,
 			'name' => &$context['page_title'],
 			'extra_after' => ' (' . sprintf($txt['of_total_members'], $context['num_members']) . ')'
@@ -514,7 +511,7 @@ class MemberListController extends AbstractController
 		else
 			redirectexit('action=memberlist');
 
-		$context['linktree'][] = array(
+		$context['breadcrumbs'][] = array(
 			'url' => $scripturl . '?action=memberlist;sa=search',
 			'name' => &$context['page_title']
 		);

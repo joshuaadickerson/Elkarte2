@@ -1871,7 +1871,6 @@ class MembersManager extends AbstractManager
 	/**
 	 * Load some basic member information
 	 *
-	 * @package Members
 	 * @param int[]|int $member_ids an array of member IDs or a single ID
 	 * @param mixed[] $options an array of possible little alternatives, can be:
 	 * - 'add_guest' (bool) to add a guest user to the returned array
@@ -3114,6 +3113,35 @@ class MembersManager extends AbstractManager
 		$request->free();
 
 		return $user_settings;
+	}
+
+	/**
+	 * Find users by their email address.
+	 *
+	 * @param string $email
+	 * @param string|null $username
+	 * @return boolean
+	 */
+	function userByEmail($email, $username = null)
+	{
+		$db = $GLOBALS['elk']['db'];
+
+		$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
+			OR email_address = {string:username}') . '
+		LIMIT 1',
+			array(
+				'email_address' => $email,
+				'username' => $username,
+			)
+		);
+
+		$return = $request->numRows() != 0;
+		$request->free();
+
+		return $return;
 	}
 
 }

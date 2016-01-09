@@ -6,6 +6,7 @@ use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Http\HttpReq;
 use Elkarte\Elkarte\Errors\Errors;
 use Elkarte\Elkarte\Events\Hooks;
+use Elkarte\Elkarte\Ips\IP;
 use Elkarte\Elkarte\Theme\TemplateLayers;
 
 class BanCheck
@@ -136,7 +137,7 @@ class BanCheck
 			// IP was valid, maybe there's also a hostname...
 			if (empty($modSettings['disableHostnameLookup']) && $user_info[$ip_number] != 'unknown')
 			{
-				$hostname = host_from_ip($user_info[$ip_number]);
+				$hostname = $GLOBALS['elk']['ip.manager']->host_from_ip(new IP($user_info[$ip_number]));
 				if (strlen($hostname) > 0)
 				{
 					$ban_query[] = '({string:hostname} LIKE bi.hostname)';
@@ -300,8 +301,7 @@ class BanCheck
 			$context['open_mod_reports'] = $_SESSION['rc']['reports'];
 		elseif ($_SESSION['mc']['bq'] != '0=1')
 		{
-			require_once(ROOTDIR . '/Messages/Moderation.subs.php');
-			recountOpenReports(true, allowedTo('admin_forum'));
+			$GLOBALS['elk']['members.moderator']->recountOpenReports(true, allowedTo('admin_forum'));
 		}
 		else
 			$context['open_mod_reports'] = 0;

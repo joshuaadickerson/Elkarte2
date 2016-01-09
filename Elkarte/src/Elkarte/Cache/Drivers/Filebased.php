@@ -95,7 +95,7 @@ class Filebased extends AbstractCacheMethod
 		// Remove the cache files in our disk cache directory
 		try
 		{
-			$files = new FilesystemIterator(CACHEDIR, FilesystemIterator::SKIP_DOTS);
+			$files = new \FilesystemIterator(CACHEDIR, \FilesystemIterator::SKIP_DOTS);
 
 			foreach ($files as $file)
 			{

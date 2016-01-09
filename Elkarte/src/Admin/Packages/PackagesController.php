@@ -1630,7 +1630,7 @@ class PackagesController extends AbstractController
 					$file_count = 0;
 					$dont_chmod = false;
 
-					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+					$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
 					foreach ($entrys as $entry)
 					{
 						$file_count++;
@@ -1825,7 +1825,7 @@ class PackagesController extends AbstractController
 
 		try
 		{
-			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+			$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
 
 			$dirs = array();
 			$sort_id = array(
@@ -2066,7 +2066,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	try
 	{
-		$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+		$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
 		foreach ($entrys as $entry)
 		{
 			// Some kind of file?

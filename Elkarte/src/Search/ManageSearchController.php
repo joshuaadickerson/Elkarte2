@@ -640,7 +640,7 @@ class ManageSearchController extends AbstractController
 
 		try
 		{
-			$files = new GlobIterator(SUBSDIR . '/Search/API/*Search.php', FilesystemIterator::SKIP_DOTS);
+			$files = new \GlobIterator(SUBSDIR . '/Search/API/*Search.php', \FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
 				if ($file->isFile())

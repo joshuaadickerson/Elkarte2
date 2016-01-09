@@ -13,6 +13,9 @@
  *
  */
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * Xml controller receives XMLhttp requests of various types.
  * (jump to, message and group icons, core features)
@@ -104,7 +107,7 @@ class XmlController extends AbstractController
 		$icons = array();
 
 		// Get all the available member group icons
-		$files = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+		$files = new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
 			if ($file->getFilename() === 'blank.png')
@@ -222,7 +225,7 @@ class XmlController extends AbstractController
 		// Chances are
 		loadLanguage('Errors');
 		loadLanguage('ManageSettings');
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
 
 		// You have to be allowed to do this
 		$validation_token = validateToken('Admin-sort', 'post', false, false);
@@ -313,7 +316,7 @@ class XmlController extends AbstractController
 		// Chances are we will need these
 		loadLanguage('Errors');
 		loadLanguage('ManageBoards');
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
 
 
 		// Validating that you can do this is always a good idea

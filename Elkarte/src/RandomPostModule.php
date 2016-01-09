@@ -38,9 +38,7 @@ class RandomPostModule implements ModuleInterface
 	{
 		if (!empty($_REQUEST['followup']))
 			$original_post = (int) $_REQUEST['followup'];
-
-		require_once(SUBSDIR . '/FollowUps.subs.php');
-
+		
 		// Time to update the original message with a pointer to the new one
 		if (!empty($original_post) && canAccessMessage($original_post))
 			linkMessages($original_post, $topicOptions['id']);

@@ -23,6 +23,7 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * "Report" Functions are responsible for generating data for reporting.

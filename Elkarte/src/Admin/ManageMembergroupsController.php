@@ -19,6 +19,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManageMembergroups controller, administration page for membergroups.
  *

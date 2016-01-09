@@ -81,14 +81,16 @@ class SiteDispatcher
 		// Reminder: hooks need to account for multiple addons setting this hook.
 		$this->hooks->hook('action_frontpage', array(&$this->_default_action));
 
+		$action = isset($_GET['action']) ? strtolower($_GET['action']) : false;
+
 		// Maintenance mode: you're out of here unless you're Admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
+			if ($action !== false && ($action == 'login2' || $action == 'logout'))
 			{
 				$this->_controller_name = 'AuthController';
-				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
+				$this->_function_name = $action == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
@@ -98,12 +100,12 @@ class SiteDispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && ($action === false || !in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
 		{
-			$this->_controller_name = 'AuthController';
+			$this->_controller_name = 'auth.controller';
 			$this->_function_name = 'action_kickguest';
 		}
-		elseif (empty($_GET['action']))
+		elseif ($action === false)
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -138,37 +140,38 @@ class SiteDispatcher
 		// $_GET['action'] => array($class, $method)
 		$actionArray = require_once('Actions.php');
 
-		$adminActions = array('Admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
+		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
 		// Allow to extend or change $actionArray through a hook
 		$this->hooks->hook('actions', array(&$actionArray, &$adminActions));
 
 		// Is it in core legacy actions?
-		if (isset($actionArray[$_GET['action']]))
+		if (isset($actionArray[$action]))
 		{
-			$this->_controller_name = $actionArray[$_GET['action']][0];
+			$this->_controller_name = $actionArray[$action][0];
 
 			// If the method is coded in, use it
-			if (!empty($actionArray[$_GET['action']][1]))
-				$this->_function_name = $actionArray[$_GET['action']][1];
+			if (!empty($actionArray[$action][1]))
+				$this->_function_name = $actionArray[$action][1];
 			// Otherwise fall back to naming patterns
 			elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 				$this->_function_name = 'action_' . $_GET['sa'];
 			else
 				$this->_function_name = 'action_index';
 		}
+		// @todo make sure we don't need this. I want to make this work with ease, but I think it is better in the database and cached in files
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
+		elseif (false && preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
 		{
 			// Admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
+			$path = in_array($action, $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.php'))
+			if (file_exists($path . '/' . ucfirst($action) . '.php'))
 			{
-				$this->_controller_name = ucfirst($_GET['action']) . 'Controller';
+				$this->_controller_name = ucfirst($action) . 'Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']) && !isset($_GET['area']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else

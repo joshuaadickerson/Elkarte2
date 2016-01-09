@@ -21,6 +21,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManageServer administration pages controller.
  *

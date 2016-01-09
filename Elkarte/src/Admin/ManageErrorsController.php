@@ -20,6 +20,8 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+
 /**
  * ManageErrors controller, administration of error log.
  */
@@ -33,6 +35,8 @@ class ManageErrorsController extends AbstractController
 	 */
 	public function action_index()
 	{
+		$this->bootstrap();
+
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
 

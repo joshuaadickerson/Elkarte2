@@ -14,7 +14,7 @@
 
 namespace Elkarte\Admin;
 
-use Elkarte\Controllers\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Class to show a list of all badbehavior log entries

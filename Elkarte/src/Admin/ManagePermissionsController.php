@@ -20,6 +20,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManagePermissions handles all possible permission stuff.
  *

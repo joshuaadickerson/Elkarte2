@@ -549,7 +549,7 @@ class ProfileHistoryController extends AbstractController
 		global $scripturl, $txt, $modSettings, $context;
 
 		// Get the names of any custom fields.
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
 		$context['custom_field_titles'] = loadAllCustomFields();
 
 		// Set the options for the error lists.

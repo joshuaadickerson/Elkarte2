@@ -21,7 +21,7 @@ function iterate($dir)
 {
 	global $keys;
 
-	$sys = new FilesystemIterator($dir, FilesystemIterator::KEY_AS_PATHNAME & FilesystemIterator::CURRENT_AS_FILEINFO & FilesystemIterator::SKIP_DOTS);
+	$sys = new \FilesystemIterator($dir, \FilesystemIterator::KEY_AS_PATHNAME & \FilesystemIterator::CURRENT_AS_FILEINFO & \FilesystemIterator::SKIP_DOTS);
 
 	foreach ($sys as $file)
 	{
@@ -79,7 +79,7 @@ function findTextFiles($dir, array $keys)
 {
 	global $loaded_txt;
 
-	$sys = new FilesystemIterator($dir, FilesystemIterator::KEY_AS_PATHNAME & FilesystemIterator::CURRENT_AS_FILEINFO & FilesystemIterator::SKIP_DOTS);
+	$sys = new \FilesystemIterator($dir, \FilesystemIterator::KEY_AS_PATHNAME & \FilesystemIterator::CURRENT_AS_FILEINFO & \FilesystemIterator::SKIP_DOTS);
 
 	$preg_keys = implode('|', $keys);
 

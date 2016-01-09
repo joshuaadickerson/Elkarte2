@@ -22,13 +22,13 @@
 namespace Elkarte\Admin;
 
 use Elkarte\Elkarte\AbstractManager;
+use Elkarte\Elkarte\Server\Server;
 
 class Admin extends AbstractManager
 {
 	/**
 	 * Get a list of versions that are currently installed on the server.
 	 *
-	 * @package Admin
 	 * @param string[] $checkFor
 	 * @return array
 	 */
@@ -61,12 +61,13 @@ class Admin extends AbstractManager
 			if (empty($conn))
 				trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 			else {
-				$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->db_title()), 'version' => '');
-				$versions['db_server']['version'] = $db->db_server_version();
+				$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->title()), 'version' => '');
+				$versions['db_server']['version'] = $db->serverVersion();
 			}
 		}
 
-		$cache_engines = loadCacheEngines();
+		$cache_man = new ManageCacheSettings();
+		$cache_engines = $cache_man->loadCacheEngines();
 		foreach ($cache_engines as $name => $details) {
 			if (in_array($name, $checkFor))
 				$versions[$name] = $details;
@@ -89,8 +90,8 @@ class Admin extends AbstractManager
 
 			// Compute some system info, if we can
 			$versions['server_name'] = array('title' => $txt['support_versions'], 'version' => php_uname());
-			require_once(ELKDIR . '/Server/Server.subs.php');
-			$loading = detectServerLoad();
+			$server = new Server();
+			$loading = $server->detectServerLoad();
 			if ($loading !== false)
 				$versions['server_load'] = array('title' => $txt['load_balancing_settings'], 'version' => $loading);
 		}

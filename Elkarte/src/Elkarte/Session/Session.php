@@ -5,6 +5,7 @@ namespace Elkarte\Elkarte\Session;
 use Elkarte\Elkarte\Database\Drivers\DatabaseInterface;
 use Elkarte\Elkarte\Events\Hooks;
 use Elkarte\Elkarte\Http\Request;
+use Elkarte\Elkarte\Security\OpenID;
 use Elkarte\Elkarte\TokenHash;
 use Util;
 
@@ -286,8 +287,6 @@ class Session
 		if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
 			return true;
 
-		require_once(SUBSDIR . '/Auth.subs.php');
-
 		// Coming from the login screen
 		if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 		{
@@ -318,6 +317,7 @@ class Session
 
 				// Password correct?
 				$password = $_POST[$type . '_pass'];
+				require_once ELKDIR . '/Security/Auth.subs.php';
 				if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
 				{
 					$_SESSION[$type . '_time'] = time();
@@ -331,7 +331,6 @@ class Session
 		// OpenID?
 		if (!empty($user_settings['openid_uri']))
 		{
-			require_once(SUBSDIR . '/OpenID.subs.php');
 			$openID = new OpenID();
 			$openID->revalidate();
 
@@ -347,6 +346,7 @@ class Session
 		elseif (empty($_POST))
 			unset($_SESSION['request_referer']);
 
+		require_once ELKDIR . '/Security/Auth.subs.php';
 		// Need to type in a password for that, man.
 		if (!isset($_GET['xml']))
 			adminLogin($type);

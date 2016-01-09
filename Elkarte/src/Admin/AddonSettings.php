@@ -33,17 +33,17 @@ class AddonSettings
 		$files = array();
 
 		try {
-			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir_path, RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::SELF_FIRST,
-				RecursiveIteratorIterator::CATCH_GET_CHILD
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dir_path, \RecursiveDirectoryIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::SELF_FIRST,
+				\RecursiveIteratorIterator::CATCH_GET_CHILD
 			);
 
 			foreach ($iterator as $file) {
 				if ($file->isFile())
 					$files[] = array('dir' => $file->getPath(), 'name' => $file->getFilename());
 			}
-		} catch (UnexpectedValueException $e) {
+		} catch (\UnexpectedValueException $e) {
 			// @todo, give them a prize
 		}
 

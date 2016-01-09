@@ -564,7 +564,7 @@ class PackageServersController extends AbstractController
 		{
 			try
 			{
-				$packages = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+				$packages = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
 				foreach ($packages as $package)
 				{
 					// No need to check these

@@ -35,15 +35,13 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 	{
 		global $context, $txt;
 
-		// We need to know where this thing is going.
-
 		$attach_dirs = attachmentPaths();
 
 		foreach ($attach_dirs as $attach_dir)
 		{
 			try
 			{
-				$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+				$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 				foreach ($files as $file)
 				{
 					if (strpos($file->getFilename(), 'post_tmp_') !== false)

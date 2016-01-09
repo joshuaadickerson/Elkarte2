@@ -388,7 +388,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	if (!isset($txt))
-		$txt = array();
+	{
+		$txt = new \Elkarte\Elkarte\Language\LanguageStringContainer([]);
+	}
 
 	theme()->loadDefaultLayers();
 

@@ -20,6 +20,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in Admin panel.

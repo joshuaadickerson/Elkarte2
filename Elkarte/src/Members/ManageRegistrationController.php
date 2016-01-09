@@ -58,7 +58,7 @@ class ManageRegistrationController extends AbstractController
 
 		// Loading, always loading.
 		loadLanguage('Login');
-		$this->_templates->load('Register');
+		$this->templates->load('Register');
 		loadJavascriptFile('register.js');
 
 		$subActions = array(

@@ -19,6 +19,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * Manage features and options administration page.
  *
@@ -74,8 +77,7 @@ class ManageFeaturesController extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		// We need this in few places so it's easier to have it loaded here
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
 	}
 
 	/**

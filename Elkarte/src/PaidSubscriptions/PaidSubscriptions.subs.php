@@ -381,7 +381,7 @@ class PaidSubscriptions extends AbstractManager
 		$gateways = array();
 
 		try {
-			$files = new FilesystemIterator(SUBSDIR . '/Subscriptions/', FilesystemIterator::SKIP_DOTS);
+			$files = new \FilesystemIterator(SUBSDIR . '/Subscriptions/', \FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file) {
 				if ($file->isDir()) {
 					$dirname = $file->getFilename();

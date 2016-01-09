@@ -19,6 +19,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * Entry point class for all of the maintenance ,routine, members, database,
  * attachments, topics and hooks

@@ -13,7 +13,7 @@
 
 namespace Elkarte\Admin;
 
-use Elkarte\Controllers\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * Admin logs controller.

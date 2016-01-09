@@ -19,6 +19,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in Admin panel.

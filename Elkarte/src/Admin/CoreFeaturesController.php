@@ -19,7 +19,7 @@
 
 namespace Elkarte\Admin;
 
-use Elkarte\Controllers\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
 
 /**
  * This class takes care of the Core Features Admin screen.
@@ -40,6 +40,7 @@ class CoreFeaturesController extends AbstractController
 	 */
 	public function action_index()
 	{
+		$this->bootstrap();
 		// just delegate to our preferred default
 		return $this->action_features();
 	}
@@ -62,9 +63,7 @@ class CoreFeaturesController extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		require_once(SUBSDIR . '/Admin.subs.php');
-
-		$this->_templates->load('CoreFeatures');
+		$this->templates->load('CoreFeatures');
 
 		$core_features = $this->settings();
 
@@ -281,11 +280,11 @@ class CoreFeaturesController extends AbstractController
 	protected function _getModulesConfig(&$core_features)
 	{
 		// Find appropriately named core feature files in the Admin directory
-		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(ADMINDIR . '/Manage*ModuleController.php', \FilesystemIterator::SKIP_DOTS);
 
 		foreach ($glob as $file)
 		{
-			$class = $file->getBasename('.controller.php') . 'Controller';
+			$class = $file->getBasename('Controller.php') . 'Controller';
 
 			if (method_exists($class, 'addCoreFeature'))
 				$class::addCoreFeature($core_features);
@@ -441,6 +440,7 @@ class CoreFeaturesController extends AbstractController
 	 *
 	 * @param mixed[] $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
+	 * @return array
 	 */
 	protected function _prepare_corefeatures($core_features)
 	{

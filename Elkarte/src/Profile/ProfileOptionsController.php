@@ -72,9 +72,7 @@ class ProfileOptionsController extends AbstractController
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			$this->_errors->fatal_lang_error('no_access', false);
-
-		$this->_templates->load('ProfileOptions');
+			$this->errors->fatal_lang_error('no_access', false);
 
 		// Can we email the user direct?
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -102,6 +100,8 @@ class ProfileOptionsController extends AbstractController
 
 		// Pass on to the actual function.
 		$action->dispatch($subAction);
+
+		$this->templates->load('ProfileOptions');
 	}
 
 	/**
@@ -112,14 +112,6 @@ class ProfileOptionsController extends AbstractController
 	public function action_editBuddies()
 	{
 		global $context, $user_profile, $memberContext;
-
-		$this->_templates->load('ProfileOptions');
-
-		// We want to view what we're doing :P
-		$context['sub_template'] = 'editBuddies';
-
-		// Use suggest to find the right buddies
-		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
 		$buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
@@ -208,6 +200,12 @@ class ProfileOptionsController extends AbstractController
 		}
 
 		$GLOBALS['elk']['hooks']->hook('view_buddies', array($this->_memID));
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'editBuddies';
+
+		// Use suggest to find the right buddies
+		loadJavascriptFile('suggest.js', array('defer' => true));
 	}
 
 	/**
@@ -218,12 +216,6 @@ class ProfileOptionsController extends AbstractController
 	public function action_editIgnoreList()
 	{
 		global $context, $user_profile, $memberContext;
-
-		$this->_templates->load('ProfileOptions');
-
-		// We want to view what we're doing :P
-		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
 		$ignoreArray = explode(',', $user_profile[$this->_memID]['pm_ignore_list']);
@@ -305,6 +297,10 @@ class ProfileOptionsController extends AbstractController
 			$this->elk['members.manager']->loadMemberContext($ignore_member);
 			$context['ignore_list'][$ignore_member] = $memberContext[$ignore_member];
 		}
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'editIgnoreList';
+		loadJavascriptFile('suggest.js', array('defer' => true));
 	}
 
 	/**
@@ -314,7 +310,7 @@ class ProfileOptionsController extends AbstractController
 	{
 		global $context, $txt;
 
-		$this->_templates->load('ProfileOptions');
+		$this->templates->load('ProfileOptions');
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -384,13 +380,11 @@ class ProfileOptionsController extends AbstractController
 	{
 		global $context, $txt;
 
-		$this->_templates->load('ProfileOptions');
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 			$this->elk['profile']->loadCustomFields($this->_memID, 'forumprofile');
 
-		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
 		$context['show_preview_button'] = true;
 
@@ -404,6 +398,9 @@ class ProfileOptionsController extends AbstractController
 			),
 			'forum'
 		);
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'edit_options';
 	}
 
 	/**
@@ -415,7 +412,7 @@ class ProfileOptionsController extends AbstractController
 
 		$this->loadThemeOptions();
 		$this->elk['profile']->loadCustomFields($this->_memID, 'pmprefs');
-		$this->_templates->load('ProfileOptions');
+		$this->templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['pm_settings_desc'];
@@ -444,9 +441,6 @@ class ProfileOptionsController extends AbstractController
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 			$this->elk['profile']->loadCustomFields($this->_memID, 'theme');
 
-		$this->_templates->load('ProfileOptions');
-
-		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
 		$this->elk['profile']->setupProfileContext(
@@ -457,6 +451,9 @@ class ProfileOptionsController extends AbstractController
 			),
 			'themepick'
 		);
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'edit_options';
 	}
 
 	/**
@@ -464,6 +461,7 @@ class ProfileOptionsController extends AbstractController
 	 * Only appropriate for people using OpenID.
 	 *
 	 * @param bool $saving = false
+	 * @return true|null
 	 */
 	public function action_authentication($saving = false)
 	{
@@ -487,7 +485,6 @@ class ProfileOptionsController extends AbstractController
 				// Is it valid?
 				else
 				{
-					require_once(SUBSDIR . '/Auth.subs.php');
 					$passwordErrors = validatePassword($this->http_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 					// Were there errors?
@@ -552,13 +549,6 @@ class ProfileOptionsController extends AbstractController
 	public function action_notification()
 	{
 		global $txt, $scripturl, $user_profile, $context, $modSettings;
-
-		$this->_templates->load('ProfileOptions');
-
-		// Going to need this for the list.
-
-
-		require_once(ROOTDIR . '/Profile/Profile.subs.php');
 
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
@@ -775,6 +765,8 @@ class ProfileOptionsController extends AbstractController
 		);
 
 		$this->loadThemeOptions();
+
+		$this->templates->load('ProfileOptions');
 	}
 
 	/**
@@ -834,10 +826,6 @@ class ProfileOptionsController extends AbstractController
 		if (empty($modSettings['allow_ignore_boards']))
 			$this->_errors->fatal_lang_error('ignoreboards_disallowed', 'user');
 
-		$this->_templates->load('ProfileOptions');
-
-		$context['sub_template'] = 'ignoreboards';
-
 		$context += getBoardList(array('not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 		// Include a list of boards per category for easy toggling.
@@ -848,6 +836,9 @@ class ProfileOptionsController extends AbstractController
 		}
 
 		$this->loadThemeOptions();
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'ignoreboards';
 	}
 
 	/**
@@ -856,9 +847,6 @@ class ProfileOptionsController extends AbstractController
 	public function action_groupMembership()
 	{
 		global $txt, $user_profile, $context;
-
-		$this->_templates->load('ProfileOptions');
-		$context['sub_template'] = 'groupMembership';
 
 		$curMember = $user_profile[$this->_memID];
 		$context['primary_group'] = $curMember['id_group'];
@@ -881,7 +869,6 @@ class ProfileOptionsController extends AbstractController
 		$groups = array_map('intval', $groups);
 
 		// Get all the membergroups they can join.
-		require_once(SUBSDIR . '/ProfileOptions.subs.php');
 		$context['groups'] = loadMembergroupsJoin($groups, $this->_memID);
 
 		// Add registered members on the end.
@@ -906,6 +893,9 @@ class ProfileOptionsController extends AbstractController
 		{
 			$context['group_request'] = $context['groups']['available'][(int) $this->http_req->query->request];
 		}
+
+		$this->templates->load('ProfileOptions');
+		$context['sub_template'] = 'groupMembership';
 	}
 
 	/**
@@ -928,8 +918,6 @@ class ProfileOptionsController extends AbstractController
 
 		// GID may be from a link or a form
 		$this->session->check(isset($this->http_req->query->gid) ? 'get' : 'post');
-
-
 
 		$old_profile = &$user_profile[$this->_memID];
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
@@ -996,7 +984,6 @@ class ProfileOptionsController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to Admin.
-		require_once(SUBSDIR . '/ProfileOptions.subs.php');
 		if ($context['can_manage_membergroups'] && !allowedTo('admin_forum'))
 		{
 			$disallow = checkMembergroupChange($group_id);
@@ -1132,8 +1119,7 @@ class ProfileOptionsController extends AbstractController
 		}
 		else
 		{
-			require_once(SUBSDIR . '/Themes.subs.php');
-			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
+			$context['member']['options'] = $this->loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
 
 			if (isset($this->http_req->post->options))
 			{

@@ -13,6 +13,9 @@
 
 namespace Elkarte\Admin;
 
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+
 /**
  * ManageBBC controller handles administration options for BBC tags.
  *

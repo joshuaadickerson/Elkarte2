@@ -2,6 +2,7 @@
 
 // I know not to use tabs here but it works in my editor and it's all going to change so :P
 return [
+	'admin'					=> ['admin.controller', 'action_index'],
 	'attachapprove' 		=> ['Elkarte\\Attachments\\ModerateAttachmentsController', 'action_attachapprove'],
 	'buddy' 				=> ['Elkarte\\Members\\MembersController', 'action_buddy'],
 	'collapse' 				=> ['boards.index_controller', 'action_collapse'],

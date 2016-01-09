@@ -64,7 +64,7 @@ class SplitTopicsController extends AbstractController
 			$this->_errors->fatal_lang_error('numbers_one_to_nine', false);
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
-		if (!isset($this->_req->query->xml))
+		if (!isset($this->http_req->query->xml))
 			$this->_templates->load('SplitTopics');
 
 
@@ -101,10 +101,10 @@ class SplitTopicsController extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Split at a specific topic
-		$splitAt = $this->_req->getQuery('at', 'intval', 0);
+		$splitAt = $this->http_req->getQuery('at', 'intval', 0);
 
 		// Validate "at".
-		if (empty($this->_req->query->at))
+		if (empty($this->http_req->query->at))
 			$this->_errors->fatal_lang_error('numbers_one_to_nine', false);
 
 		// We deal with topics here.
@@ -171,7 +171,7 @@ class SplitTopicsController extends AbstractController
 		global $txt, $context, $topic;
 
 		// Check the session to make sure they meant to do this.
-		$this->_session->check();
+		$this->session->check();
 
 		// Set the form options in to session
 		$this->_set_session_values();
@@ -184,10 +184,10 @@ class SplitTopicsController extends AbstractController
 		}
 
 		// Redirect to the selector if they chose selective.
-		if ($this->_req->post->step2 === 'selective')
+		if ($this->http_req->post->step2 === 'selective')
 		{
-			if (!empty($this->_req->post->at))
-				$_SESSION['split_selection'][$topic][] = (int) $this->_req->post->at;
+			if (!empty($this->http_req->post->at))
+				$_SESSION['split_selection'][$topic][] = (int) $this->http_req->post->at;
 
 			$this->action_splitSelectTopics();
 			return true;
@@ -202,14 +202,14 @@ class SplitTopicsController extends AbstractController
 		// Before the actual split because of the fatal_lang_errors
 		$boards = splitDestinationBoard($_SESSION['move_to_board']);
 
-		$splitAt = $this->_req->getPost('at', 'intval', 0);
+		$splitAt = $this->http_req->getPost('at', 'intval', 0);
 		$messagesToBeSplit = array();
 
 		// Fetch the message IDs of the topic that are at or after the message.
-		if ($this->_req->post->step2 === 'afterthis')
+		if ($this->http_req->post->step2 === 'afterthis')
 			$messagesToBeSplit = messagesSince($topic, $splitAt, true);
 		// Only the selected message has to be split. That should be easy.
-		elseif ($this->_req->post->step2 === 'onlythis')
+		elseif ($this->http_req->post->step2 === 'onlythis')
 			$messagesToBeSplit[] = $splitAt;
 		// There's another action?!
 		else
@@ -250,7 +250,7 @@ class SplitTopicsController extends AbstractController
 		global $txt, $topic, $context;
 
 		// Make sure the session id was passed with post.
-		$this->_session->check();
+		$this->session->check();
 
 
 
@@ -299,15 +299,15 @@ class SplitTopicsController extends AbstractController
 		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 
 		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
-		$context['destination_board'] = !empty($this->_req->post->move_to_board) ? (int) $this->_req->post->move_to_board : 0;
+		$context['destination_board'] = !empty($this->http_req->post->move_to_board) ? (int) $this->http_req->post->move_to_board : 0;
 
 		// Haven't selected anything have we?
 		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
 
 		// This is a special case for split topics from quick-moderation checkboxes
-		if (isset($this->_req->query->subname_enc))
+		if (isset($this->http_req->query->subname_enc))
 		{
-			$this->_new_topic_subject = urldecode($this->_req->query->subname_enc);
+			$this->_new_topic_subject = urldecode($this->http_req->query->subname_enc);
 			$this->_set_session_values();
 		}
 
@@ -316,13 +316,13 @@ class SplitTopicsController extends AbstractController
 
 		$context['not_selected'] = array(
 			'num_messages' => 0,
-			'start' => $this->_req->getPost('start', 'intval', 0),
+			'start' => $this->http_req->getPost('start', 'intval', 0),
 			'messages' => array(),
 		);
 
 		$context['selected'] = array(
 			'num_messages' => 0,
-			'start' => $this->_req->getQuery('start2', 'intval', 0),
+			'start' => $this->http_req->getQuery('start2', 'intval', 0),
 			'messages' => array(),
 		);
 
@@ -335,17 +335,17 @@ class SplitTopicsController extends AbstractController
 		$context['new_subject'] = $_SESSION['new_topic_subject'];
 
 		// Using the "select" sub template.
-		$context['sub_template'] = isset($this->_req->query->xml) ? 'split' : 'select';
+		$context['sub_template'] = isset($this->http_req->query->xml) ? 'split' : 'select';
 
 		// All of the js for topic split selection is needed
-		if (!isset($this->_req->query->xml))
+		if (!isset($this->http_req->query->xml))
 			loadJavascriptFile('topic.js');
 
 		// Are we using a custom messages per page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 		// Get the message ID's from before the move.
-		if (isset($this->_req->query->xml))
+		if (isset($this->http_req->query->xml))
 		{
 			$original_msgs = array(
 				'not_selected' => messageAt($context['not_selected']['start'], $topic, array(
@@ -357,8 +357,8 @@ class SplitTopicsController extends AbstractController
 			);
 
 			// You can't split the last message off.
-			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $this->_req->query->move === 'down')
-				$this->_req->query->move = '';
+			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $this->http_req->query->move === 'down')
+				$this->http_req->query->move = '';
 
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
@@ -371,13 +371,13 @@ class SplitTopicsController extends AbstractController
 		}
 
 		// (De)select a message..
-		if (!empty($this->_req->query->move))
+		if (!empty($this->http_req->query->move))
 		{
-			$_id_msg = $this->_req->getQuery('msg', 'intval');
+			$_id_msg = $this->http_req->getQuery('msg', 'intval');
 
-			if ($this->_req->query->move === 'reset')
+			if ($this->http_req->query->move === 'reset')
 				$_SESSION['split_selection'][$topic] = array();
-			elseif ($this->_req->query->move === 'up')
+			elseif ($this->http_req->query->move === 'up')
 				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_id_msg));
 			else
 				$_SESSION['split_selection'][$topic][] = $_id_msg;
@@ -421,7 +421,7 @@ class SplitTopicsController extends AbstractController
 			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 		// The XMLhttp method only needs the stuff that changed, so let's compare.
-		if (isset($this->_req->query->xml))
+		if (isset($this->http_req->query->xml))
 		{
 			$changes = array(
 				'remove' => array(
@@ -466,7 +466,7 @@ class SplitTopicsController extends AbstractController
 		global $txt;
 
 		// Clean up the subject.
-		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim', null));
+		$subname = $this->http_req->getPost('subname', 'trim', $this->http_req->getQuery('subname', 'trim', null));
 		if (isset($subname) && empty($this->_new_topic_subject))
 			$this->_new_topic_subject = $GLOBALS['elk']['text']->htmlspecialchars($subname);
 
@@ -476,9 +476,9 @@ class SplitTopicsController extends AbstractController
 		// Save in session so its available across all the form pages
 		if (empty($_SESSION['move_to_board']))
 		{
-			$_SESSION['move_to_board'] = (!empty($this->_req->post->move_new_topic) && !empty($this->_req->post->move_to_board)) ? (int) $this->_req->post->move_to_board : 0;
-			$_SESSION['reason'] = !empty($this->_req->post->reason) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->reason, ENT_QUOTES)) : '';
-			$_SESSION['messageRedirect'] = !empty($this->_req->post->messageRedirect);
+			$_SESSION['move_to_board'] = (!empty($this->http_req->post->move_new_topic) && !empty($this->http_req->post->move_to_board)) ? (int) $this->http_req->post->move_to_board : 0;
+			$_SESSION['reason'] = !empty($this->http_req->post->reason) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->reason, ENT_QUOTES)) : '';
+			$_SESSION['messageRedirect'] = !empty($this->http_req->post->messageRedirect);
 			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
 		}
 	}

@@ -186,7 +186,7 @@ class ManageDraftsModuleController extends AbstractController
 		validateToken('Admin-maint');
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
-		$drafts = getOldDrafts((int) $this->_req->post->draftdays);
+		$drafts = getOldDrafts((int) $this->http_req->post->draftdays);
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
@@ -254,16 +254,16 @@ class ManageDraftsModuleController extends AbstractController
 		);
 
 		// Saving them ?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_drafts_settings');
 
 			// Protect them from themselves.
-			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
+			$this->http_req->post->drafts_autosave_frequency = $this->http_req->post->drafts_autosave_frequency < 30 ? 30 : $this->http_req->post->drafts_autosave_frequency;
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=managedrafts');
 		}
 

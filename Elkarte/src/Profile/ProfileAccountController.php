@@ -170,7 +170,7 @@ class ProfileAccountController extends AbstractController
 		// Build a listing to view the previous warnings for this user
 		$this->_create_issued_warnings_list();
 
-		$warning_for_message = $this->_req->getQuery('msg', 'intval', false);
+		$warning_for_message = $this->http_req->getQuery('msg', 'intval', false);
 		$warned_message_subject = '';
 
 		// Are they warning because of a message?
@@ -351,16 +351,16 @@ class ProfileAccountController extends AbstractController
 	{
 		global $context;
 
-		if (isset($this->_req->post->preview))
+		if (isset($this->http_req->post->preview))
 		{
-			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
+			$warning_body = !empty($this->http_req->post->warn_body) ? trim(censor($this->http_req->post->warn_body)) : '';
 
-			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
+			if (empty($this->http_req->post->warn_sub) || empty($this->http_req->post->warn_body))
 			{
 				$this->_issueErrors[] = 'warning_notify_blank';
 			}
 
-			if (!empty($this->_req->post->warn_body))
+			if (!empty($this->http_req->post->warn_body))
 			{
 
 
@@ -370,12 +370,12 @@ class ProfileAccountController extends AbstractController
 			}
 
 			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|htmlspecialchars', '');
+			$context['preview_subject'] = $this->http_req->getPost('warn_sub', 'trim|htmlspecialchars', '');
 			$context['warning_data'] = array(
-				'reason' => $this->_req->post->warn_reason,
-				'notify' => !empty($this->_req->post->warn_notify),
-				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
-				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
+				'reason' => $this->http_req->post->warn_reason,
+				'notify' => !empty($this->http_req->post->warn_notify),
+				'notify_subject' => $this->http_req->getPost('warn_sub', 'trim', ''),
+				'notify_body' => $this->http_req->getPost('warn_body', 'trim', ''),
 				'body_preview' => $warning_body,
 			);
 		}
@@ -394,13 +394,13 @@ class ProfileAccountController extends AbstractController
 	{
 		global $txt, $context, $cur_profile;
 
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
 			// Security is good here.
-			$this->_session->check('post');
+			$this->session->check('post');
 
 			// There must be a reason, and use of flowery words is allowed.
-			$warn_reason = $this->_req->getPost('warn_reason', 'trim|htmlspecialchars', '');
+			$warn_reason = $this->http_req->getPost('warn_reason', 'trim|htmlspecialchars', '');
 			if ($warn_reason == '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';
@@ -409,11 +409,11 @@ class ProfileAccountController extends AbstractController
 			// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
 			if ($warn_reason === 'SAME')
 			{
-				$this->_req->post->warning_level = $this->_req->post->warning_level_nojs;
+				$this->http_req->post->warning_level = $this->http_req->post->warning_level_nojs;
 			}
 
 			// Set and contain the level and level changes
-			$warning_level = (int) $this->_req->post->warning_level;
+			$warning_level = (int) $this->http_req->post->warning_level;
 			$warning_level = max(0, min(100, $warning_level));
 
 			if ($warning_level < $context['min_allowed'])
@@ -451,9 +451,9 @@ class ProfileAccountController extends AbstractController
 				// Try to remember some bits.
 				$context['warning_data'] = array(
 					'reason' => $warn_reason,
-					'notify' => !empty($this->_req->post->warn_notify),
-					'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
-					'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
+					'notify' => !empty($this->http_req->post->warn_notify),
+					'notify_subject' => $this->http_req->getPost('warn_sub', 'trim', ''),
+					'notify_body' => $this->http_req->getPost('warn_body', 'trim', ''),
 				);
 			}
 
@@ -472,10 +472,10 @@ class ProfileAccountController extends AbstractController
 		global $context;
 
 		$id_notice = 0;
-		if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
+		if (!empty($this->http_req->post->warn_notify) && empty($this->_issueErrors))
 		{
-			$warn_sub = $this->_req->getPost('warn_sub', 'trim', '');
-			$warn_body = $this->_req->getPost('warn_body', 'trim', '');
+			$warn_sub = $this->http_req->getPost('warn_sub', 'trim', '');
+			$warn_body = $this->http_req->getPost('warn_body', 'trim', '');
 
 			if (empty($warn_sub) || empty($warn_body))
 			{
@@ -540,7 +540,7 @@ class ProfileAccountController extends AbstractController
 		elseif (!allowedTo('profile_remove_any'))
 			isAllowedTo('profile_remove_own');
 
-		$this->_session->check();
+		$this->session->check();
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$this->_memID])
@@ -569,14 +569,14 @@ class ProfileAccountController extends AbstractController
 
 			// Now, have you been naughty and need your posts deleting?
 			// @todo Should this check board permissions?
-			if ($this->_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
+			if ($this->http_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
 
 
 
 				// First off we delete any topics the member has started - if they wanted topics being done.
-				if ($this->_req->post->remove_type == 'topics')
+				if ($this->http_req->post->remove_type == 'topics')
 				{
 					// Fetch all topics started by this user.
 					$topicIDs = topicsStartedBy($this->_memID);
@@ -591,7 +591,7 @@ class ProfileAccountController extends AbstractController
 			}
 
 			// Only delete this poor member's account if they are actually being booted out of camp.
-			if (isset($this->_req->post->deleteAccount))
+			if (isset($this->http_req->post->deleteAccount))
 				deleteMembers($this->_memID);
 		}
 		// Do they need approval to delete?
@@ -626,7 +626,7 @@ class ProfileAccountController extends AbstractController
 
 		isAllowedTo('moderate_forum');
 
-		if (isset($this->_req->query->save)
+		if (isset($this->http_req->query->save)
 			&& isset($user_profile[$this->_memID]['is_activated'])
 			&& $user_profile[$this->_memID]['is_activated'] != 1)
 		{

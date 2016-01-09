@@ -84,28 +84,28 @@ class ManageBBCController extends AbstractController
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
 
 		// Save page
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 
 			// Security: make a pass through all tags and fix them as necessary
 			$codes = $GLOBALS['elk']['bbc']->getCodes();
 			$bbcTags = $codes->getTags();
 
-			if (!isset($this->_req->post->disabledBBC_enabledTags))
-				$this->_req->post->disabledBBC_enabledTags = array();
-			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
-				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
+			if (!isset($this->http_req->post->disabledBBC_enabledTags))
+				$this->http_req->post->disabledBBC_enabledTags = array();
+			elseif (!is_array($this->http_req->post->disabledBBC_enabledTags))
+				$this->http_req->post->disabledBBC_enabledTags = array($this->http_req->post->disabledBBC_enabledTags);
 
 			// Work out what is actually disabled!
-			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
+			$this->http_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->http_req->post->disabledBBC_enabledTags));
 
 			// Notify addons and integrations
 			$GLOBALS['elk']['hooks']->hook('save_bbc_settings', array($bbcTags));
 
 			// Save the result
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			// And we're out of here!
 			redirectexit('action=Admin;area=postsettings;sa=bbc');

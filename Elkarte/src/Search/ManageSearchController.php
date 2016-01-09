@@ -140,25 +140,25 @@ class ManageSearchController extends AbstractController
 			);
 
 		// A form was submitted.
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_search_settings');
 
-			if (empty($this->_req->post->search_results_per_page))
-				$this->_req->post->search_results_per_page = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
+			if (empty($this->http_req->post->search_results_per_page))
+				$this->http_req->post->search_results_per_page = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
 
 			$new_engines = array();
-			foreach ($this->_req->post->engine_name as $id => $searchengine)
+			foreach ($this->http_req->post->engine_name as $id => $searchengine)
 			{
 				// If no url, forget it
-				if (!empty($this->_req->post->engine_url[$id]))
+				if (!empty($this->http_req->post->engine_url[$id]))
 				{
 					$new_engines[] = array(
 						'name' => trim($GLOBALS['elk']['text']->htmlspecialchars($searchengine, ENT_COMPAT)),
-						'url' => trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->engine_url[$id], ENT_COMPAT)),
-						'separator' => trim($GLOBALS['elk']['text']->htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
+						'url' => trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->engine_url[$id], ENT_COMPAT)),
+						'separator' => trim($GLOBALS['elk']['text']->htmlspecialchars(!empty($this->http_req->post->engine_separator[$id]) ? $this->http_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
 					);
 				}
 			}
@@ -166,7 +166,7 @@ class ManageSearchController extends AbstractController
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -259,16 +259,16 @@ class ManageSearchController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('modify_search_weights', array(&$factors));
 
 		// A form was submitted.
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-msw');
 
 			$GLOBALS['elk']['hooks']->hook('save_search_weights');
 
 			$changes = array();
 			foreach ($factors as $factor)
-				$changes[$factor] = (int) $this->_req->post->$factor;
+				$changes[$factor] = (int) $this->http_req->post->$factor;
 
 			updateSettings($changes);
 		}
@@ -316,17 +316,17 @@ class ManageSearchController extends AbstractController
 			detectFulltextIndex();
 
 		// Creating index, removing or simply changing the one in use?
-		if ($this->_req->getQuery('sa', 'trim', '') === 'createfulltext')
+		if ($this->http_req->getQuery('sa', 'trim', '') === 'createfulltext')
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 			validateToken('Admin-msm', 'get');
 
 			$context['fulltext_index'] = 'body';
 			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index'], true);
 		}
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($context['fulltext_index']))
+		elseif ($this->http_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($context['fulltext_index']))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 			validateToken('Admin-msm', 'get');
 
 			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index']);
@@ -339,9 +339,9 @@ class ManageSearchController extends AbstractController
 					'search_index' => '',
 				));
 		}
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removecustom')
+		elseif ($this->http_req->getQuery('sa', 'trim', '') === 'removecustom')
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 			validateToken('Admin-msm', 'get');
 
 			drop_log_search_words();
@@ -357,15 +357,15 @@ class ManageSearchController extends AbstractController
 					'search_index' => '',
 				));
 		}
-		elseif (isset($this->_req->post->save))
+		elseif (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-msmpost');
 
 			updateSettings(array(
-				'search_index' => empty($this->_req->post->search_index) || (!in_array($this->_req->post->search_index, array('fulltext', 'custom')) && !isset($context['search_apis'][$this->_req->post->search_index])) ? '' : $this->_req->post->search_index,
-				'search_force_index' => isset($this->_req->post->search_force_index) ? '1' : '0',
-				'search_match_words' => isset($this->_req->post->search_match_words) ? '1' : '0',
+				'search_index' => empty($this->http_req->post->search_index) || (!in_array($this->http_req->post->search_index, array('fulltext', 'custom')) && !isset($context['search_apis'][$this->http_req->post->search_index])) ? '' : $this->http_req->post->search_index,
+				'search_force_index' => isset($this->http_req->post->search_force_index) ? '1' : '0',
+				'search_match_words' => isset($this->http_req->post->search_match_words) ? '1' : '0',
 			));
 		}
 
@@ -448,7 +448,7 @@ class ManageSearchController extends AbstractController
 		);
 
 		// Resume building an index that was not completed
-		if (isset($this->_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
+		if (isset($this->http_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
 		{
 			$context['index_settings'] = unserialize($modSettings['search_custom_index_resume']);
 			$context['start'] = (int) $context['index_settings']['resume_at'];
@@ -458,10 +458,10 @@ class ManageSearchController extends AbstractController
 		else
 		{
 			$context['index_settings'] = array(
-				'bytes_per_word' => isset($this->_req->query->bytes_per_word) && isset($index_properties[$this->_req->query->bytes_per_word]) ? (int) $this->_req->query->bytes_per_word : 2,
+				'bytes_per_word' => isset($this->http_req->query->bytes_per_word) && isset($index_properties[$this->http_req->query->bytes_per_word]) ? (int) $this->http_req->query->bytes_per_word : 2,
 			);
-			$context['start'] = isset($this->_req->query->start) ? (int) $this->_req->query->start : 0;
-			$context['step'] = isset($this->_req->query->step) ? (int) $this->_req->query->step : 0;
+			$context['start'] = isset($this->http_req->query->start) ? (int) $this->http_req->query->start : 0;
+			$context['step'] = isset($this->http_req->query->step) ? (int) $this->http_req->query->step : 0;
 
 			// Admin timeouts are painful when building these long indexes
 			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
@@ -469,7 +469,7 @@ class ManageSearchController extends AbstractController
 		}
 
 		if ($context['step'] !== 0)
-			$this->_session->check('request');
+			$this->session->check('request');
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
@@ -530,26 +530,26 @@ class ManageSearchController extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Saving the settings
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mssphinx');
 
 			updateSettings(array(
-				'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
-				'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
-				'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
-				'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
-				'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
-				'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
-				'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
-				'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
+				'sphinx_data_path' => rtrim($this->http_req->post->sphinx_data_path, '/'),
+				'sphinx_log_path' => rtrim($this->http_req->post->sphinx_log_path, '/'),
+				'sphinx_stopword_path' => $this->http_req->post->sphinx_stopword_path,
+				'sphinx_indexer_mem' => (int) $this->http_req->post->sphinx_indexer_mem,
+				'sphinx_searchd_server' => $this->http_req->post->sphinx_searchd_server,
+				'sphinx_searchd_port' => (int) $this->http_req->post->sphinx_searchd_port,
+				'sphinxql_searchd_port' => (int) $this->http_req->post->sphinxql_searchd_port,
+				'sphinx_max_results' => (int) $this->http_req->post->sphinx_max_results,
 			));
 		}
 		// Checking if we can connect?
-		elseif (isset($this->_req->post->checkconnect))
+		elseif (isset($this->http_req->post->checkconnect))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mssphinx');
 
 			// If they have not picked sphinx yet, let them know, but we can still check connections
@@ -608,9 +608,9 @@ class ManageSearchController extends AbstractController
 				}
 			}
 		}
-		elseif (isset($this->_req->post->createconfig))
+		elseif (isset($this->http_req->post->createconfig))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mssphinx');
 			require_once(ROOTDIR . '/Search/ManageSearch.subs.php');
 

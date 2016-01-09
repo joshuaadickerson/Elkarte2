@@ -182,26 +182,26 @@ class ManageAttachmentsController extends AbstractController
 	toggleSubDir();', true);
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Changing the attachment upload directory
-			if (isset($this->_req->post->attachmentUploadDir))
+			if (isset($this->http_req->post->attachmentUploadDir))
 			{
-				if (!empty($this->_req->post->attachmentUploadDir) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
-					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
+				if (!empty($this->http_req->post->attachmentUploadDir) && $modSettings['attachmentUploadDir'] != $this->http_req->post->attachmentUploadDir)
+					rename($modSettings['attachmentUploadDir'], $this->http_req->post->attachmentUploadDir);
 
-				$modSettings['attachmentUploadDir'] = array(1 => $this->_req->post->attachmentUploadDir);
-				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = array(1 => $this->http_req->post->attachmentUploadDir);
+				$this->http_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 			}
 
 			// Adding / changing the sub directory's for attachments
-			if (!empty($this->_req->post->use_subdirectories_for_attachments))
+			if (!empty($this->http_req->post->use_subdirectories_for_attachments))
 			{
 				// Make sure we have a base directory defined
-				if (isset($this->_req->post->use_subdirectories_for_attachments) && empty($this->_req->post->basedirectory_for_attachments))
-					$this->_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
+				if (isset($this->http_req->post->use_subdirectories_for_attachments) && empty($this->http_req->post->basedirectory_for_attachments))
+					$this->http_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
 
 				if (!empty($modSettings['attachment_basedirectories']))
 				{
@@ -211,33 +211,33 @@ class ManageAttachmentsController extends AbstractController
 				else
 					$modSettings['attachment_basedirectories'] = array();
 
-				if (!empty($this->_req->post->basedirectory_for_attachments) && !in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
+				if (!empty($this->http_req->post->basedirectory_for_attachments) && !in_array($this->http_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 				{
 					$currentAttachmentUploadDir = $modSettings['currentAttachmentUploadDir'];
 
-					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
+					if (!in_array($this->http_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
 					{
-						if (!automanage_attachments_create_directory($this->_req->post->basedirectory_for_attachments))
-							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
+						if (!automanage_attachments_create_directory($this->http_req->post->basedirectory_for_attachments))
+							$this->http_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 					}
 
-					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
+					if (!in_array($this->http_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 					{
-						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
+						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->http_req->post->basedirectory_for_attachments;
 						updateSettings(array(
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'currentAttachmentUploadDir' => $currentAttachmentUploadDir,
 						));
 
-						$this->_req->post->use_subdirectories_for_attachments = 1;
-						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
+						$this->http_req->post->use_subdirectories_for_attachments = 1;
+						$this->http_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
 				}
 			}
 
 			$GLOBALS['elk']['hooks']->hook('save_attachment_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=manageattachments;sa=attachments');
 		}
 
@@ -279,7 +279,7 @@ class ManageAttachmentsController extends AbstractController
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
 
 		// If not set, show a default path for the base directory
-		if (!isset($this->_req->query->save) && empty($modSettings['basedirectory_for_attachments']))
+		if (!isset($this->http_req->query->save) && empty($modSettings['basedirectory_for_attachments']))
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
@@ -397,7 +397,7 @@ class ManageAttachmentsController extends AbstractController
 		global $context, $txt, $scripturl, $modSettings;
 
 		// Attachments or avatars?
-		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
+		$context['browse_type'] = isset($this->http_req->query->avatars) ? 'avatars' : (isset($this->http_req->query->thumbs) ? 'thumbs' : 'attachments');
 
 		// Set the options for the list component.
 		$listOptions = array(
@@ -641,10 +641,10 @@ class ManageAttachmentsController extends AbstractController
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 		$context['attach_dirs'] = $attach_dirs;
 		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? unserialize($modSettings['attachment_basedirectories']) : array();
-		$context['checked'] = $this->_req->getSession('checked', true);
-		if (!empty($this->_req->session->results))
+		$context['checked'] = $this->http_req->getSession('checked', true);
+		if (!empty($this->http_req->session->results))
 		{
-			$context['results'] = implode('<br />', $this->_req->session->results);
+			$context['results'] = implode('<br />', $this->http_req->session->results);
 			unset($_SESSION['results']);
 		}
 	}
@@ -684,27 +684,27 @@ class ManageAttachmentsController extends AbstractController
 	 */
 	public function action_byAge()
 	{
-		$this->_session->check('post', 'Admin');
+		$this->session->check('post', 'Admin');
 
 		// @todo Ignore messages in topics that are stickied?
 
 		// Deleting an attachment?
-		if ($this->_req->getQuery('type', 'strval') !== 'avatars')
+		if ($this->http_req->getQuery('type', 'strval') !== 'avatars')
 		{
 			// Get rid of all the old attachments.
-			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'messages', true);
+			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->http_req->post->age)), 'messages', true);
 
 			// Update the messages to reflect the change.
-			if (!empty($messages) && !empty($this->_req->post->notice))
-				setRemovalNotice($messages, $this->_req->post->notice);
+			if (!empty($messages) && !empty($this->http_req->post->notice))
+				setRemovalNotice($messages, $this->http_req->post->notice);
 		}
 		else
 		{
 			// Remove all the old avatars.
-			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'members');
+			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->http_req->post->age)), 'members');
 		}
 
-		redirectexit('action=Admin;area=manageattachments' . (empty($this->_req->query->avatars) ? ';sa=maintenance' : ';avatars'));
+		redirectexit('action=Admin;area=manageattachments' . (empty($this->http_req->query->avatars) ? ';sa=maintenance' : ';avatars'));
 	}
 
 	/**
@@ -715,14 +715,14 @@ class ManageAttachmentsController extends AbstractController
 	 */
 	public function action_bySize()
 	{
-		$this->_session->check('post', 'Admin');
+		$this->session->check('post', 'Admin');
 
 		// Find humungous attachments.
-		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
+		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->http_req->post->size), 'messages', true);
 
 		// And make a note on the post.
-		if (!empty($messages) && !empty($this->_req->post->notice))
-			setRemovalNotice($messages, $this->_req->post->notice);
+		if (!empty($messages) && !empty($this->http_req->post->notice))
+			setRemovalNotice($messages, $this->http_req->post->notice);
 
 		redirectexit('action=Admin;area=manageattachments;sa=maintenance');
 	}
@@ -736,16 +736,16 @@ class ManageAttachmentsController extends AbstractController
 	{
 		global $txt, $language, $user_info;
 
-		$this->_session->check('post');
+		$this->session->check('post');
 
-		if (!empty($this->_req->post->remove))
+		if (!empty($this->http_req->post->remove))
 		{
 			// There must be a quicker way to pass this safety test??
 			$attachments = array();
-			foreach ($this->_req->post->remove as $removeID => $dummy)
+			foreach ($this->http_req->post->remove as $removeID => $dummy)
 				$attachments[] = (int) $removeID;
 
-			if ($this->_req->query->type == 'avatars' && !empty($attachments))
+			if ($this->http_req->query->type == 'avatars' && !empty($attachments))
 				removeAttachments(array('id_attach' => $attachments));
 			elseif (!empty($attachments))
 			{
@@ -761,8 +761,8 @@ class ManageAttachmentsController extends AbstractController
 			}
 		}
 
-		$sort = $this->_req->getQuery('sort', 'strval', 'date');
-		redirectexit('action=Admin;area=manageattachments;sa=browse;' . $this->_req->query->type . ';sort=' . $sort . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start);
+		$sort = $this->http_req->getQuery('sort', 'strval', 'date');
+		redirectexit('action=Admin;area=manageattachments;sa=browse;' . $this->http_req->query->type . ';sort=' . $sort . (isset($this->http_req->query->desc) ? ';desc' : '') . ';start=' . $this->http_req->query->start);
 	}
 
 	/**
@@ -774,11 +774,11 @@ class ManageAttachmentsController extends AbstractController
 	{
 		global $txt;
 
-		$this->_session->check('get', 'Admin');
+		$this->session->check('get', 'Admin');
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
-		$notice = $this->_req->getPost('notice', 'strval', $txt['attachment_delete_admin']);
+		$notice = $this->http_req->getPost('notice', 'strval', $txt['attachment_delete_admin']);
 
 		// Add the notice on the end of the changed messages.
 		if (!empty($messages))
@@ -807,17 +807,17 @@ class ManageAttachmentsController extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// If we choose cancel, redirect right back.
-		if (isset($this->_req->post->cancel))
+		if (isset($this->http_req->post->cancel))
 			redirectexit('action=Admin;area=manageattachments;sa=maintenance');
 
 		// Try give us a while to sort this out...
 		setTimeLimit(600);
 
-		$this->step = $this->_req->getQuery('step', 'intval', 0);
-		$this->substep = $this->_req->getQuery('substep', 'intval', 0);
+		$this->step = $this->http_req->getQuery('step', 'intval', 0);
+		$this->substep = $this->http_req->getQuery('substep', 'intval', 0);
 		$this->starting_substep = $this->substep;
 
 		// Don't recall the session just in case.
@@ -826,13 +826,13 @@ class ManageAttachmentsController extends AbstractController
 			unset($_SESSION['attachments_to_fix'], $_SESSION['attachments_to_fix2']);
 
 			// If we're actually fixing stuff - work out what.
-			if (isset($this->_req->query->fixErrors))
+			if (isset($this->http_req->query->fixErrors))
 			{
 				// Nothing?
-				if (empty($this->_req->post->to_fix))
+				if (empty($this->http_req->post->to_fix))
 					redirectexit('action=Admin;area=manageattachments;sa=maintenance');
 
-				foreach ($this->_req->post->to_fix as $key => $value)
+				foreach ($this->http_req->post->to_fix as $key => $value)
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
@@ -851,9 +851,9 @@ class ManageAttachmentsController extends AbstractController
 			'files_without_attachment' => 0,
 		);
 
-		$to_fix = !empty($this->_req->session->attachments_to_fix) ? $this->_req->session->attachments_to_fix : array();
-		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
-		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
+		$to_fix = !empty($this->http_req->session->attachments_to_fix) ? $this->http_req->session->attachments_to_fix : array();
+		$context['repair_errors'] = $this->http_req->getSession('attachments_to_fix2', $context['repair_errors']);
+		$fix_errors = isset($this->http_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
 		if ($this->step <= 0)
@@ -1059,11 +1059,11 @@ class ManageAttachmentsController extends AbstractController
 		$errors = array();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 0);
+			$this->current_dir = $this->http_req->getPost('current_dir', 'intval', 0);
 			$new_dirs = array();
 
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -1072,7 +1072,7 @@ class ManageAttachmentsController extends AbstractController
 			foreach ($themes as $theme)
 				$reserved_dirs[] = $theme['theme_dir'];
 
-			foreach ($this->_req->post->dirs as $id => $path)
+			foreach ($this->http_req->post->dirs as $id => $path)
 			{
 				$error = '';
 				$id = (int) $id;
@@ -1285,13 +1285,13 @@ class ManageAttachmentsController extends AbstractController
 		}
 
 		// Saving a base directory?
-		if (isset($this->_req->post->save2))
+		if (isset($this->http_req->post->save2))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Changing the current base directory?
-			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
-			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
+			$this->current_base_dir = $this->http_req->getQuery('current_base_dir', 'intval');
+			if (empty($this->http_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
 				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$this->current_base_dir])
 					$update = (array(
@@ -1301,9 +1301,9 @@ class ManageAttachmentsController extends AbstractController
 				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			if (isset($this->_req->post->base_dir))
+			if (isset($this->http_req->post->base_dir))
 			{
-				foreach ($this->_req->post->base_dir as $id => $dir)
+				foreach ($this->http_req->post->base_dir as $id => $dir)
 				{
 					if (!empty($dir) && $dir != $modSettings['attachmentUploadDir'][$id])
 					{
@@ -1337,26 +1337,26 @@ class ManageAttachmentsController extends AbstractController
 			}
 
 			// Or adding a new one?
-			if (!empty($this->_req->post->new_base_dir))
+			if (!empty($this->http_req->post->new_base_dir))
 			{
-				$this->_req->post->new_base_dir = htmlspecialchars($this->_req->post->new_base_dir, ENT_QUOTES, 'UTF-8');
+				$this->http_req->post->new_base_dir = htmlspecialchars($this->http_req->post->new_base_dir, ENT_QUOTES, 'UTF-8');
 
 				$current_dir = $modSettings['currentAttachmentUploadDir'];
 
-				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
+				if (!in_array($this->http_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
 				{
-					if (!automanage_attachments_create_directory($this->_req->post->new_base_dir))
-						$errors[] = $this->_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
+					if (!automanage_attachments_create_directory($this->http_req->post->new_base_dir))
+						$errors[] = $this->http_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
 				}
 
-				$modSettings['currentAttachmentUploadDir'] = array_search($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']);
-				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachment_basedirectories']))
-					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->new_base_dir;
+				$modSettings['currentAttachmentUploadDir'] = array_search($this->http_req->post->new_base_dir, $modSettings['attachmentUploadDir']);
+				if (!in_array($this->http_req->post->new_base_dir, $modSettings['attachment_basedirectories']))
+					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->http_req->post->new_base_dir;
 				ksort($modSettings['attachment_basedirectories']);
 
 				$update = (array(
 					'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-					'basedirectory_for_attachments' => $this->_req->post->new_base_dir,
+					'basedirectory_for_attachments' => $this->http_req->post->new_base_dir,
 					'currentAttachmentUploadDir' => $current_dir,
 				));
 			}
@@ -1370,20 +1370,20 @@ class ManageAttachmentsController extends AbstractController
 			redirectexit('action=Admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		if (isset($this->_req->session->errors))
+		if (isset($this->http_req->session->errors))
 		{
-			if (is_array($this->_req->session->errors))
+			if (is_array($this->http_req->session->errors))
 			{
 				$errors = array();
-				if (!empty($this->_req->session->errors['dir']))
-					foreach ($this->_req->session->errors['dir'] as $error)
+				if (!empty($this->http_req->session->errors['dir']))
+					foreach ($this->http_req->session->errors['dir'] as $error)
 						$errors['dir'][] = $GLOBALS['elk']['text']->htmlspecialchars($error, ENT_QUOTES);
 
-				if (!empty($this->_req->session->errors['base']))
-					foreach ($this->_req->session->errors['base'] as $error)
+				if (!empty($this->http_req->session->errors['base']))
+					foreach ($this->http_req->session->errors['base'] as $error)
 						$errors['base'][] = $GLOBALS['elk']['text']->htmlspecialchars($error, ENT_QUOTES);
 			}
-			unset($_SESSION['errors'], $this->_req->session->errors);
+			unset($_SESSION['errors'], $this->http_req->session->errors);
 		}
 
 		$listOptions = array(
@@ -1563,7 +1563,7 @@ class ManageAttachmentsController extends AbstractController
 	{
 		global $modSettings, $txt;
 
-		$this->_session->check();
+		$this->session->check();
 
 		// The list(s) of directory's that are available.
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
@@ -1573,11 +1573,11 @@ class ManageAttachmentsController extends AbstractController
 			$modSettings['basedirectory_for_attachments'] = array();
 
 		// Clean the inputs
-		$this->from = $this->_req->getPost('from', 'intval');
-		$this->auto = $this->_req->getPost('auto', 'intval', 0);
-		$this->to = $this->_req->getPost('to', 'intval');
-		$start = !empty($this->_req->post->empty_it) ? 0 : $modSettings['attachmentDirFileLimit'];
-		$_SESSION['checked'] = !empty($this->_req->post->empty_it) ? true : false;
+		$this->from = $this->http_req->getPost('from', 'intval');
+		$this->auto = $this->http_req->getPost('auto', 'intval', 0);
+		$this->to = $this->http_req->getPost('to', 'intval');
+		$start = !empty($this->http_req->post->empty_it) ? 0 : $modSettings['attachmentDirFileLimit'];
+		$_SESSION['checked'] = !empty($this->http_req->post->empty_it) ? true : false;
 
 		// Prepare for the moving
 		$limit = 501;
@@ -1771,7 +1771,7 @@ class ManageAttachmentsController extends AbstractController
 		if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] < 3 || $this->starting_substep == $this->substep)
 			return;
 
-		$context['continue_get_data'] = '?action=Admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['continue_get_data'] = '?action=Admin;area=manageattachments;sa=repair' . (isset($this->http_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
 		$context['page_title'] = $txt['not_done_title'];
 		$context['continue_post_data'] = '';
 		$context['continue_countdown'] = '2';

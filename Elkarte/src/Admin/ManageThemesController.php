@@ -104,7 +104,7 @@ class ManageThemesController extends AbstractController
 	{
 		global $txt, $context;
 
-		if (isset($this->_req->query->api))
+		if (isset($this->http_req->query->api))
 			return $this->action_index_api();
 
 		// Load the important language files...
@@ -216,8 +216,8 @@ class ManageThemesController extends AbstractController
 		);
 
 		// Follow the sa or just go to administration.
-		if (isset($this->_req->query->sa) && !empty($subActions[$this->_req->query->sa]))
-			$this->{$subActions[$this->_req->query->sa]}();
+		if (isset($this->http_req->query->sa) && !empty($subActions[$this->http_req->query->sa]))
+			$this->{$subActions[$this->http_req->query->sa]}();
 		else
 		{
 			loadLanguage('Errors');
@@ -248,33 +248,33 @@ class ManageThemesController extends AbstractController
 		loadLanguage('Admin');
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-tm');
 
 			// What themes are being made as known to the members
-			if (isset($this->_req->post->options['known_themes']))
+			if (isset($this->http_req->post->options['known_themes']))
 			{
-				foreach ($this->_req->post->options['known_themes'] as $key => $id)
-					$this->_req->post->options['known_themes'][$key] = (int) $id;
+				foreach ($this->http_req->post->options['known_themes'] as $key => $id)
+					$this->http_req->post->options['known_themes'][$key] = (int) $id;
 			}
 			else
 				$GLOBALS['elk']['errors']->fatal_lang_error('themes_none_selectable', false);
 
-			if (!in_array($this->_req->post->options['theme_guests'], $this->_req->post->options['known_themes']))
+			if (!in_array($this->http_req->post->options['theme_guests'], $this->http_req->post->options['known_themes']))
 					$GLOBALS['elk']['errors']->fatal_lang_error('themes_default_selectable', false);
 
 			// Commit the new settings.
 			updateSettings(array(
-				'theme_allow' => !empty($this->_req->post->options['theme_allow']),
-				'theme_guests' => $this->_req->post->options['theme_guests'],
-				'knownThemes' => implode(',', $this->_req->post->options['known_themes']),
+				'theme_allow' => !empty($this->http_req->post->options['theme_allow']),
+				'theme_guests' => $this->http_req->post->options['theme_guests'],
+				'knownThemes' => implode(',', $this->http_req->post->options['known_themes']),
 			));
 
-			if ((int) $this->_req->post->theme_reset == 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
+			if ((int) $this->http_req->post->theme_reset == 0 || in_array($this->http_req->post->theme_reset, $this->http_req->post->options['known_themes']))
 			{
-						updateMemberData(null, array('id_theme' => (int) $this->_req->post->theme_reset));
+						updateMemberData(null, array('id_theme' => (int) $this->http_req->post->theme_reset));
 			}
 
 			redirectexit('action=Admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=Admin');
@@ -321,13 +321,13 @@ class ManageThemesController extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 		loadLanguage('Admin');
 
-		if (isset($this->_req->query->th))
+		if (isset($this->http_req->query->th))
 			return $this->action_setthemesettings();
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-tl');
 
 			$themes = installedThemes();
@@ -335,18 +335,18 @@ class ManageThemesController extends AbstractController
 			$setValues = array();
 			foreach ($themes as $id => $theme)
 			{
-				if (file_exists($this->_req->post->reset_dir . '/' . basename($theme['theme_dir'])))
+				if (file_exists($this->http_req->post->reset_dir . '/' . basename($theme['theme_dir'])))
 				{
-					$setValues[] = array($id, 0, 'theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['theme_dir'])));
-					$setValues[] = array($id, 0, 'theme_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir']));
-					$setValues[] = array($id, 0, 'images_url', $this->_req->post->reset_url . '/' . basename($theme['theme_dir']) . '/' . basename($theme['images_url']));
+					$setValues[] = array($id, 0, 'theme_dir', realpath($this->http_req->post->reset_dir . '/' . basename($theme['theme_dir'])));
+					$setValues[] = array($id, 0, 'theme_url', $this->http_req->post->reset_url . '/' . basename($theme['theme_dir']));
+					$setValues[] = array($id, 0, 'images_url', $this->http_req->post->reset_url . '/' . basename($theme['theme_dir']) . '/' . basename($theme['images_url']));
 				}
 
-				if (isset($theme['base_theme_dir']) && file_exists($this->_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])))
+				if (isset($theme['base_theme_dir']) && file_exists($this->http_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])))
 				{
-					$setValues[] = array($id, 0, 'base_theme_dir', realpath($this->_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])));
-					$setValues[] = array($id, 0, 'base_theme_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']));
-					$setValues[] = array($id, 0, 'base_images_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
+					$setValues[] = array($id, 0, 'base_theme_dir', realpath($this->http_req->post->reset_dir . '/' . basename($theme['base_theme_dir'])));
+					$setValues[] = array($id, 0, 'base_theme_url', $this->http_req->post->reset_url . '/' . basename($theme['base_theme_dir']));
+					$setValues[] = array($id, 0, 'base_images_url', $this->http_req->post->reset_url . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
 				}
 
 				$GLOBALS['elk']['cache']->remove('theme_settings-' . $id);
@@ -405,9 +405,9 @@ class ManageThemesController extends AbstractController
 		global $txt, $context, $settings, $modSettings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$theme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 
-		if (empty($theme) && empty($this->_req->query->id))
+		if (empty($theme) && empty($this->http_req->query->id))
 		{
 			$context['themes'] = installedThemes();
 
@@ -438,15 +438,15 @@ class ManageThemesController extends AbstractController
 		}
 
 		// Submit?
-		if (isset($this->_req->post->submit) && empty($this->_req->post->who))
+		if (isset($this->http_req->post->submit) && empty($this->http_req->post->who))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-sto');
 
-			if (empty($this->_req->post->options))
+			if (empty($this->http_req->post->options))
 				$this->_options = array();
 
-			if (empty($this->_req->post->default_options))
+			if (empty($this->http_req->post->default_options))
 				$this->_default_options = array();
 
 			// Set up the query values.
@@ -478,15 +478,15 @@ class ManageThemesController extends AbstractController
 			redirectexit('action=Admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
 		// Changing the current options for all members using this theme
-		elseif (isset($this->_req->post->submit) && $this->_req->post->who == 1)
+		elseif (isset($this->http_req->post->submit) && $this->http_req->post->who == 1)
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-sto');
 
-			$this->_options = empty($this->_req->post->options) ? array() : $this->_req->post->options;
-			$this->_options_master = empty($this->_req->post->options_master) ? array() : $this->_req->post->options_master;
-			$this->_default_options = empty($this->_req->post->default_options) ? array() : $this->_req->post->default_options;
-			$this->_default_options_master = empty($this->_req->post->default_options_master) ? array() : $this->_req->post->default_options_master;
+			$this->_options = empty($this->http_req->post->options) ? array() : $this->http_req->post->options;
+			$this->_options_master = empty($this->http_req->post->options_master) ? array() : $this->http_req->post->options_master;
+			$this->_default_options = empty($this->http_req->post->default_options) ? array() : $this->http_req->post->default_options;
+			$this->_default_options_master = empty($this->http_req->post->default_options_master) ? array() : $this->http_req->post->default_options_master;
 
 			$old_settings = array();
 			foreach ($this->_default_options as $opt => $val)
@@ -526,9 +526,9 @@ class ManageThemesController extends AbstractController
 			redirectexit('action=Admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
 		// Remove all members options and use the defaults
-		elseif (!empty($this->_req->query->who) && $this->_req->query->who == 2)
+		elseif (!empty($this->http_req->query->who) && $this->http_req->query->who == 2)
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 			validateToken('Admin-stor', 'request');
 
 			removeThemeOptions($theme, 'members');
@@ -556,7 +556,7 @@ class ManageThemesController extends AbstractController
 		$context['theme_settings'] = $settings;
 
 		// Load the options for these theme
-		if (empty($this->_req->query->who))
+		if (empty($this->http_req->query->who))
 		{
 			$context['theme_options'] = loadThemeOptionsInto(array(1, $theme), -1, $context['theme_options']);
 			$context['theme_options_reset'] = false;
@@ -621,11 +621,11 @@ class ManageThemesController extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Nothing chosen, back to the start you go
-		if (empty($this->_req->query->th) && empty($this->_req->query->id))
+		if (empty($this->http_req->query->th) && empty($this->http_req->query->id))
 			return $this->action_admin();
 
 		// The theme's ID is needed
-		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$theme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 
 		// Validate inputs/user.
 		if (empty($theme))
@@ -671,15 +671,15 @@ class ManageThemesController extends AbstractController
 		}
 
 		// Submitting!
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
 			// Allowed?
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-sts');
 
 			$options = array();
-			$options['options'] = empty($this->_req->post->options) ? array() : (array) $this->_req->post->options;
-			$options['default_options'] = empty($this->_req->post->default_options) ? array() : (array) $this->_req->post->default_options;
+			$options['options'] = empty($this->http_req->post->options) ? array() : (array) $this->http_req->post->options;
+			$options['default_options'] = empty($this->http_req->post->default_options) ? array() : (array) $this->http_req->post->default_options;
 
 			// Make sure items are cast correctly.
 			foreach ($context['theme_settings'] as $item)
@@ -798,11 +798,11 @@ class ManageThemesController extends AbstractController
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		$this->_session->check('get');
+		$this->session->check('get');
 		validateToken('Admin-tr', 'request');
 
 		// The theme's ID must be an integer.
-		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$theme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 
 		// You can't delete the default theme!
 		if ($theme == 1)
@@ -844,7 +844,7 @@ class ManageThemesController extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Validate what was sent
-		if ($this->_session->check('get', '', false))
+		if ($this->session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -879,7 +879,7 @@ class ManageThemesController extends AbstractController
 		}
 
 		// The theme's ID must be an integer.
-		$theme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$theme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 
 		// You can't delete the default theme!
 		if ($theme == 1)
@@ -948,35 +948,35 @@ class ManageThemesController extends AbstractController
 
 		// Build the link tree.
 		$context['breadcrumbs'][] = array(
-			'url' => $scripturl . '?action=theme;sa=pick;u=' . (!empty($this->_req->query->u) ? (int) $this->_req->query->u : 0),
+			'url' => $scripturl . '?action=theme;sa=pick;u=' . (!empty($this->http_req->query->u) ? (int) $this->http_req->query->u : 0),
 			'name' => $txt['theme_pick'],
 		);
 		$context['default_theme_id'] = $modSettings['theme_default'];
 
 		$_SESSION['id_theme'] = 0;
 
-		if (isset($this->_req->query->id))
-			$this->_req->query->th = $this->_req->query->id;
+		if (isset($this->http_req->query->id))
+			$this->http_req->query->th = $this->http_req->query->id;
 
 		// Saving a variant cause JS doesn't work - pretend it did ;)
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
 			// Which theme?
-			foreach ($this->_req->post->save as $k => $v)
-				$this->_req->query->th = (int) $k;
+			foreach ($this->http_req->post->save as $k => $v)
+				$this->http_req->query->th = (int) $k;
 
-			if (isset($this->_req->post->vrt[$k]))
-				$this->_req->query->vrt = $this->_req->post->vrt[$k];
+			if (isset($this->http_req->post->vrt[$k]))
+				$this->http_req->query->vrt = $this->http_req->post->vrt[$k];
 		}
 
 		// Have we made a decision, or are we just browsing?
-		if (isset($this->_req->query->th))
+		if (isset($this->http_req->query->th))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
-			$th = $this->_req->getQuery('th', 'intval');
-			$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
-			$u = $this->_req->getQuery('u', 'intval');
+			$th = $this->http_req->getQuery('th', 'intval');
+			$vrt = $this->http_req->getQuery('vrt', 'cleanhtml');
+			$u = $this->http_req->getQuery('u', 'intval');
 
 			// Save for this user.
 			if (!isset($u) || !allowedTo('admin_forum'))
@@ -1045,7 +1045,7 @@ class ManageThemesController extends AbstractController
 			}
 		}
 
-		$u = $this->_req->getQuery('u', 'intval');
+		$u = $this->http_req->getQuery('u', 'intval');
 
 		// Figure out who the member of the minute is, and what theme they've chosen.
 		if (!isset($u) || !allowedTo('admin_forum'))
@@ -1111,7 +1111,7 @@ class ManageThemesController extends AbstractController
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
-		$this->_session->check('request');
+		$this->session->check('request');
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(ROOTDIR . '/Packages/Package.subs.php');
@@ -1119,33 +1119,33 @@ class ManageThemesController extends AbstractController
 		$this->_templates->load('ManageThemes');
 
 		// Passed an ID, then the Install is complete, lets redirect and show them
-		if (isset($this->_req->query->theme_id))
+		if (isset($this->http_req->query->theme_id))
 		{
-			$this->_req->query->theme_id = (int) $this->_req->query->theme_id;
+			$this->http_req->query->theme_id = (int) $this->http_req->query->theme_id;
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
 			$context['installed_theme'] = array(
-				'id' => $this->_req->query->theme_id,
-				'name' => getThemeName($this->_req->query->theme_id),
+				'id' => $this->http_req->query->theme_id,
+				'name' => getThemeName($this->http_req->query->theme_id),
 			);
 
 			return;
 		}
 
 		// How are we going to Install this theme, from a dir, zip, copy of default?
-		if ((!empty($_FILES['theme_gz']) && (!isset($_FILES['theme_gz']['error']) || $_FILES['theme_gz']['error'] != 4)) || !empty($this->_req->query->theme_gz))
+		if ((!empty($_FILES['theme_gz']) && (!isset($_FILES['theme_gz']['error']) || $_FILES['theme_gz']['error'] != 4)) || !empty($this->http_req->query->theme_gz))
 			$method = 'upload';
-		elseif (isset($this->_req->query->theme_dir) && rtrim(realpath($this->_req->query->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->_req->query->theme_dir))
+		elseif (isset($this->http_req->query->theme_dir) && rtrim(realpath($this->http_req->query->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->http_req->query->theme_dir))
 			$method = 'path';
 		else
 			$method = 'copy';
 
 		// Copy the default theme?
-		if (!empty($this->_req->post->copy) && $method == 'copy')
+		if (!empty($this->http_req->post->copy) && $method == 'copy')
 			$this->copyDefault();
 		// Install from another directory
-		elseif (isset($this->_req->post->theme_dir) && $method == 'path')
+		elseif (isset($this->http_req->post->theme_dir) && $method == 'path')
 			$this->installFromDir();
 		// Uploaded a zip file to Install from
 		elseif ($method == 'upload')
@@ -1255,22 +1255,22 @@ class ManageThemesController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('theme_install_write_error', 'critical');
 
 		// This happens when the Admin session is gone and the user has to login again
-		if (empty($_FILES['theme_gz']) && empty($this->_req->post->theme_gz))
+		if (empty($_FILES['theme_gz']) && empty($this->http_req->post->theme_gz))
 			redirectexit('action=Admin;area=theme;sa=Admin;' . $context['session_var'] . '=' . $context['session_id']);
 
 		// Set the default settings...
-		$this->theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $this->_req->post->theme_gz), '.');
+		$this->theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $this->http_req->post->theme_gz), '.');
 		$this->theme_name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $this->theme_name);
 		$this->theme_dir = BOARDDIR . '/themes/' . $this->theme_name;
 
 		if (isset($_FILES['theme_gz']) && is_uploaded_file($_FILES['theme_gz']['tmp_name']) && (ini_get('open_basedir') != '' || file_exists($_FILES['theme_gz']['tmp_name'])))
 			read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/themes/' . $this->theme_name, false, true);
-		elseif (isset($this->_req->post->theme_gz))
+		elseif (isset($this->http_req->post->theme_gz))
 		{
-			if (!isAuthorizedServer($this->_req->post->theme_gz))
+			if (!isAuthorizedServer($this->http_req->post->theme_gz))
 				$GLOBALS['elk']['errors']->fatal_lang_error('not_valid_server');
 
-			read_tgz_file($this->_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
+			read_tgz_file($this->http_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
 		}
 		else
 			redirectexit('action=Admin;area=theme;sa=Admin;' . $context['session_var'] . '=' . $context['session_id']);
@@ -1283,11 +1283,11 @@ class ManageThemesController extends AbstractController
 	 */
 	public function installFromDir()
 	{
-		if (!is_dir($this->_req->post->theme_dir) || !file_exists($this->_req->post->theme_dir . '/theme_info.xml'))
+		if (!is_dir($this->http_req->post->theme_dir) || !file_exists($this->http_req->post->theme_dir . '/theme_info.xml'))
 			$GLOBALS['elk']['errors']->fatal_lang_error('theme_install_error', false);
 
-		$this->theme_name = basename($this->_req->post->theme_dir);
-		$this->theme_dir = $this->_req->post->theme_dir;
+		$this->theme_name = basename($this->http_req->post->theme_dir);
+		$this->theme_dir = $this->http_req->post->theme_dir;
 	}
 
 	/**
@@ -1302,7 +1302,7 @@ class ManageThemesController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('theme_install_write_error', 'critical');
 
 		// Make the new directory, standard characters only
-		$this->theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $this->_req->post->copy);
+		$this->theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $this->http_req->post->copy);
 		umask(0);
 		mkdir($this->theme_dir, 0777);
 
@@ -1328,7 +1328,7 @@ class ManageThemesController extends AbstractController
 		copytree($settings['default_theme_dir'] . '/webfonts', $this->theme_dir . '/webfonts');
 		package_flush_cache();
 
-		$this->theme_name = $this->_req->post->copy;
+		$this->theme_name = $this->http_req->post->copy;
 		$this->images_url = $boardurl . '/themes/' . basename($this->theme_dir) . '/images';
 		$this->theme_dir = realpath($this->theme_dir);
 
@@ -1336,7 +1336,7 @@ class ManageThemesController extends AbstractController
 		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 		// Lets add a theme_info.xml to this theme.
-		write_theme_info($this->_req->query->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+		write_theme_info($this->http_req->query->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
 	}
 
 	/**
@@ -1356,10 +1356,10 @@ class ManageThemesController extends AbstractController
 		global $settings, $user_info, $options, $modSettings;
 
 		// Check the session id.
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// This good-for-nothing pixel is being used to keep the session alive.
-		if (empty($this->_req->query->var) || !isset($this->_req->query->val))
+		if (empty($this->http_req->query->var) || !isset($this->http_req->query->val))
 			redirectexit($settings['images_url'] . '/blank.png');
 
 		// Sorry, guests can't go any further than this..
@@ -1387,46 +1387,46 @@ class ManageThemesController extends AbstractController
 		);
 
 		// Can't change reserved vars.
-		if (in_array(strtolower($this->_req->query->var), $reservedVars))
+		if (in_array(strtolower($this->http_req->query->var), $reservedVars))
 			redirectexit($settings['images_url'] . '/blank.png');
 
 		// Use a specific theme?
-		if (isset($this->_req->query->th) || isset($this->_req->query->id))
+		if (isset($this->http_req->query->th) || isset($this->http_req->query->id))
 		{
 			// Invalidate the current themes cache too.
 			$GLOBALS['elk']['cache']->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
 
-			$settings['theme_id'] = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval'));
+			$settings['theme_id'] = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval'));
 		}
 
 		// If this is the Admin preferences the passed value will just be an element of it.
-		if ($this->_req->query->var == 'admin_preferences')
+		if ($this->http_req->query->var == 'admin_preferences')
 		{
 			$options['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
 			// New thingy...
-			if (isset($this->_req->query->admin_key) && strlen($this->_req->query->admin_key) < 5)
-				$options['admin_preferences'][$this->_req->query->admin_key] = $this->_req->query->val;
+			if (isset($this->http_req->query->admin_key) && strlen($this->http_req->query->admin_key) < 5)
+				$options['admin_preferences'][$this->http_req->query->admin_key] = $this->http_req->query->val;
 
 			// Change the value to be something nice,
-			$this->_req->query->val = serialize($options['admin_preferences']);
+			$this->http_req->query->val = serialize($options['admin_preferences']);
 		}
 		// If this is the window min/max settings, the passed window name will just be an element of it.
-		elseif ($this->_req->query->var == 'minmax_preferences')
+		elseif ($this->http_req->query->var == 'minmax_preferences')
 		{
 			$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
 
 			// New value for them
-			if (isset($this->_req->query->minmax_key) && strlen($this->_req->query->minmax_key) < 10)
-				$options['minmax_preferences'][$this->_req->query->minmax_key] = $this->_req->query->val;
+			if (isset($this->http_req->query->minmax_key) && strlen($this->http_req->query->minmax_key) < 10)
+				$options['minmax_preferences'][$this->http_req->query->minmax_key] = $this->http_req->query->val;
 
 			// Change the value to be something nice,
-			$this->_req->query->val = serialize($options['minmax_preferences']);
+			$this->http_req->query->val = serialize($options['minmax_preferences']);
 		}
 
 		// Update the option.
 		require_once(SUBSDIR . '/Themes.subs.php');
-		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val));
+		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $this->http_req->query->var, is_array($this->http_req->query->val) ? implode(',', $this->http_req->query->val) : $this->http_req->query->val));
 
 		$GLOBALS['elk']['cache']->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
 
@@ -1455,13 +1455,13 @@ class ManageThemesController extends AbstractController
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		$selectedTheme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$selectedTheme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 
 		// Unfortunately we cannot edit an unkwown theme.. redirect.
 		if (empty($selectedTheme))
 			redirectexit('action=Admin;area=theme;sa=themelist');
 		// You're browsing around, aren't you
-		elseif (!isset($this->_req->query->filename) && !isset($this->_req->post->save))
+		elseif (!isset($this->http_req->query->filename) && !isset($this->http_req->post->save))
 			redirectexit('action=Admin;area=theme;sa=browse;th=' . $selectedTheme);
 
 		// We don't have errors. Yet.
@@ -1475,7 +1475,7 @@ class ManageThemesController extends AbstractController
 		$this->prepareThemeEditContext();
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
 			$this->_action_edit_submit();
 
@@ -1486,15 +1486,15 @@ class ManageThemesController extends AbstractController
 		// We're editing .css, .template.php, .{language}.php or others.
 		// Note: we're here sending $theme_dir as parameter to action_()
 		// controller functions, which isn't cool. To be refactored.
-		if (substr($this->_req->query->filename, -4) == '.css')
+		if (substr($this->http_req->query->filename, -4) == '.css')
 			$this->_action_edit_style();
-		elseif (substr($this->_req->query->filename, -13) == '.template.php')
+		elseif (substr($this->http_req->query->filename, -13) == '.template.php')
 			$this->_action_edit_template();
 		else
 			$this->_action_edit_file();
 
 		// Create a special token to allow editing of multiple files.
-		createToken('Admin-te-' . md5($selectedTheme . '-' . $this->_req->query->filename));
+		createToken('Admin-te-' . md5($selectedTheme . '-' . $this->http_req->query->filename));
 	}
 
 	/**
@@ -1517,7 +1517,7 @@ class ManageThemesController extends AbstractController
 
 		// pick the template and send it the file
 		$context['sub_template'] = 'edit_style';
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($this->theme_dir . '/' . $this->_req->query->filename), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
+		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($this->theme_dir . '/' . $this->http_req->query->filename), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -1534,7 +1534,7 @@ class ManageThemesController extends AbstractController
 		$context['sub_template'] = 'edit_template';
 
 		// Retrieve the contents of the file
-		$file_data = file($this->theme_dir . '/' . $this->_req->query->filename);
+		$file_data = file($this->theme_dir . '/' . $this->http_req->query->filename);
 
 		// For a PHP template file, we display each function in separate boxes.
 		$j = 0;
@@ -1574,7 +1574,7 @@ class ManageThemesController extends AbstractController
 
 		// Simply set the template and the file contents.
 		$context['sub_template'] = 'edit_file';
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($this->theme_dir . '/' . $this->_req->query->filename), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
+		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($this->theme_dir . '/' . $this->http_req->query->filename), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -1588,7 +1588,7 @@ class ManageThemesController extends AbstractController
 	{
 		global $context, $settings, $user_info;
 
-		$selectedTheme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$selectedTheme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 		if (empty($selectedTheme))
 		{
 			// This should never be happening. Never I say. But... in case it does :P
@@ -1596,7 +1596,7 @@ class ManageThemesController extends AbstractController
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
-		$file = isset($this->_req->post->entire_file) ? $this->_req->post->entire_file : '';
+		$file = isset($this->http_req->post->entire_file) ? $this->http_req->post->entire_file : '';
 
 		// You did submit *something*, didn't you?
 		if (empty($file))
@@ -1607,12 +1607,12 @@ class ManageThemesController extends AbstractController
 
 		// Checking PHP syntax on css files is not a most constructive use of processing power :P
 		// We need to know what kind of file we have
-		$is_php = substr($this->_req->post->filename, -4) == '.php';
-		$is_template = substr($this->_req->post->filename, -13) == '.template.php';
-		$is_css = substr($this->_req->post->filename, -4) == '.css';
+		$is_php = substr($this->http_req->post->filename, -4) == '.php';
+		$is_template = substr($this->http_req->post->filename, -13) == '.template.php';
+		$is_css = substr($this->http_req->post->filename, -4) == '.css';
 
 		// Check you up
-		if ($this->_session->check('post', '', false) == '' && validateToken('Admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) == true)
+		if ($this->session->check('post', '', false) == '' && validateToken('Admin-te-' . md5($selectedTheme . '-' . $this->http_req->post->filename), 'post', false) == true)
 		{
 			// Consolidate the format in which we received the file contents
 			if (is_array($file))
@@ -1645,7 +1645,7 @@ class ManageThemesController extends AbstractController
 						$theme_info = getBasicThemeInfos($context['theme_id']);
 						emailAdmins('editing_theme', array(
 							'EDIT_REALNAME' => $user_info['name'],
-							'FILE_EDITED' => $this->_req->post->filename,
+							'FILE_EDITED' => $this->http_req->post->filename,
 							'THEME_NAME' => $theme_info[$context['theme_id']],
 						));
 					}
@@ -1665,7 +1665,7 @@ class ManageThemesController extends AbstractController
 			if (empty($errors))
 			{
 				// Try to save the new file contents
-				$fp = fopen($theme_dir . '/' . $this->_req->post->filename, 'w');
+				$fp = fopen($theme_dir . '/' . $this->http_req->post->filename, 'w');
 				fwrite($fp, $entire_file);
 				fclose($fp);
 
@@ -1673,7 +1673,7 @@ class ManageThemesController extends AbstractController
 					opcache_invalidate($theme_dir . '/' . $_REQUEST['filename']);
 
 				// We're done here.
-				redirectexit('action=Admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($this->_req->post->filename));
+				redirectexit('action=Admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($this->http_req->post->filename));
 			}
 			// I can't let you off the hook yet: syntax errors are a nasty beast.
 			else
@@ -1702,7 +1702,7 @@ class ManageThemesController extends AbstractController
 				}
 
 				// Re-create token for another try
-				createToken('Admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename));
+				createToken('Admin-te-' . md5($selectedTheme . '-' . $this->http_req->post->filename));
 
 				return;
 			}
@@ -1721,7 +1721,7 @@ class ManageThemesController extends AbstractController
 			else
 				$context['entire_file'] = htmlspecialchars($file, ENT_COMPAT, 'UTF-8');
 
-			$context['edit_filename'] = htmlspecialchars($this->_req->post->filename, ENT_COMPAT, 'UTF-8');
+			$context['edit_filename'] = htmlspecialchars($this->http_req->post->filename, ENT_COMPAT, 'UTF-8');
 
 			// Choose sub-template
 			if ($is_template)
@@ -1741,7 +1741,7 @@ class ManageThemesController extends AbstractController
 				$context['sub_template'] = 'edit_file';
 
 			// Re-create the token so that it can be used
-			createToken('Admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename));
+			createToken('Admin-te-' . md5($selectedTheme . '-' . $this->http_req->post->filename));
 
 			return;
 		}
@@ -1764,12 +1764,12 @@ class ManageThemesController extends AbstractController
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		$selectedTheme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
+		$selectedTheme = $this->http_req->getQuery('th', 'intval', $this->http_req->getQuery('id', 'intval', 0));
 		if (empty($selectedTheme))
 			redirectexit('action=Admin;area=theme;sa=themelist');
 
 		// Get first the directory of the theme we are editing.
-		$context['theme_id'] = isset($this->_req->query->th) ? (int) $this->_req->query->th : (isset($this->_req->query->id) ? (int) $this->_req->query->id : 0);
+		$context['theme_id'] = isset($this->http_req->query->th) ? (int) $this->http_req->query->th : (isset($this->http_req->query->id) ? (int) $this->http_req->query->id : 0);
 		$theme_dir = themeDirectory($context['theme_id']);
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
@@ -1777,25 +1777,25 @@ class ManageThemesController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('theme_edit_missing', false);
 
 		// Now, where exactly are you?
-		if (isset($this->_req->query->directory))
+		if (isset($this->http_req->query->directory))
 		{
-			if (substr($this->_req->query->directory, 0, 1) === '.')
-				$this->_req->query->directory = '';
+			if (substr($this->http_req->query->directory, 0, 1) === '.')
+				$this->http_req->query->directory = '';
 			else
 			{
-				$this->_req->query->directory = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $this->_req->query->directory);
+				$this->http_req->query->directory = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $this->http_req->query->directory);
 
-				$temp = realpath($theme_dir . '/' . $this->_req->query->directory);
+				$temp = realpath($theme_dir . '/' . $this->http_req->query->directory);
 				if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) != realpath($theme_dir))
-					$this->_req->query->directory = '';
+					$this->http_req->query->directory = '';
 			}
 		}
 
-		if (isset($this->_req->query->directory) && $this->_req->query->directory != '')
+		if (isset($this->http_req->query->directory) && $this->http_req->query->directory != '')
 		{
-			$context['theme_files'] = get_file_listing($theme_dir . '/' . $this->_req->query->directory, $this->_req->query->directory . '/');
+			$context['theme_files'] = get_file_listing($theme_dir . '/' . $this->http_req->query->directory, $this->http_req->query->directory . '/');
 
-			$temp = dirname($this->_req->query->directory);
+			$temp = dirname($this->http_req->query->directory);
 			array_unshift($context['theme_files'], array(
 				'filename' => $temp == '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
 				'is_writable' => is_writable($theme_dir . '/' . $temp),
@@ -1879,21 +1879,21 @@ class ManageThemesController extends AbstractController
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'edit';
 
-		$context['theme_id'] = isset($this->_req->query->th) ? (int) $this->_req->query->th : (int) $this->_req->query->id;
+		$context['theme_id'] = isset($this->http_req->query->th) ? (int) $this->http_req->query->th : (int) $this->http_req->query->id;
 
 		$theme_dirs = array();
 		$theme_dirs = loadThemeOptionsInto($context['theme_id'], null, $theme_dirs, array('base_theme_dir', 'theme_dir'));
 
-		if (isset($this->_req->query->template) && preg_match('~[\./\\\\:\0]~', $this->_req->query->template) == 0)
+		if (isset($this->http_req->query->template) && preg_match('~[\./\\\\:\0]~', $this->http_req->query->template) == 0)
 		{
-			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/' . $this->_req->query->template . '.template.php'))
-				$filename = $theme_dirs['base_theme_dir'] . '/' . $this->_req->query->template . '.template.php';
-			elseif (file_exists($settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php'))
-				$filename = $settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/' . $this->http_req->query->template . '.template.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/' . $this->http_req->query->template . '.template.php';
+			elseif (file_exists($settings['default_theme_dir'] . '/' . $this->http_req->query->template . '.template.php'))
+				$filename = $settings['default_theme_dir'] . '/' . $this->http_req->query->template . '.template.php';
 			else
 				$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dirs['theme_dir'] . '/' . $this->_req->query->template . '.template.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/' . $this->http_req->query->template . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -1902,16 +1902,16 @@ class ManageThemesController extends AbstractController
 
 			redirectexit('action=Admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');
 		}
-		elseif (isset($this->_req->query->lang_file) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $this->_req->query->lang_file) != 0)
+		elseif (isset($this->http_req->query->lang_file) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $this->http_req->query->lang_file) != 0)
 		{
-			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php'))
-				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
-			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php'))
-				$filename = $settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $this->http_req->query->lang_file . '.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $this->http_req->query->template . '.php';
+			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->http_req->query->template . '.php'))
+				$filename = $settings['default_theme_dir'] . '/languages/' . $this->http_req->query->template . '.php';
 			else
 				$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->http_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -2023,7 +2023,7 @@ class ManageThemesController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('theme_edit_missing', false);
 
 		// Get the filename from the appropriate spot
-		$filename = isset($this->_req->post->save) ? $this->_req->getPost('filename', 'strval', '') : $this->_req->getQuery('filename', 'strval', '');
+		$filename = isset($this->http_req->post->save) ? $this->http_req->getPost('filename', 'strval', '') : $this->http_req->getQuery('filename', 'strval', '');
 
 		// You're editing a file: we have extra-checks coming up first.
 		if (substr($filename, 0, 1) === '.')

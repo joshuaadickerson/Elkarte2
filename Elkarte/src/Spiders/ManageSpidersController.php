@@ -105,18 +105,18 @@ class ManageSearchEnginesController extends AbstractController
 		}
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
-		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
-			$this->_req->post->spider_group = 0;
+		if (isset($this->http_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->http_req->post->spider_group]))
+			$this->http_req->post->spider_group = 0;
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			// security checks
-			$this->_session->check();
+			$this->session->check();
 
 			// notify the interested addons or integrations
 			$GLOBALS['elk']['hooks']->hook('save_search_engine_settings');
@@ -214,16 +214,16 @@ class ManageSearchEnginesController extends AbstractController
 		}
 
 		// Are we adding a new one?
-		if (!empty($this->_req->post->addSpider))
+		if (!empty($this->http_req->post->addSpider))
 			return $this->action_editspiders();
 		// User pressed the 'remove selection button'.
-		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
+		elseif (!empty($this->http_req->post->removeSpiders) && !empty($this->http_req->post->remove) && is_array($this->http_req->post->remove))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-ser');
 
 			// Make sure every entry is a proper integer.
-			$toRemove = array_map('intval', $this->_req->post->remove);
+			$toRemove = array_map('intval', $this->http_req->post->remove);
 
 			// Delete them all!
 			$this->spiders->removeSpiders($toRemove);
@@ -353,19 +353,19 @@ class ManageSearchEnginesController extends AbstractController
 		global $context, $txt;
 
 		// Some standard stuff.
-		$context['id_spider'] = $this->_req->getQuery('sid', 'intval', 0);
+		$context['id_spider'] = $this->http_req->getQuery('sid', 'intval', 0);
 		$context['page_title'] = $context['id_spider'] ? $txt['spiders_edit'] : $txt['spiders_add'];
 		$context['sub_template'] = 'spider_edit';
 
 		// Are we saving?
-		if (!empty($this->_req->post->save))
+		if (!empty($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-ses');
 
 			// Check the IP range is valid.
 			$ips = array();
-			$ip_sets = explode(',', $this->_req->post->spider_ip);
+			$ip_sets = explode(',', $this->http_req->post->spider_ip);
 			foreach ($ip_sets as $set)
 			{
 				$test = ip2range(trim($set));
@@ -375,7 +375,7 @@ class ManageSearchEnginesController extends AbstractController
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			$this->spiders->updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
+			$this->spiders->updateSpider($context['id_spider'], $this->http_req->post->spider_name, $this->http_req->post->spider_agent, $ips);
 
 			// Order by user agent length.
 			$this->spiders->sortSpiderTable();
@@ -413,12 +413,12 @@ class ManageSearchEnginesController extends AbstractController
 		$this->_templates->load('ManageSearch');
 
 		// Did they want to delete some or all entries?
-		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))
+		if ((!empty($this->http_req->post->delete_entries) && isset($this->http_req->post->older)) || !empty($this->http_req->post->removeAll))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-sl');
 
-			$since = $this->_req->getPost('older', 'intval', 0);
+			$since = $this->http_req->getPost('older', 'intval', 0);
 			$deleteTime = time() - ($since * 24 * 60 * 60);
 
 			// Delete the entries.
@@ -536,12 +536,12 @@ class ManageSearchEnginesController extends AbstractController
 		}
 
 		// Are we cleaning up some old stats?
-		if (!empty($this->_req->post->delete_entries) && isset($this->_req->post->older))
+		if (!empty($this->http_req->post->delete_entries) && isset($this->http_req->post->older))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-ss');
 
-			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);
+			$deleteTime = time() - (((int) $this->http_req->post->older) * 24 * 60 * 60);
 
 			// Delete the entries.
 			$this->spiders->removeSpiderOldStats($deleteTime);
@@ -553,7 +553,7 @@ class ManageSearchEnginesController extends AbstractController
 		$max_date = key($date_choices);
 
 		// What are we currently viewing?
-		$current_date = isset($this->_req->post->new_date) && isset($date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
+		$current_date = isset($this->http_req->post->new_date) && isset($date_choices[$this->http_req->post->new_date]) ? $this->http_req->post->new_date : $max_date;
 
 		// Prepare the HTML.
 		$date_select = '
@@ -575,7 +575,7 @@ class ManageSearchEnginesController extends AbstractController
 			</noscript>';
 
 		// If we manually jumped to a date work out the offset.
-		if (isset($this->_req->post->new_date))
+		if (isset($this->http_req->post->new_date))
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 

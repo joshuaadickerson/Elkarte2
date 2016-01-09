@@ -70,7 +70,7 @@ class TopicController extends AbstractController
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// Load up the helpers
 
@@ -111,7 +111,7 @@ class TopicController extends AbstractController
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
 
 		// Back to the topic!
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**
@@ -137,7 +137,7 @@ class TopicController extends AbstractController
 		if (empty($topic))
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// We need this for the sendNotifications() function.
 
@@ -160,7 +160,7 @@ class TopicController extends AbstractController
 			sendNotifications($topic, 'sticky');
 
 		// Take them back to the now stickied topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**
@@ -185,7 +185,7 @@ class TopicController extends AbstractController
 		// Its not enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
-			unset($this->_req->query->action);
+			unset($this->http_req->query->action);
 			$context['theme_loaded'] = false;
 			$this->_errors->fatal_lang_error('feature_disabled', false);
 		}
@@ -238,7 +238,7 @@ class TopicController extends AbstractController
 			$context['topic_subject'] = $context['posts'][min($posts_id)]['subject'];
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
-		if (isset($this->_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+		if (isset($this->http_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 		{
 
 			$context['printattach'] = messagesAttachments(array_keys($context['posts']));

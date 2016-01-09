@@ -148,8 +148,8 @@ class MaintenanceController extends AbstractController
 		$subAction = $action->initialize($subActions, 'routine');
 
 		// Doing something special, does it exist?
-		if (isset($this->_req->query->activity, $subActions[$subAction]['activities'][$this->_req->query->activity]))
-			$activity = $this->_req->query->activity;
+		if (isset($this->http_req->query->activity, $subActions[$subAction]['activities'][$this->http_req->query->activity]))
+			$activity = $this->http_req->query->activity;
 
 		// Set a few things.
 		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
@@ -283,7 +283,7 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt, $scripturl;
 
-		if ($this->_req->getQuery('done', 'trim|strval') === 'recount')
+		if ($this->http_req->getQuery('done', 'trim|strval') === 'recount')
 			$context['maintenance_finished'] = $txt['maintain_recount'];
 
 		// set up the sub-template
@@ -356,7 +356,7 @@ class MaintenanceController extends AbstractController
 		$context['membergroups'] = getBasicMembergroupData(array('all'));
 
 		// Show that we completed this action
-		if ($this->_req->getQuery('done', 'strval') === 'recountposts')
+		if ($this->http_req->getQuery('done', 'strval') === 'recountposts')
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_recountposts'])),
 			);
@@ -416,11 +416,11 @@ class MaintenanceController extends AbstractController
 
 		$GLOBALS['elk']['hooks']->hook('topics_maintenance', array(&$context['topics_actions']));
 
-		if ($this->_req->getQuery('done', 'strval') === 'purgeold')
+		if ($this->http_req->getQuery('done', 'strval') === 'purgeold')
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old'])),
 			);
-		elseif ($this->_req->getQuery('done', 'strval') === 'massmove')
+		elseif ($this->http_req->getQuery('done', 'strval') === 'massmove')
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['move_topics_maintenance'])),
 			);
@@ -455,7 +455,7 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt;
 
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-maint');
 
 		// Just wipe the whole cache directory!
@@ -476,7 +476,7 @@ class MaintenanceController extends AbstractController
 
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-maint');
 
 		// Maintenance time was scheduled!
@@ -528,9 +528,9 @@ class MaintenanceController extends AbstractController
 
 		$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 
-		if ($body_type === 'text' || ($body_type !== 'text' && isset($this->_req->post->do_conversion)))
+		if ($body_type === 'text' || ($body_type !== 'text' && isset($this->http_req->post->do_conversion)))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-maint');
 
 			// Make it longer so we can do their limit.
@@ -551,11 +551,11 @@ class MaintenanceController extends AbstractController
 
 			return;
 		}
-		elseif ($body_type !== 'text' && (!isset($this->_req->post->do_conversion) || isset($this->_req->post->cont)))
+		elseif ($body_type !== 'text' && (!isset($this->http_req->post->do_conversion) || isset($this->http_req->post->cont)))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			if (empty($this->_req->query->start))
+			if (empty($this->http_req->query->start))
 				validateToken('Admin-maint');
 			else
 				validateToken('Admin-convertMsg');
@@ -565,10 +565,10 @@ class MaintenanceController extends AbstractController
 			$context['continue_countdown'] = 3;
 			$context['sub_template'] = 'not_done';
 			$increment = 500;
-			$id_msg_exceeding = isset($this->_req->post->id_msg_exceeding) ? explode(',', $this->_req->post->id_msg_exceeding) : array();
+			$id_msg_exceeding = isset($this->http_req->post->id_msg_exceeding) ? explode(',', $this->http_req->post->id_msg_exceeding) : array();
 
 			$max_msgs = countMessages();
-			$start = $this->_req->query->start;
+			$start = $this->http_req->query->start;
 
 			// Try for as much time as possible.
 			setTimeLimit(600);
@@ -629,7 +629,7 @@ class MaintenanceController extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Some validation
-		$this->_session->check('post');
+		$this->session->check('post');
 		validateToken('Admin-maint');
 
 		ignore_user_abort(true);
@@ -691,14 +691,14 @@ class MaintenanceController extends AbstractController
 		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
-		$this->_session->check();
+		$this->session->check();
 
 		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 
 		// Validate the request or the loop
-		if (!isset($this->_req->query->step))
+		if (!isset($this->http_req->query->step))
 			validateToken('Admin-maint');
 		else
 			validateToken('Admin-boardrecount');
@@ -718,8 +718,8 @@ class MaintenanceController extends AbstractController
 
 		// An 8 step process, should be 12 for the Admin
 		$this->total_steps = 8;
-		$this->start = $this->_req->getQuery('start', 'inval', 0);
-		$this->step = $this->_req->getQuery('step', 'intval', 0);
+		$this->start = $this->http_req->getQuery('start', 'inval', 0);
+		$this->step = $this->http_req->getQuery('step', 'intval', 0);
 
 		// Get each topic with a wrong reply count and fix it
 		if (empty($this->step))
@@ -858,7 +858,7 @@ class MaintenanceController extends AbstractController
 		{
 			while ($this->start < $modSettings['maxMsgID'])
 			{
-				updateMessagesBoardID($this->_req->query->start, $this->increment);
+				updateMessagesBoardID($this->http_req->query->start, $this->increment);
 				$this->start += $this->increment;
 
 				if (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'] > 3)
@@ -966,15 +966,15 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt;
 
-		$this->_session->check();
+		$this->session->check();
 
 		$validator = new DataValidator();
 		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
 		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
-		$validator->validate($this->_req->post);
+		$validator->validate($this->http_req->post);
 
 		// Fetch the Mr. Clean values
-		$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
+		$our_post = array_replace((array) $this->http_req->post, $validator->validation_data());
 
 		// Do we have a valid set of options to continue?
 		if (($our_post['type'] === 'name' && !empty($our_post['from_name'])) || ($our_post['type'] === 'email' && !$validator->validation_errors('from_email')))
@@ -1031,19 +1031,19 @@ class MaintenanceController extends AbstractController
 		if (!allowedTo('admin_forum'))
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_dump_database', 'critical');
 
-		$this->_session->check('post');
+		$this->session->check('post');
 
 		if (empty($iknowitmaybeunsafe))
 		{
 			require_once(SUBSDIR . '/FtpConnection.php');
 
-			$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+			$ftp = new Ftp_Connection($this->http_req->post->ftp_server, $this->http_req->post->ftp_port, $this->http_req->post->ftp_username, $this->http_req->post->ftp_password);
 
 			if ($ftp->error === false)
 			{
 				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-				if (!$ftp->chdir($this->_req->post->ftp_path))
-					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
+				if (!$ftp->chdir($this->http_req->post->ftp_path))
+					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->http_req->post->ftp_path));
 			}
 
 			// If we had an error...
@@ -1055,10 +1055,10 @@ class MaintenanceController extends AbstractController
 				// Fill the boxes for a FTP connection with data from the previous attempt
 				$context['package_ftp'] = array(
 					'form_elements_only' => 1,
-					'server' => $this->_req->post->ftp_server,
-					'port' => $this->_req->post->ftp_port,
-					'username' => $this->_req->post->ftp_username,
-					'path' => $this->_req->post->ftp_path,
+					'server' => $this->http_req->post->ftp_server,
+					'port' => $this->http_req->post->ftp_port,
+					'username' => $this->http_req->post->ftp_username,
+					'path' => $this->http_req->post->ftp_path,
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
 
@@ -1084,7 +1084,7 @@ class MaintenanceController extends AbstractController
 	{
 		global $context, $txt;
 
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-maint');
 
 		// Start with checking and cleaning what was sent
@@ -1093,10 +1093,10 @@ class MaintenanceController extends AbstractController
 		$validator->validation_rules(array('maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required'));
 
 		// Validator says, you can pass or not
-		if ($validator->validate($this->_req->post))
+		if ($validator->validate($this->http_req->post))
 		{
 			// Get the clean data
-			$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
+			$our_post = array_replace((array) $this->http_req->post, $validator->validation_data());
 
 			require_once(SUBSDIR . '/Maintenance.subs.php');
 
@@ -1130,29 +1130,29 @@ class MaintenanceController extends AbstractController
 		validateToken('Admin-maint');
 
 		isAllowedTo('admin_forum');
-		$this->_session->check('post', 'Admin');
+		$this->session->check('post', 'Admin');
 
 		// No boards at all?  Forget it then :/.
-		if (empty($this->_req->post->boards))
+		if (empty($this->http_req->post->boards))
 			redirectexit('action=Admin;area=maintain;sa=topics');
 
-		$boards = array_keys($this->_req->post->boards);
+		$boards = array_keys($this->http_req->post->boards);
 
-		if (!isset($this->_req->post->delete_type) || !in_array($this->_req->post->delete_type, array('moved', 'nothing', 'locked')))
+		if (!isset($this->http_req->post->delete_type) || !in_array($this->http_req->post->delete_type, array('moved', 'nothing', 'locked')))
 			$delete_type = 'nothing';
 		else
-			$delete_type = $this->_req->post->delete_type;
+			$delete_type = $this->http_req->post->delete_type;
 
-		$exclude_stickies = isset($this->_req->post->delete_old_not_sticky);
+		$exclude_stickies = isset($this->http_req->post->delete_old_not_sticky);
 
 		// @todo what is the minimum for maxdays? Maybe throw an error?
-		$older_than = time() - 3600 * 24 * max($this->_req->getPost('maxdays', 'intval', 0), 1);
+		$older_than = time() - 3600 * 24 * max($this->http_req->getPost('maxdays', 'intval', 0), 1);
 
 
 		removeOldTopics($boards, $delete_type, $exclude_stickies, $older_than);
 
 		// Log an action into the moderation log.
-		logAction('pruned', array('days' => max($this->_req->getPost('maxdays', 'intval', 0), 1)));
+		logAction('pruned', array('days' => max($this->http_req->getPost('maxdays', 'intval', 0), 1)));
 
 		redirectexit('action=Admin;area=maintain;sa=topics;done=purgeold');
 	}
@@ -1170,7 +1170,7 @@ class MaintenanceController extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// And valid requests
-		$this->_session->check();
+		$this->session->check();
 
 		// Set up to the context.
 		$context['page_title'] = $txt['not_done_title'];
@@ -1178,11 +1178,11 @@ class MaintenanceController extends AbstractController
 		$context['continue_post_data'] = '';
 		$context['continue_get_data'] = '';
 		$context['sub_template'] = 'not_done';
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 
 		// First time we do this?
-		$id_board_from = $this->_req->getPost('id_board_from', 'intval', (int) $this->_req->query->id_board_from);
-		$id_board_to = $this->_req->getPost('id_board_to', 'intval', (int) $this->_req->query->id_board_to);
+		$id_board_from = $this->http_req->getPost('id_board_from', 'intval', (int) $this->http_req->query->id_board_from);
+		$id_board_to = $this->http_req->getPost('id_board_to', 'intval', (int) $this->http_req->query->id_board_to);
 
 		// No boards then this is your stop.
 		if (empty($id_board_from) || empty($id_board_to))
@@ -1193,11 +1193,11 @@ class MaintenanceController extends AbstractController
 
 
 		// How many topics are we moving?
-		if (!isset($this->_req->query->totaltopics))
+		if (!isset($this->http_req->query->totaltopics))
 			$total_topics = countTopicsFromBoard($id_board_from);
 		else
 		{
-			$total_topics = (int) $this->_req->query->totaltopics;
+			$total_topics = (int) $this->http_req->query->totaltopics;
 			validateToken('admin_movetopics');
 		}
 
@@ -1263,10 +1263,10 @@ class MaintenanceController extends AbstractController
 
 		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
-		if (isset($this->_req->query->filter) && in_array($this->_req->query->filter, array_keys($currentHooks)))
+		if (isset($this->http_req->query->filter) && in_array($this->http_req->query->filter, array_keys($currentHooks)))
 		{
-			$context['filter_url'] = ';filter=' . $this->_req->query->filter;
-			$context['current_filter'] = $this->_req->query->filter;
+			$context['filter_url'] = ';filter=' . $this->http_req->query->filter;
+			$context['current_filter'] = $this->http_req->query->filter;
 		}
 
 		$list_options = array(
@@ -1391,7 +1391,7 @@ class MaintenanceController extends AbstractController
 		global $txt, $context;
 
 		// Check the session
-		$this->_session->check();
+		$this->session->check();
 
 		// Set up to the context for the pause screen
 		$context['page_title'] = $txt['not_done_title'];
@@ -1401,7 +1401,7 @@ class MaintenanceController extends AbstractController
 
 		// Init, do 200 members in a bunch
 		$increment = 200;
-		$start = $this->_req->getQuery('start', 'intval', 0);
+		$start = $this->http_req->getQuery('start', 'intval', 0);
 
 		// Ask for some extra time, on big boards this may take a bit
 		setTimeLimit(600);
@@ -1410,7 +1410,7 @@ class MaintenanceController extends AbstractController
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// Only run this query if we don't have the total number of members that have posted
-		if (!isset($this->_req->session->total_members) || $start === 0)
+		if (!isset($this->http_req->session->total_members) || $start === 0)
 		{
 			validateToken('Admin-maint');
 			$total_members = countContributors();
@@ -1419,7 +1419,7 @@ class MaintenanceController extends AbstractController
 		else
 		{
 			validateToken('Admin-recountposts');
-			$total_members = $this->_req->session->total_members;
+			$total_members = $this->http_req->session->total_members;
 		}
 
 		// Lets get the next group of members and determine their post count
@@ -1460,8 +1460,8 @@ class MaintenanceController extends AbstractController
 		global $context;
 
 		$context['filter'] = false;
-		if (isset($this->_req->query->filter))
-			$context['filter'] = $this->_req->query->filter;
+		if (isset($this->http_req->query->filter))
+			$context['filter'] = $this->http_req->query->filter;
 
 		return integration_hooks_count($context['filter']);
 	}

@@ -94,10 +94,10 @@ class Profile extends AbstractManager
 		global $profile_fields, $context, $cur_profile, $txt;
 
 		if (!empty($hook))
-			$GLOBALS['elk']['hooks']->hook('' . $hook . '_profile_fields', array(&$fields));
+			$this->hooks->hook('' . $hook . '_profile_fields', array(&$fields));
 
 		// Make sure we have this!
-		loadProfileFields(true);
+		$this->loadProfileFields(true);
 
 		// First check for any linked sets.
 		foreach ($profile_fields as $key => $field)
@@ -364,7 +364,7 @@ class Profile extends AbstractManager
 				'type' => 'callback',
 				'callback_func' => 'avatar_select',
 				// This handles the permissions too.
-				'preload' => 'profileLoadAvatarData',
+				'preload' => [$this, 'profileLoadAvatarData'],
 				'input_validate' => 'profileSaveAvatarData',
 				'save_key' => 'avatar',
 			),
@@ -490,7 +490,7 @@ class Profile extends AbstractManager
 				'type' => 'callback',
 				'callback_func' => 'group_manage',
 				'permission' => 'manage_membergroups',
-				'preload' => 'profileLoadGroups',
+				'preload' => [$this, 'profileLoadGroups'],
 				'log_change' => true,
 				'input_validate' => 'profileSaveGroups',
 			),
@@ -558,14 +558,14 @@ class Profile extends AbstractManager
 				'options' => 'return $context[\'profile_languages\'];',
 				'label' => $txt['preferred_language'],
 				'permission' => 'profile_identity',
-				'preload' => 'profileLoadLanguages',
+				'preload' => [$this, 'profileLoadLanguages'],
 				'enabled' => !empty($modSettings['userLanguage']),
 				'value' => empty($cur_profile['lngfile']) ? $language : $cur_profile['lngfile'],
 				'input_validate' => function (&$value) {
 					global $context, $cur_profile;
 
 					// Load the languages.
-					profileLoadLanguages();
+					$this->profileLoadLanguages();
 
 					if (isset($context['profile_languages'][$value])) {
 						if ($context['user']['is_owner'] && empty($context['password_auth_failed']))
@@ -827,7 +827,7 @@ class Profile extends AbstractManager
 				'callback_func' => 'signature_modify',
 				'permission' => 'profile_extra',
 				'enabled' => substr($modSettings['signature_settings'], 0, 1) == 1,
-				'preload' => 'profileLoadSignatureData',
+				'preload' => [$this, 'profileLoadSignatureData'],
 				'input_validate' => 'profileValidateSignature',
 			),
 			'show_online' => array(
@@ -1071,7 +1071,7 @@ class Profile extends AbstractManager
 
 			// Logging group changes are a bit different...
 			if ($key == 'id_group' && $field['log_change']) {
-				profileLoadGroups();
+				$this->profileLoadGroups();
 
 				// Any changes to primary group?
 				if ($_POST['id_group'] != $old_profile['id_group']) {
@@ -1750,7 +1750,7 @@ class Profile extends AbstractManager
 		if ($context['member']['avatar']['allow_server_stored']) {
 
 			$context['avatar_list'] = array();
-			$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
+			$context['avatars'] = is_dir($modSettings['avatar_directory']) ? $GLOBALS['elk']['attachments.file_manager']->getServerStoredAvatars('', 0) : array();
 		} else {
 			$context['avatar_list'] = array();
 			$context['avatars'] = array();
@@ -1764,13 +1764,13 @@ class Profile extends AbstractManager
 	/**
 	 * Loads all the member groups that this member can assign
 	 * Places the result in context for template use
+	 * @return true
 	 */
 	function profileLoadGroups()
 	{
 		global $cur_profile, $context, $user_settings;
 
-
-		$context['member_groups'] = getGroupsList();
+		$context['member_groups'] = $GLOBALS['elk']['groups.manager']->getGroupsList();
 		$context['member_groups'][0]['is_primary'] = $cur_profile['id_group'] == 0;
 
 		$curGroups = explode(',', $cur_profile['additional_groups']);

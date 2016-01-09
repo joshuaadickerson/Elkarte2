@@ -67,11 +67,11 @@ class DraftController extends AbstractController
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Some initial context.
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if (!empty($this->http_req->query->delete) || !empty($this->http_req->post->delete))
 			$this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
 
 		// Get things started
@@ -166,17 +166,17 @@ class DraftController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Set up what we will need
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if (!empty($this->http_req->query->delete) || !empty($this->http_req->post->delete))
 			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
 
 		// Perhaps a draft was selected for editing? if so pass this off
-		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))
+		if (!empty($this->http_req->query->id_draft) && !empty($context['drafts_pm_save']))
 		{
-			$this->_session->check('get');
-			redirectexit('action=pm;sa=send;id_draft=' . $this->_req->getQuery('id_draft', 'intval'));
+			$this->session->check('get');
+			redirectexit('action=pm;sa=send;id_draft=' . $this->http_req->getQuery('id_draft', 'intval'));
 		}
 
 		// Get the count of applicable drafts
@@ -252,17 +252,17 @@ class DraftController extends AbstractController
 	protected function _action_delete($redirect = '')
 	{
 
-		$this->_session->check(empty($this->_req->post) ? 'get' : '');
+		$this->session->check(empty($this->http_req->post) ? 'get' : '');
 
 		// Lets see what we have been sent, one or many to delete
 		$toDelete = array();
-		if (!empty($this->_req->query->delete))
+		if (!empty($this->http_req->query->delete))
 		{
-			$toDelete[] = (int) $this->_req->query->delete;
+			$toDelete[] = (int) $this->http_req->query->delete;
 		}
 		else
 		{
-			$toDelete = array_map('intval', $this->_req->post->delete);
+			$toDelete = array_map('intval', $this->http_req->post->delete);
 		}
 
 		if (!empty($toDelete))

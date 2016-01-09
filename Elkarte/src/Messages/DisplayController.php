@@ -100,26 +100,26 @@ class DisplayController extends AbstractController
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
-		if (count((array) $this->_req->query) > 2)
+		if (count((array) $this->http_req->query) > 2)
 		{
-			foreach ($this->_req->query as $k => $v)
+			foreach ($this->http_req->query as $k => $v)
 			{
 				if (!in_array($k, array('topic', 'board', 'start', session_name())))
 					$context['robot_no_index'] = true;
 			}
 		}
 
-		$this->_start = $this->_req->getQuery('start');
+		$this->_start = $this->http_req->getQuery('start');
 		if (!empty($this->_start) && (!is_numeric($this->_start) || $this->_start % $context['messages_per_page'] !== 0))
 			$context['robot_no_index'] = true;
 
 		// Find the previous or next topic.  Make a fuss if there are no more.
-		if ($this->_req->getQuery('prev_next') === 'prev' || $this->_req->getQuery('prev_next') === 'next')
+		if ($this->http_req->getQuery('prev_next') === 'prev' || $this->http_req->getQuery('prev_next') === 'next')
 		{
 			// No use in calculating the next topic if there's only one.
 			if ($board_info['num_topics'] > 1)
 			{
-				$topic = $this->_req->query->prev_next === 'prev'
+				$topic = $this->http_req->query->prev_next === 'prev'
 					? previousTopic($topic, $board, $user_info['id'], $includeUnapproved)
 					: nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
 				$context['current_topic'] = $topic;
@@ -156,7 +156,7 @@ class DisplayController extends AbstractController
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->http_req->query->noredir))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
@@ -166,9 +166,9 @@ class DisplayController extends AbstractController
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
 		$context['topic_unwatched'] = isset($topicinfo['unwatched']) ? $topicinfo['unwatched'] : 0;
-		if (isset($this->_req->query->redirfrom))
+		if (isset($this->http_req->query->redirfrom))
 		{
-			$redirfrom = $this->_req->getQuery('redirfrom', 'intval');
+			$redirfrom = $this->http_req->getQuery('redirfrom', 'intval');
 			$redir_topics = topicsList(array($redirfrom));
 			if (!empty($redir_topics[$redirfrom]))
 			{
@@ -283,7 +283,7 @@ class DisplayController extends AbstractController
 		$context['is_marked_notify'] = false;
 
 		// Did we report a post to a moderator just now?
-		$context['report_sent'] = isset($this->_req->query->reportsent);
+		$context['report_sent'] = isset($this->http_req->query->reportsent);
 		if ($context['report_sent'])
 			$this->_layers->add('report_sent');
 
@@ -295,14 +295,14 @@ class DisplayController extends AbstractController
 
 		// If all is set, but not allowed... just unset it.
 		$can_show_all = !empty($modSettings['enableAllMessages']) && $total_visible_posts > $context['messages_per_page'] && $total_visible_posts < $modSettings['enableAllMessages'];
-		if (isset($this->_req->query->all) && !$can_show_all)
-			unset($this->_req->query->all);
+		if (isset($this->http_req->query->all) && !$can_show_all)
+			unset($this->http_req->query->all);
 		// Otherwise, it must be allowed... so pretend start was -1.
-		elseif (isset($this->_req->query->all))
+		elseif (isset($this->http_req->query->all))
 			$this->_start = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->http_req->query->all)));
 		$context['start'] = $this->_start;
 
 		// This is information about which page is current, and which page we're on - in case you don't like
@@ -319,7 +319,7 @@ class DisplayController extends AbstractController
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
-		if ($can_show_all && isset($this->_req->query->all))
+		if ($can_show_all && isset($this->http_req->query->all))
 		{
 			// No limit! (actually, there is a limit, but...)
 			$context['messages_per_page'] = -1;
@@ -391,7 +391,7 @@ class DisplayController extends AbstractController
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
 		{
-			$boardseen = isset($this->_req->query->boardseen);
+			$boardseen = isset($this->http_req->query->boardseen);
 
 			$mark_at_msg = max($messages);
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
@@ -611,18 +611,18 @@ class DisplayController extends AbstractController
 		global $topic, $board, $user_info, $context, $modSettings;
 
 		// Check the session = get or post.
-		$this->_session->check('request');
+		$this->session->check('request');
 
-		if (empty($this->_req->post->msgs))
-			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));
+		if (empty($this->http_req->post->msgs))
+			redirectexit('topic=' . $topic . '.' . $this->http_req->getQuery('start', 'intval'));
 
-		$messages = array_map('intval', $this->_req->post->msgs);
+		$messages = array_map('intval', $this->http_req->post->msgs);
 
 		// We are restoring messages. We handle this in another place.
-		if (isset($this->_req->query->restore_selected))
+		if (isset($this->http_req->query->restore_selected))
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 
-		if (isset($this->_req->query->split_selection))
+		if (isset($this->http_req->query->split_selection))
 		{
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
@@ -667,7 +667,7 @@ class DisplayController extends AbstractController
 			$remover->removeMessage($message);
 		}
 
-		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->_req->query->start);
+		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->http_req->query->start);
 	}
 
 	/**

@@ -152,12 +152,12 @@ class ManageCalendarModuleController extends AbstractController
 		global $scripturl, $txt, $context;
 
 		// Submitting something...
-		if (isset($this->_req->query->delete) && !empty($this->_req->query->holiday))
+		if (isset($this->http_req->query->delete) && !empty($this->http_req->query->holiday))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mc');
 
-			$to_remove = array_map('intval', array_keys($this->_req->query->holiday));
+			$to_remove = array_map('intval', array_keys($this->http_req->query->holiday));
 
 			// Now the IDs are "safe" do the delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
@@ -269,32 +269,32 @@ class ManageCalendarModuleController extends AbstractController
 
 		$this->_templates->load('ManageCalendar');
 
-		$context['is_new'] = !isset($this->_req->query->holiday);
+		$context['is_new'] = !isset($this->http_req->query->holiday);
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
 		// Cast this for safety...
-		$this->_req->query->holiday = $this->_req->getQuery('holiday', 'intval');
+		$this->http_req->query->holiday = $this->http_req->getQuery('holiday', 'intval');
 
 		// Submitting?
 
-		if (isset($this->_req->post->$context['session_var']) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
+		if (isset($this->http_req->post->$context['session_var']) && (isset($this->http_req->post->delete) || $this->http_req->post->title != ''))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Not too long good sir?
-			$this->_req->post->title = $GLOBALS['elk']['text']->substr($this->_req->post->title, 0, 60);
-			$this->_req->post->holiday = $this->_req->getPost('holiday', 'intval', 0);
+			$this->http_req->post->title = $GLOBALS['elk']['text']->substr($this->http_req->post->title, 0, 60);
+			$this->http_req->post->holiday = $this->http_req->getPost('holiday', 'intval', 0);
 
-			if (isset($this->_req->post->delete))
-				removeHolidays($this->_req->post->holiday);
+			if (isset($this->http_req->post->delete))
+				removeHolidays($this->http_req->post->holiday);
 			else
 			{
-				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
-				if (isset($this->_req->post->edit))
-					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
+				$date = strftime($this->http_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->http_req->post->month, $this->http_req->post->day, $this->http_req->post->year));
+				if (isset($this->http_req->post->edit))
+					editHoliday($this->http_req->post->holiday, $date, $this->http_req->post->title);
 				else
-					insertHoliday($date, $this->_req->post->title);
+					insertHoliday($date, $this->http_req->post->title);
 			}
 
 			redirectexit('action=Admin;area=managecalendar;sa=holidays');
@@ -313,7 +313,7 @@ class ManageCalendarModuleController extends AbstractController
 		}
 		// If it's not new load the data.
 		else
-			$context['holiday'] = getHoliday($this->_req->query->holiday);
+			$context['holiday'] = getHoliday($this->http_req->query->holiday);
 
 		// Last day for the drop down?
 		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
@@ -338,11 +338,11 @@ class ManageCalendarModuleController extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			$GLOBALS['elk']['hooks']->hook('save_calendar_settings');
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			// Update the stats in case.
 			updateSettings(array(

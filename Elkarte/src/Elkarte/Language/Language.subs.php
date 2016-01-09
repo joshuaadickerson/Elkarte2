@@ -620,7 +620,7 @@ function getLanguages($use_cache = true)
 	$cache = $GLOBALS['elk']['cache'];
 
 	// Either we don't use the cache, or its expired.
-	$languages = '';
+	$languages = [];
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', !$cache->checkLevel(1) ? 86400 : 3600))
 	{
@@ -630,6 +630,8 @@ function getLanguages($use_cache = true)
 
 		// Default language directories to try.
 		$language_directories = array(
+			// Why would we do anything else?
+			LANGUAGEDIR,
 			$settings['default_theme_dir'] . '/languages',
 			$settings['actual_theme_dir'] . '/languages',
 		);

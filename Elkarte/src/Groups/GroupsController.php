@@ -45,7 +45,7 @@ class GroupsController extends AbstractController
 		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
-			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
+			$this->http_req->query->area = $this->http_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
 			$controller = new ModerationCenterController(new EventManager());
 			$controller->pre_dispatch();
 			$controller->prepareModcenter();
@@ -224,7 +224,7 @@ class GroupsController extends AbstractController
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
-		$current_group = $this->_req->getQuery('group', 'intval', 0);
+		$current_group = $this->http_req->getQuery('group', 'intval', 0);
 
 		// These will be needed
 
@@ -250,8 +250,8 @@ class GroupsController extends AbstractController
 			'name' => $context['group']['name'],
 		);
 		$context['can_send_email'] = allowedTo('send_email_to_members');
-		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
-		$context['start'] = $this->_req->query->start;
+		$context['sort_direction'] = isset($this->http_req->query->desc) ? 'down' : 'up';
+		$context['start'] = $this->http_req->query->start;
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// @todo: use createList
@@ -282,32 +282,32 @@ class GroupsController extends AbstractController
 			$context['group']['assignable'] = 0;
 
 		// Removing member from group?
-		if (isset($this->_req->post->remove)
-			&& !empty($this->_req->post->rem)
-			&& is_array($this->_req->post->rem)
+		if (isset($this->http_req->post->remove)
+			&& !empty($this->http_req->post->rem)
+			&& is_array($this->http_req->post->rem)
 			&& $context['group']['assignable'])
 		{
 			// Security first
-			$this->_session->check();
+			$this->session->check();
 			validateToken('mod-mgm');
 
 			// Make sure we're dealing with integers only.
-			$to_remove = array_map('intval', $this->_req->post->rem);
+			$to_remove = array_map('intval', $this->http_req->post->rem);
 			removeMembersFromGroups($to_remove, $current_group, true);
 		}
 		// Must be adding new members to the group...
-		elseif (isset($this->_req->post->add)
-			&& (!empty($this->_req->post->toAdd) || !empty($this->_req->post->member_add)) && $context['group']['assignable'])
+		elseif (isset($this->http_req->post->add)
+			&& (!empty($this->http_req->post->toAdd) || !empty($this->http_req->post->member_add)) && $context['group']['assignable'])
 		{
 			// Make sure you can do this
-			$this->_session->check();
+			$this->session->check();
 			validateToken('mod-mgm');
 
 			$member_query = array(array('and' => 'not_in_group'));
 			$member_parameters = array('not_in_group' => $current_group);
 
 			// Get all the members to be added... taking into account names can be quoted ;)
-			$toAdd = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
+			$toAdd = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $toAdd, $matches);
 			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $toAdd))));
 
@@ -321,9 +321,9 @@ class GroupsController extends AbstractController
 
 			// Any members passed by ID?
 			$member_ids = array();
-			if (!empty($this->_req->post->member_add))
+			if (!empty($this->http_req->post->member_add))
 			{
-				foreach ($this->_req->post->member_add as $id)
+				foreach ($this->http_req->post->member_add as $id)
 				{
 					if ($id > 0)
 						$member_ids[] = (int) $id;
@@ -355,23 +355,23 @@ class GroupsController extends AbstractController
 		// Sort out the sorting!
 		$sort_methods = array(
 			'name' => 'real_name',
-			'email' => allowedTo('moderate_forum') ? 'email_address' : 'hide_email ' . (isset($this->_req->query->desc) ? 'DESC' : 'ASC') . ', email_address',
+			'email' => allowedTo('moderate_forum') ? 'email_address' : 'hide_email ' . (isset($this->http_req->query->desc) ? 'DESC' : 'ASC') . ', email_address',
 			'active' => 'last_login',
 			'registered' => 'date_registered',
 			'posts' => 'posts',
 		);
 
 		// They didn't pick one, or tried a wrong one, so default to by name..
-		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
+		if (!isset($this->http_req->query->sort) || !isset($sort_methods[$this->http_req->query->sort]))
 		{
 			$context['sort_by'] = 'name';
-			$querySort = 'real_name' . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
+			$querySort = 'real_name' . (isset($this->http_req->query->desc) ? ' DESC' : ' ASC');
 		}
 		// Otherwise sort by what they asked
 		else
 		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$querySort = $sort_methods[$this->_req->query->sort] . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
+			$context['sort_by'] = $this->http_req->query->sort;
+			$querySort = $sort_methods[$this->http_req->query->sort] . (isset($this->http_req->query->desc) ? ' DESC' : ' ASC');
 		}
 
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
@@ -385,7 +385,7 @@ class GroupsController extends AbstractController
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->http_req->query->desc) ? ';desc' : ''), $this->http_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
 		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);
@@ -442,27 +442,27 @@ class GroupsController extends AbstractController
 		$where_parameters = array();
 
 		// We've submitted?
-		if (isset($this->_req->post->$context['session_var'])
-			&& !empty($this->_req->post->groupr)
-			&& !empty($this->_req->post->req_action))
+		if (isset($this->http_req->post->$context['session_var'])
+			&& !empty($this->http_req->post->groupr)
+			&& !empty($this->http_req->post->req_action))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			validateToken('mod-gr');
 
 
 
 			// Clean the values.
-			$this->_req->post->groupr = array_map('intval', $this->_req->post->groupr);
+			$this->http_req->post->groupr = array_map('intval', $this->http_req->post->groupr);
 
 			// If we are giving a reason (And why shouldn't we?), then we don't actually do much.
-			if ($this->_req->post->req_action === 'reason')
+			if ($this->http_req->post->req_action === 'reason')
 			{
 				// Different sub template...
 				$context['sub_template'] = 'group_request_reason';
 
 				// And a limitation. We don't care that the page number bit makes no sense, as we don't need it!
 				$where .= ' AND lgr.id_request IN ({array_int:request_ids})';
-				$where_parameters['request_ids'] = $this->_req->post->groupr;
+				$where_parameters['request_ids'] = $this->http_req->post->groupr;
 
 				$context['group_requests'] = list_getGroupRequests(0, $modSettings['defaultMaxMessages'], 'lgr.id_request', $where, $where_parameters);
 				createToken('mod-gr');
@@ -474,10 +474,10 @@ class GroupsController extends AbstractController
 			else
 			{
 				// Get the details of all the members concerned...
-						$concerned = getConcernedMembers($this->_req->post->groupr, $where, $this->_req->post->req_action === 'approve');
+						$concerned = getConcernedMembers($this->http_req->post->groupr, $where, $this->http_req->post->req_action === 'approve');
 
 				// Cleanup old group requests..
-				deleteGroupRequests($this->_req->post->groupr);
+				deleteGroupRequests($this->http_req->post->groupr);
 
 				// Ensure everyone who is online gets their changes right away.
 				updateSettings(array('settings_updated' => time()));
@@ -487,7 +487,7 @@ class GroupsController extends AbstractController
 
 
 					// They are being approved?
-					if ($this->_req->post->req_action === 'approve')
+					if ($this->http_req->post->req_action === 'approve')
 					{
 						// Make the group changes.
 						foreach ($concerned['group_changes'] as $id => $groups)
@@ -518,7 +518,7 @@ class GroupsController extends AbstractController
 						// Same as for approving, kind of.
 						foreach ($concerned['email_details'] as $email)
 						{
-							$custom_reason = isset($this->_req->post->groupreason) && isset($this->_req->post->groupreason[$email['rid']]) ? $this->_req->post->groupreason[$email['rid']] : '';
+							$custom_reason = isset($this->http_req->post->groupreason) && isset($this->http_req->post->groupreason[$email['rid']]) ? $this->http_req->post->groupreason[$email['rid']] : '';
 
 							$replacements = array(
 								'USERNAME' => $email['member_name'],

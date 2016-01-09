@@ -775,8 +775,8 @@ class AdminController extends AbstractController
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		//$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
-		//$context['search_term'] = $this->_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
+		//$context['search_term'] = $this->http_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
+		//$context['search_term'] = $this->http_req->getPost('search_term', 'trim|$GLOBALS['elk']['text']->htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
@@ -890,9 +890,9 @@ class AdminController extends AbstractController
 		$_REQUEST['sa'] = 'query';
 
 		// Set the query values
-		$this->_req->post->sa = 'query';
-		$this->_req->post->membername = $GLOBALS['elk']['text']->un_htmlspecialchar($context['search_term']);
-		$this->_req->post->types = '';
+		$this->http_req->post->sa = 'query';
+		$this->http_req->post->membername = $GLOBALS['elk']['text']->un_htmlspecialchar($context['search_term']);
+		$this->http_req->post->types = '';
 
 		//$managemembers = new ManageMembersController(new \Elkarte\Elkarte\Events\EventManager()anager());
 		//$managemembers->pre_dispatch();
@@ -968,7 +968,7 @@ class AdminController extends AbstractController
 		// Clean any Admin tokens as well.
 		cleanTokens(false, '-Admin');
 
-		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
+		if (isset($this->http_req->query->redir, $this->http_req->server->HTTP_REFERER))
 			redirectexit($_SERVER['HTTP_REFERER']);
 		else
 			redirectexit();

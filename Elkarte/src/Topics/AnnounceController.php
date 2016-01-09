@@ -93,8 +93,8 @@ class AnnounceController extends AbstractController
 		$context['announce_topic']['subject'] = censor($context['announce_topic']['subject']);
 
 		// Prepare for the template
-		$context['move'] = isset($this->_req->query->move) ? 1 : 0;
-		$context['go_back'] = isset($this->_req->query->goback) ? 1 : 0;
+		$context['move'] = isset($this->http_req->query->move) ? 1 : 0;
+		$context['go_back'] = isset($this->http_req->query->goback) ? 1 : 0;
 		$context['sub_template'] = 'announce';
 	}
 
@@ -113,17 +113,17 @@ class AnnounceController extends AbstractController
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
 
-		$this->_session->check();
+		$this->session->check();
 
-		$context['start'] = $this->_req->getPost('start', 'intval', 0);
+		$context['start'] = $this->http_req->getPost('start', 'intval', 0);
 		$groups = array_merge($board_info['groups'], array(1));
 		$who = array();
 
 		// Load any supplied membergroups (from announcement_send template pause loop)
-		if (isset($this->_req->post->membergroups))
-			$_who = explode(',', $this->_req->post->membergroups);
+		if (isset($this->http_req->post->membergroups))
+			$_who = explode(',', $this->http_req->post->membergroups);
 		else
-			$_who = $this->_req->post->who;
+			$_who = $this->http_req->post->who;
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))
@@ -165,9 +165,9 @@ class AnnounceController extends AbstractController
 		{
 			logAction('announce_topic', array('topic' => $topic), 'user');
 
-			if (!empty($this->_req->post->move) && allowedTo('move_any'))
-				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($this->_req->post->goback) ? '' : ';goback'));
-			elseif (!empty($this->_req->post->goback))
+			if (!empty($this->http_req->post->move) && allowedTo('move_any'))
+				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($this->http_req->post->goback) ? '' : ';goback'));
+			elseif (!empty($this->http_req->post->goback))
 				redirectexit('topic=' . $topic . '.new;boardseen#new', isBrowser('ie'));
 			else
 				redirectexit('board=' . $board . '.0');
@@ -182,8 +182,8 @@ class AnnounceController extends AbstractController
 			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
 
 		// Prepare for the template
-		$context['move'] = empty($this->_req->post->move) ? 0 : 1;
-		$context['go_back'] = empty($this->_req->post->goback) ? 0 : 1;
+		$context['move'] = empty($this->http_req->post->move) ? 0 : 1;
+		$context['go_back'] = empty($this->http_req->post->goback) ? 0 : 1;
 		$context['membergroups'] = implode(',', $who);
 		$context['topic_subject'] = $topic_info['subject'];
 		$context['sub_template'] = 'announcement_send';

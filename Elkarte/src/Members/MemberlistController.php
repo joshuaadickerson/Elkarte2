@@ -53,7 +53,7 @@ class MemberListController extends AbstractController
 
 		// These are handy later
 		$context['old_search_value'] = '';
-		$context['in_search'] = !empty($this->_req->post->search);
+		$context['in_search'] = !empty($this->http_req->post->search);
 
 		foreach ($context['custom_search_fields'] as $field)
 			$this->_search_fields['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
@@ -74,7 +74,7 @@ class MemberListController extends AbstractController
 		// Make sure they can view the memberlist.
 		isAllowedTo('view_mlist');
 
-		$context['listing_by'] = $this->_req->getQuery('sa', 'trim', 'all');
+		$context['listing_by'] = $this->http_req->getQuery('sa', 'trim', 'all');
 
 		// $subActions array format:
 		// 'subaction' => array('label', 'function', 'is_selected')
@@ -239,9 +239,9 @@ class MemberListController extends AbstractController
 		$memberlist_cache = '';
 
 		// Some handy short cuts
-		$start = $this->_req->getQuery('start', '', null);
-		$desc = $this->_req->getQuery('desc', '', null);
-		$sort = $this->_req->getQuery('sort', '', null);
+		$start = $this->http_req->getQuery('start', '', null);
+		$desc = $this->http_req->getQuery('desc', '', null);
+		$sort = $this->http_req->getQuery('sort', '', null);
 
 		// Only use caching if:
 		// 1. there are at least 2k members,
@@ -395,15 +395,15 @@ class MemberListController extends AbstractController
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// They're searching..
-		if (isset($this->_req->query->search, $this->_req->query->fields)
-			|| isset($this->_req->post->search, $this->_req->post->fields))
+		if (isset($this->http_req->query->search, $this->http_req->query->fields)
+			|| isset($this->http_req->post->search, $this->http_req->post->fields))
 		{
 			// Some handy short cuts
-			$start = $this->_req->getQuery('start', '', null);
-			$desc = $this->_req->getQuery('desc', '', null);
-			$sort = $this->_req->getQuery('sort', '', null);
-			$search = $GLOBALS['elk']['text']->htmlspecialchars(trim(isset($this->_req->query->search) ? $this->_req->query->search : $this->_req->post->search), ENT_QUOTES);
-			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
+			$start = $this->http_req->getQuery('start', '', null);
+			$desc = $this->http_req->getQuery('desc', '', null);
+			$sort = $this->http_req->getQuery('sort', '', null);
+			$search = $GLOBALS['elk']['text']->htmlspecialchars(trim(isset($this->http_req->query->search) ? $this->http_req->query->search : $this->http_req->post->search), ENT_QUOTES);
+			$input_fields = isset($this->http_req->query->fields) ? explode(',', $this->http_req->query->fields) : $this->http_req->post->fields;
 
 			$fields_key = array_keys($this->_search_fields);
 			$context['search_defaults'] = array();

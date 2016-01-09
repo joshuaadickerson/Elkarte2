@@ -86,7 +86,7 @@ class NewsController extends AbstractController
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$this->_limit = empty($this->_req->query->limit) || (int) $this->_req->query->limit < 1 ? $limit : min((int) $this->_req->query->limit, $limit);
+		$this->_limit = empty($this->http_req->query->limit) || (int) $this->http_req->query->limit < 1 ? $limit : min((int) $this->http_req->query->limit, $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -95,9 +95,9 @@ class NewsController extends AbstractController
 		);
 
 		// Specifying specific categories only?
-		if (!empty($this->_req->query->c) && empty($board))
+		if (!empty($this->http_req->query->c) && empty($board))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$categories = array_map('intval', explode(',', $this->http_req->query->c));
 
 			if (count($categories) == 1)
 			{
@@ -119,10 +119,10 @@ class NewsController extends AbstractController
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->_limit * 5);
 		}
 		// Maybe they only want to see feeds form some certain boards?
-		elseif (!empty($this->_req->query->boards))
+		elseif (!empty($this->http_req->query->boards))
 		{
 
-			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$query_boards = array_map('intval', explode(',', $this->http_req->query->boards));
 
 			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
 
@@ -169,7 +169,7 @@ class NewsController extends AbstractController
 		}
 
 		// If format isn't set, or is wrong, rss2 is default
-		$xml_format = $this->_req->getQuery('type', 'trim', 'rss2');
+		$xml_format = $this->http_req->getQuery('type', 'trim', 'rss2');
 		if (!in_array($xml_format, array('rss', 'rss2', 'atom', 'rdf')))
 			$xml_format = 'rss2';
 
@@ -184,14 +184,14 @@ class NewsController extends AbstractController
 		// Easy adding of sub actions
 		$GLOBALS['elk']['hooks']->hook('xmlfeeds', array(&$subActions));
 
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
+		$subAction = isset($this->http_req->query->sa) && isset($subActions[$this->http_req->query->sa]) ? $this->http_req->query->sa : 'recent';
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
+		$cachekey = array($xml_format, $this->http_req->query->action, $this->_limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 		{
-			if (isset($this->_req->query->$var))
-				$cachekey[] = $this->_req->query->$var;
+			if (isset($this->http_req->query->$var))
+				$cachekey[] = $this->http_req->query->$var;
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
@@ -223,7 +223,7 @@ class NewsController extends AbstractController
 		else
 			ob_start();
 
-		if (isset($this->_req->query->debug))
+		if (isset($this->http_req->query->debug))
 			header('Content-Type: text/xml; charset=UTF-8');
 		elseif ($xml_format === 'rss' || $xml_format === 'rss2')
 			header('Content-Type: application/rss+xml; charset=UTF-8');
@@ -245,9 +245,9 @@ class NewsController extends AbstractController
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 			{
-				if (isset($this->_req->query->$var))
+				if (isset($this->http_req->query->$var))
 				{
-					$url_parts[] = $var . '=' . (is_array( $this->_req->query->$var) ? implode(',',  $this->_req->query->$var) : $this->_req->query->$var);
+					$url_parts[] = $var . '=' . (is_array( $this->http_req->query->$var) ? implode(',',  $this->http_req->query->$var) : $this->http_req->query->$var);
 				}
 			}
 
@@ -550,11 +550,11 @@ class NewsController extends AbstractController
 		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 
 		// You must input a valid user....
-		if (empty($this->_req->query->u) || loadMemberData((int) $this->_req->query->u) === false)
+		if (empty($this->http_req->query->u) || loadMemberData((int) $this->http_req->query->u) === false)
 			return array();
 
 		// Make sure the id is a number and not "I like trying to hack the database".
-		$uid = (int) $this->_req->query->u;
+		$uid = (int) $this->http_req->query->u;
 
 		// Load the member's contextual information!
 		if (!loadMemberContext($uid) || !allowedTo('profile_view_any'))

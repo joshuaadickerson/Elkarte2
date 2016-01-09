@@ -137,16 +137,16 @@ class ManageNewsController extends AbstractController
 
 
 		// The 'remove selected' button was pressed.
-		if (!empty($this->_req->post->delete_selection) && !empty($this->_req->post->remove))
+		if (!empty($this->http_req->post->delete_selection) && !empty($this->http_req->post->remove))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Store the news temporarily in this array.
 			$temp_news = explode("\n", $modSettings['news']);
 
 			// Remove the items that were selected.
 			foreach ($temp_news as $i => $news)
-				if (in_array($i, $this->_req->post->remove))
+				if (in_array($i, $this->http_req->post->remove))
 					unset($temp_news[$i]);
 
 			// Update the database.
@@ -155,23 +155,23 @@ class ManageNewsController extends AbstractController
 			logAction('news');
 		}
 		// The 'Save' button was pressed.
-		elseif (!empty($this->_req->post->save_items))
+		elseif (!empty($this->http_req->post->save_items))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			foreach ($this->_req->post->news as $i => $news)
+			foreach ($this->http_req->post->news as $i => $news)
 			{
 				if (trim($news) == '')
-					unset($this->_req->post->news[$i]);
+					unset($this->http_req->post->news[$i]);
 				else
 				{
-					$this->_req->post->news[$i] = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
-					preparsecode($this->_req->post->news[$i]);
+					$this->http_req->post->news[$i] = $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->news[$i], ENT_QUOTES);
+					preparsecode($this->http_req->post->news[$i]);
 				}
 			}
 
 			// Send the new news to the database.
-			updateSettings(array('news' => implode("\n", $this->_req->post->news)));
+			updateSettings(array('news' => implode("\n", $this->http_req->post->news)));
 
 			// Log this into the moderation log.
 			logAction('news');
@@ -358,8 +358,8 @@ class ManageNewsController extends AbstractController
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-		$context['subject'] = !empty($this->_req->post->subject) ? $this->_req->post->subject : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
-		$context['message'] = !empty($this->_req->post->message) ? $this->_req->post->message : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
+		$context['subject'] = !empty($this->http_req->post->subject) ? $this->http_req->post->subject : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($this->http_req->post->message) ? $this->http_req->post->message : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -380,16 +380,16 @@ class ManageNewsController extends AbstractController
 		if (isset($context['preview']))
 		{
 
-			$context['recipients']['members'] = !empty($this->_req->post->members) ? explode(',', $this->_req->post->members) : array();
-			$context['recipients']['exclude_members'] = !empty($this->_req->post->exclude_members) ? explode(',', $this->_req->post->exclude_members) : array();
-			$context['recipients']['groups'] = !empty($this->_req->post->groups) ? explode(',', $this->_req->post->groups) : array();
-			$context['recipients']['exclude_groups'] = !empty($this->_req->post->exclude_groups) ? explode(',', $this->_req->post->exclude_groups) : array();
-			$context['recipients']['emails'] = !empty($this->_req->post->emails) ? explode(';', $this->_req->post->emails) : array();
-			$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
-			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
-			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-			$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
-			$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
+			$context['recipients']['members'] = !empty($this->http_req->post->members) ? explode(',', $this->http_req->post->members) : array();
+			$context['recipients']['exclude_members'] = !empty($this->http_req->post->exclude_members) ? explode(',', $this->http_req->post->exclude_members) : array();
+			$context['recipients']['groups'] = !empty($this->http_req->post->groups) ? explode(',', $this->http_req->post->groups) : array();
+			$context['recipients']['exclude_groups'] = !empty($this->http_req->post->exclude_groups) ? explode(',', $this->http_req->post->exclude_groups) : array();
+			$context['recipients']['emails'] = !empty($this->http_req->post->emails) ? explode(';', $this->http_req->post->emails) : array();
+			$context['email_force'] = $this->http_req->getPost('email_force', 'intval', 0);
+			$context['total_emails'] = $this->http_req->getPost('total_emails', 'intval', 0);
+			$context['max_id_member'] = $this->http_req->getPost('max_id_member', 'intval', 0);
+			$context['send_pm'] = $this->http_req->getPost('send_pm', 'intval', 0);
+			$context['send_html'] = $this->http_req->getPost('send_html', 'intval', 0);
 
 			return prepareMailingForPreview();
 		}
@@ -446,20 +446,20 @@ class ManageNewsController extends AbstractController
 	protected function _toAddOrExclude()
 	{
 		// Members selected (via auto select) to specifically get the newsletter
-		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
+		if (isset($this->http_req->post->member_list) && is_array($this->http_req->post->member_list))
 		{
 			$members = array();
-			foreach ($this->_req->post->member_list as $member_id)
+			foreach ($this->http_req->post->member_list as $member_id)
 				$members[] = (int) $member_id;
 
 			$this->_members = array_unique(array_merge($this->_members, $members));
 		}
 
 		// Members selected (via auto select) to specifically not get the newsletter
-		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
+		if (isset($this->http_req->post->exclude_member_list) && is_array($this->http_req->post->exclude_member_list))
 		{
 			$members = array();
-			foreach ($this->_req->post->exclude_member_list as $member_id)
+			foreach ($this->http_req->post->exclude_member_list as $member_id)
 				$members[] = (int) $member_id;
 
 			$this->_exclude_members = array_unique(array_merge($this->_exclude_members, $members));
@@ -473,10 +473,10 @@ class ManageNewsController extends AbstractController
 	protected function _toClean()
 	{
 		$toClean = array();
-		if (!empty($this->_req->post->members))
+		if (!empty($this->http_req->post->members))
 			$toClean['_members'] = 'members';
 
-		if (!empty($this->_req->post->exclude_members))
+		if (!empty($this->http_req->post->exclude_members))
 			$toClean['_exclude_members'] = 'exclude_members';
 
 		// Manual entries found?
@@ -486,10 +486,10 @@ class ManageNewsController extends AbstractController
 			foreach ($toClean as $key => $type)
 			{
 				// Remove the quotes.
-				$temp = strtr((string) $this->_req->post->$type, array('\\"' => '"'));
+				$temp = strtr((string) $this->http_req->post->$type, array('\\"' => '"'));
 
 				// Break it up in to an array for processing
-				preg_match_all('~"([^"]+)"~', $this->_req->post->$type, $matches);
+				preg_match_all('~"([^"]+)"~', $this->http_req->post->$type, $matches);
 				$temp = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $temp))));
 
 				// Clean the valid ones, drop the mangled ones
@@ -524,7 +524,7 @@ class ManageNewsController extends AbstractController
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
 		// A nice successful screen if you did it
-		if (isset($this->_req->query->success))
+		if (isset($this->http_req->query->success))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			$this->_templates->load('ManageNews');
@@ -532,7 +532,7 @@ class ManageNewsController extends AbstractController
 		}
 
 		// If just previewing we prepare a message and return it for viewing
-		if (isset($this->_req->post->preview))
+		if (isset($this->http_req->post->preview))
 		{
 			$context['preview'] = true;
 			return $this->action_mailingcompose();
@@ -543,19 +543,19 @@ class ManageNewsController extends AbstractController
 		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
 
 		// If by PM's I suggest we half the above number.
-		if (!empty($this->_req->post->send_pm))
+		if (!empty($this->http_req->post->send_pm))
 			$num_at_once /= 2;
 
-		$this->_session->check();
+		$this->session->check();
 
 		// Where are we actually to?
-		$context['start'] = $this->_req->getPost('start', 'intval', 0);
-		$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
-		$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
-		$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-		$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
-		$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
-		$context['parse_html'] = $this->_req->getPost('parse_html', 'intval', 0);
+		$context['start'] = $this->http_req->getPost('start', 'intval', 0);
+		$context['email_force'] = $this->http_req->getPost('email_force', 'intval', 0);
+		$context['total_emails'] = $this->http_req->getPost('total_emails', 'intval', 0);
+		$context['max_id_member'] = $this->http_req->getPost('max_id_member', 'intval', 0);
+		$context['send_pm'] = $this->http_req->getPost('send_pm', 'intval', 0);
+		$context['send_html'] = $this->http_req->getPost('send_html', 'intval', 0);
+		$context['parse_html'] = $this->http_req->getPost('parse_html', 'intval', 0);
 
 		// Create our main context.
 		$context['recipients'] = array(
@@ -567,9 +567,9 @@ class ManageNewsController extends AbstractController
 		);
 
 		// Have we any excluded members?
-		if (!empty($this->_req->post->exclude_members))
+		if (!empty($this->http_req->post->exclude_members))
 		{
-			$members = explode(',', $this->_req->post->exclude_members);
+			$members = explode(',', $this->http_req->post->exclude_members);
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
@@ -578,9 +578,9 @@ class ManageNewsController extends AbstractController
 		}
 
 		// What about members we *must* do?
-		if (!empty($this->_req->post->members))
+		if (!empty($this->http_req->post->members))
 		{
-			$members = explode(',', $this->_req->post->members);
+			$members = explode(',', $this->http_req->post->members);
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
@@ -589,41 +589,41 @@ class ManageNewsController extends AbstractController
 		}
 
 		// Cleaning groups is simple - although deal with both checkbox and commas.
-		if (isset($this->_req->post->groups))
+		if (isset($this->http_req->post->groups))
 		{
-			if (is_array($this->_req->post->groups))
+			if (is_array($this->http_req->post->groups))
 			{
-				foreach ($this->_req->post->groups as $group => $dummy)
+				foreach ($this->http_req->post->groups as $group => $dummy)
 					$context['recipients']['groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->groups) != '')
+			elseif (trim($this->http_req->post->groups) != '')
 			{
-				$groups = explode(',', $this->_req->post->groups);
+				$groups = explode(',', $this->http_req->post->groups);
 				foreach ($groups as $group)
 					$context['recipients']['groups'][] = (int) $group;
 			}
 		}
 
 		// Same for excluded groups
-		if (isset($this->_req->post->exclude_groups))
+		if (isset($this->http_req->post->exclude_groups))
 		{
-			if (is_array($this->_req->post->exclude_groups))
+			if (is_array($this->http_req->post->exclude_groups))
 			{
-				foreach ($this->_req->post->exclude_groups as $group => $dummy)
+				foreach ($this->http_req->post->exclude_groups as $group => $dummy)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->exclude_groups) != '')
+			elseif (trim($this->http_req->post->exclude_groups) != '')
 			{
-				$groups = explode(',', $this->_req->post->exclude_groups);
+				$groups = explode(',', $this->http_req->post->exclude_groups);
 				foreach ($groups as $group)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
 		}
 
 		// Finally - emails!
-		if (!empty($this->_req->post->emails))
+		if (!empty($this->http_req->post->emails))
 		{
-			$addressed = array_unique(explode(';', strtr($this->_req->post->emails, array("\n" => ';', "\r" => ';', ',' => ';'))));
+			$addressed = array_unique(explode(';', strtr($this->http_req->post->emails, array("\n" => ';', "\r" => ';', ',' => ';'))));
 			foreach ($addressed as $curmem)
 			{
 				$curmem = trim($curmem);
@@ -642,18 +642,18 @@ class ManageNewsController extends AbstractController
 
 
 		// We are relying too much on writing to superglobals...
-		$base_subject = $this->_req->getPost('subject', 'strval', '');
-		$base_message = $this->_req->getPost('message', 'strval', '');
+		$base_subject = $this->http_req->getPost('subject', 'strval', '');
+		$base_message = $this->http_req->getPost('message', 'strval', '');
 
 		// Save the message and its subject in $context
 		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
 		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
-		if (!$context['send_pm'] && !empty($this->_req->post->send_html))
+		if (!$context['send_pm'] && !empty($this->http_req->post->send_html))
 		{
 			// Prepare the message for HTML.
-			if (!empty($this->_req->post->parse_html))
+			if (!empty($this->http_req->post->parse_html))
 				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
 
 			// This is here to prevent spam filters from tagging this as spam.
@@ -684,14 +684,14 @@ class ManageNewsController extends AbstractController
 		);
 
 		// We might need this in a bit
-		$cleanLatestMember = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
+		$cleanLatestMember = empty($this->http_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 		// Replace in all the standard things.
 		$base_message = str_replace($variables,
 			array(
-				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
+				!empty($this->http_req->post->send_html) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
-				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
+				!empty($this->http_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
 			), $base_message);
@@ -729,12 +729,12 @@ class ManageNewsController extends AbstractController
 
 			$to_member = array(
 				$email,
-				!empty($this->_req->post->send_html) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
+				!empty($this->http_req->post->send_html) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
 				'??',
 				$email
 			);
 
-			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($this->_req->post->send_html), 5);
+			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($this->http_req->post->send_html), 5);
 
 			// Done another...
 			$i++;
@@ -815,13 +815,13 @@ class ManageNewsController extends AbstractController
 					continue;
 
 				// We might need this
-				$cleanMemberName = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
+				$cleanMemberName = empty($this->http_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
 
 				// Replace the member-dependant variables
 				$message = str_replace($from_member,
 					array(
 						$row['email_address'],
-						!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
+						!empty($this->http_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
 					), $base_message);
@@ -836,7 +836,7 @@ class ManageNewsController extends AbstractController
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
-					sendmail($row['email_address'], $subject, $message, null, null, !empty($this->_req->post->send_html), 5);
+					sendmail($row['email_address'], $subject, $message, null, null, !empty($this->http_req->post->send_html), 5);
 				else
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
 			}
@@ -898,13 +898,13 @@ class ManageNewsController extends AbstractController
 		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_news_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=news;sa=settings');
 		}
 

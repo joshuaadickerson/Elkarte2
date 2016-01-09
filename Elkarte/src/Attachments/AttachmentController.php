@@ -76,7 +76,7 @@ class AttachmentController extends AbstractController
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
-		if ($this->_session->check('request', '', false) != '')
+		if ($this->session->check('request', '', false) != '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
 			return false;
@@ -90,11 +90,11 @@ class AttachmentController extends AbstractController
 			$attach_errors = AttachmentErrorContext::context();
 			$attach_errors->activate();
 
-			if ($context['attachments']['can']['post'] && empty($this->_req->post->from_qr))
+			if ($context['attachments']['can']['post'] && empty($this->http_req->post->from_qr))
 			{
 
 
-				$process = $this->_req->getPost('msg', 'intval', '');
+				$process = $this->http_req->getPost('msg', 'intval', '');
 				processAttachments($process);
 			}
 
@@ -150,7 +150,7 @@ class AttachmentController extends AbstractController
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is valid
-		if ($this->_session->check('request', '', false) !== '')
+		if ($this->session->check('request', '', false) !== '')
 		{
 			loadLanguage('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
@@ -159,11 +159,11 @@ class AttachmentController extends AbstractController
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($this->_req->post->attachid) && !empty($_SESSION['temp_attachments']))
+		if (isset($this->http_req->post->attachid) && !empty($_SESSION['temp_attachments']))
 		{
 
 
-			$result = removeTempAttachById($this->_req->post->attachid);
+			$result = removeTempAttachById($this->http_req->post->attachid);
 			if ($result === true)
 				$context['json_data'] = array('result' => true);
 			else
@@ -196,19 +196,19 @@ class AttachmentController extends AbstractController
 		$context['no_last_modified'] = true;
 
 		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
+		if (!isset($this->http_req->query->attach) && !isset($this->http_req->query->id))
 			$this->_errors->fatal_lang_error('no_access', false);
 
-		$id_attach = isset($this->_req->query->attach)
-			? (int) $this->_req->query->attach
-			: (int) $this->_req->query->id;
+		$id_attach = isset($this->http_req->query->attach)
+			? (int) $this->http_req->query->attach
+			: (int) $this->http_req->query->id;
 
-		if ($this->_req->getQuery('type') === 'avatar')
+		if ($this->http_req->getQuery('type') === 'avatar')
 		{
 			$attachment = getAvatar($id_attach);
 
 			$is_avatar = true;
-			$this->_req->query->image = true;
+			$this->http_req->query->image = true;
 		}
 		// This is just a regular attachment...
 		else
@@ -252,7 +252,7 @@ class AttachmentController extends AbstractController
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i', $this->http_req->server->SERVER_PROTOCOL) ? $this->http_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -260,9 +260,9 @@ class AttachmentController extends AbstractController
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
+		if (!empty($this->http_req->server->HTTP_IF_MODIFIED_SINCE))
 		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
+			list ($modified_since) = explode(';', $this->http_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -275,7 +275,7 @@ class AttachmentController extends AbstractController
 
 		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
+		if (!empty($this->http_req->server->HTTP_IF_NONE_MATCH) && strpos($this->http_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
 		{
 			@ob_end_clean();
 
@@ -294,19 +294,19 @@ class AttachmentController extends AbstractController
 		header('ETag: ' . $eTag);
 
 		// Make sure the mime type warrants an inline display.
-		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
-			unset($this->_req->query->image);
+		if (isset($this->http_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+			unset($this->http_req->query->image);
 		// Does this have a mime type?
-		elseif (!empty($mime_type) && (isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		elseif (!empty($mime_type) && (isset($this->http_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
 			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
 		else
 		{
 			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-			if (isset($this->_req->query->image))
-				unset($this->_req->query->image);
+			if (isset($this->http_req->query->image))
+				unset($this->http_req->query->image);
 		}
 
-		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
+		$disposition = !isset($this->http_req->query->image) ? 'attachment' : 'inline';
 
 		// Different browsers like different standards...
 		if (isBrowser('firefox'))
@@ -319,7 +319,7 @@ class AttachmentController extends AbstractController
 			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-		if (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
+		if (!isset($this->http_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
 			header('Cache-Control: no-cache');
 		else
 			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
@@ -331,7 +331,7 @@ class AttachmentController extends AbstractController
 		@set_time_limit(600);
 
 		// Recode line endings for text files, if enabled.
-		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
+		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->http_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
 		{
 			$req = $GLOBALS['elk']['req'];
 			if (strpos($req->user_agent(), 'Windows') !== false)
@@ -377,7 +377,7 @@ class AttachmentController extends AbstractController
 		global $txt, $modSettings, $user_info, $topic, $settings;
 
 		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach))
+		if (!isset($this->http_req->query->attach))
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
@@ -386,9 +386,9 @@ class AttachmentController extends AbstractController
 
 		try
 		{
-			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
+			if (empty($topic) || (string) (int) $this->http_req->query->attach !== (string) $this->http_req->query->attach)
 			{
-				$attach_data = getTempAttachById($this->_req->query->attach);
+				$attach_data = getTempAttachById($this->http_req->query->attach);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];
@@ -397,7 +397,7 @@ class AttachmentController extends AbstractController
 			}
 			else
 			{
-				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
+				$id_attach = $this->http_req->getQuery('attach', 'intval', -1);
 
 				isAllowedTo('view_attachments');
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
@@ -445,7 +445,7 @@ class AttachmentController extends AbstractController
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i', $this->http_req->server->SERVER_PROTOCOL) ? $this->http_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -453,9 +453,9 @@ class AttachmentController extends AbstractController
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
+		if (!empty($this->http_req->server->HTTP_IF_MODIFIED_SINCE))
 		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
+			list ($modified_since) = explode(';', $this->http_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -468,7 +468,7 @@ class AttachmentController extends AbstractController
 
 		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
+		if (!empty($this->http_req->server->HTTP_IF_NONE_MATCH) && strpos($this->http_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
 		{
 			@ob_end_clean();
 

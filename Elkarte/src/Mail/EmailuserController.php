@@ -85,17 +85,17 @@ class EmailuserController extends AbstractController
 		$row['subject'] = censor($row['subject']);
 
 		// Sending yet, or just getting prepped?
-		if (empty($this->_req->post->send))
+		if (empty($this->http_req->post->send))
 		{
 			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
-			$context['start'] = $this->_req->query->start;
+			$context['start'] = $this->http_req->query->start;
 			$context['sub_template'] = 'send_topic';
 
 			return;
 		}
 
 		// Actually send the message...
-		$this->_session->check();
+		$this->session->check();
 		spamProtection('sendtopic');
 
 		$result = $this->_sendTopic($row);
@@ -119,7 +119,7 @@ class EmailuserController extends AbstractController
 		$this->_layers->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
-		if (empty($this->_req->post->send))
+		if (empty($this->http_req->post->send))
 			die();
 
 		// We need at least a topic... go away if you don't have one.
@@ -135,7 +135,7 @@ class EmailuserController extends AbstractController
 		}
 
 		// Is the session valid?
-		if ($this->_session->check('post', '', false))
+		if ($this->session->check('post', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -231,7 +231,7 @@ class EmailuserController extends AbstractController
 		));
 
 		// Any errors or are we good to go?
-		if (!$validator->validate($this->_req->post))
+		if (!$validator->validate($this->http_req->post))
 		{
 			$errors = $validator->validation_errors();
 
@@ -257,10 +257,10 @@ class EmailuserController extends AbstractController
 
 		$emailtemplate = 'send_topic';
 
-		if (!empty($this->_req->post->comment))
+		if (!empty($this->http_req->post->comment))
 		{
 			$emailtemplate .= '_comment';
-			$replacements['COMMENT'] = $this->_req->post->comment;
+			$replacements['COMMENT'] = $this->http_req->post->comment;
 		}
 
 		$emaildata = loadEmailTemplate($emailtemplate, $replacements);
@@ -293,19 +293,19 @@ class EmailuserController extends AbstractController
 		$context['form_hidden_vars'] = array();
 		$uid = '';
 		$mid = '';
-		if (isset($this->_req->post->uid) || isset($this->_req->query->uid))
+		if (isset($this->http_req->post->uid) || isset($this->http_req->query->uid))
 		{
 
 			// Get the latest activated member's display name.
-			$uid = $this->_req->getPost('uid', 'intval', isset($this->_req->query->uid) ? (int) $this->_req->query->uid : 0);
+			$uid = $this->http_req->getPost('uid', 'intval', isset($this->http_req->query->uid) ? (int) $this->http_req->query->uid : 0);
 			$row = getBasicMemberData($uid);
 
 			$context['form_hidden_vars']['uid'] = $uid;
 		}
-		elseif (isset($this->_req->post->msg) || isset($this->_req->query->msg))
+		elseif (isset($this->http_req->post->msg) || isset($this->http_req->query->msg))
 		{
 
-			$mid = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
+			$mid = $this->http_req->getPost('msg', 'intval', isset($this->http_req->query->msg) ? (int) $this->http_req->query->msg : 0);
 			$row = mailFromMessage($mid);
 
 			$context['form_hidden_vars']['msg'] = $mid;
@@ -341,9 +341,9 @@ class EmailuserController extends AbstractController
 		$context['page_title'] = $txt['send_email'];
 
 		// Are we actually sending it?
-		if (isset($this->_req->post->send, $this->_req->post->email_body))
+		if (isset($this->http_req->post->send, $this->http_req->post->email_body))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Don't let them send too many!
 			spamProtection('sendmail');
@@ -369,7 +369,7 @@ class EmailuserController extends AbstractController
 				'email_body' => $txt['message'],
 				'email_subject' => $txt['send_email_subject']
 			));
-			$validator->validate($this->_req->post);
+			$validator->validate($this->http_req->post);
 
 			// If it's a guest sort out their names.
 			if ($user_info['is_guest'])
@@ -457,16 +457,16 @@ class EmailuserController extends AbstractController
 		);
 
 		// If they're posting, it should be processed by action_reporttm2.
-		if ((isset($this->_req->post->$context['session_var']) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
+		if ((isset($this->http_req->post->$context['session_var']) || isset($this->http_req->post->save)) && !$report_errors->hasErrors())
 			$this->action_reporttm2();
 
 		// We need a message ID to check!
-		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
+		if (empty($this->http_req->query->msg) && empty($this->http_req->post->msg))
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 
-		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
+		$message_id = $this->http_req->getPost('msg', 'intval', isset($this->http_req->query->msg) ? (int) $this->http_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
 			$this->_errors->fatal_lang_error('no_board', false);
 
@@ -505,11 +505,11 @@ class EmailuserController extends AbstractController
 			check_id: "report_comment"
 		});', true);
 
-		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
-		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
+		$context['comment_body'] = $this->http_req->getPost('comment', 'trim', '');
+		$context['email_address'] = $this->http_req->getPost('email', 'trim', '');
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
-		$context['start'] = $this->_req->query->start;
+		$context['start'] = $this->http_req->query->start;
 		$context['message_id'] = $message_id;
 		$context['page_title'] = $txt['report_to_mod'];
 		$context['sub_template'] = 'report';
@@ -539,13 +539,13 @@ class EmailuserController extends AbstractController
 		$report_errors = ErrorContext::context('report', 1);
 
 		// Check their session.
-		if ($this->_session->check('post', '', false) != '')
+		if ($this->session->check('post', '', false) != '')
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if ($this->_req->getPost('comment', '$GLOBALS['elk']['text']->htmltrim', '') === '')
+		if ($this->http_req->getPost('comment', '$GLOBALS['elk']['text']->htmltrim', '') === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->comment), array("\r" => '', "\t" => ''));
 
 		if ($GLOBALS['elk']['text']->strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
@@ -553,12 +553,12 @@ class EmailuserController extends AbstractController
 		// Guests need to provide their address!
 		if ($user_info['is_guest'])
 		{
-			if (!DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
-				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
+			if (!DataValidator::is_valid($this->http_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+				empty($this->http_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
-			$this->elk['ban_check']->isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
+			$this->elk['ban_check']->isBannedEmail($this->http_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
-			$user_info['email'] = htmlspecialchars($this->_req->post->email, ENT_COMPAT, 'UTF-8');
+			$user_info['email'] = htmlspecialchars($this->http_req->post->email, ENT_COMPAT, 'UTF-8');
 		}
 
 		// Could they get the right verification code?
@@ -585,7 +585,7 @@ class EmailuserController extends AbstractController
 		}
 
 		// Get the basic topic information, and make sure they can see it.
-		$msg_id = (int) $this->_req->post->msg;
+		$msg_id = (int) $this->http_req->post->msg;
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))
@@ -642,7 +642,7 @@ class EmailuserController extends AbstractController
 				'REPORTERNAME' => $reporterName,
 				'TOPICLINK' => $scripturl . '?topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id,
 				'REPORTLINK' => !empty($id_report) ? $scripturl . '?action=moderate;area=reports;report=' . $id_report : '',
-				'COMMENT' => $this->_req->post->comment,
+				'COMMENT' => $this->http_req->post->comment,
 			);
 
 			$emaildata = loadEmailTemplate('report_to_moderator', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);

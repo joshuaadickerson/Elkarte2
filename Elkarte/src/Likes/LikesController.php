@@ -128,7 +128,7 @@ class LikesController extends AbstractController
 	{
 		global $user_info, $modSettings;
 
-		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
+		$this->_id_liked = $this->http_req->getPost('msg', 'intval', (isset($this->http_req->query->msg) ? (int) $this->http_req->query->msg : 0));
 
 		// We like these
 
@@ -176,7 +176,7 @@ class LikesController extends AbstractController
 		$this->_doLikePost('-', 'rlikemsg');
 
 		// No longer liked, return to whence you came
-		if (!isset($this->_req->query->profile))
+		if (!isset($this->http_req->query->profile))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
 			redirectexit('action=profile;area=showlikes;sa=given;u=' . $user_info['id']);
@@ -223,7 +223,7 @@ class LikesController extends AbstractController
 		$check = true;
 
 		// Valid request
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// If you're a guest or simply can't do this, we stop
 		is_not_guest();
@@ -266,7 +266,7 @@ class LikesController extends AbstractController
 		// Load in our helper functions
 
 
-		if ($this->_req->getQuery('sa') === 'received')
+		if ($this->http_req->getQuery('sa') === 'received')
 			$this->_action_showReceived();
 		else
 			$this->_action_showGiven();
@@ -490,7 +490,7 @@ class LikesController extends AbstractController
 		loadLanguage('Profile');
 
 		// Get the message in question
-		$message = $this->_req->getQuery('msg', 'intval', 0);
+		$message = $this->http_req->getQuery('msg', 'intval', 0);
 
 		// Build the listoption array to display the data
 		$listOptions = array(

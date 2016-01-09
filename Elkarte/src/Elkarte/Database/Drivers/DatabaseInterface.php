@@ -278,4 +278,7 @@ interface DatabaseInterface
 	 * @return resource
 	 */
 	public function connection();
+
+	/** @return string self::TITLE */
+	public function title();
 }

@@ -82,17 +82,17 @@ class ManageAvatarsController extends AbstractController
 		$config_vars = $this->_avatarSettings->settings();
 
 		// Saving avatar settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_avatar_settings');
 
 			// Disable if invalid values would result
-			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
-				$this->_req->post->custom_avatar_enabled = 0;
+			if (isset($this->http_req->post->custom_avatar_enabled) && $this->http_req->post->custom_avatar_enabled == 1 && (empty($this->http_req->post->custom_avatar_dir) || empty($this->http_req->post->custom_avatar_url)))
+				$this->http_req->post->custom_avatar_enabled = 0;
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=manageattachments;sa=avatars');
 		}
 

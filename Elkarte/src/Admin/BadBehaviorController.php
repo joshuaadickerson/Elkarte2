@@ -58,17 +58,17 @@ class BadBehaviorController extends AbstractController
 
 		// Set up the filtering...
 		$filter = array();
-		if (isset($this->_req->query->value, $this->_req->query->filter))
+		if (isset($this->http_req->query->value, $this->http_req->query->filter))
 			$filter = $this->_setFilter();
 
 		if ($filter === false)
 		{
 			// Bad filter or something else going on, back to the start you go
-			redirectexit('action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
+			redirectexit('action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->http_req->query->desc) ? ';desc' : ''));
 		}
 
 		// Deleting or just doing a little weeding?
-		if (isset($this->_req->post->delall) || isset($this->_req->post->delete))
+		if (isset($this->http_req->post->delall) || isset($this->http_req->post->delete))
 			$this->_action_delete($filter);
 
 		// Just how many entries are there?
@@ -76,14 +76,14 @@ class BadBehaviorController extends AbstractController
 
 		// If this filter turns up empty, just return
 		if (empty($num_errors) && !empty($filter))
-			redirectexit('action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
+			redirectexit('action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->http_req->query->desc) ? ';desc' : ''));
 
 		// Clean up start.
-		$start = $this->_req->getQuery('start', 'intval', 0);
+		$start = $this->http_req->getQuery('start', 'intval', 0);
 		$start = $start < 0 ? 0 : $start;
 
 		// Do we want to reverse the listing?
-		$sort = isset($this->_req->query->desc) ? 'down' : 'up';
+		$sort = isset($this->http_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=Admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
@@ -186,16 +186,16 @@ class BadBehaviorController extends AbstractController
 			'user_agent' => $txt['badbehaviorlog_agent'],
 		);
 
-		if (!isset($filters[$this->_req->query->filter]))
+		if (!isset($filters[$this->http_req->query->filter]))
 			return false;
 
 		return array(
-			'variable' => $this->_req->query->filter == 'useragent' ? 'user_agent' : $this->_req->query->filter,
+			'variable' => $this->http_req->query->filter == 'useragent' ? 'user_agent' : $this->http_req->query->filter,
 			'value' => array(
-				'sql' => in_array($this->_req->query->filter, array('request_uri', 'user_agent')) ? base64_decode(strtr($this->_req->query->value, array(' ' => '+'))) : $db->escape_wildcard_string($this->_req->query->value),
+				'sql' => in_array($this->http_req->query->filter, array('request_uri', 'user_agent')) ? base64_decode(strtr($this->http_req->query->value, array(' ' => '+'))) : $db->escape_wildcard_string($this->http_req->query->value),
 			),
-			'href' => ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value,
-			'entity' => $filters[$this->_req->query->filter]
+			'href' => ';filter=' . $this->http_req->query->filter . ';value=' . $this->http_req->query->value,
+			'entity' => $filters[$this->http_req->query->filter]
 		);
 	}
 
@@ -206,18 +206,18 @@ class BadBehaviorController extends AbstractController
 	 */
 	protected function _action_delete($filter)
 	{
-		$type = isset($this->_req->post->delall) ? 'delall' : 'delete';
+		$type = isset($this->http_req->post->delall) ? 'delall' : 'delete';
 
 		// Make sure the session exists and the token is correct
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-bbl');
 
 		$redirect = deleteBadBehavior($type, $filter);
-		$redirect_path = 'action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->_req->query->desc) ? ';desc' : '');
+		$redirect_path = 'action=Admin;area=logs;sa=badbehaviorlog' . (isset($this->http_req->query->desc) ? ';desc' : '');
 
 		if ($redirect === 'delete')
 		{
-			$start = $this->_req->getQuery('start', 'intval', 0);
+			$start = $this->http_req->getQuery('start', 'intval', 0);
 
 			// Go back to where we were.
 			redirectexit($redirect_path . ';start=' . $start . (!empty($filter) ? $filter['href'] : ''));

@@ -52,11 +52,11 @@ class OpenIDController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// The OpenID provider did not respond with the OpenID mode? Throw an error..
-		if (!isset($this->_req->query->openid_mode))
+		if (!isset($this->http_req->query->openid_mode))
 			$this->_errors->fatal_lang_error('openid_return_no_mode', false);
 
 		// @todo Check for error status!
-		if ($this->_req->query->openid_mode !== 'id_res')
+		if ($this->http_req->query->openid_mode !== 'id_res')
 			$this->_errors->fatal_lang_error('openid_not_resolved');
 
 		// We'll need our subs.
@@ -65,23 +65,23 @@ class OpenIDController extends AbstractController
 		// This has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
 		{
-			if (isset($this->_req->query->$key))
+			if (isset($this->http_req->query->$key))
 			{
-				$this->_req->query->$key = str_replace(' ', '+', $this->_req->query->$key);
+				$this->http_req->query->$key = str_replace(' ', '+', $this->http_req->query->$key);
 			}
 		}
 
 		$openID = new OpenID();
 
 		// Did they tell us to remove any associations?
-		if (!empty($this->_req->query->openid_invalidate_handle))
-			$openID->removeAssociation($this->_req->query->openid_invalidate_handle);
+		if (!empty($this->http_req->query->openid_invalidate_handle))
+			$openID->removeAssociation($this->http_req->query->openid_invalidate_handle);
 
 		// Get the OpenID server info.
-		$server_info = $openID->getServerInfo($this->_req->query->openid_identity);
+		$server_info = $openID->getServerInfo($this->http_req->query->openid_identity);
 
 		// Get the association data.
-		$assoc = $openID->getAssociation($server_info['server'], $this->_req->query->openid_assoc_handle, true);
+		$assoc = $openID->getAssociation($server_info['server'], $this->http_req->query->openid_assoc_handle, true);
 		if ($assoc === null)
 			$this->_errors->fatal_lang_error('openid_no_assoc');
 
@@ -89,23 +89,23 @@ class OpenIDController extends AbstractController
 		if (!$this->_verify_string($assoc['secret']))
 			$this->_errors->fatal_lang_error('openid_sig_invalid', 'critical');
 
-		if (!isset($_SESSION['openid']['saved_data'][$this->_req->query->t]))
+		if (!isset($_SESSION['openid']['saved_data'][$this->http_req->query->t]))
 			$this->_errors->fatal_lang_error('openid_load_data');
 
-		$openid_uri = $_SESSION['openid']['saved_data'][$this->_req->query->t]['openid_uri'];
-		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$this->_req->query->t]['cookieTime'];
+		$openid_uri = $_SESSION['openid']['saved_data'][$this->http_req->query->t]['openid_uri'];
+		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$this->http_req->query->t]['cookieTime'];
 
 		if (empty($openid_uri))
 			$this->_errors->fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
-		$openid_save_fields = isset($this->_req->query->sf) ? unserialize(base64_decode($this->_req->query->sf)) : array();
-		$context['openid_claimed_id'] = $this->_req->query->openid_claimed_id;
+		$openid_save_fields = isset($this->http_req->query->sf) ? unserialize(base64_decode($this->http_req->query->sf)) : array();
+		$context['openid_claimed_id'] = $this->http_req->query->openid_claimed_id;
 
 		// Is there a user with this OpenID_uri?
 		$member_found = memberByOpenID($context['openid_claimed_id']);
 
-		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
+		if (empty($member_found) && $this->http_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
 				updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
@@ -127,23 +127,23 @@ class OpenIDController extends AbstractController
 				'openid_uri' => $context['openid_claimed_id'],
 			);
 
-			if (isset($this->_req->query->openid_sreg_nickname))
-				$_SESSION['openid']['nickname'] = $this->_req->query->openid_sreg_nickname;
-			if (isset($this->_req->query->openid_sreg_email))
-				$_SESSION['openid']['email'] = $this->_req->query->openid_sreg_email;
-			if (isset($this->_req->query->openid_sreg_dob))
-				$_SESSION['openid']['dob'] = $this->_req->query->openid_sreg_dob;
-			if (isset($this->_req->query->openid_sreg_gender))
-				$_SESSION['openid']['gender'] = $this->_req->query->openid_sreg_gender;
+			if (isset($this->http_req->query->openid_sreg_nickname))
+				$_SESSION['openid']['nickname'] = $this->http_req->query->openid_sreg_nickname;
+			if (isset($this->http_req->query->openid_sreg_email))
+				$_SESSION['openid']['email'] = $this->http_req->query->openid_sreg_email;
+			if (isset($this->http_req->query->openid_sreg_dob))
+				$_SESSION['openid']['dob'] = $this->http_req->query->openid_sreg_dob;
+			if (isset($this->http_req->query->openid_sreg_gender))
+				$_SESSION['openid']['gender'] = $this->http_req->query->openid_sreg_gender;
 
 			// Were we just verifying the registration state?
-			if (isset($this->_req->query->sa) && $this->_req->query->sa === 'register2')
+			if (isset($this->http_req->query->sa) && $this->http_req->query->sa === 'register2')
 			{
 				// Did we save some open ID fields?
 				if (!empty($openid_save_fields))
 				{
 					foreach ($openid_save_fields as $id => $value)
-						$this->_req->post->$id = $value;
+						$this->http_req->post->$id = $value;
 				}
 
 				$controller = new RegisterController(new EventManager());
@@ -153,14 +153,14 @@ class OpenIDController extends AbstractController
 			else
 				redirectexit('action=register');
 		}
-		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
+		elseif (isset($this->http_req->query->sa) && $this->http_req->query->sa === 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
 		{
 			$_SESSION['openid_revalidate_time'] = time();
 
 			// Restore the get data.
 			require_once(SUBSDIR . '/Auth.subs.php');
-			$_SESSION['openid']['saved_data'][$this->_req->query->t]['get']['openid_restore_post'] = $this->_req->query->t;
-			$query_string = construct_query_string($_SESSION['openid']['saved_data'][$this->_req->query->t]['get']);
+			$_SESSION['openid']['saved_data'][$this->http_req->query->t]['get']['openid_restore_post'] = $this->http_req->query->t;
+			$query_string = construct_query_string($_SESSION['openid']['saved_data'][$this->http_req->query->t]['get']);
 
 			redirectexit($query_string);
 		}
@@ -199,19 +199,19 @@ class OpenIDController extends AbstractController
 	protected function _verify_string($raw_secret)
 	{
 		$this->_secret = base64_decode($raw_secret);
-		$signed = explode(',', $this->_req->query->openid_signed);
+		$signed = explode(',', $this->http_req->query->openid_signed);
 		$verify_str = '';
 
 		foreach ($signed as $sign)
 		{
 			$sign_key = 'openid_' . str_replace('.', '_', $sign);
-			$verify_str .= $sign . ':' . strtr($this->_req->query->$sign_key, array('&amp;' => '&')) . "\n";
+			$verify_str .= $sign . ':' . strtr($this->http_req->query->$sign_key, array('&amp;' => '&')) . "\n";
 		}
 
 		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $this->_secret, true));
 
 		// Verify the OpenID signature.
-		return $verify_str == $this->_req->query->openid_sig;
+		return $verify_str == $this->http_req->query->openid_sig;
 	}
 
 	/**

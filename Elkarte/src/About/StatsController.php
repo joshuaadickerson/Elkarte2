@@ -90,10 +90,10 @@ class StatsController extends AbstractController
 		list($year, $month) = $this->_expandedStats();
 
 		// Handle the XMLHttpRequest.
-		if (isset($this->_req->query->xml))
+		if (isset($this->http_req->query->xml))
 		{
 			// Collapsing stats only needs adjustments of the session variables.
-			if (!empty($this->_req->query->collapse))
+			if (!empty($this->http_req->query->collapse))
 				obExit(false);
 
 			$context['sub_template'] = 'stats';
@@ -281,22 +281,22 @@ class StatsController extends AbstractController
 		$year = '';
 		$month = '';
 
-		if (!empty($this->_req->query->expand))
+		if (!empty($this->http_req->query->expand))
 		{
 			$context['robot_no_index'] = true;
 
-			$month = (int) substr($this->_req->query->expand, 4);
-			$year = (int) substr($this->_req->query->expand, 0, 4);
+			$month = (int) substr($this->http_req->query->expand, 4);
+			$year = (int) substr($this->http_req->query->expand, 0, 4);
 			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
 				$_SESSION['expanded_stats'][$year][] = $month;
 		}
 		// Done looking at the details and want to fold it back up
-		elseif (!empty($this->_req->query->collapse))
+		elseif (!empty($this->http_req->query->collapse))
 		{
 			$context['robot_no_index'] = true;
 
-			$month = (int) substr($this->_req->query->collapse, 4);
-			$year = (int) substr($this->_req->query->collapse, 0, 4);
+			$month = (int) substr($this->http_req->query->collapse, 4);
+			$year = (int) substr($this->http_req->query->collapse, 0, 4);
 			if (!empty($_SESSION['expanded_stats'][$year]))
 				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
 		}

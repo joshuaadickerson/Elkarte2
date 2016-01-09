@@ -66,7 +66,7 @@ class XmlPreviewController extends AbstractController
 
 
 		$errors = array();
-		$news = !isset($this->_req->post->news) ? '' : $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->news, ENT_QUOTES);
+		$news = !isset($this->http_req->post->news) ? '' : $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->news, ENT_QUOTES);
 		if (empty($news))
 			$errors[] = array('value' => 'no_news');
 		else
@@ -105,13 +105,13 @@ class XmlPreviewController extends AbstractController
 		loadLanguage('Errors');
 
 		$context['post_error']['errors'] = array();
-		$context['send_pm'] = !empty($this->_req->post->send_pm) ? 1 : 0;
-		$context['send_html'] = !empty($this->_req->post->send_html) ? 1 : 0;
+		$context['send_pm'] = !empty($this->http_req->post->send_pm) ? 1 : 0;
+		$context['send_html'] = !empty($this->http_req->post->send_html) ? 1 : 0;
 
 		// Let them know about any mistakes
-		if (empty($this->_req->post->subject))
+		if (empty($this->http_req->post->subject))
 			$context['post_error']['errors'][] = $txt['error_no_subject'];
-		if (empty($this->_req->post->message))
+		if (empty($this->http_req->post->message))
 			$context['post_error']['errors'][] = $txt['error_no_message'];
 
 		prepareMailingForPreview();
@@ -130,7 +130,7 @@ class XmlPreviewController extends AbstractController
 		loadLanguage('Profile');
 		loadLanguage('Errors');
 
-		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
+		$user = isset($this->http_req->post->user) ? (int) $this->http_req->post->user : 0;
 		$is_owner = $user == $user_info['id'];
 
 		// @todo Temporary
@@ -149,7 +149,7 @@ class XmlPreviewController extends AbstractController
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
-			$preview_signature = !empty($this->_req->post->signature) ? $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->signature) : '';
+			$preview_signature = !empty($this->http_req->post->signature) ? $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->signature) : '';
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
@@ -219,18 +219,18 @@ class XmlPreviewController extends AbstractController
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
 		{
-			$warning_body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->title)) : '';
-			if (isset($this->_req->post->issuing))
+			$warning_body = !empty($this->http_req->post->body) ? trim(censor($this->http_req->post->body)) : '';
+			$context['preview_subject'] = !empty($this->http_req->post->title) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->title)) : '';
+			if (isset($this->http_req->post->issuing))
 			{
-				if (empty($this->_req->post->title) || empty($this->_req->post->body))
+				if (empty($this->http_req->post->title) || empty($this->http_req->post->body))
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
-				if (empty($this->_req->post->title))
+				if (empty($this->http_req->post->title))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
-				if (empty($this->_req->post->body))
+				if (empty($this->http_req->post->body))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
 
 				// Add in few replacements.
@@ -258,7 +258,7 @@ class XmlPreviewController extends AbstractController
 			}
 
 			// Deal with any BBC so it looks good for the preview
-			if (!empty($this->_req->post->body))
+			if (!empty($this->http_req->post->body))
 			{
 				preparsecode($warning_body);
 				$bbc_parser = $GLOBALS['elk']['bbc'];
@@ -288,20 +288,20 @@ class XmlPreviewController extends AbstractController
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
 		{
-			$body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->title)) : '';
+			$body = !empty($this->http_req->post->body) ? trim(censor($this->http_req->post->body)) : '';
+			$context['preview_subject'] = !empty($this->http_req->post->title) ? trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->title)) : '';
 
-			if (isset($this->_req->post->issuing))
+			if (isset($this->http_req->post->issuing))
 			{
-				if (empty($this->_req->post->title) || empty($this->_req->post->body))
+				if (empty($this->http_req->post->title) || empty($this->http_req->post->body))
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
-				if (empty($this->_req->post->title))
+				if (empty($this->http_req->post->title))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
 
-				if (empty($this->_req->post->body))
+				if (empty($this->http_req->post->body))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
 
 				// Add in few replacements.
@@ -333,7 +333,7 @@ class XmlPreviewController extends AbstractController
 			}
 
 			// Deal with any BBC so it looks good for the preview
-			if (!empty($this->_req->post->body))
+			if (!empty($this->http_req->post->body))
 			{
 				preparsecode($body);
 				$bbc_parser = $GLOBALS['elk']['bbc'];

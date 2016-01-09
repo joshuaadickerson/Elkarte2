@@ -62,18 +62,18 @@ class SuggestController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('autosuggest', array(&$searchTypes));
 
 		// Good old session check
-		$this->_session->check('post');
+		$this->session->check('post');
 
 		// This requires the XML template
 		$this->_templates->load('Xml');
 
 		// Any parameters?
-		$context['search_param'] = isset($this->_req->post->search_param) ? unserialize(base64_decode($this->_req->post->search_param)) : array();
+		$context['search_param'] = isset($this->http_req->post->search_param) ? unserialize(base64_decode($this->http_req->post->search_param)) : array();
 
-		if (isset($this->_req->post->suggest_type, $this->_req->post->search) && isset($searchTypes[$this->_req->post->suggest_type]))
+		if (isset($this->http_req->post->suggest_type, $this->http_req->post->search) && isset($searchTypes[$this->http_req->post->suggest_type]))
 		{
 			// Shortcut
-			$currentSearch = $searchTypes[$this->_req->post->suggest_type];
+			$currentSearch = $searchTypes[$this->http_req->post->suggest_type];
 
 			// Do we have a file to include?
 			if (!empty($currentSearch['file']) && file_exists($currentSearch['file']))
@@ -82,7 +82,7 @@ class SuggestController extends AbstractController
 			// If it is a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
-				$suggest = new $currentSearch['class']($this->_req->post->search, $context['search_param']);
+				$suggest = new $currentSearch['class']($this->http_req->post->search, $context['search_param']);
 
 				// Okay, let's at least assume the method exists... *rolleyes*
 				$context['xml_data'] = $suggest->$currentSearch['function']();
@@ -90,8 +90,8 @@ class SuggestController extends AbstractController
 			// Let's maintain the "namespace" action_suggest_
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))
 			{
-				$function = 'action_suggest_' . $searchTypes[$this->_req->post->suggest_type];
-				$context['xml_data'] = $function($this->_req->post->search, $context['search_param']);
+				$function = 'action_suggest_' . $searchTypes[$this->http_req->post->suggest_type];
+				$context['xml_data'] = $function($this->http_req->post->search, $context['search_param']);
 			}
 
 			// If we have data, return it

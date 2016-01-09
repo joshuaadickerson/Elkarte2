@@ -373,7 +373,7 @@ class ModerationCenterController extends AbstractController
 		global $txt, $context;
 
 		// What notice have they asked to view
-		$id_notice = $this->_req->getQuery('nid', 'intval', 0);
+		$id_notice = $this->http_req->getQuery('nid', 'intval', 0);
 		$notice = moderatorNotice($id_notice);
 
 		// legit?
@@ -420,7 +420,7 @@ class ModerationCenterController extends AbstractController
 			isAllowedTo('moderate_forum');
 
 		// Are they wanting to view a particular report?
-		if (!empty($this->_req->query->report))
+		if (!empty($this->http_req->query->report))
 			return $this->action_modReport();
 
 		// This should not be needed...
@@ -440,30 +440,30 @@ class ModerationCenterController extends AbstractController
 		}
 
 		// Are we viewing open or closed reports?
-		$context['view_closed'] = $this->_req->getQuery('sa') === 'closed' ? 1 : 0;
+		$context['view_closed'] = $this->http_req->getQuery('sa') === 'closed' ? 1 : 0;
 
 		// Are we doing any work?
-		if ((isset($this->_req->query->ignore) || isset($this->_req->query->close)) && isset($this->_req->query->rid))
+		if ((isset($this->http_req->query->ignore) || isset($this->http_req->query->close)) && isset($this->http_req->query->rid))
 		{
-			$this->_session->check('get');
-			$rid = $this->_req->getQuery('rid', 'intval');
+			$this->session->check('get');
+			$rid = $this->http_req->getQuery('rid', 'intval');
 
 			// Update the report...
-			if (isset($this->_req->query->ignore))
-				updateReportsStatus($rid, 'ignore', (int) $this->_req->query->ignore);
-			elseif (isset($this->_req->query->close))
-				updateReportsStatus($rid, 'close', (int) $this->_req->query->close);
+			if (isset($this->http_req->query->ignore))
+				updateReportsStatus($rid, 'ignore', (int) $this->http_req->query->ignore);
+			elseif (isset($this->http_req->query->close))
+				updateReportsStatus($rid, 'close', (int) $this->http_req->query->close);
 
 			// Time to update.
 			updateSettings(array('last_mod_report_action' => time()));
 			recountOpenReports(true, $show_pms);
 		}
-		elseif (isset($this->_req->post->close) && isset($this->_req->post->close_selected))
+		elseif (isset($this->http_req->post->close) && isset($this->http_req->post->close_selected))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 
 			// All the ones to update...
-			$toClose = array_map('intval', $this->_req->post->close);
+			$toClose = array_map('intval', $this->http_req->post->close);
 			if (!empty($toClose))
 			{
 				updateReportsStatus($toClose, 'close', 1);
@@ -478,8 +478,8 @@ class ModerationCenterController extends AbstractController
 		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->_req->query->start, $context['total_reports'], 10);
-		$context['start'] = $this->_req->query->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->http_req->query->start, $context['total_reports'], 10);
+		$context['start'] = $this->http_req->query->start;
 
 		// By George, that means we in a position to get the reports, golly good.
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
@@ -612,9 +612,9 @@ class ModerationCenterController extends AbstractController
 			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', $user_settings['mod_prefs']);
 
 		// Are we saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			validateToken('mod-set');
 
 			/* Current format of mod_prefs is:
@@ -631,8 +631,8 @@ class ModerationCenterController extends AbstractController
 
 			// Do blocks first!
 			$mod_blocks = '';
-			if (!empty($this->_req->post->mod_homepage))
-				foreach ($this->_req->post->mod_homepage as $k => $v)
+			if (!empty($this->http_req->post->mod_homepage))
+				foreach ($this->http_req->post->mod_homepage as $k => $v)
 				{
 					// Make sure they can add this...
 					if (isset($context['homepage_blocks'][$k]))
@@ -642,15 +642,15 @@ class ModerationCenterController extends AbstractController
 			// Now check other options!
 			$pref_binary = 0;
 
-			if ($context['can_moderate_approvals'] && !empty($this->_req->post->mod_notify_approval))
+			if ($context['can_moderate_approvals'] && !empty($this->http_req->post->mod_notify_approval))
 				$pref_binary |= 4;
 
 			if ($context['can_moderate_boards'])
 			{
-				if (!empty($this->_req->post->mod_notify_report))
-					$pref_binary |= ($this->_req->post->mod_notify_report == 2 ? 1 : 2);
+				if (!empty($this->http_req->post->mod_notify_report))
+					$pref_binary |= ($this->http_req->post->mod_notify_report == 2 ? 1 : 2);
 
-				$show_reports = !empty($this->_req->post->mod_show_reports) ? 1 : 0;
+				$show_reports = !empty($this->http_req->post->mod_show_reports) ? 1 : 0;
 			}
 
 			// Put it all together.
@@ -681,7 +681,7 @@ class ModerationCenterController extends AbstractController
 		require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 		loadJavascriptFile('Admin.js', array(), 'admin_scripts');
 
-		$context['id_template'] = $this->_req->getQuery('tid', 'intval', 0);
+		$context['id_template'] = $this->http_req->getQuery('tid', 'intval', 0);
 		$context['is_edit'] = $context['id_template'];
 
 		// Standard template things.
@@ -702,17 +702,17 @@ class ModerationCenterController extends AbstractController
 			modLoadTemplate($context['id_template']);
 
 		// Wait, we are saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			validateToken('mod-wt');
 
 			// To check the BBC is pretty good...
 
 
 			// Bit of cleaning!
-			$template_body = trim($this->_req->post->template_body);
-			$template_title = trim($this->_req->post->template_title);
+			$template_body = trim($this->http_req->post->template_body);
+			$template_title = trim($this->http_req->post->template_title);
 
 			// Need something in both boxes.
 			if (!empty($template_body) && !empty($template_title))
@@ -727,7 +727,7 @@ class ModerationCenterController extends AbstractController
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $user_info['id'] : 0;
+				$recipient_id = !empty($this->http_req->post->make_personal) ? $user_info['id'] : 0;
 
 				// If we are this far it's save time.
 				if ($context['is_edit'])
@@ -759,7 +759,7 @@ class ModerationCenterController extends AbstractController
 				$context['warning_errors'] = array();
 				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
 				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
-				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
+				$context['template_data']['personal'] = !empty($this->http_req->post->make_personal);
 
 				if (empty($template_title))
 					$context['warning_errors'][] = $txt['mc_warning_template_error_no_title'];
@@ -782,7 +782,7 @@ class ModerationCenterController extends AbstractController
 		global $context, $scripturl, $txt;
 
 		// Have to at least give us something
-		$report = $this->_req->getQuery('report', 'intval', 0);
+		$report = $this->http_req->getQuery('report', 'intval', 0);
 		if (empty($report))
 			$this->_errors->fatal_lang_error('mc_no_modreport_specified');
 
@@ -803,11 +803,11 @@ class ModerationCenterController extends AbstractController
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.
-		if (isset($this->_req->post->add_comment) && !empty($this->_req->post->mod_comment))
+		if (isset($this->http_req->post->add_comment) && !empty($this->http_req->post->mod_comment))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			$newComment = trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->mod_comment));
+			$newComment = trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->mod_comment));
 
 			// In it goes.
 			if (!empty($newComment))
@@ -1017,8 +1017,8 @@ class ModerationCenterController extends AbstractController
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
-		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['view_posts'] = isset($this->http_req->query->sa) && $this->http_req->query->sa === 'post';
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 
 		$this->_templates->load('ModerationCenter');
 
@@ -1033,16 +1033,16 @@ class ModerationCenterController extends AbstractController
 		);
 
 		// First off - are we deleting?
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		if (!empty($this->http_req->query->delete) || !empty($this->http_req->post->delete))
 		{
-			Session::getInstance()->check(isset($this->_req->query->delete) ? 'get' : 'post');
+			Session::getInstance()->check(isset($this->http_req->query->delete) ? 'get' : 'post');
 
 			// Clicked on remove or using checkboxes to multi delete
 			$toDelete = array();
-			if (isset($this->_req->query->delete))
-				$toDelete[] = (int) $this->_req->query->delete;
+			if (isset($this->http_req->query->delete))
+				$toDelete[] = (int) $this->http_req->query->delete;
 			else
-				$toDelete = array_map('intval', $this->_req->post->delete);
+				$toDelete = array_map('intval', $this->http_req->post->delete);
 
 			if (!empty($toDelete))
 			{
@@ -1232,9 +1232,9 @@ class ModerationCenterController extends AbstractController
 		loadLanguage('Modlog');
 
 		// If we're coming in from a search, get the variables.
-		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
+		if (!empty($this->http_req->post->params) && empty($this->http_req->post->is_search))
 		{
-			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
+			$search_params = base64_decode(strtr($this->http_req->post->params, array(' ' => '+')));
 			$search_params = @unserialize($search_params);
 		}
 
@@ -1245,16 +1245,16 @@ class ModerationCenterController extends AbstractController
 		);
 
 		// Setup the allowed quick search type
-		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$context['order'] = isset($this->http_req->query->sort) && isset($searchTypes[$this->http_req->query->sort]) ? $this->http_req->query->sort : 'member';
 		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
-		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
-			$search_params_string = empty($this->_req->post->search) ? '' : $this->_req->post->search;
+		if (!isset($search_params['string']) || (!empty($this->http_req->post->search) && $search_params['string'] != $this->http_req->post->search))
+			$search_params_string = empty($this->http_req->post->search) ? '' : $this->http_req->post->search;
 		else
 			$search_params_string = $search_params['string'];
 
-		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+		if (isset($this->http_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($this->http_req->post->search_type) && isset($searchTypes[$this->http_req->post->search_type]) ? $this->http_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
 		else
 			$search_params_type = $search_params['type'];
 
@@ -1402,18 +1402,18 @@ class ModerationCenterController extends AbstractController
 		require_once(ROOTDIR . '/Messages/Moderation.subs.php');
 
 		// Submitting a new one?
-		if (isset($this->_req->post->add))
+		if (isset($this->http_req->post->add))
 		{
 			$this->action_modifyWarningTemplate();
 			return true;
 		}
 		// Deleting and existing one
-		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
+		elseif (isset($this->http_req->post->delete) && !empty($this->http_req->post->deltpl))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			validateToken('mod-wt');
 
-			removeWarningTemplate($this->_req->post->deltpl);
+			removeWarningTemplate($this->http_req->post->deltpl);
 		}
 
 		// Setup context as always.
@@ -1751,11 +1751,11 @@ class ModerationCenterController extends AbstractController
 		global $context, $scripturl, $txt, $user_info;
 
 		// Are we saving a note?
-		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
+		if (isset($this->http_req->post->makenote) && isset($this->http_req->post->new_note))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			$new_note = $GLOBALS['elk']['text']->htmlspecialchars(trim($this->_req->post->new_note));
+			$new_note = $GLOBALS['elk']['text']->htmlspecialchars(trim($this->http_req->post->new_note));
 
 			// Make sure they actually entered something.
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
@@ -1773,12 +1773,12 @@ class ModerationCenterController extends AbstractController
 		}
 
 		// Bye... bye...
-		if (isset($this->_req->query->notes) && isset($this->_req->query->delete) && is_numeric($this->_req->query->delete))
+		if (isset($this->http_req->query->notes) && isset($this->http_req->query->delete) && is_numeric($this->http_req->query->delete))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			// Just checkin'!
-			$id_delete = (int) $this->_req->query->delete;
+			$id_delete = (int) $this->http_req->query->delete;
 
 			// Lets delete it.
 			removeModeratorNote($id_delete);
@@ -1794,12 +1794,12 @@ class ModerationCenterController extends AbstractController
 		$moderator_notes_total = countModeratorNotes();
 
 		// Grab the current notes. We can only use the cache for the first page of notes.
-		$offset = isset($this->_req->query->notes) && isset($this->_req->query->start) ? $this->_req->query->start : 0;
+		$offset = isset($this->http_req->query->notes) && isset($this->http_req->query->start) ? $this->http_req->query->start : 0;
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
-		$context['start'] = $this->_req->query->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->http_req->query->start, $moderator_notes_total, 10);
+		$context['start'] = $this->http_req->query->start;
 
 		$bbc_parser = $GLOBALS['elk']['bbc'];
 

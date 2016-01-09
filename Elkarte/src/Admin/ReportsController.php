@@ -88,7 +88,7 @@ class ReportsController extends AbstractController
 				'is_first' => $is_first++ == 0,
 			);
 
-		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
+		$report_type = !empty($this->http_req->post->rt) ? $this->http_req->post->rt : (!empty($this->http_req->query->rt) ? $this->http_req->query->rt : null);
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
 		{
@@ -110,7 +110,7 @@ class ReportsController extends AbstractController
 		);
 
 		// Specific template? Use that instead of main!
-		$set_template = isset($this->_req->query->st) ? $this->_req->query->st : null;
+		$set_template = isset($this->http_req->query->st) ? $this->http_req->query->st : null;
 		if (isset($set_template) && isset($reportTemplates[$set_template]))
 		{
 			$context['sub_template'] = $set_template;
@@ -279,12 +279,12 @@ class ReportsController extends AbstractController
 		// Lets get started
 		$query_boards = array();
 
-		if (isset($this->_req->post->boards))
+		if (isset($this->http_req->post->boards))
 		{
-			if (!is_array($this->_req->post->boards))
-				$query_boards['boards'] = array_map('intval', explode(',', $this->_req->post->boards));
+			if (!is_array($this->http_req->post->boards))
+				$query_boards['boards'] = array_map('intval', explode(',', $this->http_req->post->boards));
 			else
-				$query_boards['boards'] = array_map('intval', $this->_req->post->boards);
+				$query_boards['boards'] = array_map('intval', $this->http_req->post->boards);
 		}
 		else
 			$query_boards = 'all';
@@ -298,12 +298,12 @@ class ReportsController extends AbstractController
 
 		// Groups, next.
 		$query_groups = array();
-		if (isset($this->_req->post->groups))
+		if (isset($this->http_req->post->groups))
 		{
-			if (!is_array($this->_req->post->groups))
-				$query_groups = array_map('intval', explode(',', $this->_req->post->groups));
+			if (!is_array($this->http_req->post->groups))
+				$query_groups = array_map('intval', explode(',', $this->http_req->post->groups));
 			else
-				$query_groups = array_map('intval', $this->_req->post->groups);
+				$query_groups = array_map('intval', $this->http_req->post->groups);
 
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
@@ -489,12 +489,12 @@ class ReportsController extends AbstractController
 	{
 		global $txt;
 
-		if (isset($this->_req->post->groups))
+		if (isset($this->http_req->post->groups))
 		{
-			if (!is_array($this->_req->post->groups))
-				$this->_req->post->groups = explode(',', $this->_req->post->groups);
+			if (!is_array($this->http_req->post->groups))
+				$this->http_req->post->groups = explode(',', $this->http_req->post->groups);
 
-			$query_groups = array_diff(array_map('intval', $this->_req->post->groups), array(3));
+			$query_groups = array_diff(array_map('intval', $this->http_req->post->groups), array(3));
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
@@ -507,7 +507,7 @@ class ReportsController extends AbstractController
 		require_once(SUBSDIR . '/Reports.subs.php');
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
-		if (!isset($this->_req->post->groups) || in_array(-1, $this->_req->post->groups) || in_array(0, $this->_req->post->groups))
+		if (!isset($this->http_req->post->groups) || in_array(-1, $this->http_req->post->groups) || in_array(0, $this->http_req->post->groups))
 			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
 		else
 			$groups = array('col' => '') + $all_groups;
@@ -525,7 +525,7 @@ class ReportsController extends AbstractController
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$perms = boardPermissionsByGroup($group_clause, isset($this->_req->post->groups) ? $this->_req->post->groups : array());
+		$perms = boardPermissionsByGroup($group_clause, isset($this->http_req->post->groups) ? $this->http_req->post->groups : array());
 		$lastPermission = null;
 		$curData = array();
 		foreach ($perms as $row)

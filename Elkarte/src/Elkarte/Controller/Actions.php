@@ -1,5 +1,6 @@
 <?php
 
+// I know not to use tabs here but it works in my editor and it's all going to change so :P
 return [
 	'attachapprove' 		=> ['Elkarte\\Attachments\\ModerateAttachmentsController', 'action_attachapprove'],
 	'buddy' 				=> ['Elkarte\\Members\\MembersController', 'action_buddy'],
@@ -8,25 +9,25 @@ return [
 	// @todo: move this to attachment action also
 	'dlattach' 				=> ['Elkarte\\Attachments\\AttachmentController', 'action_index'],
 	'unwatchtopic' 			=> ['Elkarte\\Notifications\\NotifyController', 'action_unwatchtopic'],
-	'editpoll' 				=> ['Elkarte\\PollController', 'action_editpoll'],
-	'editpoll2' 			=> ['Elkarte\\PollController', 'action_editpoll2'],
+	'editpoll' 				=> ['polls.controller', 'action_editpoll'],
+	'editpoll2' 			=> ['polls.controller', 'action_editpoll2'],
 	'quickhelp' 			=> ['Elkarte\\HelpController', 'action_quickhelp'],
 	'jsmodify' 				=> ['Elkarte\\PostController', 'action_jsmodify'],
 	'jsoption' 				=> ['Elkarte\\ManageThemesController', 'action_jsoption'],
-	'lockvoting' 			=> ['Elkarte\\Polls\\PollController', 'action_lockvoting'],
+	'lockvoting' 			=> ['polls.controller', 'action_lockvoting'],
 	'login' 				=> ['auth.controller', 'action_login'],
 	'login2' 				=> ['auth.controller', 'action_login2'],
 	'logout' 				=> ['auth.controller', 'action_logout'],
 	'markasread' 			=> ['Elkarte\\MarkReadController', 'action_index'],
 	'mergetopics' 			=> ['Elkarte\\MergeTopicsController', 'action_index'],
 	'moderate' 				=> ['Elkarte\\ModerationCenterController', 'action_index'],
-	'movetopic' 			=> ['Elkarte\\Topics\\MoveTopicController', 'action_movetopic'],
-	'movetopic2' 			=> ['Elkarte\\Topics\\MoveTopicController', 'action_movetopic2'],
+	'movetopic' 			=> ['topics.move_controller', 'action_movetopic'],
+	'movetopic2' 			=> ['topics.move_controller', 'action_movetopic2'],
 	'notify' 				=> ['Elkarte\\Notifications\\NotifyController', 'action_notify'],
 	'notifyboard' 			=> ['Elkarte\\Notifications\\NotifyController', 'action_notifyboard'],
 	'openidreturn' 			=> ['Elkarte\\OpenIDController', 'action_openidreturn'],
 	'xrds' 					=> ['Elkarte\\OpenIDController', 'action_xrds'],
-	'pm' 					=> ['Elkarte\\PersonalMessages\\PersonalMessageController', 'action_index'],
+	'pm' 					=> ['pm.controller', 'action_index'],
 	'post' 					=> ['messages.post_controller', 'action_post'],
 	'post2' 				=> ['messages.post_controller', 'action_post2'],
 	'quotefast' 			=> ['messages.post_controller', 'action_quotefast'],
@@ -43,7 +44,8 @@ return [
 	'profile' 				=> ['Elkarte\\Profile\\ProfileController', 'action_index'],
 	'viewquery' 			=> ['Elkarte\\AdminDebugController', 'action_viewquery'],
 	'viewadminfile' 		=> ['Elkarte\\AdminDebugController', 'action_viewadminfile'],
-	'.xml' 					=> ['Elkarte\\NewsController', 'action_showfeed'],
+	// This is going away and being replaced with a RESTful interface
+	//'.xml' 					=> ['Elkarte\\NewsController', 'action_showfeed'],
 	'xmlhttp' 				=> ['Elkarte\\XmlController', 'action_index'],
 	'xmlpreview' 			=> ['Elkarte\\XmlPreviewController', 'action_index'],
 ];

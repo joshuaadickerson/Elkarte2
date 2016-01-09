@@ -155,7 +155,7 @@ class XmlController extends AbstractController
 			// Load up the core features of the system
 			if ($result === true)
 			{
-				$id = $this->_req->getPost('feature_id', 'trim', '');
+				$id = $this->http_req->getPost('feature_id', 'trim', '');
 
 				// The feature being enabled does exist, no messing about
 				if (!empty($id) && isset($context['features'][$id]))
@@ -163,7 +163,7 @@ class XmlController extends AbstractController
 					$feature = $context['features'][$id];
 					$feature_id = 'feature_' . $id;
 					$returns[] = array(
-						'value' => (!empty($this->_req->post->$feature_id) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+						'value' => (!empty($this->http_req->post->$feature_id) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
 					);
 
 					createToken('Admin-core', 'post');
@@ -231,13 +231,13 @@ class XmlController extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
+			if ($this->http_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				$view_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($this->_req->post->list_custom_profile_fields as $id)
+				foreach ($this->http_req->post->list_custom_profile_fields as $id)
 				{
 					$id = (int) $id;
 					$replace .= '
@@ -323,17 +323,17 @@ class XmlController extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
-			if ($this->_req->getPost('order', 'trim', '') === 'reorder' && isset($this->_req->post->moved))
+			if ($this->http_req->getPost('order', 'trim', '') === 'reorder' && isset($this->http_req->post->moved))
 			{
 				$list_order = 0;
 				$moved_key = 0;
 
 				// What board was drag and dropped?
-				list (, $board_moved,) = explode(',', $this->_req->post->moved);
+				list (, $board_moved,) = explode(',', $this->http_req->post->moved);
 				$board_moved = (int) $board_moved;
 
 				// The board ids arrive in 1-n view order ...
-				foreach ($this->_req->post->cbp as $id)
+				foreach ($this->http_req->post->cbp as $id)
 				{
 					list ($category, $board, $childof) = explode(',', $id);
 
@@ -486,23 +486,23 @@ class XmlController extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// Valid posting
-			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
+			if ($this->http_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the details on the moved smile
-				list (, $smile_moved) = explode('_', $this->_req->post->moved);
+				list (, $smile_moved) = explode('_', $this->http_req->post->moved);
 				$smile_moved = (int) $smile_moved;
 				$smile_moved_details = getSmiley($smile_moved);
 
 				// Check if we moved rows or locations
 				$smile_received_location = null;
 				$smile_received_row = null;
-				if (!empty($this->_req->post->received))
+				if (!empty($this->http_req->post->received))
 				{
 					$displayTypes = array(
 						'postform' => 0,
 						'popup' => 2
 					);
-					list ($smile_received_location, $smile_received_row) = explode('|', $this->_req->post->received);
+					list ($smile_received_location, $smile_received_row) = explode('|', $this->http_req->post->received);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 
@@ -514,7 +514,7 @@ class XmlController extends AbstractController
 					$moved_key = 0;
 					$smiley_tree = array();
 
-					foreach ($this->_req->post->smile as $smile_id)
+					foreach ($this->http_req->post->smile as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;
 
@@ -641,14 +641,14 @@ class XmlController extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($this->_req->post->order, $this->_req->post->list_sort_email_fp) && $this->_req->post->order === 'reorder')
+			if (isset($this->http_req->post->order, $this->http_req->post->list_sort_email_fp) && $this->http_req->post->order === 'reorder')
 			{
 				$filters = array();
 				$filter_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($this->_req->post->list_sort_email_fp as $id)
+				foreach ($this->http_req->post->list_sort_email_fp as $id)
 				{
 					$filters[] = (int) $id;
 					$replace .= '
@@ -731,7 +731,7 @@ class XmlController extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
+			if ($this->http_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the current list of icons.
 				$message_icons = fetchMessageIconsDetails();
@@ -740,7 +740,7 @@ class XmlController extends AbstractController
 				$iconInsert = array();
 
 				// The field ids arrive in 1-n view order, so we simply build an update array
-				foreach ($this->_req->post->list_message_icon_list as $id)
+				foreach ($this->http_req->post->list_message_icon_list as $id)
 				{
 						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
 						$view_order++;

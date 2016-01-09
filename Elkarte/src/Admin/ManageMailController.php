@@ -90,10 +90,10 @@ class ManageMailController extends AbstractController
 		$this->_templates->load('ManageMail');
 
 		// First, are we deleting something from the queue?
-		if (isset($this->_req->post->delete))
+		if (isset($this->http_req->post->delete))
 		{
-			$this->_session->check('post');
-			deleteMailQueueItems($this->_req->post->delete);
+			$this->session->check('post');
+			deleteMailQueueItems($this->http_req->post->delete);
 		}
 
 		// Fetch the number of items in the current queue
@@ -245,26 +245,26 @@ class ManageMailController extends AbstractController
 		$config_vars = $this->_mailSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			// TODO: $postobj is should be removed after save_db is properly refactored.
 			$postobj = null;
 			// Make the SMTP password a little harder to see in a backup etc.
-			if (!empty($this->_req->post->smtp_password[1]))
+			if (!empty($this->http_req->post->smtp_password[1]))
 			{
-				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
-				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
-				$postobj = array('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
+				$this->http_req->post->smtp_password[0] = base64_encode($this->http_req->post->smtp_password[0]);
+				$this->http_req->post->smtp_password[1] = base64_encode($this->http_req->post->smtp_password[1]);
+				$postobj = array('smtp_password' => array(0 => ($this->http_req->post->smtp_password[0]), 1 => ($this->http_req->post->smtp_password[1])));
 			}
-			$this->_session->check();
+			$this->session->check();
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
 			$GLOBALS['elk']['hooks']->hook('save_mail_settings');
 
 			// You can not send more per page load than you can per minute
-			if (!empty($this->_req->post->mail_batch_size))
-				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
+			if (!empty($this->http_req->post->mail_batch_size))
+				$this->http_req->post->mail_batch_size = min((int) $this->http_req->post->mail_batch_size, (int) $this->http_req->post->mail_period_limit);
 
 			SettingsForm::save_db($config_vars, (object) $postobj);
 			redirectexit('action=Admin;area=mailqueue;sa=settings');
@@ -383,7 +383,7 @@ class ManageMailController extends AbstractController
 	{
 		global $modSettings;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// This is certainly needed!
 
@@ -392,10 +392,10 @@ class ManageMailController extends AbstractController
 		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
 
 		// If we don't yet have the total to clear, find it.
-		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
+		$all_emails = isset($this->http_req->query->te) ? (int) $this->http_req->query->te : list_getMailQueueSize();
 
 		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
+		$sent_emails = isset($this->http_req->query->sent) ? (int) $this->http_req->query->sent : 0;
 
 		// Send this batch, then go for a short break...
 		while (reduceMailQueue($number_to_send, true, true) === true)

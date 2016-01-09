@@ -177,18 +177,18 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		// View all the topics, or just a few?
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$maxindex = isset($this->_req->query->all) && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
+		$maxindex = isset($this->http_req->query->all) && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
 
 		// Right, let's only index normal stuff!
 		$session_name = session_name();
-		foreach ($this->_req->query as $k => $v)
+		foreach ($this->http_req->query as $k => $v)
 		{
 			// Don't index a sort result etc.
 			if (!in_array($k, array('board', 'start', $session_name)))
 				$context['robot_no_index'] = true;
 		}
 
-		if (!empty($this->_req->query->start) && (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] != 0))
+		if (!empty($this->http_req->query->start) && (!is_numeric($this->http_req->query->start) || $this->http_req->query->start % $context['messages_per_page'] != 0))
 		{
 			$context['robot_no_index'] = true;
 		}
@@ -202,35 +202,35 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		}
 
 		// We only know these.
-		if (isset($this->_req->query->sort) && !in_array($this->_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
-			$this->_req->query->sort = 'last_post';
+		if (isset($this->http_req->query->sort) && !in_array($this->http_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
+			$this->http_req->query->sort = 'last_post';
 
 		// Make sure the starting place makes sense and construct the page index.
-		if (isset($this->_req->query->sort))
-			$sort_string = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
+		if (isset($this->http_req->query->sort))
+			$sort_string = ';sort=' . $this->http_req->query->sort . (isset($this->http_req->query->desc) ? ';desc' : '');
 		else
 			$sort_string = '';
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->http_req->query->start, $board_info['total_topics'], $maxindex, true);
 
-		$context['start'] = &$this->_req->query->start;
+		$context['start'] = &$this->http_req->query->start;
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?board=' . $board . '.' . $context['start'];
 
 		$context['links'] += array(
-			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start - $context['topics_per_page']) : '',
-			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start + $context['topics_per_page']) : '',
+			'prev' => $this->http_req->query->start >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($this->http_req->query->start - $context['topics_per_page']) : '',
+			'next' => $this->http_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($this->http_req->query->start + $context['topics_per_page']) : '',
 		);
 
 		$context['page_info'] = array(
-			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
+			'current_page' => $this->http_req->query->start / $context['topics_per_page'] + 1,
 			'num_pages' => floor(($board_info['total_topics'] - 1) / $context['topics_per_page']) + 1
 		);
 
-		if (isset($this->_req->query->all) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
+		if (isset($this->http_req->query->all) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
 		{
 			$maxindex = $modSettings['enableAllMessages'];
-			$this->_req->query->start = 0;
+			$this->http_req->query->start = 0;
 		}
 
 		// Build a list of the board's moderators.
@@ -315,16 +315,16 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		$sort_methods = $this->elk['topics.list']->messageIndexSort();
 
 		// They didn't pick one, default to by last post descending.
-		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
+		if (!isset($this->http_req->query->sort) || !isset($sort_methods[$this->http_req->query->sort]))
 		{
 			$context['sort_by'] = 'last_post';
-			$ascending = isset($this->_req->query->asc);
+			$ascending = isset($this->http_req->query->asc);
 		}
 		// Otherwise sort by user selection and default to ascending.
 		else
 		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$ascending = !isset($this->_req->query->desc);
+			$context['sort_by'] = $this->http_req->query->sort;
+			$ascending = !isset($this->http_req->query->desc);
 		}
 
 		$sort_column = $sort_methods[$context['sort_by']];
@@ -342,7 +342,7 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 			);
 
 		// Calculate the fastest way to get the topics.
-		$start = (int) $this->_req->query->start;
+		$start = (int) $this->http_req->query->start;
 		if ($start > ($board_info['total_topics'] - 1) / 2)
 		{
 			$ascending = !$ascending;
@@ -477,11 +477,11 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		global $board, $user_info, $modSettings, $context;
 
 		// Check the session = get or post.
-		$this->_session->check('request');
+		$this->session->check('request');
 
 		// Lets go straight to the restore area.
-		if ($this->_req->getPost('qaction') === 'restore' && !empty($this->_req->post->topics))
-			redirectexit('action=restoretopic;topics=' . implode(',', $this->_req->post->topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
+		if ($this->http_req->getPost('qaction') === 'restore' && !empty($this->http_req->post->topics))
+			redirectexit('action=restoretopic;topics=' . implode(',', $this->http_req->post->topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
@@ -494,13 +494,13 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 
 
 		// Remember the last board they moved things to.
-		if (isset($this->_req->post->move_to))
+		if (isset($this->http_req->post->move_to))
 		{
 			$_SESSION['move_to_topic'] = array(
-				'move_to' => $this->_req->post->move_to,
+				'move_to' => $this->http_req->post->move_to,
 				// And remember the last expiry period too.
-				'redirect_topic' => $this->_req->getPost('redirect_topic', 'intval', 0),
-				'redirect_expires' => $this->_req->getPost('redirect_expires', 'intval', 0),
+				'redirect_topic' => $this->http_req->getPost('redirect_topic', 'intval', 0),
+				'redirect_expires' => $this->http_req->getPost('redirect_expires', 'intval', 0),
 			);
 		}
 
@@ -522,12 +522,12 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 				'approve_posts' => allowedTo('approve_posts') ? array($board) : array(),
 			);
 
-			$redirect_url = 'board=' . $board . '.' . $this->_req->query->start;
+			$redirect_url = 'board=' . $board . '.' . $this->http_req->query->start;
 		}
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
+			$redirect_url = isset($this->http_req->post->redirect_url) ? $this->http_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
 		}
 
 		if (!$user_info['is_guest'])
@@ -543,29 +543,29 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 		if (!empty($boards_can['merge_any']))
 			$possibleActions[] = 'merge';
 
-		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $this->_req->post->qaction.
+		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $this->http_req->post->qaction.
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
-		if (!empty($this->_req->post->topics))
+		if (!empty($this->http_req->post->topics))
 		{
 			// If the action isn't valid, just quit now.
-			if (empty($this->_req->post->qaction) || !in_array($this->_req->post->qaction, $possibleActions))
+			if (empty($this->http_req->post->qaction) || !in_array($this->http_req->post->qaction, $possibleActions))
 				redirectexit($redirect_url);
 
 			// Merge requires all topics as one parameter and can be done at once.
-			if ($this->_req->post->qaction === 'merge')
+			if ($this->http_req->post->qaction === 'merge')
 			{
 				// Merge requires at least two topics.
-				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
+				if (empty($this->http_req->post->topics) || count($this->http_req->post->topics) < 2)
 					redirectexit($redirect_url);
 
 				$controller = new MergeTopicsController(new EventManager());
 				$controller->pre_dispatch();
-				return $controller->action_mergeExecute($this->_req->post->topics);
+				return $controller->action_mergeExecute($this->http_req->post->topics);
 			}
 
 			// Just convert to the other method, to make it easier.
-			foreach ($this->_req->post->topics as $topic)
-				$actions[(int) $topic] = $this->_req->post->qaction;
+			foreach ($this->http_req->post->topics as $topic)
+				$actions[(int) $topic] = $this->http_req->post->qaction;
 		}
 
 		// Weird... how'd you get here?
@@ -624,11 +624,11 @@ class MessageIndexController extends AbstractController implements FrontpageInte
 						$stickyCache[] = $row['id_topic'];
 						break;
 					case 'move':
-						if (isset($this->_req->query->current_board))
-							moveTopicConcurrence((int) $this->_req->query->current_board);
+						if (isset($this->http_req->query->current_board))
+							moveTopicConcurrence((int) $this->http_req->query->current_board);
 
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-						$moveCache[1][$row['id_topic']] = (int) (isset($this->_req->post->move_tos[$row['id_topic']]) ? $this->_req->post->move_tos[$row['id_topic']] : $this->_req->post->move_to);
+						$moveCache[1][$row['id_topic']] = (int) (isset($this->http_req->post->move_tos[$row['id_topic']]) ? $this->http_req->post->move_tos[$row['id_topic']] : $this->http_req->post->move_to);
 
 						if (empty($moveCache[1][$row['id_topic']]))
 							continue;

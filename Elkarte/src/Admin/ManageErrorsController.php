@@ -37,7 +37,7 @@ class ManageErrorsController extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// The error log. View the list or view a file?
-		$activity = $this->_req->getQuery('activity', 'strval');
+		$activity = $this->http_req->getQuery('activity', 'strval');
 
 		// Some code redundancy... and we only take this!
 		if (isset($activity) && $activity == 'file')
@@ -72,21 +72,21 @@ class ManageErrorsController extends AbstractController
 		$filter = $this->_setupFiltering();
 
 		// Deleting, are we?
-		$type = isset($this->_req->post->delall) ? 'delall' : (isset($this->_req->post->delete) ? 'delete' : false);
+		$type = isset($this->http_req->post->delall) ? 'delall' : (isset($this->http_req->post->delete) ? 'delete' : false);
 		if ($type !== false)
 		{
 			// Make sure the session exists and is correct; otherwise, might be a hacker.
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-el');
 
-			$error_list = $this->_req->getPost('delete');
+			$error_list = $this->http_req->getPost('delete');
 			deleteErrors($type, $filter, $error_list);
 
 			// Go back to where we were.
 			if ($type == 'delete')
-				redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (!empty($filter) ? ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value : ''));
+				redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->http_req->query->desc) ? ';desc' : '') . ';start=' . $this->http_req->query->start . (!empty($filter) ? ';filter=' . $this->http_req->query->filter . ';value=' . $this->http_req->query->value : ''));
 
-			redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
+			redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->http_req->query->desc) ? ';desc' : ''));
 		}
 
 		$num_errors = numErrors($filter);
@@ -94,21 +94,21 @@ class ManageErrorsController extends AbstractController
 
 		// If this filter is empty...
 		if ($num_errors == 0 && !empty($filter))
-			redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
+			redirectexit('action=Admin;area=logs;sa=errorlog' . (isset($this->http_req->query->desc) ? ';desc' : ''));
 
 		// Clean up start.
-		if (!isset($this->_req->query->start) || $this->_req->query->start < 0)
-			$this->_req->query->start = 0;
+		if (!isset($this->http_req->query->start) || $this->http_req->query->start < 0)
+			$this->http_req->query->start = 0;
 
 		// Do we want to reverse error listing?
-		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
+		$context['sort_direction'] = isset($this->http_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=Admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter['href']) ? $filter['href'] : ''), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
-		$context['start'] = $this->_req->query->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=Admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter['href']) ? $filter['href'] : ''), $this->http_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['start'] = $this->http_req->query->start;
 		$context['errors'] = array();
 
-		$logdata = getErrorLogData($this->_req->query->start, $context['sort_direction'], $filter);
+		$logdata = getErrorLogData($this->http_req->query->start, $context['sort_direction'], $filter);
 		if (!empty($logdata))
 		{
 			$context['errors'] = $logdata['errors'];
@@ -241,21 +241,21 @@ class ManageErrorsController extends AbstractController
 		$filter = array();
 
 		// Set up the filtering...
-		if (isset($this->_req->query->value, $this->_req->query->filter) && isset($filters[$this->_req->query->filter]))
+		if (isset($this->http_req->query->value, $this->http_req->query->filter) && isset($filters[$this->http_req->query->filter]))
 		{
 			$filter = array(
-				'variable' => $this->_req->query->filter,
+				'variable' => $this->http_req->query->filter,
 				'value' => array(
-					'sql' => in_array($this->_req->query->filter, array('message', 'url', 'file'))
-						? base64_decode(strtr($this->_req->query->value, array(' ' => '+')))
-						: $db->escape_wildcard_string($this->_req->query->value),
+					'sql' => in_array($this->http_req->query->filter, array('message', 'url', 'file'))
+						? base64_decode(strtr($this->http_req->query->value, array(' ' => '+')))
+						: $db->escape_wildcard_string($this->http_req->query->value),
 				),
-				'href' => ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value,
-				'entity' => $filters[$this->_req->query->filter]
+				'href' => ';filter=' . $this->http_req->query->filter . ';value=' . $this->http_req->query->value,
+				'entity' => $filters[$this->http_req->query->filter]
 			);
 		}
-		elseif (isset($this->_req->query->filter) || isset($this->_req->query->value))
-			unset($this->_req->query->filter, $this->_req->query->value);
+		elseif (isset($this->http_req->query->filter) || isset($this->http_req->query->value))
+			unset($this->http_req->query->filter, $this->http_req->query->value);
 
 		return $filter;
 	}
@@ -275,13 +275,13 @@ class ManageErrorsController extends AbstractController
 		global $context;
 
 		// We can't help you if you don't spell it out loud :P
-		if (!isset($this->_req->query->file))
+		if (!isset($this->http_req->query->file))
 			redirectexit();
 
 		// Decode the file and get the line
-		$filename = base64_decode($this->_req->query->file);
+		$filename = base64_decode($this->http_req->query->file);
 		$file = realpath($filename);
-		$line = $this->_req->getQuery('line', 'intval', 0);
+		$line = $this->http_req->getQuery('line', 'intval', 0);
 
 		// Make sure things are normalized
 		$real_board = realpath(BOARDDIR);

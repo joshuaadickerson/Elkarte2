@@ -46,7 +46,7 @@ class MarkReadController extends AbstractController
 		// Guests can't mark things.
 		is_not_guest();
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		$redir = $this->_dispatch();
 
@@ -60,7 +60,7 @@ class MarkReadController extends AbstractController
 	 */
 	protected function _dispatch()
 	{
-		$subAction = $this->_req->getQuery('sa', 'trim', 'action_markasread');
+		$subAction = $this->http_req->getQuery('sa', 'trim', 'action_markasread');
 
 		switch ($subAction)
 		{
@@ -111,10 +111,10 @@ class MarkReadController extends AbstractController
 			return;
 		}
 
-		if ($this->_session->check('get', '', false))
+		if ($this->session->check('get', '', false))
 		{
 			// Again, this is a special case, someone will deal with the others later :P
-			if ($this->_req->getQuery('sa') === 'all')
+			if ($this->http_req->getQuery('sa') === 'all')
 			{
 				loadLanguage('Errors');
 				$context['xml_data'] = array(
@@ -131,7 +131,7 @@ class MarkReadController extends AbstractController
 		$this->_dispatch();
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
-		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
+		if ($this->http_req->getQuery('sa') === 'all' || $this->http_req->getQuery('sa') === 'board' && !isset($this->http_req->query->bi))
 		{
 			$context['xml_data'] = array(
 				'text' => $txt['topic_alert_none'],
@@ -159,7 +159,7 @@ class MarkReadController extends AbstractController
 
 		// Mark boards as read
 		if (!empty($boards))
-			markBoardsRead($boards, isset($this->_req->query->unread), true);
+			markBoardsRead($boards, isset($this->http_req->query->unread), true);
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
@@ -180,7 +180,7 @@ class MarkReadController extends AbstractController
 		global $user_info, $modSettings;
 
 		// Make sure all the topics are integers!
-		$topics = array_map('intval', explode('-', $this->_req->query->topics));
+		$topics = array_map('intval', explode('-', $this->http_req->query->topics));
 
 
 		$logged_topics = getLoggedTopics($user_info['id'], $topics);
@@ -211,7 +211,7 @@ class MarkReadController extends AbstractController
 		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
 		$topicinfo = getTopicInfo($topic, 'all');
-		$topic_msg_id = $this->_req->getQuery('t', 'intval');
+		$topic_msg_id = $this->http_req->getQuery('t', 'intval');
 
 		if (!empty($topic_msg_id))
 		{
@@ -226,11 +226,11 @@ class MarkReadController extends AbstractController
 				$earlyMsg = previousMessage($topic_msg_id, $topic);
 		}
 		// Marking read from first page?  That's the whole topic.
-		elseif ($this->_req->query->start == 0)
+		elseif ($this->http_req->query->start == 0)
 			$earlyMsg = 0;
 		else
 		{
-			list ($earlyMsg) = messageAt((int) $this->_req->query->start, $topic);
+			list ($earlyMsg) = messageAt((int) $this->http_req->query->start, $topic);
 			$earlyMsg--;
 		}
 
@@ -249,27 +249,27 @@ class MarkReadController extends AbstractController
 	{
 		global $board, $board_info;
 
-		//$this->_session->check('get');
+		//$this->session->check('get');
 
 
 
 		$categories = array();
 		$boards = array();
 
-		if (isset($this->_req->query->c))
+		if (isset($this->http_req->query->c))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$categories = array_map('intval', explode(',', $this->http_req->query->c));
 		}
 
-		if (isset($this->_req->query->boards))
+		if (isset($this->http_req->query->boards))
 		{
-			$boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$boards = array_map('intval', explode(',', $this->http_req->query->boards));
 		}
 
 		if (!empty($board))
 			$boards[] = (int) $board;
 
-		if (isset($this->_req->query->children) && !empty($boards))
+		if (isset($this->http_req->query->children) && !empty($boards))
 		{
 			// Mark all children of the boards we got (selected by the user).
 			$boards = addChildBoards($boards);
@@ -281,7 +281,7 @@ class MarkReadController extends AbstractController
 			return '';
 
 		// Mark boards as read.
-		markBoardsRead($boards, isset($this->_req->query->unread), true);
+		markBoardsRead($boards, isset($this->http_req->query->unread), true);
 
 		foreach ($boards as $b)
 		{
@@ -289,7 +289,7 @@ class MarkReadController extends AbstractController
 				$_SESSION['topicseen_cache'][$b] = array();
 		}
 
-		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
+		$this->_querystring_board_limits = $this->http_req->getQuery('sa') === 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
 
 		$sort_methods = array(
 			'subject',
@@ -301,13 +301,13 @@ class MarkReadController extends AbstractController
 		);
 
 		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort) || !in_array($this->_req->query->sort, $sort_methods))
-			$this->_querystring_sort_limits = isset($this->_req->query->asc) ? ';asc' : '';
+		if (!isset($this->http_req->query->sort) || !in_array($this->http_req->query->sort, $sort_methods))
+			$this->_querystring_sort_limits = isset($this->http_req->query->asc) ? ';asc' : '';
 		// But, for other methods the default sort is ascending.
 		else
-			$this->_querystring_sort_limits = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
+			$this->_querystring_sort_limits = ';sort=' . $this->http_req->query->sort . (isset($this->http_req->query->desc) ? ';desc' : '');
 
-		if (!isset($this->_req->query->unread))
+		if (!isset($this->http_req->query->unread))
 		{
 			// Find all boards with the parents in the board list
 			$boards_to_add = accessibleBoards(null, $boards);

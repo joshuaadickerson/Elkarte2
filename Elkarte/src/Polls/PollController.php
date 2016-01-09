@@ -75,10 +75,10 @@ class PollController extends AbstractController
 			if (!$row['guest_vote'])
 				$this->_errors->fatal_lang_error('guest_vote_disabled');
 			// Guest already voted?
-			elseif (!empty($this->_req->cookie->guest_poll_vote) && preg_match('~^[0-9,;]+$~', $this->_req->cookie->guest_poll_vote) && strpos($this->_req->cookie->guest_poll_vote, ';' . $row['id_poll'] . ',') !== false)
+			elseif (!empty($this->http_req->cookie->guest_poll_vote) && preg_match('~^[0-9,;]+$~', $this->http_req->cookie->guest_poll_vote) && strpos($this->http_req->cookie->guest_poll_vote, ';' . $row['id_poll'] . ',') !== false)
 			{
 				// ;id,timestamp,[vote,vote...]; etc
-				$guestinfo = explode(';', $this->_req->cookie->guest_poll_vote);
+				$guestinfo = explode(';', $this->http_req->cookie->guest_poll_vote);
 
 				// Find the poll we're after.
 				foreach ($guestinfo as $i => $guestvoted)
@@ -94,9 +94,9 @@ class PollController extends AbstractController
 					// Remove the poll info from the cookie to allow guest to vote again
 					unset($guestinfo[$i]);
 					if (!empty($guestinfo))
-						$this->_req->cookie->guest_poll_vote = ';' . implode(';', $guestinfo);
+						$this->http_req->cookie->guest_poll_vote = ';' . implode(';', $guestinfo);
 					else
-						unset($this->_req->cookie->guest_poll_vote);
+						unset($this->http_req->cookie->guest_poll_vote);
 				}
 				else
 					$this->_errors->fatal_lang_error('poll_error', false);
@@ -113,9 +113,9 @@ class PollController extends AbstractController
 		if (!$user_info['is_guest'] && $row['selected'] != -1 && empty($row['change_vote']))
 			$this->_errors->fatal_lang_error('poll_error', false);
 		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
-		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($this->_req->post->options))
+		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($this->http_req->post->options))
 		{
-			$this->_session->check('request');
+			$this->session->check('request');
 
 			// Find out what they voted for before.
 			$pollOptions = determineVote($user_info['id'], $row['id_poll']);
@@ -131,23 +131,23 @@ class PollController extends AbstractController
 			}
 
 			// Redirect back to the topic so the user can vote again!
-			if (empty($this->_req->post->options))
-				redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+			if (empty($this->http_req->post->options))
+				redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 		}
 
-		$this->_session->check('request');
+		$this->session->check('request');
 
 		// Make sure the option(s) are valid.
-		if (empty($this->_req->post->options))
+		if (empty($this->http_req->post->options))
 			$this->_errors->fatal_lang_error('didnt_select_vote', false);
 
 		// Too many options checked!
-		if (count($this->_req->post->options) > $row['max_votes'])
+		if (count($this->http_req->post->options) > $row['max_votes'])
 			$this->_errors->fatal_lang_error('poll_too_many_votes', false, array($row['max_votes']));
 
 		$pollOptions = array();
 		$inserts = array();
-		foreach ($this->_req->post->options as $id)
+		foreach ($this->http_req->post->options as $id)
 		{
 			$id = (int) $id;
 
@@ -163,10 +163,10 @@ class PollController extends AbstractController
 		if ($user_info['is_guest'] && count($pollOptions) > 0)
 		{
 			// Time is stored in case the poll is reset later, plus what they voted for.
-			$this->_req->cookie->guest_poll_vote = empty($this->_req->cookie->guest_poll_vote) ? '' : $this->_req->cookie->guest_poll_vote;
+			$this->http_req->cookie->guest_poll_vote = empty($this->http_req->cookie->guest_poll_vote) ? '' : $this->http_req->cookie->guest_poll_vote;
 
 			// ;id,timestamp,[vote,vote...]; etc
-			$this->_req->cookie->guest_poll_vote .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? implode(',', $pollOptions) : $pollOptions[0]);
+			$this->http_req->cookie->guest_poll_vote .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? implode(',', $pollOptions) : $pollOptions[0]);
 
 			// Increase num guest voters count by 1
 			increaseGuestVote($row['id_poll']);
@@ -174,14 +174,14 @@ class PollController extends AbstractController
 			// Set the guest cookie so we can track the voting
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
-			elk_setcookie('guest_poll_vote', $this->_req->cookie->guest_poll_vote, time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
+			elk_setcookie('guest_poll_vote', $this->http_req->cookie->guest_poll_vote, time() + 2500000, $cookie_url[1], $cookie_url[0], false, false);
 		}
 
 		// Maybe let a social networking mod log this, or something?
 		$GLOBALS['elk']['hooks']->hook('poll_vote', array(&$row['id_poll'], &$pollOptions));
 
 		// Return to the post...
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**
@@ -201,7 +201,7 @@ class PollController extends AbstractController
 
 		require_once(SUBSDIR . '/Poll.subs.php');
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
 		$poll = pollStatus($topic);
@@ -229,7 +229,7 @@ class PollController extends AbstractController
 		// Lock!  *Poof* - no one can vote.
 		lockPoll($poll['id_poll'], $poll['locked']);
 
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**
@@ -263,8 +263,8 @@ class PollController extends AbstractController
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 
 		$context['sub_template'] = 'poll_edit';
-		$context['start'] = $this->_req->getQuery('start', 'intval');
-		$context['is_edit'] = isset($this->_req->post->add) ? 0 : 1;
+		$context['start'] = $this->http_req->getQuery('start', 'intval');
+		$context['is_edit'] = isset($this->http_req->post->add) ? 0 : 1;
 
 		$poll_errors = ErrorContext::context('poll');
 		$pollinfo = pollInfoForTopic($topic);
@@ -286,7 +286,7 @@ class PollController extends AbstractController
 		elseif (!$context['is_edit'] && !allowedTo('poll_add_any'))
 			isAllowedTo('poll_add_' . ($user_info['id'] == $pollinfo['id_member_started'] ? 'own' : 'any'));
 
-		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
+		$context['can_moderate_poll'] = isset($this->http_req->post->add) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 		// Do we enable guest voting?
 		$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
@@ -294,17 +294,17 @@ class PollController extends AbstractController
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
 		if ($poll_errors->hasErrors())
 		{
-			$question = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->question);
+			$question = $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->question);
 
 			// Basic theme info...
 			$context['poll'] = array(
 				'id' => $pollinfo['id_poll'],
 				'question' => $question,
-				'hide_results' => empty($this->_req->post->poll_hide) ? 0 : $this->_req->post->poll_hide,
-				'change_vote' => isset($this->_req->post->poll_change_vote),
-				'guest_vote' => isset($this->_req->post->poll_guest_vote),
+				'hide_results' => empty($this->http_req->post->poll_hide) ? 0 : $this->http_req->post->poll_hide,
+				'change_vote' => isset($this->http_req->post->poll_change_vote),
+				'guest_vote' => isset($this->http_req->post->poll_guest_vote),
 				'guest_vote_allowed' => in_array(-1, $groupsAllowedVote['allowed']),
-				'max_votes' => empty($this->_req->post->poll_max_votes) ? '1' : max(1, $this->_req->post->poll_max_votes),
+				'max_votes' => empty($this->http_req->post->poll_max_votes) ? '1' : max(1, $this->http_req->post->poll_max_votes),
 			);
 
 			// Start at number one with no last id to speak of.
@@ -323,7 +323,7 @@ class PollController extends AbstractController
 						$last_id = $option['id_choice'] + 1;
 
 					// They cleared this by either omitting it or emptying it.
-					if (!isset($this->_req->post->options[$option['id_choice']]) || $this->_req->post->options[$option['id_choice']] == '')
+					if (!isset($this->http_req->post->options[$option['id_choice']]) || $this->http_req->post->options[$option['id_choice']] == '')
 						continue;
 
 					// Add the choice!
@@ -339,7 +339,7 @@ class PollController extends AbstractController
 
 			// Work out how many options we have, so we get the 'is_last' field right...
 			$totalPostOptions = 0;
-			foreach ($this->_req->post->options as $id => $label)
+			foreach ($this->http_req->post->options as $id => $label)
 			{
 				if ($label != '')
 					$totalPostOptions++;
@@ -348,7 +348,7 @@ class PollController extends AbstractController
 			$count = 1;
 
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
-			foreach ($this->_req->post->options as $id => $label)
+			foreach ($this->http_req->post->options as $id => $label)
 			{
 				$label = censor($GLOBALS['elk']['text']->htmlspecialchars($label));
 
@@ -393,11 +393,11 @@ class PollController extends AbstractController
 			$context['last_choice_id'] = $last_id;
 
 			if ($context['can_moderate_poll'])
-				$context['poll']['expiration'] = $this->_req->post->poll_expire;
+				$context['poll']['expiration'] = $this->http_req->post->poll_expire;
 
 			// Check the question/option count for errors.
 			// @todo: why !$poll_errors->hasErrors()?
-			if (trim($this->_req->post->question) == '' && !$poll_errors->hasErrors())
+			if (trim($this->http_req->post->question) == '' && !$poll_errors->hasErrors())
 				$poll_errors->addError('no_question');
 
 			// No check is needed, since nothing is really posted.
@@ -505,12 +505,12 @@ class PollController extends AbstractController
 		global $topic, $board, $user_info;
 
 		// Sneaking off, are we?
-		if (empty($this->_req->post))
+		if (empty($this->http_req->post))
 			redirectexit('action=editpoll;topic=' . $topic . '.0');
 
 		$poll_errors = ErrorContext::context('poll');
 
-		if ($this->_session->check('post', '', false) != '')
+		if ($this->session->check('post', '', false) != '')
 			$poll_errors->addError('session_timeout');
 
 		// HACKERS (!!) can't edit :P.
@@ -518,7 +518,7 @@ class PollController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Is this a new poll, or editing an existing?
-		$isEdit = isset($this->_req->post->add) ? 0 : 1;
+		$isEdit = isset($this->http_req->post->add) ? 0 : 1;
 
 		// Make sure we have our stuff.
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -543,7 +543,7 @@ class PollController extends AbstractController
 		$idCount = 0;
 
 		// Ensure the user is leaving a valid amount of options - there must be at least two.
-		foreach ($this->_req->post->options as $k => $option)
+		foreach ($this->http_req->post->options as $k => $option)
 		{
 			if (trim($option) !== '')
 			{
@@ -558,7 +558,7 @@ class PollController extends AbstractController
 			$poll_errors->addError('poll_many');
 
 		// Also - ensure they are not removing the question.
-		if ($this->_req->getPost('question', 'trim') === '')
+		if ($this->http_req->getPost('question', 'trim') === '')
 			$poll_errors->addError('no_question');
 
 		// Got any errors to report?
@@ -569,12 +569,12 @@ class PollController extends AbstractController
 		$this->checkSubmitOnce('check');
 
 		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
-		$question = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->getPost('question', 'trim'));
+		$question = $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->getPost('question', 'trim'));
 		$question = $GLOBALS['elk']['text']->substr($question, 0, 255);
-		$poll_hide = $this->_req->getPost('poll_hide', 'intval', 0);
-		$poll_expire = $this->_req->getPost('poll_expire', 'intval', 0);
-		$poll_change_vote = isset($this->_req->post->poll_change_vote) ? 1 : 0;
-		$poll_guest_vote = isset($this->_req->post->poll_guest_vote) ? 1 : 0;
+		$poll_hide = $this->http_req->getPost('poll_hide', 'intval', 0);
+		$poll_expire = $this->http_req->getPost('poll_expire', 'intval', 0);
+		$poll_change_vote = isset($this->http_req->post->poll_change_vote) ? 1 : 0;
+		$poll_guest_vote = isset($this->http_req->post->poll_guest_vote) ? 1 : 0;
 		$poll_max_votes = 0;
 
 		// Make sure guests are actually allowed to vote generally.
@@ -597,10 +597,10 @@ class PollController extends AbstractController
 			else
 				$poll_expire = $bcinfo['expire_time'];
 
-			if (empty($this->_req->post->poll_max_votes) || $this->_req->post->poll_max_votes <= 0)
+			if (empty($this->http_req->post->poll_max_votes) || $this->http_req->post->poll_max_votes <= 0)
 				$poll_max_votes = 1;
 			else
-				$poll_max_votes = $this->_req->getPost('poll_max_votes', 'intval', 0);
+				$poll_max_votes = $this->http_req->getPost('poll_max_votes', 'intval', 0);
 		}
 
 		// If we're editing, let's commit the changes.
@@ -632,7 +632,7 @@ class PollController extends AbstractController
 		$add_options = array();
 		$update_options = array();
 		$delete_options = array();
-		foreach ($this->_req->post->options as $k => $option)
+		foreach ($this->http_req->post->options as $k => $option)
 		{
 			// Make sure the key is numeric for sanity's sake.
 			$k = (int) $k;
@@ -668,13 +668,13 @@ class PollController extends AbstractController
 			deletePollOptions($bcinfo['id_poll'], $delete_options);
 
 		// Shall I reset the vote count, sir?
-		if (isset($this->_req->post->resetVoteCount))
+		if (isset($this->http_req->post->resetVoteCount))
 			resetVotes($bcinfo['id_poll']);
 
 		$GLOBALS['elk']['hooks']->hook('poll_add_edit', array($bcinfo['id_poll'], $isEdit));
 
 		// Off we go.
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**
@@ -696,7 +696,7 @@ class PollController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// Verify the session.
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// We need to work with them polls.
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -726,7 +726,7 @@ class PollController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('poll_remove', array($pollID));
 
 		// Take the moderator back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->post->start);
 	}
 
 	/**

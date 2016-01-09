@@ -124,7 +124,7 @@ class ManagePermissionsController extends AbstractController
 		);
 
 		// Set the subAction, taking permissions in to account
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) && empty($subActions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : (allowedTo('manage_permissions') ? 'index' : 'settings');
+		$subAction = isset($this->http_req->query->sa) && isset($subActions[$this->http_req->query->sa]) && empty($subActions[$this->http_req->query->sa]['disabled']) ? $this->http_req->query->sa : (allowedTo('manage_permissions') ? 'index' : 'settings');
 
 		// Load the subactions, call integrate_sa_manage_permissions
 		$action->initialize($subActions);
@@ -157,8 +157,8 @@ class ManagePermissionsController extends AbstractController
 		$context['page_title'] = $txt['permissions_title'];
 
 		// pid = profile id
-		if (!empty($this->_req->query->pid))
-			$this->_pid = (int) $this->_req->query->pid;
+		if (!empty($this->http_req->query->pid))
+			$this->_pid = (int) $this->http_req->query->pid;
 
 		// Needed for <5.4 due to lack of $this support in closures
 		$_pid = isset($this->_pid) ? $this->_pid : null;
@@ -175,7 +175,7 @@ class ManagePermissionsController extends AbstractController
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=Admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
+			'base_href' => $scripturl . '?action=Admin;area=permissions;sa=index' . (isset($this->http_req->query->sort2) ? ';sort2=' . urlencode($this->http_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -313,7 +313,7 @@ class ManagePermissionsController extends AbstractController
 			$listOptions = array(
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
-				'base_href' => $scripturl . '?action=Admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
+				'base_href' => $scripturl . '?action=Admin;area=permissions;sa=index' . (isset($this->http_req->query->sort2) ? ';sort2=' . urlencode($this->http_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
 				'default_sort_col' => 'required_posts',
 				'request_vars' => array(
 					'sort' => 'sort2',
@@ -478,16 +478,16 @@ class ManagePermissionsController extends AbstractController
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		$context['page_title'] = $txt['permissions_boards'];
-		$context['edit_all'] = isset($this->_req->query->edit);
+		$context['edit_all'] = isset($this->http_req->query->edit);
 
 		// Saving?
-		if (!empty($this->_req->post->save_changes) && !empty($this->_req->post->boardprofile))
+		if (!empty($this->http_req->post->save_changes) && !empty($this->http_req->post->boardprofile))
 		{
-			$this->_session->check('request');
+			$this->session->check('request');
 			validateToken('Admin-mpb');
 
 			$changes = array();
-			foreach ($this->_req->post->boardprofile as $board => $profile)
+			foreach ($this->http_req->post->boardprofile as $board => $profile)
 				$changes[(int) $profile][] = (int) $board;
 
 			if (!empty($changes))
@@ -558,7 +558,7 @@ class ManagePermissionsController extends AbstractController
 	{
 		global $context;
 
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-mpq', 'quick');
 
 		// we'll need to init illegal permissions, update permissions, etc.
@@ -569,18 +569,18 @@ class ManagePermissionsController extends AbstractController
 		loadIllegalGuestPermissions();
 
 		// Make sure only one of the quick options was selected.
-		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
+		if ((!empty($this->http_req->post->predefined) && ((isset($this->http_req->post->copy_from) && $this->http_req->post->copy_from != 'empty') || !empty($this->http_req->post->permissions))) || (!empty($this->http_req->post->copy_from) && $this->http_req->post->copy_from != 'empty' && !empty($this->http_req->post->permissions)))
 			$GLOBALS['elk']['errors']->fatal_lang_error('permissions_only_one_option', false);
 
-		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
-			$this->_req->post->group = array();
+		if (empty($this->http_req->post->group) || !is_array($this->http_req->post->group))
+			$this->http_req->post->group = array();
 
 		// Only accept numeric values for selected membergroups.
-		foreach ($this->_req->post->group as $id => $group_id)
-			$this->_req->post->group[$id] = (int) $group_id;
-		$this->_req->post->group = array_unique($this->_req->post->group);
+		foreach ($this->http_req->post->group as $id => $group_id)
+			$this->http_req->post->group[$id] = (int) $group_id;
+		$this->http_req->post->group = array_unique($this->http_req->post->group);
 
-		$this->_pid = $this->_req->getQuery('pid', 'intval', 0);
+		$this->_pid = $this->http_req->getQuery('pid', 'intval', 0);
 
 		// Fix up the old global to the new default!
 		$bid = max(1, $this->_pid);
@@ -593,70 +593,70 @@ class ManagePermissionsController extends AbstractController
 		updateSettings(array('settings_updated' => time()));
 
 		// No groups where selected.
-		if (empty($this->_req->post->group))
+		if (empty($this->http_req->post->group))
 			redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
 
 		// Set a predefined permission profile.
-		if (!empty($this->_req->post->predefined))
+		if (!empty($this->http_req->post->predefined))
 		{
 			// Make sure it's a predefined permission set we expect.
-			if (!in_array($this->_req->post->predefined, array('restrict', 'standard', 'moderator', 'maintenance')))
+			if (!in_array($this->http_req->post->predefined, array('restrict', 'standard', 'moderator', 'maintenance')))
 				redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
 
-			foreach ($this->_req->post->group as $group_id)
+			foreach ($this->http_req->post->group as $group_id)
 			{
 				if (!empty($this->_pid))
-					setPermissionLevel($this->_req->post->predefined, $group_id, $this->_pid);
+					setPermissionLevel($this->http_req->post->predefined, $group_id, $this->_pid);
 				else
-					setPermissionLevel($this->_req->post->predefined, $group_id);
+					setPermissionLevel($this->http_req->post->predefined, $group_id);
 			}
 		}
 		// Set a permission profile based on the permissions of a selected group.
-		elseif ($this->_req->post->copy_from != 'empty')
+		elseif ($this->http_req->post->copy_from != 'empty')
 		{
 			// Just checking the input.
-			if (!is_numeric($this->_req->post->copy_from))
+			if (!is_numeric($this->http_req->post->copy_from))
 				redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
 
 			// Make sure the group we're copying to is never included.
-			$this->_req->post->group = array_diff($this->_req->post->group, array($this->_req->post->copy_from));
+			$this->http_req->post->group = array_diff($this->http_req->post->group, array($this->http_req->post->copy_from));
 
 			// No groups left? Too bad.
-			if (empty($this->_req->post->group))
+			if (empty($this->http_req->post->group))
 				redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
 
 			if (empty($this->_pid))
-				copyPermission($this->_req->post->copy_from, $this->_req->post->group, $context['illegal_permissions'], $context['non_guest_permissions']);
+				copyPermission($this->http_req->post->copy_from, $this->http_req->post->group, $context['illegal_permissions'], $context['non_guest_permissions']);
 
 			// Now do the same for the board permissions.
-			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $context['non_guest_permissions']);
+			copyBoardPermission($this->http_req->post->copy_from, $this->http_req->post->group, $bid, $context['non_guest_permissions']);
 
 			// Update any children out there!
-			updateChildPermissions($this->_req->post->group, $this->_pid);
+			updateChildPermissions($this->http_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
-		elseif (!empty($this->_req->post->permissions))
+		elseif (!empty($this->http_req->post->permissions))
 		{
 			// Unpack two variables that were transported.
-			list ($permissionType, $permission) = explode('/', $this->_req->post->permissions);
+			list ($permissionType, $permission) = explode('/', $this->http_req->post->permissions);
 
 			// Check whether our input is within expected range.
-			if (!in_array($this->_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
+			if (!in_array($this->http_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
 				redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
 
-			if ($this->_req->post->add_remove == 'clear')
+			if ($this->http_req->post->add_remove == 'clear')
 			{
 				if ($permissionType == 'membergroup')
-					deletePermission($this->_req->post->group, $permission, $context['illegal_permissions']);
+					deletePermission($this->http_req->post->group, $permission, $context['illegal_permissions']);
 				else
-					deleteBoardPermission($this->_req->post->group, $bid, $permission);
+					deleteBoardPermission($this->http_req->post->group, $bid, $permission);
 			}
 			// Add a permission (either 'set' or 'deny').
 			else
 			{
-				$add_deny = $this->_req->post->add_remove == 'add' ? '1' : '0';
+				$add_deny = $this->http_req->post->add_remove == 'add' ? '1' : '0';
 				$permChange = array();
-				foreach ($this->_req->post->group as $groupID)
+				foreach ($this->http_req->post->group as $groupID)
 				{
 					if ($groupID == -1 && in_array($permission, $context['non_guest_permissions']))
 						continue;
@@ -678,7 +678,7 @@ class ManagePermissionsController extends AbstractController
 			}
 
 			// Another child update!
-			updateChildPermissions($this->_req->post->group, $this->_pid);
+			updateChildPermissions($this->http_req->post->group, $this->_pid);
 		}
 
 		redirectexit('action=Admin;area=permissions;pid=' . $this->_pid);
@@ -691,14 +691,14 @@ class ManagePermissionsController extends AbstractController
 	{
 		global $context, $txt;
 
-		if (!isset($this->_req->query->group))
+		if (!isset($this->http_req->query->group))
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		$context['group']['id'] = (int) $this->_req->query->group;
+		$context['group']['id'] = (int) $this->http_req->query->group;
 
 		// It's not likely you'd end up here with this setting disabled.
-		if ($this->_req->query->group == 1)
+		if ($this->http_req->query->group == 1)
 			redirectexit('action=Admin;area=permissions');
 
 		loadAllPermissions();
@@ -721,7 +721,7 @@ class ManagePermissionsController extends AbstractController
 		else
 			$context['group']['name'] = $txt['membergroups_members'];
 
-		$context['profile']['id'] = $this->_req->getQuery('pid', 'intval', 0);
+		$context['profile']['id'] = $this->http_req->getQuery('pid', 'intval', 0);
 
 		// If this is a moderator and they are editing "no profile" then we only do boards.
 		if ($context['group']['id'] == 3 && empty($context['profile']['id']))
@@ -750,7 +750,7 @@ class ManagePermissionsController extends AbstractController
 
 		// General permissions?
 		if ($context['permission_type'] == 'membergroup')
-			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
+			$permissions['membergroup'] = fetchPermissions($this->http_req->query->group);
 
 		// Fetch current board permissions...
 		$permissions['board'] = fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
@@ -791,7 +791,7 @@ class ManagePermissionsController extends AbstractController
 	{
 		global $context;
 
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-mp');
 
 		// We'll need to init illegal permissions, update child permissions, etc.
@@ -800,8 +800,8 @@ class ManagePermissionsController extends AbstractController
 
 		loadIllegalPermissions();
 
-		$current_group_id = (int) $this->_req->query->group;
-		$this->_pid = $this->_req->getQuery('pid', 'intval');
+		$current_group_id = (int) $this->http_req->query->group;
+		$this->_pid = $this->http_req->getQuery('pid', 'intval');
 
 		// Cannot modify predefined profiles.
 		if ($this->_pid > 1 && $this->_pid < 5)
@@ -830,9 +830,9 @@ class ManagePermissionsController extends AbstractController
 		}
 
 		// Prepare all permissions that were set or denied for addition to the DB.
-		if (isset($this->_req->post->perm) && is_array($this->_req->post->perm))
+		if (isset($this->http_req->post->perm) && is_array($this->http_req->post->perm))
 		{
-			foreach ($this->_req->post->perm as $perm_type => $perm_array)
+			foreach ($this->http_req->post->perm as $perm_type => $perm_array)
 			{
 				if (is_array($perm_array))
 				{
@@ -901,11 +901,11 @@ class ManagePermissionsController extends AbstractController
 		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			$GLOBALS['elk']['hooks']->hook('save_permission_settings');
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
@@ -984,35 +984,35 @@ class ManagePermissionsController extends AbstractController
 		$context['sub_template'] = 'edit_profiles';
 
 		// If we're creating a new one do it first.
-		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) != '')
+		if (isset($this->http_req->post->create) && trim($this->http_req->post->profile_name) != '')
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mpp');
-			copyPermissionProfile($this->_req->post->profile_name, (int) $this->_req->post->copy_from);
+			copyPermissionProfile($this->http_req->post->profile_name, (int) $this->http_req->post->copy_from);
 		}
 		// Renaming?
-		elseif (isset($this->_req->post->rename))
+		elseif (isset($this->http_req->post->rename))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mpp');
 
 			// Just showing the boxes?
-			if (!isset($this->_req->post->rename_profile))
+			if (!isset($this->http_req->post->rename_profile))
 				$context['show_rename_boxes'] = true;
 			else
 			{
-				foreach ($this->_req->post->rename_profile as $id => $name)
+				foreach ($this->http_req->post->rename_profile as $id => $name)
 					renamePermissionProfile($id, $name);
 			}
 		}
 		// Deleting?
-		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->delete_profile))
+		elseif (isset($this->http_req->post->delete) && !empty($this->http_req->post->delete_profile))
 		{
-			$this->_session->check('post');
+			$this->session->check('post');
 			validateToken('Admin-mpp');
 
 			$profiles = array();
-			foreach ($this->_req->post->delete_profile as $profile)
+			foreach ($this->http_req->post->delete_profile as $profile)
 				if ($profile > 4)
 					$profiles[] = (int) $profile;
 
@@ -1055,11 +1055,11 @@ class ManagePermissionsController extends AbstractController
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Just in case.
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		$context['page_title'] = $txt['permissions_post_moderation'];
 		$context['sub_template'] = 'postmod_permissions';
-		$context['current_profile'] = $this->_req->getQuery('pid', 'intval', 1);
+		$context['current_profile'] = $this->http_req->getQuery('pid', 'intval', 1);
 
 		// Load all the permission profiles.
 		loadPermissionProfiles();
@@ -1084,7 +1084,7 @@ class ManagePermissionsController extends AbstractController
 			$all_permissions = array_merge($all_permissions, $perm_set);
 
 		// If we're saving the changes then do just that - save them.
-		if (!empty($this->_req->post->save_changes) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
+		if (!empty($this->http_req->post->save_changes) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
 		{
 			validateToken('Admin-mppm');
 
@@ -1097,7 +1097,7 @@ class ManagePermissionsController extends AbstractController
 			{
 				foreach ($mappings as $index => $data)
 				{
-					$temp = $this->_req->post->$index;
+					$temp = $this->http_req->post->$index;
 					if (isset($temp[$group['id']]))
 					{
 						if ($temp[$group['id']] == 'allow')

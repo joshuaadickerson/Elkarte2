@@ -88,14 +88,14 @@ class UnreadController extends AbstractController
 
 
 		// Determine the action, unreadreplies or unread
-		$this->_action = $this->_req->getQuery('action') === 'unreadreplies' ? 'unreadreplies' : 'unread';
+		$this->_action = $this->http_req->getQuery('action') === 'unreadreplies' ? 'unreadreplies' : 'unread';
 		$this->_action_unread = $this->_action === 'unread';
 		$this->_action_unreadreplies = $this->_action !== 'unread';
 
 		// Some goodies for template use
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
-		$context['showing_all_topics'] = isset($this->_req->query->all);
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['showing_all_topics'] = isset($this->http_req->query->all);
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
 		// Initialize the Unread class
@@ -118,13 +118,13 @@ class UnreadController extends AbstractController
 		$this->_wanted_boards();
 		$this->_sorting_conditions();
 
-		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) == 1)
+		if (!empty($this->http_req->query->c) && is_array($this->http_req->query->c) && count($this->http_req->query->c) == 1)
 		{
 			require_once(SUBSDIR . '/Categories.subs.php');
-			$name = categoryName((int) $this->_req->query->c[0]);
+			$name = categoryName((int) $this->http_req->query->c[0]);
 
 			$context['breadcrumbs'][] = array(
-				'url' => $scripturl . '#c' . (int) $this->_req->query->c[0],
+				'url' => $scripturl . '#c' . (int) $this->http_req->query->c[0],
 				'name' => $name
 			);
 		}
@@ -224,11 +224,11 @@ class UnreadController extends AbstractController
 			}
 			else
 			{
-				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
+				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->http_req->query->start);
 			}
 		}
 		else
-			$context['topics'] = $this->_grabber->getUnreads($type, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
+			$context['topics'] = $this->_grabber->getUnreads($type, $this->http_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		$this->_exiting_unread();
 
@@ -262,23 +262,23 @@ class UnreadController extends AbstractController
 			}
 			else
 			{
-				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
+				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->http_req->query->start);
 			}
 
 			return;
 		}
 
 		$context['links'] += array(
-			'first' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
-			'last' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], floor(($this->_num_topics - 1) / $context['topics_per_page']) * $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
+			'first' => $this->http_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
+			'last' => $this->http_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], floor(($this->_num_topics - 1) / $context['topics_per_page']) * $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 			'up' => $scripturl,
 		);
 		$context['page_info'] = array(
-			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
+			'current_page' => $this->http_req->query->start / $context['topics_per_page'] + 1,
 			'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 		);
 
-		$context['topics'] = $this->_grabber->getUnreads(null, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
+		$context['topics'] = $this->_grabber->getUnreads(null, $this->http_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		if ($context['topics'] === false)
 		{
@@ -289,7 +289,7 @@ class UnreadController extends AbstractController
 			}
 			else
 			{
-				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
+				$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->http_req->query->start);
 			}
 
 			return;
@@ -305,13 +305,13 @@ class UnreadController extends AbstractController
 	{
 		global $board, $context;
 
-		if (isset($this->_req->query->children) && (!empty($board) || !empty($this->_req->query->boards)))
+		if (isset($this->http_req->query->children) && (!empty($board) || !empty($this->http_req->query->boards)))
 		{
 			$this->_boards = array();
 
-			if (!empty($this->_req->query->boards))
+			if (!empty($this->http_req->query->boards))
 			{
-				$this->_boards = array_map('intval', explode(',', explode(',', $this->_req->query->boards)));
+				$this->_boards = array_map('intval', explode(',', explode(',', $this->http_req->query->boards)));
 			}
 
 			if (!empty($board))
@@ -330,23 +330,23 @@ class UnreadController extends AbstractController
 			$this->_boards = array($board);
 			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
 		}
-		elseif (!empty($this->_req->query->boards))
+		elseif (!empty($this->http_req->query->boards))
 		{
-			$selected_boards = array_map('intval', explode(',', $this->_req->query->boards));
+			$selected_boards = array_map('intval', explode(',', $this->http_req->query->boards));
 
 			$this->_boards = accessibleBoards($selected_boards);
 
 			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%1$d';
 		}
-		elseif (!empty($this->_req->query->c))
+		elseif (!empty($this->http_req->query->c))
 		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
+			$categories = array_map('intval', explode(',', $this->http_req->query->c));
 
 			$this->_boards = array_keys(boardsPosts(array(), $categories, $this->_action_unread));
 
-			$context['querystring_board_limits'] = ';c=' . $this->_req->query->c . ';start=%1$d';
+			$context['querystring_board_limits'] = ';c=' . $this->http_req->query->c . ';start=%1$d';
 
-			$this->_req->query->c = explode(',', $this->_req->query->c);
+			$this->http_req->query->c = explode(',', $this->http_req->query->c);
 		}
 		else
 		{
@@ -386,18 +386,18 @@ class UnreadController extends AbstractController
 		);
 
 		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
+		if (!isset($this->http_req->query->sort) || !isset($sort_methods[$this->http_req->query->sort]))
 		{
 			$context['sort_by'] = 'last_post';
-			$ascending = isset($this->_req->query->asc);
+			$ascending = isset($this->http_req->query->asc);
 
 			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
 		}
 		// But, for other methods the default sort is ascending.
 		else
 		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$ascending = !isset($this->_req->query->desc);
+			$context['sort_by'] = $this->http_req->query->sort;
+			$ascending = !isset($this->http_req->query->desc);
 
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
@@ -412,7 +412,7 @@ class UnreadController extends AbstractController
 
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
-				'url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->http_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
 			);
 	}
@@ -444,8 +444,8 @@ class UnreadController extends AbstractController
 		$all = $context['showing_all_topics'] ? ';all' : '';
 
 		// Make sure the starting place makes sense and construct the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $this->_action . $all . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $this->_req->query->start, $this->_num_topics, $context['topics_per_page'], true);
-		$context['current_page'] = (int) $this->_req->query->start / $context['topics_per_page'];
+		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $this->_action . $all . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $this->http_req->query->start, $this->_num_topics, $context['topics_per_page'], true);
+		$context['current_page'] = (int) $this->http_req->query->start / $context['topics_per_page'];
 
 		if ($context['showing_all_topics'])
 		{
@@ -462,15 +462,15 @@ class UnreadController extends AbstractController
 		}
 
 		$context['links'] += array(
-			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
-			'next' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
+			'prev' => $this->http_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->http_req->query->start - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
+			'next' => $this->http_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->http_req->query->start + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 		);
 		$context['page_info'] = array(
-			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
+			'current_page' => $this->http_req->query->start / $context['topics_per_page'] + 1,
 			'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 		);
 
-		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
+		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->http_req->query->start);
 		$topics_to_mark = implode('-', $topic_ids);
 
 		if ($settings['show_mark_read'])

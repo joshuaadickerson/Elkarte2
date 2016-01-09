@@ -132,39 +132,39 @@ class ManageRegistrationController extends AbstractController
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		if (!empty($this->_req->post->regSubmit))
+		if (!empty($this->http_req->post->regSubmit))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-regc');
 
 			// @todo move this to a filter/sanitation class
-			foreach ($this->_req->post as $key => $value)
+			foreach ($this->http_req->post as $key => $value)
 				if (!is_array($value))
-					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+					$this->http_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 
 			// Generate a password
-			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
+			if (empty($this->http_req->post->password) || !is_string($this->http_req->post->password) || trim($this->http_req->post->password) === '')
 			{
 				mt_srand(time() + 1277);
 				$password = generateValidationCode();
 			}
 			else
 			{
-				$password = $this->_req->post->password;
+				$password = $this->http_req->post->password;
 			}
 
 			$regOptions = array(
 				'interface' => 'Admin',
-				'username' => $this->_req->post->user,
-				'email' => $this->_req->post->email,
+				'username' => $this->http_req->post->user,
+				'email' => $this->http_req->post->email,
 				'password' => $password,
 				'password_check' => $password,
 				'check_reserved_name' => true,
 				'check_password_strength' => true,
 				'check_email_ban' => false,
-				'send_welcome_email' => isset($this->_req->post->emailPassword),
-				'require' => isset($this->_req->post->emailActivate) ? 'activation' : 'nothing',
-				'memberGroup' => empty($this->_req->post->group) || !allowedTo('manage_membergroups') ? 0 : (int) $this->_req->post->group,
+				'send_welcome_email' => isset($this->http_req->post->emailPassword),
+				'require' => isset($this->http_req->post->emailActivate) ? 'activation' : 'nothing',
+				'memberGroup' => empty($this->http_req->post->group) || !allowedTo('manage_membergroups') ? 0 : (int) $this->http_req->post->group,
 				'ip' => '127.0.0.1',
 				'ip2' => '127.0.0.1',
 				'auth_method' => 'password',
@@ -183,9 +183,9 @@ class ManageRegistrationController extends AbstractController
 			{
 				$context['new_member'] = array(
 					'id' => $memberID,
-					'name' => $this->_req->post->user,
+					'name' => $this->http_req->post->user,
 					'href' => $scripturl . '?action=profile;u=' . $memberID,
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $this->_req->post->user . '</a>',
+					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $this->http_req->post->user . '</a>',
 				);
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
@@ -251,22 +251,22 @@ class ManageRegistrationController extends AbstractController
 				$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
 
 				// Are we editing this?
-				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang == '.' . $lang['filename'])
+				if (isset($this->http_req->post->agree_lang) && $this->http_req->post->agree_lang == '.' . $lang['filename'])
 					$context['current_agreement'] = '.' . $lang['filename'];
 			}
 		}
 
-		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
+		if (isset($this->http_req->post->save) && isset($this->http_req->post->agreement))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-rega');
 
 			// Off it goes to the agreement file.
 			$fp = fopen(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt', 'w');
-			fwrite($fp, str_replace("\r", '', $this->_req->post->agreement));
+			fwrite($fp, str_replace("\r", '', $this->http_req->post->agreement));
 			fclose($fp);
 
-			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
+			updateSettings(array('requireAgreement' => !empty($this->http_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->http_req->post->checkboxAgreement)));
 		}
 
 		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
@@ -292,18 +292,18 @@ class ManageRegistrationController extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Submitting new reserved words.
-		if (!empty($this->_req->post->save_reserved_names))
+		if (!empty($this->http_req->post->save_reserved_names))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-regr');
 
 			// Set all the options....
 			updateSettings(array(
-				'reserveWord' => (isset($this->_req->post->matchword) ? '1' : '0'),
-				'reserveCase' => (isset($this->_req->post->matchcase) ? '1' : '0'),
-				'reserveUser' => (isset($this->_req->post->matchuser) ? '1' : '0'),
-				'reserveName' => (isset($this->_req->post->matchname) ? '1' : '0'),
-				'reserveNames' => str_replace("\r", '', $this->_req->post->reserved)
+				'reserveWord' => (isset($this->http_req->post->matchword) ? '1' : '0'),
+				'reserveCase' => (isset($this->http_req->post->matchcase) ? '1' : '0'),
+				'reserveUser' => (isset($this->http_req->post->matchuser) ? '1' : '0'),
+				'reserveName' => (isset($this->http_req->post->matchname) ? '1' : '0'),
+				'reserveNames' => str_replace("\r", '', $this->http_req->post->reserved)
 			));
 		}
 
@@ -342,20 +342,20 @@ class ManageRegistrationController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
 
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Are there some contacts missing?
-			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))
+			if (!empty($this->http_req->post->coppaAge) && !empty($this->http_req->post->coppaType) && empty($this->http_req->post->coppaPost) && empty($this->http_req->post->coppaFax))
 				$GLOBALS['elk']['errors']->fatal_lang_error('admin_setting_coppa_require_contact');
 
 			// Post needs to take into account line breaks.
-			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);
+			$this->http_req->post->coppaPost = str_replace("\n", '<br />', empty($this->http_req->post->coppaPost) ? '' : $this->http_req->post->coppaPost);
 
 			$GLOBALS['elk']['hooks']->hook('save_registration_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			redirectexit('action=Admin;area=regcenter;sa=settings');
 		}

@@ -240,8 +240,8 @@ class ProfileHistoryController extends AbstractController
 		}
 
 		// Searching?
-		if (isset($this->_req->query->searchip))
-			$context['ip'] = trim($this->_req->query->searchip);
+		if (isset($this->http_req->query->searchip))
+			$context['ip'] = trim($this->http_req->query->searchip);
 
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
 			&& isValidIPv6($context['ip']) === false)

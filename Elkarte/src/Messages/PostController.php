@@ -635,7 +635,7 @@ class PostController extends AbstractController
 		$context['current_action'] = 'post2';
 
 		// If the session has timed out, let the user re-submit their form.
-		if ($this->_session->check('post', '', false) != '')
+		if ($this->session->check('post', '', false) != '')
 		{
 			$this->_post_errors->addError('session_timeout');
 
@@ -1185,7 +1185,7 @@ class PostController extends AbstractController
 		if (empty($topic))
 			obExit(false);
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 

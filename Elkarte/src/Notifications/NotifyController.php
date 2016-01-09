@@ -63,7 +63,7 @@ class NotifyController extends AbstractController
 			$this->_errors->fatal_lang_error('not_a_topic', false);
 
 		// What do we do?  Better ask if they didn't say..
-		if (empty($this->_req->query->sa))
+		if (empty($this->http_req->query->sa))
 		{
 			// Load the template, but only if it is needed.
 			$this->_templates->load('Notify');
@@ -72,8 +72,8 @@ class NotifyController extends AbstractController
 			$context['notification_set'] = hasTopicNotification($user_info['id'], $topic);
 
 			// Set the template variables...
-			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $this->_req->query->start;
-			$context['start'] = $this->_req->query->start;
+			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $this->http_req->query->start;
+			$context['start'] = $this->http_req->query->start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notification_settings';
 
@@ -81,13 +81,13 @@ class NotifyController extends AbstractController
 		}
 		else
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			$this->_toggle_topic_notification();
 		}
 
 		// Send them back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->query->start);
 
 		return true;
 	}
@@ -118,7 +118,7 @@ class NotifyController extends AbstractController
 		}
 
 		// And members still need the right permissions
-		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->_req->query->sa))
+		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->http_req->query->sa))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -129,12 +129,12 @@ class NotifyController extends AbstractController
 		}
 
 		// And sessions still matter, so you better have a valid one
-		if ($this->_session->check('get', '', false))
+		if ($this->session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => $scripturl . '?action=notify;sa=' . ($this->http_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->http_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 			return;
 		}
@@ -143,9 +143,9 @@ class NotifyController extends AbstractController
 
 		// Return the results so the UI can be updated properly
 		$context['xml_data'] = array(
-			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api',
-			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
+			'text' => $this->http_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notify;sa=' . ($this->http_req->query->sa === 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $this->http_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api',
+			'confirm' => $this->http_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
 		);
 	}
 
@@ -160,7 +160,7 @@ class NotifyController extends AbstractController
 
 
 		// Attempt to turn notifications on/off.
-		setTopicNotification($user_info['id'], $topic, $this->_req->query->sa === 'on');
+		setTopicNotification($user_info['id'], $topic, $this->http_req->query->sa === 'on');
 	}
 
 	/**
@@ -188,7 +188,7 @@ class NotifyController extends AbstractController
 			$this->_errors->fatal_lang_error('no_board', false);
 
 		// No subaction: find out what to do.
-		if (empty($this->_req->query->sa))
+		if (empty($this->http_req->query->sa))
 		{
 			// We're gonna need the notify template...
 			$this->_templates->load('Notify');
@@ -197,8 +197,8 @@ class NotifyController extends AbstractController
 			$context['notification_set'] = hasBoardNotification($user_info['id'], $board);
 
 			// Set the template variables...
-			$context['board_href'] = $scripturl . '?board=' . $board . '.' . $this->_req->query->start;
-			$context['start'] = $this->_req->query->start;
+			$context['board_href'] = $scripturl . '?board=' . $board . '.' . $this->http_req->query->start;
+			$context['start'] = $this->http_req->query->start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notify_board';
 
@@ -207,14 +207,14 @@ class NotifyController extends AbstractController
 		// Turn the board level notification on/off?
 		else
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			// Turn notification on/off for this board.
 			$this->_toggle_board_notification();
 		}
 
 		// Back to the board!
-		redirectexit('board=' . $board . '.' . $this->_req->query->start);
+		redirectexit('board=' . $board . '.' . $this->http_req->query->start);
 	}
 
 	/**
@@ -244,7 +244,7 @@ class NotifyController extends AbstractController
 		}
 
 		// Have to have provided the right information
-		if (!allowedTo('mark_notify') || empty($board) || empty($this->_req->query->sa))
+		if (!allowedTo('mark_notify') || empty($board) || empty($this->http_req->query->sa))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -256,12 +256,12 @@ class NotifyController extends AbstractController
 		}
 
 		// Sessions are always verified
-		if ($this->_session->check('get', '', false))
+		if ($this->session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=notifyboard;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => $scripturl . '?action=notifyboard;sa=' . ($this->http_req->query->sa === 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $this->http_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 
 			return;
@@ -270,9 +270,9 @@ class NotifyController extends AbstractController
 		$this->_toggle_board_notification();
 
 		$context['xml_data'] = array(
-			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notifyboard;sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
-			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
+			'text' => $this->http_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
+			'url' => $scripturl . '?action=notifyboard;sa=' . ($this->http_req->query->sa === 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $this->http_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'confirm' => $this->http_req->query->sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
 		);
 	}
 
@@ -287,7 +287,7 @@ class NotifyController extends AbstractController
 
 
 		// Turn notification on/off for this board.
-		setBoardNotification($user_info['id'], $board, $this->_req->query->sa === 'on');
+		setBoardNotification($user_info['id'], $board, $this->http_req->query->sa === 'on');
 	}
 
 	/**
@@ -309,13 +309,13 @@ class NotifyController extends AbstractController
 		// Let's do something only if the function is enabled
 		if (!$user_info['is_guest'] && !empty($modSettings['enable_unwatch']))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			$this->_toggle_topic_watch();
 		}
 
 		// Back to the topic.
-		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+		redirectexit('topic=' . $topic . '.' . $this->http_req->query->start);
 	}
 
 	/**
@@ -355,12 +355,12 @@ class NotifyController extends AbstractController
 		}
 
 		// Sessions need to be validated
-		if ($this->_session->check('get', '', false))
+		if ($this->session->check('get', '', false))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($this->http_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->http_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 			return;
 		}
@@ -368,8 +368,8 @@ class NotifyController extends AbstractController
 		$this->_toggle_topic_watch();
 
 		$context['xml_data'] = array(
-			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $this->_req->query->start . ';sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'text' => $this->http_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
+			'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $this->http_req->query->start . ';sa=' . ($this->http_req->query->sa === 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
 		);
 	}
 
@@ -380,6 +380,6 @@ class NotifyController extends AbstractController
 	{
 		global $user_info, $topic;
 
-		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
+		setTopicWatch($user_info['id'], $topic, $this->http_req->query->sa === 'on');
 	}
 }

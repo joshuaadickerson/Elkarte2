@@ -100,13 +100,13 @@ class ManageScheduledTasksController extends AbstractController
 		$context['page_title'] = $txt['maintain_tasks'];
 
 		// Saving changes?
-		if (isset($this->_req->post->save) && isset($this->_req->post->enable_task))
+		if (isset($this->http_req->post->save) && isset($this->http_req->post->enable_task))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Enable and disable as required.
 			$enablers = array(0);
-			foreach ($this->_req->post->enable_task as $id => $enabled)
+			foreach ($this->http_req->post->enable_task as $id => $enabled)
 			{
 				if ($enabled)
 					$enablers[] = (int) $id;
@@ -120,11 +120,11 @@ class ManageScheduledTasksController extends AbstractController
 		}
 
 		// Want to run any of the tasks?
-		if (isset($this->_req->post->run) && isset($this->_req->post->run_task))
+		if (isset($this->http_req->post->run) && isset($this->http_req->post->run_task))
 		{
 			// Lets figure out which ones they want to run.
 			$tasks = array();
-			foreach ($this->_req->post->run_task as $task => $dummy)
+			foreach ($this->http_req->post->run_task as $task => $dummy)
 				$tasks[] = (int) $task;
 
 			// Load up the tasks.
@@ -241,7 +241,7 @@ class ManageScheduledTasksController extends AbstractController
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
-		$context['tasks_were_run'] = isset($this->_req->query->done);
+		$context['tasks_were_run'] = isset($this->http_req->query->done);
 
 		// If we had any errors, place them in context as well
 		if (isset($_SESSION['st_error']))
@@ -270,18 +270,18 @@ class ManageScheduledTasksController extends AbstractController
 
 
 		// Cleaning...
-		if (!isset($this->_req->query->tid))
+		if (!isset($this->http_req->query->tid))
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
-		$this->_req->query->tid = (int) $this->_req->query->tid;
+		$this->http_req->query->tid = (int) $this->http_req->query->tid;
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-st');
 
 			// Do we have a valid offset?
-			preg_match('~(\d{1,2}):(\d{1,2})~', $this->_req->post->offset, $matches);
+			preg_match('~(\d{1,2}):(\d{1,2})~', $this->http_req->post->offset, $matches);
 
 			// If a half is empty then assume zero offset!
 			if (!isset($matches[2]) || $matches[2] > 59)
@@ -293,30 +293,30 @@ class ManageScheduledTasksController extends AbstractController
 			$offset = $matches[1] * 3600 + $matches[2] * 60 - date('Z');
 
 			// The other time bits are simple!
-			$interval = max((int) $this->_req->post->regularity, 1);
-			$unit = in_array(substr($this->_req->post->unit, 0, 1), array('m', 'h', 'd', 'w')) ? substr($this->_req->post->unit, 0, 1) : 'd';
+			$interval = max((int) $this->http_req->post->regularity, 1);
+			$unit = in_array(substr($this->http_req->post->unit, 0, 1), array('m', 'h', 'd', 'w')) ? substr($this->http_req->post->unit, 0, 1) : 'd';
 
 			// Don't allow one minute intervals.
 			if ($interval == 1 && $unit == 'm')
 				$interval = 2;
 
 			// Is it disabled?
-			$disabled = !isset($this->_req->post->enabled) ? 1 : 0;
+			$disabled = !isset($this->http_req->post->enabled) ? 1 : 0;
 
 			// Do the update!
-			$this->_req->query->tid = (int) $this->_req->query->tid;
-			updateTask($this->_req->query->tid, $disabled, $offset, $interval, $unit);
+			$this->http_req->query->tid = (int) $this->http_req->query->tid;
+			updateTask($this->http_req->query->tid, $disabled, $offset, $interval, $unit);
 
 			// Check the next event.
-			calculateNextTrigger($this->_req->query->tid, true);
+			calculateNextTrigger($this->http_req->query->tid, true);
 
 			// Return to the main list.
 			redirectexit('action=Admin;area=scheduledtasks');
 		}
 
 		// Load the task, understand? Que? Que?
-		$this->_req->query->tid = (int) $this->_req->query->tid;
-		$context['task'] = loadTaskDetails($this->_req->query->tid);
+		$this->http_req->query->tid = (int) $this->http_req->query->tid;
+		$context['task'] = loadTaskDetails($this->http_req->query->tid);
 
 		createToken('Admin-st');
 	}
@@ -336,9 +336,9 @@ class ManageScheduledTasksController extends AbstractController
 		loadLanguage('ManageScheduledTasks');
 
 		// Empty the log?
-		if (!empty($this->_req->post->removeAll))
+		if (!empty($this->http_req->post->removeAll))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-tl');
 
 			emptyTaskLog();

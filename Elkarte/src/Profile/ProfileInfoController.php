@@ -21,6 +21,7 @@
 namespace Elkarte\Profile;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Ips\IP;
 
 /**
  * ProfileInfoController class, access all profile summary areas for a user
@@ -181,7 +182,7 @@ class ProfileInfoController extends AbstractController
 		{
 			// Make sure it's a valid ip address; otherwise, don't bother...
 			if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $memberContext[$this->_memID]['ip']) == 1 && empty($modSettings['disableHostnameLookup']))
-				$context['member']['hostname'] = host_from_ip($memberContext[$this->_memID]['ip']);
+				$context['member']['hostname'] = $this->elk['ip.manager']->host_from_ip(new IP($memberContext[$this->_memID]['ip']));
 			else
 				$context['member']['hostname'] = '';
 
@@ -259,7 +260,7 @@ class ProfileInfoController extends AbstractController
 				$topicCount = $this->elk['profile']->count_user_topics($this->_memID);
 				$range_limit = '';
 				$maxIndex = 10;
-				$start = $this->_req->getQuery('start', 'intval', 0);
+				$start = $this->http_req->getQuery('start', 'intval', 0);
 
 				// If they are a frequent topic starter we guess the range to help the query
 				if ($topicCount > 1000)
@@ -327,7 +328,7 @@ class ProfileInfoController extends AbstractController
 				$msgCount = $this->elk['profile']->count_user_posts($this->_memID);
 				$range_limit = '';
 				$maxIndex = 10;
-				$start = $this->_req->getQuery('start', 'intval', 0);
+				$start = $this->http_req->getQuery('start', 'intval', 0);
 
 				// If they are a frequent poster, we guess the range to help minimize what the query work
 				if ($msgCount > 1000)
@@ -485,7 +486,7 @@ class ProfileInfoController extends AbstractController
 		global $txt, $user_info, $scripturl, $modSettings, $context, $user_profile, $board;
 
 		// Some initial context.
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+		$context['start'] = $this->http_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
 		$this->_templates->load('ProfileInfo');
@@ -515,23 +516,23 @@ class ProfileInfoController extends AbstractController
 			$this->_errors->fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
-		if ($this->_req->getQuery('sa', 'trim', '') === 'attach')
+		if ($this->http_req->getQuery('sa', 'trim', '') === 'attach')
 			return $this->action_showAttachments();
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'unwatchedtopics' && $modSettings['enable_unwatch'])
+		elseif ($this->http_req->getQuery('sa', 'trim', '') === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 			return $this->action_showUnwatched();
 
 		// Are we just viewing topics?
-		$context['is_topics'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? true : false;
+		$context['is_topics'] = $this->http_req->getQuery('sa', 'trim', '') === 'topics' ? true : false;
 
 		// If just deleting a message, do it and then redirect back.
-		if (isset($this->_req->query->delete) && !$context['is_topics'])
+		if (isset($this->http_req->query->delete) && !$context['is_topics'])
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
 			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
-			$remover->removeMessage((int) $this->_req->query->delete);
+			$remover->removeMessage((int) $this->http_req->query->delete);
 
 			// Back to... where we are now ;).
 			redirectexit('action=profile;u=' . $this->_memID . ';area=showposts;start=' . $context['start']);
@@ -552,7 +553,7 @@ class ProfileInfoController extends AbstractController
 
 		// Reverse the query if we're past 50% of the pages for better performance.
 		$start = $context['start'];
-		$reverse = $this->_req->getQuery('start', 'intval', 0) > $msgCount / 2;
+		$reverse = $this->http_req->getQuery('start', 'intval', 0) > $msgCount / 2;
 		if ($reverse)
 		{
 			$maxIndex = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 && $msgCount > $context['start'] ? $msgCount - $context['start'] : (int) $modSettings['defaultMaxMessages'];
@@ -969,13 +970,13 @@ class ProfileInfoController extends AbstractController
 		);
 
 		// Number of topics started.
-		$context['num_topics'] = UserStatsTopicsStarted($this->_memID);
+		$context['num_topics'] = $this->elk['about.stats']->UserStatsTopicsStarted($this->_memID);
 
 		// Number of polls started.
-		$context['num_polls'] = UserStatsPollsStarted($this->_memID);
+		$context['num_polls'] = $this->elk['about.stats']->UserStatsPollsStarted($this->_memID);
 
 		// Number of polls voted in.
-		$context['num_votes'] = UserStatsPollsVoted($this->_memID);
+		$context['num_votes'] = $this->elk['about.stats']->UserStatsPollsVoted($this->_memID);
 
 		// Format the numbers...
 		$context['num_topics'] = comma_format($context['num_topics']);
@@ -983,16 +984,16 @@ class ProfileInfoController extends AbstractController
 		$context['num_votes'] = comma_format($context['num_votes']);
 
 		// Grab the boards this member posted in most often.
-		$context['popular_boards'] = UserStatsMostPostedBoard($this->_memID);
+		$context['popular_boards'] = $this->elk['about.stats']->UserStatsMostPostedBoard($this->_memID);
 
 		// Now get the 10 boards this user has most often participated in.
-		$context['board_activity'] = UserStatsMostActiveBoard($this->_memID);
+		$context['board_activity'] = $this->elk['about.stats']->UserStatsMostActiveBoard($this->_memID);
 
 		// Posting activity by time.
-		$context['posts_by_time'] = UserStatsPostingTime($this->_memID);
+		$context['posts_by_time'] = $this->elk['about.stats']->UserStatsPostingTime($this->_memID);
 
 		// Custom stats (just add a template_layer to add it to the template!)
-		$GLOBALS['elk']['hooks']->hook('profile_stats', array($this->_memID));
+		$this->hooks->hook('profile_stats', array($this->_memID));
 	}
 
 	/**

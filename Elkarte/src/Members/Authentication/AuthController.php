@@ -374,7 +374,7 @@ class AuthController extends AbstractController
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
-			$this->_session->check('get');
+			$this->session->check('get');
 
 		if (isset($_SESSION['pack_ftp']))
 			$_SESSION['pack_ftp'] = null;

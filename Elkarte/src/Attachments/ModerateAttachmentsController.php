@@ -50,22 +50,22 @@ class ModerateAttachmentsController extends AbstractController
 		global $user_info;
 
 		// Security is our primary concern...
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// Is it approve or delete?
-		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject' ? true : false;
+		$is_approve = !isset($this->http_req->query->sa) || $this->http_req->query->sa !== 'reject' ? true : false;
 
 		$attachments = array();
 
 
 		// If we are approving all ID's in a message, get the ID's.
-		if ($this->_req->query->sa === 'all' && !empty($this->_req->query->mid))
+		if ($this->http_req->query->sa === 'all' && !empty($this->http_req->query->mid))
 		{
-			$id_msg = (int) $this->_req->query->mid;
+			$id_msg = (int) $this->http_req->query->mid;
 			$attachments = attachmentsOfMessage($id_msg);
 		}
-		elseif (!empty($this->_req->query->aid))
-			$attachments[] = (int) $this->_req->query->aid;
+		elseif (!empty($this->http_req->query->aid))
+			$attachments[] = (int) $this->http_req->query->aid;
 
 		if (empty($attachments))
 			$this->_errors->fatal_lang_error('no_access', false);

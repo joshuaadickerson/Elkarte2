@@ -41,14 +41,14 @@ class ScheduledTasksController extends AbstractController
 	public function action_autotask()
 	{
 		// The mail queue is also called from here.
-		if ($this->_req->getQuery('scheduled') === 'mailq')
+		if ($this->http_req->getQuery('scheduled') === 'mailq')
 			$this->action_reducemailqueue();
 		else
 		{
 			$GLOBALS['elk']['hooks']->include_hook('autotask_include');
 
 			// Run tasks based on this time stamp
-			$ts = $this->_req->getQuery('ts', 'intval', 0);
+			$ts = $this->http_req->getQuery('ts', 'intval', 0);
 			processNextTasks($ts);
 
 			// Get the timestamp stored for the next task, if any.
@@ -63,7 +63,7 @@ class ScheduledTasksController extends AbstractController
 
 		// Return, if we're not explicitly called.
 		// @todo remove?
-		if (!isset($this->_req->query->scheduled))
+		if (!isset($this->http_req->query->scheduled))
 			return true;
 
 		// Finally, send some bland image

@@ -91,16 +91,16 @@ class ManageTopicsController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			// Security checks
-			$this->_session->check();
+			$this->session->check();
 
 			// Notify addons and integrations of the settings change.
 			$GLOBALS['elk']['hooks']->hook('save_topic_settings');
 
 			// Save the result!
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			// We're done here, pal.
 			redirectexit('action=Admin;area=postsettings;sa=topics');

@@ -106,11 +106,11 @@ class AdminLogController extends AbstractController
 
 		// Give integration a way to add items
 		$GLOBALS['elk']['hooks']->hook('manage_logs', array(&$log_functions));
-		$sub_action = isset($this->_req->query->sa, $log_functions[$this->_req->query->sa]) && empty($log_functions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : 'errorlog';
+		$sub_action = isset($this->http_req->query->sa, $log_functions[$this->http_req->query->sa]) && empty($log_functions[$this->http_req->query->sa]['disabled']) ? $this->http_req->query->sa : 'errorlog';
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
-		if (!isset($this->_req->query->sa))
-			$this->_req->query->desc = true;
+		if (!isset($this->http_req->query->sa))
+			$this->http_req->query->desc = true;
 
 		// figure out what to call
 		if (isset($log_functions[$sub_action]['file']))
@@ -163,15 +163,15 @@ class AdminLogController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('prune_settings');
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$savevar = array(
 				array('text', 'pruningOptions')
 			);
 
-			if (!empty($this->_req->post->pruningOptions))
+			if (!empty($this->http_req->post->pruningOptions))
 			{
 				$vals = array();
 				foreach ($config_vars as $index => $dummy)
@@ -179,7 +179,7 @@ class AdminLogController extends AbstractController
 					if (!is_array($dummy) || $index == 'pruningOptions')
 						continue;
 
-					$vals[] = empty($this->_req->post->$dummy[1]) || $this->_req->post->$dummy[1] < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
+					$vals[] = empty($this->http_req->post->$dummy[1]) || $this->http_req->post->$dummy[1] < 0 ? 0 : $this->http_req->getPost($dummy[1], 'intval');
 				}
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}

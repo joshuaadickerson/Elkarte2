@@ -136,7 +136,7 @@ class PackageServersController extends AbstractController
 		$name = '';
 
 		// Browsing the packages from a server
-		if (isset($this->_req->query->server))
+		if (isset($this->http_req->query->server))
 			list($name, $url, $server) = $this->_package_server();
 
 		// Minimum required parameter did not exist so dump out.
@@ -331,8 +331,8 @@ class PackageServersController extends AbstractController
 			// We could read the package info and see if we have a duplicate id & version, however that is
 			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
 			// and do the save.
-			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
-				$this->_req->query->auto = true;
+			if ($this->http_req->getQuery('area') === 'packageservers' && $this->http_req->getQuery('sa') === 'download')
+				$this->http_req->query->auto = true;
 
 			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
@@ -362,13 +362,13 @@ class PackageServersController extends AbstractController
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		if (isset($this->_req->query->server))
-			$this->_session->check('get');
+		if (isset($this->http_req->query->server))
+			$this->session->check('get');
 		else
-			$this->_session->check();
+			$this->session->check();
 
 		// To download something, we need either a valid server or url.
-		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
+		if (empty($this->http_req->query->server) && (!empty($this->http_req->query->get) && !empty($this->http_req->post->package)))
 			$GLOBALS['elk']['errors']->fatal_lang_error('package_get_error_is_zero', false);
 
 		// Start off with nothing
@@ -377,7 +377,7 @@ class PackageServersController extends AbstractController
 		$url = '';
 
 		// Download from a package server?
-		if (isset($this->_req->query->server))
+		if (isset($this->http_req->query->server))
 		{
 			list(, $url, $server) = $this->_package_server();
 
@@ -385,15 +385,15 @@ class PackageServersController extends AbstractController
 			$listing = json_decode(fetch_web_data($url));
 
 			// Find the requested package by section and number, make sure it matches
-			$section = $this->_req->query->section;
+			$section = $this->http_req->query->section;
 			$section = $listing->$section;
 
 			// This is what they requested, yes?
-			if (basename($section[$this->_req->query->num]->server[0]->download) === $this->_req->query->package)
+			if (basename($section[$this->http_req->query->num]->server[0]->download) === $this->http_req->query->package)
 			{
 				// Where to download it from
-				$package_name = $this->_rename_master($section[$this->_req->query->num]->server[0]->download);
-				$path_url = pathinfo($section[$this->_req->query->num]->server[0]->download);
+				$package_name = $this->_rename_master($section[$this->http_req->query->num]->server[0]->download);
+				$path_url = pathinfo($section[$this->http_req->query->num]->server[0]->download);
 				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
 			}
 			// Not found or some monkey business
@@ -401,14 +401,14 @@ class PackageServersController extends AbstractController
 				fatal_lang_error('package_cant_download', false);
 		}
 		// Entered a url and optional filename
-		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
-			$package_name = basename($this->_req->post->filename);
+		elseif (isset($this->http_req->post->byurl) && !empty($this->http_req->post->filename))
+			$package_name = basename($this->http_req->post->filename);
 		// Must just be a link then
 		else
-			$package_name = $this->_rename_master($this->_req->post->package);
+			$package_name = $this->_rename_master($this->http_req->post->package);
 
 		// Avoid over writing any existing package files of the same name
-		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
+		if (isset($this->http_req->query->conflict) || (isset($this->http_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
@@ -428,7 +428,7 @@ class PackageServersController extends AbstractController
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $this->_req->post->package);
+		$packageInfo = getPackageInfo($url . $this->http_req->post->package);
 
 		if (!is_array($packageInfo))
 			$GLOBALS['elk']['errors']->fatal_lang_error($packageInfo);
@@ -436,16 +436,16 @@ class PackageServersController extends AbstractController
 		// Save the package to disk, use FTP if necessary
 		create_chmod_control(
 			array(BOARDDIR . '/packages/' . $package_name),
-			array('destination_url' => $scripturl . '?action=Admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
-				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-				? ';auto' : '') . ';package=' . $this->_req->post->package . (isset($this->_req->query->conflict)
+			array('destination_url' => $scripturl . '?action=Admin;area=packageservers;sa=download' . (isset($this->http_req->query->server)
+				? ';server=' . $this->http_req->query->server : '') . (isset($this->http_req->query->auto)
+				? ';auto' : '') . ';package=' . $this->http_req->post->package . (isset($this->http_req->query->conflict)
 				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'crash_on_error' => true)
 		);
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->post->package));
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->http_req->post->package));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->post->package) == 1 && strpos($this->_req->post->package, 'dlattach') === false && isset($this->_req->query->auto))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->http_req->post->package) == 1 && strpos($this->http_req->post->package, 'dlattach') === false && isset($this->http_req->query->auto))
 			redirectexit('action=Admin;area=packages;sa=Install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
@@ -488,12 +488,12 @@ class PackageServersController extends AbstractController
 		$url = '';
 		$server = '';
 
-		if (isset($this->_req->query->server))
+		if (isset($this->http_req->query->server))
 		{
-			if ($this->_req->query->server == '')
+			if ($this->http_req->query->server == '')
 				redirectexit('action=Admin;area=packageservers');
 
-			$server = $this->_req->getQuery('server', 'intval');
+			$server = $this->http_req->getQuery('server', 'intval');
 
 			// Query the server table to find the requested server.
 			$packageserver = fetchPackageServers($server);
@@ -622,15 +622,15 @@ class PackageServersController extends AbstractController
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Validate the user.
-		$this->_session->check();
+		$this->session->check();
 
 		// If they put a slash on the end, get rid of it.
-		if (substr($this->_req->post->serverurl, -1) == '/')
-			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
+		if (substr($this->http_req->post->serverurl, -1) == '/')
+			$this->http_req->post->serverurl = substr($this->http_req->post->serverurl, 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->servername));
-		$serverurl = trim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->serverurl));
+		$servername = trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->servername));
+		$serverurl = trim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
 		$serverurl = addProtocol($serverurl, array('http://', 'https://'));
@@ -648,13 +648,13 @@ class PackageServersController extends AbstractController
 	 */
 	public function action_remove()
 	{
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// We no longer browse this server.
-		$this->_req->query->server = (int) $this->_req->query->server;
-		deletePackageServer($this->_req->query->server);
+		$this->http_req->query->server = (int) $this->http_req->query->server;
+		deletePackageServer($this->http_req->query->server);
 
 		redirectexit('action=Admin;area=packageservers');
 	}
@@ -716,17 +716,17 @@ class PackageServersController extends AbstractController
 		if ($unwritable)
 		{
 			// Are they connecting to their FTP account already?
-			if (isset($this->_req->post->ftp_username))
+			if (isset($this->http_req->post->ftp_username))
 			{
-				$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+				$ftp = new Ftp_Connection($this->http_req->post->ftp_server, $this->http_req->post->ftp_port, $this->http_req->post->ftp_username, $this->http_req->post->ftp_password);
 
 				if ($ftp->error === false)
 				{
 					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($this->_req->post->ftp_path))
+					if (!$ftp->chdir($this->http_req->post->ftp_path))
 					{
 						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->http_req->post->ftp_path));
 					}
 				}
 			}
@@ -745,18 +745,18 @@ class PackageServersController extends AbstractController
 
 				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
-				if ($found_path || !isset($this->_req->post->ftp_path))
-					$this->_req->post->ftp_path = $detect_path;
+				if ($found_path || !isset($this->http_req->post->ftp_path))
+					$this->http_req->post->ftp_path = $detect_path;
 
-				if (!isset($this->_req->post->ftp_username))
-					$this->_req->post->ftp_username = $username;
+				if (!isset($this->http_req->post->ftp_username))
+					$this->http_req->post->ftp_username = $username;
 
 				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
 				$context['package_ftp'] = array(
-					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $this->_req->post->ftp_path,
+					'server' => isset($this->http_req->post->ftp_server) ? $this->http_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($this->http_req->post->ftp_port) ? $this->http_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($this->http_req->post->ftp_username) ? $this->http_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $this->http_req->post->ftp_path,
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
 

@@ -90,7 +90,7 @@ class ManageMembergroupsController extends AbstractController
 		);
 
 		// Default to sub action 'index' or 'settings' depending on permissions.
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (allowedTo('manage_membergroups') ? 'index' : 'settings');
+		$subAction = isset($this->http_req->query->sa) && isset($subActions[$this->http_req->query->sa]) ? $this->http_req->query->sa : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
 		// Set that subaction, call integrate_sa_manage_membergroups
 		$subAction = $action->initialize($subActions, $subAction);
@@ -124,7 +124,7 @@ class ManageMembergroupsController extends AbstractController
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=Admin;area=membergroups' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : ''),
+			'base_href' => $scripturl . '?action=Admin;area=membergroups' . (isset($this->http_req->query->sort2) ? ';sort2=' . urlencode($this->http_req->query->sort2) : ''),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -232,7 +232,7 @@ class ManageMembergroupsController extends AbstractController
 		$listOptions = array(
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
-			'base_href' => $scripturl . '?action=Admin;area=membergroups' . (isset($this->_req->query->sort) ? ';sort=' . urlencode($this->_req->query->sort) : ''),
+			'base_href' => $scripturl . '?action=Admin;area=membergroups' . (isset($this->http_req->query->sort) ? ';sort=' . urlencode($this->http_req->query->sort) : ''),
 			'default_sort_col' => 'required_posts',
 			'request_vars' => array(
 				'sort' => 'sort2',
@@ -352,13 +352,13 @@ class ManageMembergroupsController extends AbstractController
 
 
 		// A form was submitted, we can start adding.
-		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
+		if (isset($this->http_req->post->group_name) && trim($this->http_req->post->group_name) != '')
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mmg');
 
-			$postCountBasedGroup = isset($this->_req->post->min_posts) && (!isset($this->_req->post->postgroup_based) || !empty($this->_req->post->postgroup_based));
-			$group_type = !isset($this->_req->post->group_type) || $this->_req->post->group_type < 0 || $this->_req->post->group_type > 3 || ($this->_req->post->group_type == 1 && !allowedTo('admin_forum')) ? 0 : (int) $this->_req->post->group_type;
+			$postCountBasedGroup = isset($this->http_req->post->min_posts) && (!isset($this->http_req->post->postgroup_based) || !empty($this->http_req->post->postgroup_based));
+			$group_type = !isset($this->http_req->post->group_type) || $this->http_req->post->group_type < 0 || $this->http_req->post->group_type > 3 || ($this->http_req->post->group_type == 1 && !allowedTo('admin_forum')) ? 0 : (int) $this->http_req->post->group_type;
 
 			// @todo Check for members with same name too?
 
@@ -367,14 +367,14 @@ class ManageMembergroupsController extends AbstractController
 
 			loadIllegalPermissions();
 			$id_group = getMaxGroupID() + 1;
-			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
+			$minposts = !empty($this->http_req->post->min_posts) ? (int) $this->http_req->post->min_posts : '-1';
 
-			addMembergroup($id_group, $this->_req->post->group_name, $minposts, $group_type);
+			addMembergroup($id_group, $this->http_req->post->group_name, $minposts, $group_type);
 
 			$GLOBALS['elk']['hooks']->hook('add_membergroup', array($id_group, $postCountBasedGroup));
 
 			// Update the post groups now, if this is a post group!
-			if (isset($this->_req->post->min_posts))
+			if (isset($this->http_req->post->min_posts))
 			{
 
 				updatePostGroupStats();
@@ -382,18 +382,18 @@ class ManageMembergroupsController extends AbstractController
 
 			// You cannot set permissions for post groups if they are disabled.
 			if ($postCountBasedGroup && empty($modSettings['permission_enable_postgroups']))
-				$this->_req->post->perm_type = '';
+				$this->http_req->post->perm_type = '';
 
-			if ($this->_req->post->perm_type == 'predefined')
+			if ($this->http_req->post->perm_type == 'predefined')
 			{
 				// Set default permission level.
 				require_once(SUBSDIR . '/ManagePermissions.subs.php');
-				setPermissionLevel($this->_req->post->level, $id_group, null);
+				setPermissionLevel($this->http_req->post->level, $id_group, null);
 			}
 			// Copy or inherit the permissions!
-			elseif ($this->_req->post->perm_type == 'copy' || $this->_req->post->perm_type == 'inherit')
+			elseif ($this->http_req->post->perm_type == 'copy' || $this->http_req->post->perm_type == 'inherit')
 			{
-				$copy_id = $this->_req->post->perm_type == 'copy' ? (int) $this->_req->post->copyperm : (int) $this->_req->post->inheritperm;
+				$copy_id = $this->http_req->post->perm_type == 'copy' ? (int) $this->http_req->post->copyperm : (int) $this->http_req->post->inheritperm;
 
 				// Are you a powerful Admin?
 				if (!allowedTo('admin_forum'))
@@ -413,17 +413,17 @@ class ManageMembergroupsController extends AbstractController
 				copyBoardPermissions($id_group, $copy_id);
 
 				// Also get some membergroup information if we're copying and not copying from guests...
-				if ($copy_id > 0 && $this->_req->post->perm_type == 'copy')
+				if ($copy_id > 0 && $this->http_req->post->perm_type == 'copy')
 					updateCopiedGroup($id_group, $copy_id);
 
 				// If inheriting say so...
-				elseif ($this->_req->post->perm_type == 'inherit')
+				elseif ($this->http_req->post->perm_type == 'inherit')
 					updateInheritedGroup($id_group, $copy_id);
 			}
 
 			// Make sure all boards selected are stored in a proper array.
 			$changed_boards = array();
-			$accesses = empty($this->_req->post->boardaccess) || !is_array($this->_req->post->boardaccess) ? array() : $this->_req->post->boardaccess;
+			$accesses = empty($this->http_req->post->boardaccess) || !is_array($this->http_req->post->boardaccess) ? array() : $this->http_req->post->boardaccess;
 			$changed_boards['allow'] = array();
 			$changed_boards['deny'] = array();
 			$changed_boards['ignore'] = array();
@@ -447,7 +447,7 @@ class ManageMembergroupsController extends AbstractController
 			));
 
 			// We did it.
-			logAction('add_group', array('group' => $this->_req->post->group_name), 'Admin');
+			logAction('add_group', array('group' => $this->http_req->post->group_name), 'Admin');
 
 			// Go change some more settings.
 			redirectexit('action=Admin;area=membergroups;sa=edit;group=' . $id_group);
@@ -456,8 +456,8 @@ class ManageMembergroupsController extends AbstractController
 		// Just show the 'add membergroup' screen.
 		$context['page_title'] = $txt['membergroups_new_group'];
 		$context['sub_template'] = 'new_group';
-		$context['post_group'] = isset($this->_req->query->postgroup);
-		$context['undefined_group'] = !isset($this->_req->query->postgroup) && !isset($this->_req->query->generalgroup);
+		$context['post_group'] = isset($this->http_req->query->postgroup);
+		$context['undefined_group'] = !isset($this->http_req->query->postgroup) && !isset($this->http_req->query->generalgroup);
 		$context['allow_protected'] = allowedTo('admin_forum');
 
 		if (!empty($modSettings['deny_boards_access']))
@@ -487,10 +487,10 @@ class ManageMembergroupsController extends AbstractController
 	 */
 	public function action_delete()
 	{
-		$this->_session->check('get');
+		$this->session->check('get');
 
 
-		deleteMembergroups((int) $this->_req->query->group);
+		deleteMembergroups((int) $this->http_req->query->group);
 
 		// Go back to the membergroup index.
 		redirectexit('action=Admin;area=membergroups;');
@@ -512,7 +512,7 @@ class ManageMembergroupsController extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		$current_group_id = isset($this->_req->query->group) ? (int) $this->_req->query->group : 0;
+		$current_group_id = isset($this->http_req->query->group) ? (int) $this->http_req->query->group : 0;
 		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
@@ -529,9 +529,9 @@ class ManageMembergroupsController extends AbstractController
 			$GLOBALS['elk']['errors']->fatal_lang_error('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
-		if (isset($this->_req->post->delete))
+		if (isset($this->http_req->post->delete))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mmg');
 
 			if (empty($current_group_id))
@@ -543,10 +543,10 @@ class ManageMembergroupsController extends AbstractController
 			redirectexit('action=Admin;area=membergroups;');
 		}
 		// A form was submitted with the new membergroup settings.
-		elseif (isset($this->_req->post->save))
+		elseif (isset($this->http_req->post->save))
 		{
 			// Validate the session.
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mmg');
 
 			if (empty($current_group_id))
@@ -573,10 +573,10 @@ class ManageMembergroupsController extends AbstractController
 			$validator->validation_rules(array(
 				'boardaccess' => 'contains[allow,ignore,deny]',
 			));
-			$validator->validate($this->_req->post);
+			$validator->validate($this->http_req->post);
 
 			// Insert the clean data
-			$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
+			$our_post = array_replace((array) $this->http_req->post, $validator->validation_data());
 
 			// Can they really inherit from this group?
 			$inherit_type  = array();
@@ -643,17 +643,17 @@ class ManageMembergroupsController extends AbstractController
 			}
 
 			// Do we need to set inherited permissions?
-			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
+			if ($group_inherit != -2 && $group_inherit != $this->http_req->post->old_inherit)
 			{
 				require_once(SUBSDIR . '/Permission.subs.php');
 				updateChildPermissions($group_inherit);
 			}
 
 			// Lastly, moderators!
-			$moderator_string = isset($this->_req->post->group_moderators) ? trim($this->_req->post->group_moderators) : '';
+			$moderator_string = isset($this->http_req->post->group_moderators) ? trim($this->http_req->post->group_moderators) : '';
 			detachGroupModerators($current_group['id_group']);
 
-			if ((!empty($moderator_string) || !empty($this->_req->post->moderator_list)) && $min_posts == -1 && $current_group['id_group'] != 3)
+			if ((!empty($moderator_string) || !empty($this->http_req->post->moderator_list)) && $min_posts == -1 && $current_group['id_group'] != 3)
 			{
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
@@ -676,7 +676,7 @@ class ManageMembergroupsController extends AbstractController
 				else
 				{
 					$moderators = array();
-					foreach ($this->_req->post->moderator_list as $moderator)
+					foreach ($this->http_req->post->moderator_list as $moderator)
 						$moderators[] = (int) $moderator;
 
 					$group_moderators = array();
@@ -794,9 +794,9 @@ class ManageMembergroupsController extends AbstractController
 
 		$config_vars = $this->_groupSettings->settings();
 
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			$GLOBALS['elk']['hooks']->hook('save_membergroup_settings');
 
 			// Yeppers, saving this...

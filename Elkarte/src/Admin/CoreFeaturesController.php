@@ -71,11 +71,11 @@ class CoreFeaturesController extends AbstractController
 		$this->loadGeneralSettingParameters();
 
 		// Are we saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			if (isset($this->_req->query->xml))
+			if (isset($this->http_req->query->xml))
 			{
 				$tokenValidation = validateToken('Admin-core', 'post', false);
 
@@ -87,7 +87,7 @@ class CoreFeaturesController extends AbstractController
 
 			$this->_save_core_features($core_features);
 
-			if (!isset($this->_req->query->xml))
+			if (!isset($this->http_req->query->xml))
 				redirectexit('action=Admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -103,7 +103,7 @@ class CoreFeaturesController extends AbstractController
 			updateSettings(array('admin_features' => ''));
 
 		// sub_template is already generic_xml and the token is created somewhere else
-		if (isset($this->_req->query->xml))
+		if (isset($this->http_req->query->xml))
 			return true;
 
 		$context['sub_template'] = 'core_features';
@@ -359,8 +359,8 @@ class CoreFeaturesController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
-			$context['sub_action'] = $this->_req->query->sa;
+		if (isset($this->http_req->query->sa, $subActions[$this->http_req->query->sa]))
+			$context['sub_action'] = $this->http_req->query->sa;
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
@@ -385,7 +385,7 @@ class CoreFeaturesController extends AbstractController
 		// Cycle each feature and change things as required!
 		foreach ($core_features as $id => $feature)
 		{
-			$feature_id = $this->_req->getPost('feature_' . $id);
+			$feature_id = $this->http_req->getPost('feature_' . $id);
 
 			// Enabled?
 			if (!empty($feature_id))
@@ -430,7 +430,7 @@ class CoreFeaturesController extends AbstractController
 			// Standard save callback?
 			if (isset($feature['save_callback']))
 			{
-				$status = $this->_req->getPost('feature_' . $id);
+				$status = $this->http_req->getPost('feature_' . $id);
 				$feature['save_callback'](!empty($status));
 			}
 		}

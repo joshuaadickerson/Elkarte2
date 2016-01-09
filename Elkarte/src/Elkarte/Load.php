@@ -1165,8 +1165,8 @@ function loadLoadAverage()
 
 	if (($context['load_average'] = $cache->get('loadavg', 90)) == null)
 	{
-		require_once(ELKDIR . '/Server/Server.subs.php');
-		$context['load_average'] = detectServerLoad();
+		$server = new \Elkarte\Elkarte\Server\Server();
+		$context['load_average'] = $server->detectServerLoad();
 
 		$cache->put('loadavg', $context['load_average'], 90);
 	}

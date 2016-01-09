@@ -120,13 +120,13 @@ class RecentController extends AbstractController
 		$this->_grabber = new Recent($user_info['id']);
 
 		// Set or use a starting point for pagination
-		$this->_start = $this->_req->getPost('start', 'intval', 0);
+		$this->_start = $this->http_req->getPost('start', 'intval', 0);
 
 		// Recent posts by category id's
-		if (!empty($this->_req->query->c) && empty($board))
+		if (!empty($this->http_req->query->c) && empty($board))
 			$categories = $this->_recentPostsCategory();
 		// Or recent posts by board id's?
-		elseif (!empty($this->_req->query->boards))
+		elseif (!empty($this->http_req->query->boards))
 			$this->_recentPostsBoards();
 		// Or just the recent posts for a specific board
 		elseif (!empty($board))
@@ -209,7 +209,7 @@ class RecentController extends AbstractController
 	{
 		global $scripturl, $modSettings, $context;
 
-		$categories = array_map('intval', explode(',', $this->_req->query->c));
+		$categories = array_map('intval', explode(',', $this->http_req->query->c));
 
 		if (count($categories) === 1)
 		{
@@ -251,10 +251,10 @@ class RecentController extends AbstractController
 	{
 		global $scripturl, $modSettings;
 
-		$this->_req->query->boards = array_map('intval', explode(',', $this->_req->query->boards));
+		$this->http_req->query->boards = array_map('intval', explode(',', $this->http_req->query->boards));
 
 		// Fetch the number of posts for the supplied board IDs
-		$boards_posts = boardsPosts($this->_req->query->boards, array());
+		$boards_posts = boardsPosts($this->http_req->query->boards, array());
 		$this->_total_posts = array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
@@ -273,7 +273,7 @@ class RecentController extends AbstractController
 			$this->_maxMsgID = array(500, 9);
 		}
 
-		$this->_base_url = $scripturl . '?action=recent;boards=' . implode(',', $this->_req->query->boards);
+		$this->_base_url = $scripturl . '?action=recent;boards=' . implode(',', $this->http_req->query->boards);
 	}
 
 	/**

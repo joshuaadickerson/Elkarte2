@@ -51,7 +51,7 @@ class AdminDebugController extends AbstractController
 		global $context, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
-		if ($db_show_debug !== true || !isset($this->_req->session->debug))
+		if ($db_show_debug !== true || !isset($this->http_req->session->debug))
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
 		// Don't allow except for administrators.
@@ -60,18 +60,18 @@ class AdminDebugController extends AbstractController
 		$debug = $GLOBALS['elk']['debug'];
 
 		// If we're just hiding/showing, do it now.
-		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')
+		if (isset($this->http_req->query->sa) && $this->http_req->query->sa === 'hide')
 		{
 			$debug->toggleViewQueries();
 
-			if (strpos($this->_req->session->old_url, 'action=viewquery') !== false)
+			if (strpos($this->http_req->session->old_url, 'action=viewquery') !== false)
 				redirectexit();
 			else
-				redirectexit($this->_req->session->old_url);
+				redirectexit($this->http_req->session->old_url);
 		}
 
 		// Looking at a specific query?
-		$query_id = $this->_req->getQuery('qq', 'intval');
+		$query_id = $this->http_req->getQuery('qq', 'intval');
 		$query_id = $query_id === null ? -1 : $query_id - 1;
 
 		// Just to stay on the safe side, better remove any layer and add back only html

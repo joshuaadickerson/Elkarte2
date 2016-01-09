@@ -1463,7 +1463,6 @@ class Attachments
 	/**
 	 * Recursive function to retrieve server-stored avatar files
 	 *
-	 * @package Attachments
 	 * @param string $directory
 	 * @param int $level
 	 * @return array
@@ -1510,7 +1509,7 @@ class Attachments
 
 		foreach ($dirs as $line)
 		{
-			$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
+			$tmp = $this->getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
 			if (!empty($tmp))
 				$result[] = array(
 					'filename' => htmlspecialchars($line, ENT_COMPAT, 'UTF-8'),

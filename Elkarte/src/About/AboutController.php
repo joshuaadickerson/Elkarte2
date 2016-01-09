@@ -105,9 +105,9 @@ class AboutController extends AbstractController
             redirectexit();
 
         // Submitted the contact form?
-        if (isset($this->_req->post->send))
+        if (isset($this->http_req->post->send))
         {
-            $this->_session->check('post');
+            $this->session->check('post');
             validateToken('contact');
 
             // Can't send a lot of these in a row, no sir!
@@ -133,11 +133,11 @@ class AboutController extends AbstractController
             ));
 
             // Any form errors
-            if (!$validator->validate($this->_req->post))
+            if (!$validator->validate($this->http_req->post))
                 $context['errors'] = $validator->validation_errors();
 
             // Get the clean data
-            $this->_req->post = new \ArrayObject($validator->validation_data(), \ArrayObject::ARRAY_AS_PROPS);
+            $this->http_req->post = new \ArrayObject($validator->validation_data(), \ArrayObject::ARRAY_AS_PROPS);
 
             // Trigger the verify contact event for captcha checks
             $this->_events->trigger('verify_contact', array());
@@ -148,7 +148,7 @@ class AboutController extends AbstractController
                 $admins = $this->mem_manager->admins();
                 if (!empty($admins))
                 {
-                    $this->elk['pm']->sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $this->_req->post->contactmessage, false, array('id' => 0, 'name' => $this->_req->post->emailaddress, 'username' => $this->_req->post->emailaddress));
+                    $this->elk['pm']->sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $this->http_req->post->contactmessage, false, array('id' => 0, 'name' => $this->http_req->post->emailaddress, 'username' => $this->http_req->post->emailaddress));
                 }
 
                 // Send the PM
@@ -156,13 +156,13 @@ class AboutController extends AbstractController
             }
             else
             {
-                $context['emailaddress'] = $this->_req->post->emailaddress;
-                $context['contactmessage'] = $this->_req->post->contactmessage;
+                $context['emailaddress'] = $this->http_req->post->emailaddress;
+                $context['contactmessage'] = $this->http_req->post->contactmessage;
             }
         }
 
         // Show the contact done form or the form itself
-        if (isset($this->_req->query->done))
+        if (isset($this->http_req->query->done))
             $context['sub_template'] = 'contact_form_done';
         else
         {

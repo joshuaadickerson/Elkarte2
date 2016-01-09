@@ -22,6 +22,8 @@
 namespace Elkarte\Profile;
 
 use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
+use Elkarte\Elkarte\Security\OpenID;
 
 /**
  * ProfileOptionsController class. Does the job of showing and editing people's profiles.
@@ -45,7 +47,8 @@ class ProfileOptionsController extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		$this->_memID = currentMemberID();
+		$this->bootstrap();
+		$this->_memID = $this->elk['profile']->currentMemberID();
 	}
 
 	/**
@@ -127,33 +130,33 @@ class ProfileOptionsController extends AbstractController
 		}
 
 		// Removing a buddy?
-		if (isset($this->_req->query->remove))
+		if (isset($this->http_req->query->remove))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			$GLOBALS['elk']['hooks']->hook('remove_buddy', array($this->_memID));
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($buddiesArray as $key => $buddy)
 			{
-				if ($buddy == (int) $this->_req->query->remove)
+				if ($buddy == (int) $this->http_req->query->remove)
 					unset($buddiesArray[$key]);
 			}
 
 			// Make the changes.
 			$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
-				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+			$this->elk['members.manager']->updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
 		}
 		// Or adding a new one
-		elseif (isset($this->_req->post->new_buddy))
+		elseif (isset($this->http_req->post->new_buddy))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Prepare the string for extraction...
-			$new_buddy = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
+			$new_buddy = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
 			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
 
@@ -170,12 +173,11 @@ class ProfileOptionsController extends AbstractController
 			if (!empty($new_buddies))
 			{
 				// Now find out the id_member of the buddy.
-				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$buddiesArray = getBuddiesID($new_buddies);
+				$buddiesArray = $this->elk['profile.options']->getBuddiesID($new_buddies);
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
-						updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+				$this->elk['members.manager']->updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 			}
 
 			// Back to the buddy list!
@@ -187,7 +189,7 @@ class ProfileOptionsController extends AbstractController
 
 		if (!empty($buddiesArray))
 		{
-				$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
+				$result = $this->elk['members.manager']->getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
 			foreach ($result as $row)
 				$buddies[] = $row['id_member'];
 		}
@@ -195,13 +197,13 @@ class ProfileOptionsController extends AbstractController
 		$context['buddy_count'] = count($buddies);
 
 		// Load all the members up.
-		loadMemberData($buddies, false, 'profile');
+		$this->elk['members.manager']->loadMemberData($buddies, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
-			loadMemberContext($buddy, true);
+			$this->elk['members.manager']->loadMemberContext($buddy, true);
 			$context['buddies'][$buddy] = $memberContext[$buddy];
 		}
 
@@ -232,30 +234,30 @@ class ProfileOptionsController extends AbstractController
 		}
 
 		// Removing a member from the ignore list?
-		if (isset($this->_req->query->remove))
+		if (isset($this->http_req->query->remove))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($ignoreArray as $key => $id_remove)
 			{
-				if ($id_remove == (int) $this->_req->query->remove)
+				if ($id_remove == (int) $this->http_req->query->remove)
 					unset($ignoreArray[$key]);
 			}
 
 			// Make the changes.
 			$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
-				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+			$this->elk['members.manager']->updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
-		elseif (isset($this->_req->post->new_ignore))
+		elseif (isset($this->http_req->post->new_ignore))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Prepare the string for extraction...
-			$new_ignore = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
+			$new_ignore = strtr($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
 			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
 
@@ -270,12 +272,11 @@ class ProfileOptionsController extends AbstractController
 			if (!empty($new_entries))
 			{
 				// Now find out the id_member for the members in question.
-				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = getBuddiesID($new_entries, false);
+				$ignoreArray = $this->elk['profile.options']->getBuddiesID($new_entries, false);
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
-						updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+				$this->elk['members.manager']->updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 			}
 
 			// Back to the list of pitiful people!
@@ -287,7 +288,7 @@ class ProfileOptionsController extends AbstractController
 
 		if (!empty($ignoreArray))
 		{
-				$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
+				$result = $this->elk['members.manager']->getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
 			foreach ($result as $row)
 				$ignored[] = $row['id_member'];
 		}
@@ -295,13 +296,13 @@ class ProfileOptionsController extends AbstractController
 		$context['ignore_count'] = count($ignored);
 
 		// Load all the members up.
-		loadMemberData($ignored, false, 'profile');
+		$this->elk['members.manager']->loadMemberData($ignored, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['ignore_list'] = array();
 		foreach ($ignored as $ignore_member)
 		{
-			loadMemberContext($ignore_member);
+			$this->elk['members.manager']->loadMemberContext($ignore_member);
 			$context['ignore_list'][$ignore_member] = $memberContext[$ignore_member];
 		}
 	}
@@ -317,12 +318,12 @@ class ProfileOptionsController extends AbstractController
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
-			loadCustomFields($this->_memID, 'account');
+			$this->elk['profile']->loadCustomFields($this->_memID, 'account');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['account_info'];
 
-		setupProfileContext(
+		$this->elk['profile']->setupProfileContext(
 			array(
 				'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
 				'id_group', 'hr',
@@ -387,13 +388,13 @@ class ProfileOptionsController extends AbstractController
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
-			loadCustomFields($this->_memID, 'forumprofile');
+			$this->elk['profile']->loadCustomFields($this->_memID, 'forumprofile');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
 		$context['show_preview_button'] = true;
 
-		setupProfileContext(
+		$this->elk['profile']->setupProfileContext(
 			array(
 				'avatar_choice', 'hr', 'personal_text', 'hr',
 				'bday1', 'location', 'gender', 'hr',
@@ -413,14 +414,14 @@ class ProfileOptionsController extends AbstractController
 		global $context, $txt;
 
 		$this->loadThemeOptions();
-		loadCustomFields($this->_memID, 'pmprefs');
+		$this->elk['profile']->loadCustomFields($this->_memID, 'pmprefs');
 		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['pm_settings_desc'];
 
 		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
-		setupProfileContext(
+		$this->elk['profile']->setupProfileContext(
 			array(
 				'receive_from',
 				'hr',
@@ -441,14 +442,14 @@ class ProfileOptionsController extends AbstractController
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
-			loadCustomFields($this->_memID, 'theme');
+			$this->elk['profile']->loadCustomFields($this->_memID, 'theme');
 
 		$this->_templates->load('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
-		setupProfileContext(
+		$this->elk['profile']->setupProfileContext(
 			array(
 				'id_theme', 'smiley_set', 'hr',
 				'time_format', 'time_offset', 'hr',
@@ -475,19 +476,19 @@ class ProfileOptionsController extends AbstractController
 		if ($saving)
 		{
 			// Moving to password passed authentication?
-			if ($this->_req->post->authenticate === 'passwd')
+			if ($this->http_req->post->authenticate === 'passwd')
 			{
 				// Didn't enter anything?
-				if ($this->_req->post->passwrd1 === '')
+				if ($this->http_req->post->passwrd1 === '')
 					$post_errors[] = 'no_password';
 				// Do the two entries for the password even match?
-				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+				elseif (!isset($this->http_req->post->passwrd2) || $this->http_req->post->passwrd1 != $this->http_req->post->passwrd2)
 					$post_errors[] = 'bad_new_password';
 				// Is it valid?
 				else
 				{
 					require_once(SUBSDIR . '/Auth.subs.php');
-					$passwordErrors = validatePassword($this->_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
+					$passwordErrors = validatePassword($this->http_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 					// Were there errors?
 					if ($passwordErrors != null)
@@ -497,15 +498,14 @@ class ProfileOptionsController extends AbstractController
 				if (empty($post_errors))
 				{
 					// Integration?
-					$GLOBALS['elk']['hooks']->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd1));
+					$this->hooks->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->http_req->post->passwrd1));
 
 					// Go then.
-					require_once(SUBSDIR . '/Auth.subs.php');
-					$new_pass = $this->_req->post->passwrd1;
+					$new_pass = $this->http_req->post->passwrd1;
 					$passwd = validateLoginPassword($new_pass, '', $cur_profile['member_name'], true);
 
 					// Do the important bits.
-								updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
+					$this->elk['members.manager']->updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
 						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
@@ -518,25 +518,23 @@ class ProfileOptionsController extends AbstractController
 				return true;
 			}
 			// Not right yet!
-			elseif ($this->_req->post->authenticate === 'openid' && !empty($this->_req->post->openid_identifier))
+			elseif ($this->http_req->post->authenticate === 'openid' && !empty($this->http_req->post->openid_identifier))
 			{
-				require_once(SUBSDIR . '/OpenID.subs.php');
-
 				$openID = new OpenID();
-				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
+				$this->http_req->post->openid_identifier = $openID->canonize($this->http_req->post->openid_identifier);
 
-				if (memberExists($this->_req->post->openid_identifier))
+				if ($this->elk['members.manager']->memberExists($this->http_req->post->openid_identifier))
 					$post_errors[] = 'openid_in_use';
 				elseif (empty($post_errors))
 				{
 					// Authenticate using the new OpenID URI first to make sure they didn't make a mistake.
 					if ($context['user']['is_owner'])
 					{
-						$_SESSION['new_openid_uri'] = $this->_req->post->openid_identifier;
-						$openID->validate($this->_req->post->openid_identifier, false, null, 'change_uri');
+						$_SESSION['new_openid_uri'] = $this->http_req->post->openid_identifier;
+						$openID->validate($this->http_req->post->openid_identifier, false, null, 'change_uri');
 					}
 					else
-						updateMemberData($this->_memID, array('openid_uri' => $this->_req->post->openid_identifier));
+						$this->elk['members.manager']->updateMemberData($this->_memID, array('openid_uri' => $this->http_req->post->openid_identifier));
 				}
 			}
 		}
@@ -869,7 +867,7 @@ class ProfileOptionsController extends AbstractController
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 		$context['can_edit_primary'] = $context['can_manage_protected'];
-		$context['update_message'] = isset($this->_req->query->msg) && isset($txt['group_membership_msg_' . $this->_req->query->msg]) ? $txt['group_membership_msg_' . $this->_req->query->msg] : '';
+		$context['update_message'] = isset($this->http_req->query->msg) && isset($txt['group_membership_msg_' . $this->http_req->query->msg]) ? $txt['group_membership_msg_' . $this->http_req->query->msg] : '';
 
 		// Get all the groups this user is a member of.
 		$groups = explode(',', $curMember['additional_groups']);
@@ -902,11 +900,11 @@ class ProfileOptionsController extends AbstractController
 			$context['can_edit_primary'] = false;
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
-		if (isset($this->_req->query->request)
-			&& isset($context['groups']['available'][(int) $this->_req->query->request])
-			&& $context['groups']['available'][(int) $this->_req->query->request]['type'] == 2)
+		if (isset($this->http_req->query->request)
+			&& isset($context['groups']['available'][(int) $this->http_req->query->request])
+			&& $context['groups']['available'][(int) $this->http_req->query->request]['type'] == 2)
 		{
-			$context['group_request'] = $context['groups']['available'][(int) $this->_req->query->request];
+			$context['group_request'] = $context['groups']['available'][(int) $this->http_req->query->request];
 		}
 	}
 
@@ -923,13 +921,13 @@ class ProfileOptionsController extends AbstractController
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
 			isAllowedTo('manage_membergroups');
 
-		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
+		$group_id = $this->http_req->getPost('gid', 'intval', $this->http_req->getQuery('gid', 'intval', null));
 
-		if (!isset($group_id) && !isset($this->_req->post->primary))
+		if (!isset($group_id) && !isset($this->http_req->post->primary))
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// GID may be from a link or a form
-		$this->_session->check(isset($this->_req->query->gid) ? 'get' : 'post');
+		$this->session->check(isset($this->http_req->query->gid) ? 'get' : 'post');
 
 
 
@@ -941,10 +939,10 @@ class ProfileOptionsController extends AbstractController
 		$newPrimary = $old_profile['id_group'];
 		$addGroups = array_flip(explode(',', $old_profile['additional_groups']));
 		$canChangePrimary = $old_profile['id_group'] == 0 ? 1 : 0;
-		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
+		$changeType = isset($this->http_req->post->primary) ? 'primary' : (isset($this->http_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
-		$group_id = isset($group_id) ? $group_id : (int) $this->_req->post->primary;
+		$group_id = isset($group_id) ? $group_id : (int) $this->http_req->post->primary;
 		$foundTarget = $changeType === 'primary' && $group_id == 0 ? true : false;
 
 		// Sanity check!!
@@ -1046,7 +1044,7 @@ class ProfileOptionsController extends AbstractController
 						'RECPNAME' => $member['member_name'],
 						'APPYNAME' => $old_profile['member_name'],
 						'GROUPNAME' => $group_name,
-						'REASON' => $this->_req->post->reason,
+						'REASON' => $this->http_req->post->reason,
 						'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
 					);
 
@@ -1119,16 +1117,16 @@ class ProfileOptionsController extends AbstractController
 	{
 		global $context, $options, $cur_profile;
 
-		if (isset($this->_req->post->default_options))
-			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
+		if (isset($this->http_req->post->default_options))
+			$this->http_req->post->options = isset($this->http_req->post->options) ? $this->http_req->post->options + $this->http_req->post->default_options : $this->http_req->post->default_options;
 
 		if ($context['user']['is_owner'])
 		{
 			$context['member']['options'] = $options;
 
-			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
+			if (isset($this->http_req->post->options) && is_array($this->http_req->post->options))
 			{
-				foreach ($this->_req->post->options as $k => $v)
+				foreach ($this->http_req->post->options as $k => $v)
 					$context['member']['options'][$k] = $v;
 			}
 		}
@@ -1137,9 +1135,9 @@ class ProfileOptionsController extends AbstractController
 			require_once(SUBSDIR . '/Themes.subs.php');
 			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
 
-			if (isset($this->_req->post->options))
+			if (isset($this->http_req->post->options))
 			{
-				foreach ($this->_req->post->options as $var => $val)
+				foreach ($this->http_req->post->options as $var => $val)
 					$context['member']['options'][$var] = $val;
 			}
 		}

@@ -205,17 +205,17 @@ class ManageFeaturesController extends AbstractController
 		$config_vars = $this->_basicSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Prevent absurd boundaries here - make it a day tops.
-			if (isset($this->_req->post->lastActive))
-				$this->_req->post->lastActive = min((int) $this->_req->post->lastActive, 1440);
+			if (isset($this->http_req->post->lastActive))
+				$this->http_req->post->lastActive = min((int) $this->http_req->post->lastActive, 1440);
 
 			$GLOBALS['elk']['hooks']->hook('save_basic_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			writeLog();
 			redirectexit('action=Admin;area=featuresettings;sa=basic');
@@ -260,7 +260,7 @@ class ManageFeaturesController extends AbstractController
 		$config_vars = $this->_layoutSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			// Remove and reset if needed
 			if (!empty($modSettings['front_page']))
@@ -269,20 +269,20 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
-			if (!empty($this->_req->post->front_page))
+			if (!empty($this->http_req->post->front_page))
 			{
-				$front_page = (string) $this->_req->post->front_page;
-				if ($front_page::validateFrontPageOptions($this->_req->post))
+				$front_page = (string) $this->http_req->post->front_page;
+				if ($front_page::validateFrontPageOptions($this->http_req->post))
 				{
 					$GLOBALS['elk']['hooks']->add('integrate_action_frontpage', $front_page . '::frontPageHook');
 				}
 			}
 
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_layout_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			writeLog();
 
 			redirectexit('action=Admin;area=featuresettings;sa=layout');
@@ -324,13 +324,13 @@ class ManageFeaturesController extends AbstractController
 		$config_vars = $this->_karmaSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_karma_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=karma');
 		}
 
@@ -370,13 +370,13 @@ class ManageFeaturesController extends AbstractController
 		$config_vars = $this->_likesSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_likes_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=likes');
 		}
 
@@ -416,19 +416,19 @@ class ManageFeaturesController extends AbstractController
 		$config_vars = $this->_notificationsSettings->settings();
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_modify_mention_settings', array(&$config_vars));
 
-			if (empty($this->_req->post->notifications))
+			if (empty($this->http_req->post->notifications))
 			{
 				$notification_methods = serialize(array());
 			}
 			else
 			{
-				$notification_methods = serialize($this->_req->post->notifications);
+				$notification_methods = serialize($this->http_req->post->notifications);
 			}
 
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -439,7 +439,7 @@ class ManageFeaturesController extends AbstractController
 			$modules_toggle = array('enable' => array(), 'disable' => array());
 			foreach ($current_settings as $type => $val)
 			{
-				if (!isset($this->_req->post->notifications[$type]))
+				if (!isset($this->http_req->post->notifications[$type]))
 				{
 					toggleMentionsVisibility($type, false);
 					$modules_toggle['disable'][] = $type;
@@ -447,9 +447,9 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			// Then make visible what was hidden, but only if there is anything
-			if (!empty($this->_req->post->notifications))
+			if (!empty($this->http_req->post->notifications))
 			{
-				foreach ($this->_req->post->notifications as $type => $val)
+				foreach ($this->http_req->post->notifications as $type => $val)
 				{
 
 					if (!isset($current_settings[$type]))
@@ -459,7 +459,7 @@ class ManageFeaturesController extends AbstractController
 					}
 				}
 
-				$enabled_mentions = array_keys($this->_req->post->notifications);
+				$enabled_mentions = array_keys($this->http_req->post->notifications);
 			}
 
 			// Let's just keep it active, there are too many reasons it should be.
@@ -484,7 +484,7 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=mention');
 		}
 
@@ -547,15 +547,15 @@ class ManageFeaturesController extends AbstractController
 		$disabledTags[] = 'footnote';
 
 		// Applying to ALL signatures?!!
-		if (isset($this->_req->query->apply))
+		if (isset($this->http_req->query->apply))
 		{
 			// Security!
-			$this->_session->check('get');
+			$this->session->check('get');
 
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
-			$applied_sigs = $this->_req->getQuery('step', 'intval', 0);
+			$applied_sigs = $this->http_req->getQuery('step', 'intval', 0);
 			updateAllSignatures($applied_sigs);
 
 			$settings_applied = true;
@@ -583,42 +583,42 @@ class ManageFeaturesController extends AbstractController
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Clean up the tag stuff!
 			$codes = $GLOBALS['elk']['bbc']->getCodes();
 			$bbcTags = $codes->getTags();
 
-			if (!isset($this->_req->post->signature_bbc_enabledTags))
-				$this->_req->post->signature_bbc_enabledTags = array();
-			elseif (!is_array($this->_req->post->signature_bbc_enabledTags))
-				$this->_req->post->signature_bbc_enabledTags = array($this->_req->post->signature_bbc_enabledTags);
+			if (!isset($this->http_req->post->signature_bbc_enabledTags))
+				$this->http_req->post->signature_bbc_enabledTags = array();
+			elseif (!is_array($this->http_req->post->signature_bbc_enabledTags))
+				$this->http_req->post->signature_bbc_enabledTags = array($this->http_req->post->signature_bbc_enabledTags);
 
 			$sig_limits = array();
 			foreach ($context['signature_settings'] as $key => $value)
 			{
 				if ($key == 'allow_smileys')
 					continue;
-				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
+				elseif ($key == 'max_smileys' && empty($this->http_req->post->signature_allow_smileys))
 					$sig_limits[] = -1;
 				else
 				{
-					$current_key = $this->_req->getPost('signature_' . $key, 'intval');
+					$current_key = $this->http_req->getPost('signature_' . $key, 'intval');
 					$sig_limits[] = !empty($current_key) ? max(1, $current_key) : 0;
 				}
 			}
 
 			$GLOBALS['elk']['hooks']->hook('save_signature_settings', array(&$sig_limits, &$bbcTags));
 
-			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
+			$this->http_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->http_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
-			SettingsForm::save_db($save_vars, $this->_req->post);
+			SettingsForm::save_db($save_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=sig');
 		}
 
@@ -666,18 +666,18 @@ class ManageFeaturesController extends AbstractController
 		$context['fields_no_registration'] = array('posts', 'warning_status');
 
 		// Are we saving any standard field changes?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-scp');
 
 			$changes = array();
 
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
-			if (!empty($this->_req->post->active))
+			if (!empty($this->http_req->post->active))
 			{
-				foreach ($this->_req->post->active as $value)
+				foreach ($this->http_req->post->active as $value)
 				{
 					if (isset($disable_fields[$value]))
 						unset($disable_fields[$value]);
@@ -689,9 +689,9 @@ class ManageFeaturesController extends AbstractController
 
 			// Things we want to show on registration?
 			$reg_fields = array();
-			if (!empty($this->_req->post->reg))
+			if (!empty($this->http_req->post->reg))
 			{
-				foreach ($this->_req->post->reg as $value)
+				foreach ($this->http_req->post->reg as $value)
 				{
 					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
 						$reg_fields[] = $value;
@@ -934,18 +934,18 @@ class ManageFeaturesController extends AbstractController
 		$this->_templates->load('ManageFeatures');
 
 		// Sort out the context!
-		$context['fid'] = $this->_req->getQuery('fid', 'intval', 0);
+		$context['fid'] = $this->http_req->getQuery('fid', 'intval', 0);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'profile';
 		$context['page_title'] = $context['fid'] ? $txt['custom_edit_title'] : $txt['custom_add_title'];
 		$context['sub_template'] = 'edit_profile_field';
 
 		// Any errors messages to show?
-		if (isset($this->_req->query->msg))
+		if (isset($this->http_req->query->msg))
 		{
 			loadLanguage('Errors');
 
-			if (isset($txt['custom_option_' . $this->_req->query->msg]))
-				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
+			if (isset($txt['custom_option_' . $this->http_req->query->msg]))
+				$context['custom_option__error'] = $txt['custom_option_' . $this->http_req->query->msg];
 		}
 
 		// Load the profile language for section names.
@@ -987,61 +987,61 @@ class ManageFeaturesController extends AbstractController
 		theme()->addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
-		if (isset($this->_req->post->onoff))
+		if (isset($this->http_req->post->onoff))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-scp');
 
 			// Enable and disable custom fields as required.
 			$enabled = array(0);
-			foreach ($this->_req->post->cust as $id)
+			foreach ($this->http_req->post->cust as $id)
 				$enabled[] = (int) $id;
 
 			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
-		elseif (isset($this->_req->post->save))
+		elseif (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-ecp');
 
 			// Everyone needs a name - even the (bracket) unknown...
-			if (trim($this->_req->post->field_name) == '')
-				redirectexit($scripturl . '?action=Admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
+			if (trim($this->http_req->post->field_name) == '')
+				redirectexit($scripturl . '?action=Admin;area=featuresettings;sa=profileedit;fid=' . $this->http_req->query->fid . ';msg=need_name');
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
-			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
-				redirectexit($scripturl . '?action=Admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
+			if (!empty($this->http_req->post->regex) && @preg_match($this->http_req->post->regex, 'dummy') === false)
+				redirectexit($scripturl . '?action=Admin;area=featuresettings;sa=profileedit;fid=' . $this->http_req->query->fid . ';msg=regex_error');
 
-			$this->_req->post->field_name = $this->_req->getPost('field_name', 'htmlspecialchars');
-			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'htmlspecialchars');
+			$this->http_req->post->field_name = $this->http_req->getPost('field_name', 'htmlspecialchars');
+			$this->http_req->post->field_desc = $this->http_req->getPost('field_desc', 'htmlspecialchars');
 
 			// Checkboxes...
-			$show_reg = $this->_req->getPost('reg', 'intval', 0);
-			$show_display = isset($this->_req->post->display) ? 1 : 0;
-			$show_memberlist = isset($this->_req->post->memberlist) ? 1 : 0;
-			$bbc = isset($this->_req->post->bbc) ? 1 : 0;
-			$show_profile = $this->_req->post->profile_area;
-			$active = isset($this->_req->post->active) ? 1 : 0;
-			$private = $this->_req->getPost('private', 'intval', 0);
-			$can_search = isset($this->_req->post->can_search) ? 1 : 0;
+			$show_reg = $this->http_req->getPost('reg', 'intval', 0);
+			$show_display = isset($this->http_req->post->display) ? 1 : 0;
+			$show_memberlist = isset($this->http_req->post->memberlist) ? 1 : 0;
+			$bbc = isset($this->http_req->post->bbc) ? 1 : 0;
+			$show_profile = $this->http_req->post->profile_area;
+			$active = isset($this->http_req->post->active) ? 1 : 0;
+			$private = $this->http_req->getPost('private', 'intval', 0);
+			$can_search = isset($this->http_req->post->can_search) ? 1 : 0;
 
 			// Some masking stuff...
-			$mask = $this->_req->getPost('mask', 'strval', '');
-			if ($mask == 'regex' && isset($this->_req->post->regex))
-				$mask .= $this->_req->post->regex;
+			$mask = $this->http_req->getPost('mask', 'strval', '');
+			if ($mask == 'regex' && isset($this->http_req->post->regex))
+				$mask .= $this->http_req->post->regex;
 
-			$field_length = $this->_req->getPost('max_length', 'intval', 255);
-			$enclose = $this->_req->getPost('enclose', 'strval', '');
-			$placement = $this->_req->getPost('placement', 'intval', 0);
+			$field_length = $this->http_req->getPost('max_length', 'intval', 255);
+			$enclose = $this->http_req->getPost('enclose', 'strval', '');
+			$placement = $this->http_req->getPost('placement', 'intval', 0);
 
 			// Select options?
 			$field_options = '';
 			$newOptions = array();
-			$default = isset($this->_req->post->default_check) && $this->_req->post->field_type == 'check' ? 1 : '';
-			if (!empty($this->_req->post->select_option) && ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio'))
+			$default = isset($this->http_req->post->default_check) && $this->http_req->post->field_type == 'check' ? 1 : '';
+			if (!empty($this->http_req->post->select_option) && ($this->http_req->post->field_type == 'select' || $this->http_req->post->field_type == 'radio'))
 			{
-				foreach ($this->_req->post->select_option as $k => $v)
+				foreach ($this->http_req->post->select_option as $k => $v)
 				{
 					// Clean, clean, clean...
 					$v = $GLOBALS['elk']['text']->htmlspecialchars($v);
@@ -1058,7 +1058,7 @@ class ManageFeaturesController extends AbstractController
 					$newOptions[$k] = $v;
 
 					// Is it default?
-					if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+					if (isset($this->http_req->post->default_select) && $this->http_req->post->default_select == $k)
 						$default = $v;
 				}
 
@@ -1069,13 +1069,13 @@ class ManageFeaturesController extends AbstractController
 			}
 
 			// Text area by default has dimensions
-			if ($this->_req->post->field_type == 'textarea')
-				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
+			if ($this->http_req->post->field_type == 'textarea')
+				$default = (int) $this->http_req->post->rows . ',' . (int) $this->http_req->post->cols;
 
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = $GLOBALS['elk']['text']->substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
+				$colname = $GLOBALS['elk']['text']->substr(strtr($this->http_req->post->field_name, array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1094,14 +1094,14 @@ class ManageFeaturesController extends AbstractController
 			else
 			{
 				// Anything going to check or select is pointless keeping - as is anything coming from check!
-				if (($this->_req->post->field_type == 'check' && $context['field']['type'] != 'check')
-					|| (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
-					|| ($context['field']['type'] == 'check' && $this->_req->post->field_type != 'check'))
+				if (($this->http_req->post->field_type == 'check' && $context['field']['type'] != 'check')
+					|| (($this->http_req->post->field_type == 'select' || $this->http_req->post->field_type == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
+					|| ($context['field']['type'] == 'check' && $this->http_req->post->field_type != 'check'))
 				{
 					deleteProfileFieldUserData($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
-				elseif ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio')
+				elseif ($this->http_req->post->field_type == 'select' || $this->http_req->post->field_type == 'radio')
 				{
 					$optionChanges = array();
 					$takenKeys = array();
@@ -1144,9 +1144,9 @@ class ManageFeaturesController extends AbstractController
 					'can_search' => $can_search,
 					'bbc' => $bbc,
 					'current_field' => $context['fid'],
-					'field_name' => $this->_req->post->field_name,
-					'field_desc' => $this->_req->post->field_desc,
-					'field_type' => $this->_req->post->field_type,
+					'field_name' => $this->http_req->post->field_name,
+					'field_desc' => $this->http_req->post->field_desc,
+					'field_type' => $this->http_req->post->field_type,
 					'field_options' => $field_options,
 					'show_profile' => $show_profile,
 					'default_value' => $default,
@@ -1158,7 +1158,7 @@ class ManageFeaturesController extends AbstractController
 				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
-				if (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && !empty($newOptions))
+				if (($this->http_req->post->field_type == 'select' || $this->http_req->post->field_type == 'radio') && !empty($newOptions))
 					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
 			}
 			// Otherwise creating a new one
@@ -1166,9 +1166,9 @@ class ManageFeaturesController extends AbstractController
 			{
 				$new_field = array(
 					'col_name' => $colname,
-					'field_name' => $this->_req->post->field_name,
-					'field_desc' => $this->_req->post->field_desc,
-					'field_type' => $this->_req->post->field_type,
+					'field_name' => $this->http_req->post->field_name,
+					'field_desc' => $this->http_req->post->field_desc,
+					'field_type' => $this->http_req->post->field_type,
 					'field_length' => $field_length,
 					'field_options' => $field_options,
 					'show_reg' => $show_reg,
@@ -1189,9 +1189,9 @@ class ManageFeaturesController extends AbstractController
 			}
 		}
 		// Deleting?
-		elseif (isset($this->_req->post->delete) && $context['field']['colname'])
+		elseif (isset($this->http_req->post->delete) && $context['field']['colname'])
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-ecp');
 
 			// Delete the old data first, then the field.
@@ -1200,9 +1200,9 @@ class ManageFeaturesController extends AbstractController
 		}
 
 		// Rebuild display cache etc.
-		if (isset($this->_req->post->delete) || isset($this->_req->post->save) || isset($this->_req->post->onoff))
+		if (isset($this->http_req->post->delete) || isset($this->http_req->post->save) || isset($this->http_req->post->onoff))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Update the display cache
 			updateDisplayCache();
@@ -1233,20 +1233,20 @@ class ManageFeaturesController extends AbstractController
 		$context['pm_limits'] = loadPMLimits();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
-				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])
-					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
+				if (isset($this->http_req->post->group[$group_id]) && $this->http_req->post->group[$group_id] != $group['max_messages'])
+					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->http_req->post->group[$group_id]));
 			}
 
 			$GLOBALS['elk']['hooks']->hook('save_pmsettings_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=featuresettings;sa=pmsettings');
 		}
 

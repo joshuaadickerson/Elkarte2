@@ -148,7 +148,7 @@ class MentionsController extends AbstractController
 	 */
 	public function action_index()
 	{
-		if ($this->_req->getQuery('sa') === 'fetch')
+		if ($this->http_req->getQuery('sa') === 'fetch')
 		{
 			$this->action_fetch();
 		}

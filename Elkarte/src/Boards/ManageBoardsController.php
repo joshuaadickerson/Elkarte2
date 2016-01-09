@@ -166,34 +166,34 @@ class ManageBoardsController extends AbstractController
 		$this->_templates->load('ManageBoards');
 
 		// Moving a board, child of, before, after, top
-		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
+		if (isset($this->http_req->query->sa) && $this->http_req->query->sa == 'move' && in_array($this->http_req->query->move_to, array('child', 'before', 'after', 'top')))
 		{
-			$this->_session->check('get');
-			validateToken('Admin-bm-' . (int) $this->_req->query->src_board, 'request');
+			$this->session->check('get');
+			validateToken('Admin-bm-' . (int) $this->http_req->query->src_board, 'request');
 
 			// Top is special, its the top!
-			if ($this->_req->query->move_to === 'top')
+			if ($this->http_req->query->move_to === 'top')
 				$boardOptions = array(
-					'move_to' => $this->_req->query->move_to,
-					'target_category' => (int) $this->_req->query->target_cat,
+					'move_to' => $this->http_req->query->move_to,
+					'target_category' => (int) $this->http_req->query->target_cat,
 					'move_first_child' => true,
 				);
 			// Moving it after another board
 			else
 				$boardOptions = array(
-					'move_to' => $this->_req->query->move_to,
-					'target_board' => (int) $this->_req->query->target_board,
+					'move_to' => $this->http_req->query->move_to,
+					'target_board' => (int) $this->http_req->query->target_board,
 					'move_first_child' => true,
 				);
 
 			// Use modifyBoard to perform the action
-			modifyBoard((int) $this->_req->query->src_board, $boardOptions);
+			modifyBoard((int) $this->http_req->query->src_board, $boardOptions);
 		}
 
 		getBoardTree();
 
 		createToken('Admin-sort');
-		$context['move_board'] = !empty($this->_req->query->move) && isset($boards[(int) $this->_req->query->move]) ? (int) $this->_req->query->move : 0;
+		$context['move_board'] = !empty($this->http_req->query->move) && isset($boards[(int) $this->http_req->query->move]) ? (int) $this->http_req->query->move : 0;
 
 		$bbc_parser = $GLOBALS['elk']['bbc'];
 
@@ -315,7 +315,7 @@ class ManageBoardsController extends AbstractController
 		getBoardTree();
 
 		// id_cat must be a number.... if it exists.
-		$this->cat = $this->_req->getQuery('cat', 'intval', 0);
+		$this->cat = $this->http_req->getQuery('cat', 'intval', 0);
 
 		// Start with one - "In first place".
 		$context['category_order'] = array(
@@ -328,7 +328,7 @@ class ManageBoardsController extends AbstractController
 		);
 
 		// If this is a new category set up some defaults.
-		if ($this->_req->query->sa == 'newcat')
+		if ($this->http_req->query->sa == 'newcat')
 		{
 			$context['category'] = array(
 				'id' => 0,
@@ -373,10 +373,10 @@ class ManageBoardsController extends AbstractController
 			$prevCat = $catid;
 		}
 
-		if (!isset($this->_req->query->delete))
+		if (!isset($this->http_req->query->delete))
 		{
 			$context['sub_template'] = 'modify_category';
-			$context['page_title'] = $this->_req->query->sa == 'newcat' ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
+			$context['page_title'] = $this->http_req->query->sa == 'newcat' ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
 		}
 		else
 		{
@@ -403,47 +403,47 @@ class ManageBoardsController extends AbstractController
 	 */
 	public function action_cat2()
 	{
-		$this->_session->check();
-		validateToken('Admin-bc-' . $this->_req->post->cat);
+		$this->session->check();
+		validateToken('Admin-bc-' . $this->http_req->post->cat);
 
 		require_once(SUBSDIR . '/Categories.subs.php');
 
-		$this->cat = (int) $this->_req->post->cat;
+		$this->cat = (int) $this->http_req->post->cat;
 
 		// Add a new category or modify an existing one..
-		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
+		if (isset($this->http_req->post->edit) || isset($this->http_req->post->add))
 		{
 			$catOptions = array();
 
-			if (isset($this->_req->post->cat_order))
-				$catOptions['move_after'] = (int) $this->_req->post->cat_order;
+			if (isset($this->http_req->post->cat_order))
+				$catOptions['move_after'] = (int) $this->http_req->post->cat_order;
 
 			// Change "This & That" to "This &amp; That" but don't change "&cent" to "&amp;cent;"...
-			$catOptions['cat_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->cat_name);
+			$catOptions['cat_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->http_req->post->cat_name);
 
-			$catOptions['is_collapsible'] = isset($this->_req->post->collapse);
+			$catOptions['is_collapsible'] = isset($this->http_req->post->collapse);
 
-			if (isset($this->_req->post->add))
+			if (isset($this->http_req->post->add))
 				createCategory($catOptions);
 			else
 				modifyCategory($this->cat, $catOptions);
 		}
 		// If they want to delete - first give them confirmation.
-		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->empty))
+		elseif (isset($this->http_req->post->delete) && !isset($this->http_req->post->confirmation) && !isset($this->http_req->post->empty))
 		{
 			$this->action_cat();
 			return;
 		}
 		// Delete the category!
-		elseif (isset($this->_req->post->delete))
+		elseif (isset($this->http_req->post->delete))
 		{
 			// First off - check if we are moving all the current boards first - before we start deleting!
-			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+			if (isset($this->http_req->post->delete_action) && $this->http_req->post->delete_action == 1)
 			{
-				if (empty($this->_req->post->cat_to))
+				if (empty($this->http_req->post->cat_to))
 					$GLOBALS['elk']['errors']->fatal_lang_error('mboards_delete_error');
 
-				deleteCategories(array($this->cat), (int) $this->_req->post->cat_to);
+				deleteCategories(array($this->cat), (int) $this->http_req->post->cat_to);
 			}
 			else
 				deleteCategories(array($this->cat));
@@ -479,16 +479,16 @@ class ManageBoardsController extends AbstractController
 		loadPermissionProfiles();
 
 		// id_board must be a number....
-		$this->boardid = $this->_req->getQuery('boardid', 'intval', 0);
+		$this->boardid = $this->http_req->getQuery('boardid', 'intval', 0);
 		if (!isset($boards[$this->boardid]))
 		{
 			$this->boardid = 0;
-			$this->_req->query->sa = 'newboard';
+			$this->http_req->query->sa = 'newboard';
 		}
 
-		if ($this->_req->query->sa == 'newboard')
+		if ($this->http_req->query->sa == 'newboard')
 		{
-			$this->cat = $this->_req->getQuery('cat', 'intval', 0);
+			$this->cat = $this->http_req->getQuery('cat', 'intval', 0);
 
 			// Category doesn't exist, man... sorry.
 			if (empty($this->cat))
@@ -529,7 +529,7 @@ class ManageBoardsController extends AbstractController
 		}
 
 		// As we may have come from the permissions screen keep track of where we should go on save.
-		$context['redirect_location'] = isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions' ? 'permissions' : 'boards';
+		$context['redirect_location'] = isset($this->http_req->query->rid) && $this->http_req->query->rid == 'permissions' ? 'permissions' : 'boards';
 
 		// We might need this to hide links to certain areas.
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
@@ -552,7 +552,7 @@ class ManageBoardsController extends AbstractController
 			)
 		);
 
-		$context['groups'] += getOtherGroups($curBoard, $this->_req->query->sa == 'newboard');
+		$context['groups'] += getOtherGroups($curBoard, $this->http_req->query->sa == 'newboard');
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))
@@ -609,7 +609,7 @@ class ManageBoardsController extends AbstractController
 
 		$context['themes'] = getAllThemes();
 
-		if (!isset($this->_req->query->delete))
+		if (!isset($this->http_req->query->delete))
 		{
 			$context['sub_template'] = 'modify_board';
 			$context['page_title'] = $txt['boardsEdit'];
@@ -641,44 +641,44 @@ class ManageBoardsController extends AbstractController
 	{
 		global $context;
 
-		$board_id = $this->_req->getPost('boardid', 'intval', 0);
-		$this->_session->check();
-		validateToken('Admin-be-' . $this->_req->post->boardid);
+		$board_id = $this->http_req->getPost('boardid', 'intval', 0);
+		$this->session->check();
+		validateToken('Admin-be-' . $this->http_req->post->boardid);
 
 
 
 
 		// Mode: modify aka. don't delete.
-		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
+		if (isset($this->http_req->post->edit) || isset($this->http_req->post->add))
 		{
 			$boardOptions = array();
 
 			// Move this board to a new category?
-			if (!empty($this->_req->post->new_cat))
+			if (!empty($this->http_req->post->new_cat))
 			{
 				$boardOptions['move_to'] = 'bottom';
-				$boardOptions['target_category'] = (int) $this->_req->post->new_cat;
+				$boardOptions['target_category'] = (int) $this->http_req->post->new_cat;
 			}
 			// Change the boardorder of this board?
-			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
+			elseif (!empty($this->http_req->post->placement) && !empty($this->http_req->post->board_order))
 			{
-				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
+				if (!in_array($this->http_req->post->placement, array('before', 'after', 'child')))
 					$GLOBALS['elk']['errors']->fatal_lang_error('mangled_post', false);
 
-				$boardOptions['move_to'] = $this->_req->post->placement;
-				$boardOptions['target_board'] = (int) $this->_req->post->board_order;
+				$boardOptions['move_to'] = $this->http_req->post->placement;
+				$boardOptions['target_board'] = (int) $this->http_req->post->board_order;
 			}
 
 			// Checkboxes....
-			$boardOptions['posts_count'] = isset($this->_req->post->count);
-			$boardOptions['override_theme'] = isset($this->_req->post->override_theme);
-			$boardOptions['board_theme'] = (int) $this->_req->post->boardtheme;
+			$boardOptions['posts_count'] = isset($this->http_req->post->count);
+			$boardOptions['override_theme'] = isset($this->http_req->post->override_theme);
+			$boardOptions['board_theme'] = (int) $this->http_req->post->boardtheme;
 			$boardOptions['access_groups'] = array();
 			$boardOptions['deny_groups'] = array();
 
-			if (!empty($this->_req->post->groups))
+			if (!empty($this->http_req->post->groups))
 			{
-				foreach ($this->_req->post->groups as $group => $action)
+				foreach ($this->http_req->post->groups as $group => $action)
 				{
 					if ($action == 'allow')
 						$boardOptions['access_groups'][] = (int) $group;
@@ -691,28 +691,28 @@ class ManageBoardsController extends AbstractController
 				$GLOBALS['elk']['errors']->fatal_lang_error('too_many_groups', false);
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
-			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
+			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->http_req->post->board_name);
 
-			$boardOptions['board_description'] = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->desc);
+			$boardOptions['board_description'] = $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->desc);
 			preparsecode($boardOptions['board_description']);
 
-			$boardOptions['moderator_string'] = $this->_req->post->moderators;
+			$boardOptions['moderator_string'] = $this->http_req->post->moderators;
 
-			if (isset($this->_req->post->moderator_list) && is_array($this->_req->post->moderator_list))
+			if (isset($this->http_req->post->moderator_list) && is_array($this->http_req->post->moderator_list))
 			{
 				$moderators = array();
-				foreach ($this->_req->post->moderator_list as $moderator)
+				foreach ($this->http_req->post->moderator_list as $moderator)
 					$moderators[(int) $moderator] = (int) $moderator;
 
 				$boardOptions['moderators'] = $moderators;
 			}
 
 			// Are they doing redirection?
-			$boardOptions['redirect'] = !empty($this->_req->post->redirect_enable) && isset($this->_req->post->redirect_address) && trim($this->_req->post->redirect_address) != '' ? trim($this->_req->post->redirect_address) : '';
+			$boardOptions['redirect'] = !empty($this->http_req->post->redirect_enable) && isset($this->http_req->post->redirect_address) && trim($this->http_req->post->redirect_address) != '' ? trim($this->http_req->post->redirect_address) : '';
 
 			// Profiles...
-			$boardOptions['profile'] = $this->_req->post->profile;
-			$boardOptions['inherit_permissions'] = $this->_req->post->profile == -1;
+			$boardOptions['profile'] = $this->http_req->post->profile;
+			$boardOptions['inherit_permissions'] = $this->http_req->post->profile == -1;
 
 			// We need to know what used to be case in terms of redirection.
 			if (!empty($board_id))
@@ -726,18 +726,18 @@ class ManageBoardsController extends AbstractController
 				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
 					$boardOptions['num_posts'] = 0;
 				// Resetting the count?
-				elseif ($boardOptions['redirect'] && !empty($this->_req->post->reset_redirect))
+				elseif ($boardOptions['redirect'] && !empty($this->http_req->post->reset_redirect))
 					$boardOptions['num_posts'] = 0;
 			}
 
 			$GLOBALS['elk']['hooks']->hook('save_board', array($board_id, &$boardOptions));
 
 			// Create a new board...
-			if (isset($this->_req->post->add))
+			if (isset($this->http_req->post->add))
 			{
 				// New boards by default go to the bottom of the category.
-				if (empty($this->_req->post->new_cat))
-					$boardOptions['target_category'] = (int) $this->_req->post->cur_cat;
+				if (empty($this->http_req->post->new_cat))
+					$boardOptions['target_category'] = (int) $this->http_req->post->cur_cat;
 				if (!isset($boardOptions['move_to']))
 					$boardOptions['move_to'] = 'bottom';
 
@@ -747,26 +747,26 @@ class ManageBoardsController extends AbstractController
 			else
 				modifyBoard($board_id, $boardOptions);
 		}
-		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
+		elseif (isset($this->http_req->post->delete) && !isset($this->http_req->post->confirmation) && !isset($this->http_req->post->no_children))
 		{
 			$this->action_board();
 			return;
 		}
-		elseif (isset($this->_req->post->delete))
+		elseif (isset($this->http_req->post->delete))
 		{
 			// First off - check if we are moving all the current sub-boards first - before we start deleting!
-			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+			if (isset($this->http_req->post->delete_action) && $this->http_req->post->delete_action == 1)
 			{
-				if (empty($this->_req->post->board_to))
+				if (empty($this->http_req->post->board_to))
 					$GLOBALS['elk']['errors']->fatal_lang_error('mboards_delete_board_error');
 
-				deleteBoards(array($board_id), (int) $this->_req->post->board_to);
+				deleteBoards(array($board_id), (int) $this->http_req->post->board_to);
 			}
 			else
 				deleteBoards(array($board_id), 0);
 		}
 
-		if (isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions')
+		if (isset($this->http_req->query->rid) && $this->http_req->query->rid == 'permissions')
 			redirectexit('action=Admin;area=permissions;sa=board;' . $context['session_var'] . '=' . $context['session_id']);
 		else
 			redirectexit('action=Admin;area=manageboards');
@@ -804,9 +804,9 @@ class ManageBoardsController extends AbstractController
 		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';
 
 		// Doing a save?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_board_settings');
 

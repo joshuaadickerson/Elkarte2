@@ -62,12 +62,16 @@ abstract class AbstractController
 	protected $layers;
 	/** @var HttpReq instance of HttpReq object */
 	protected $req;
+	/** @var HttpReq instance of HttpReq object */
+	protected $http_req;
 	/** @var EventManager The event manager. */
 	protected $events;
 	/** @var Cache */
 	protected $cache;
 	/** @var  Templates */
 	protected $templates;
+	/** @var Session */
+	protected $session;
 
 	public function bootstrap()
 	{
@@ -75,11 +79,11 @@ abstract class AbstractController
 		$elk = $this->elk;
 
 		// @todo inject these in the constructor arguments
-		$this->_layers = $elk['layers'];
+		$this->_layers = $this->layers = $elk['layers'];
 		$this->_templates = $this->templates = $elk['templates'];
-		$this->_errors = $elk['errors'];
-		$this->_req = $elk['http_req'];
-		$this->_session = $elk['session'];
+		$this->_errors = $this->errors = $elk['errors'];
+		$this->_req = $this->http_req = $elk['http_req'];
+		$this->_session = $this->session = $elk['session'];
 		$this->hooks = $elk['hooks'];
 
 		$this->_events = $this->events = new EventManager();
@@ -95,7 +99,7 @@ abstract class AbstractController
 	 */
 	public static function canFrontPage()
 	{
-		return in_array('\\ElkArte\\Sources\\Frontpage_Interface', class_implements(get_called_class()));
+		return in_array(__NAMESPACE__ . '\\FrontpageInterface', class_implements(get_called_class()));
 	}
 
 	/**
@@ -282,8 +286,7 @@ abstract class AbstractController
 			return false;
 		else
 		{
-			$this->_templates->load('Login');
-			loadJavascriptFile('sha256.js', array('defer' => true));
+			$this->templates->load('Login');
 			$context['sub_template'] = 'kick_guest';
 			$context['robot_no_index'] = true;
 		}
@@ -339,7 +342,7 @@ abstract class AbstractController
 				return true;
 			}
 			elseif ($is_fatal)
-				$GLOBALS['elk']['errors']->fatal_lang_error('error_form_already_submitted', false);
+				$this->errors->fatal_lang_error('error_form_already_submitted', false);
 			else
 				return false;
 		}
@@ -348,5 +351,18 @@ abstract class AbstractController
 			$_SESSION['forms'] = array_diff($_SESSION['forms'], array($_REQUEST['seqnum']));
 		elseif ($action != 'free')
 			trigger_error('AbstractController::checkSubmitOnce(): Invalid action \'' . $action . '\'', E_USER_WARNING);
+	}
+
+	/**
+	 * Get a local url
+	 * Shortcut to Elkarte::url()
+	 *
+	 * @param string[]|array $parameters
+	 * @param bool $relative
+	 * @return string
+	 */
+	protected function url(array $parameters = array(), $relative = true)
+	{
+		return $this->elk->url($parameters, (bool) $relative);
 	}
 }

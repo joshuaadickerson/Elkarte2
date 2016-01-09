@@ -112,7 +112,7 @@ class ProfileController extends AbstractController
 		$this->_define_profile_menu();
 
 		// Is there an updated message to show?
-		if (isset($this->_req->query->updated))
+		if (isset($this->http_req->query->updated))
 			$context['profile_updated'] = $txt['profile_updated_own'];
 
 		// If it said no permissions that meant it wasn't valid!
@@ -138,13 +138,13 @@ class ProfileController extends AbstractController
 		// Before we go any further, let's work on the area we've said is valid.
 		// Note this is done here just in case we ever compromise the menu function in error!
 		$this->_completed_save = false;
-		$context['do_preview'] = isset($this->_req->post->preview_signature);
+		$context['do_preview'] = isset($this->http_req->post->preview_signature);
 
 		// Are we saving data in a valid area?
-		$this->_saving = $this->_req->getPost('save', 'trim', $this->_req->getQuery('save', 'trim', null));
+		$this->_saving = $this->http_req->getPost('save', 'trim', $this->http_req->getQuery('save', 'trim', null));
 		if (isset($this->_profile_include_data['sc']) && (isset($this->_saving) || $context['do_preview']))
 		{
-			$this->_session->check($this->_profile_include_data['sc']);
+			$this->session->check($this->_profile_include_data['sc']);
 			$this->_completed_save = true;
 		}
 
@@ -607,9 +607,9 @@ class ProfileController extends AbstractController
 		{
 			// Clean up the POST variables.
 			$text = $GLOBALS['elk']['text'];
-			$post = $text->htmltrim__recursive((array) $this->_req->post);
+			$post = $text->htmltrim__recursive((array) $this->http_req->post);
 			$post = $text->htmlspecialchars__recursive($post);
-			$this->_req->post = new ArrayObject($post, ArrayObject::ARRAY_AS_PROPS);
+			$this->http_req->post = new ArrayObject($post, ArrayObject::ARRAY_AS_PROPS);
 
 			// Does the change require the current password as well?
 			$this->_check_password($check_password);
@@ -655,14 +655,14 @@ class ProfileController extends AbstractController
 			elseif (in_array($this->_current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
 			{
 				// @todo yes this is ugly, but saveProfileFields needs to be updated first
-				$_POST = (array) $this->_req->post;
+				$_POST = (array) $this->http_req->post;
 
 				saveProfileFields();
 			}
 			else
 			{
 				// @todo yes this is also ugly, but saveProfileChanges needs to be updated first
-				$_POST = (array) $this->_req->post;
+				$_POST = (array) $this->http_req->post;
 
 				$this->_force_redirect = true;
 				saveProfileChanges($profile_vars, $this->_memID);
@@ -682,7 +682,7 @@ class ProfileController extends AbstractController
 				// If we've changed the password, notify any integration that may be listening in.
 				if (isset($profile_vars['passwd']))
 				{
-					$GLOBALS['elk']['hooks']->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd2));
+					$GLOBALS['elk']['hooks']->hook('reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->http_req->post->passwrd2));
 				}
 
 						updateMemberData($this->_memID, $profile_vars);
@@ -760,19 +760,19 @@ class ProfileController extends AbstractController
 			else
 			{
 				// You didn't even enter a password!
-				if (trim($this->_req->post->oldpasswrd) === '')
+				if (trim($this->http_req->post->oldpasswrd) === '')
 				{
 					$post_errors[] = 'no_password';
 				}
 
 				// Since the password got modified due to all the $_POST cleaning, lets undo it so we can get the correct password
-				$this->_req->post->oldpasswrd = $GLOBALS['elk']['text']->un_htmlspecialchar($this->_req->post->oldpasswrd);
+				$this->http_req->post->oldpasswrd = $GLOBALS['elk']['text']->un_htmlspecialchar($this->http_req->post->oldpasswrd);
 
 				// Does the integration want to check passwords?
-				$good_password = in_array(true, $GLOBALS['elk']['hooks']->hook('verify_password', array($cur_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
+				$good_password = in_array(true, $GLOBALS['elk']['hooks']->hook('verify_password', array($cur_profile['member_name'], $this->http_req->post->oldpasswrd, false)), true);
 
 				// Bad password!!!
-				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $user_info['passwd'], $user_profile[$this->_memID]['member_name']))
+				if (!$good_password && !validateLoginPassword($this->http_req->post->oldpasswrd, $user_info['passwd'], $user_profile[$this->_memID]['member_name']))
 				{
 					$post_errors[] = 'bad_password';
 				}

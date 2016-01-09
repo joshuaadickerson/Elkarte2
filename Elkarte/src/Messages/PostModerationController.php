@@ -65,14 +65,14 @@ class PostModerationController extends AbstractController
 	{
 		global $txt, $scripturl, $context, $user_info;
 
-		$context['current_view'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
+		$context['current_view'] = $this->http_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
 		$context['header_title'] = $txt['mc_' . ($context['current_view'] === 'topics' ? 'topics' : 'posts')];
 
 		// Work out what boards we can work in!
 		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
-		$this->_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
+		$this->_brd = $this->http_req->getPost('brd', 'intval', $this->http_req->getQuery('brd', 'intval', null));
 
 		// If we filtered by board remove ones outside of this board.
 		// @todo Put a message saying we're filtered?
@@ -108,25 +108,25 @@ class PostModerationController extends AbstractController
 		$toAction = array();
 
 		// Check if we have something to do?
-		if (isset($this->_req->query->approve))
-			$toAction[] = (int) $this->_req->query->approve;
+		if (isset($this->http_req->query->approve))
+			$toAction[] = (int) $this->http_req->query->approve;
 		// Just a deletion?
-		elseif (isset($this->_req->query->delete))
-			$toAction[] = (int) $this->_req->query->delete;
+		elseif (isset($this->http_req->query->delete))
+			$toAction[] = (int) $this->http_req->query->delete;
 		// Lots of approvals?
-		elseif (isset($this->_req->post->item))
-			$toAction = array_map('intval', $this->_req->post->item);
+		elseif (isset($this->http_req->post->item))
+			$toAction = array_map('intval', $this->http_req->post->item);
 
 		// What are we actually doing.
-		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		if (isset($this->http_req->query->approve) || (isset($this->http_req->post->do) && $this->http_req->post->do === 'approve'))
 			$curAction = 'approve';
-		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		elseif (isset($this->http_req->query->delete) || (isset($this->http_req->post->do) && $this->http_req->post->do === 'delete'))
 			$curAction = 'delete';
 
 		// Right, so we have something to do?
 		if (!empty($toAction) && isset($curAction))
 		{
-			$this->_session->check('request');
+			$this->session->check('request');
 
 
 
@@ -228,8 +228,8 @@ class PostModerationController extends AbstractController
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
-		$context['start'] = $this->_req->query->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->http_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$context['start'] = $this->http_req->query->start;
 
 		// We have enough to make some pretty tabs!
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -303,26 +303,26 @@ class PostModerationController extends AbstractController
 
 		// Get together the array of things to act on, if any.
 		$attachments = array();
-		if (isset($this->_req->query->approve))
-			$attachments[] = (int) $this->_req->query->approve;
-		elseif (isset($this->_req->query->delete))
-			$attachments[] = (int) $this->_req->query->delete;
-		elseif (isset($this->_req->post->item))
+		if (isset($this->http_req->query->approve))
+			$attachments[] = (int) $this->http_req->query->approve;
+		elseif (isset($this->http_req->query->delete))
+			$attachments[] = (int) $this->http_req->query->delete;
+		elseif (isset($this->http_req->post->item))
 		{
-			foreach ($this->_req->post->item as $item)
+			foreach ($this->http_req->post->item as $item)
 				$attachments[] = (int) $item;
 		}
 
 		// Are we approving or deleting?
-		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		if (isset($this->http_req->query->approve) || (isset($this->http_req->post->do) && $this->http_req->post->do === 'approve'))
 			$curAction = 'approve';
-		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		elseif (isset($this->http_req->query->delete) || (isset($this->http_req->post->do) && $this->http_req->post->do === 'delete'))
 			$curAction = 'delete';
 
 		// Something to do, let's do it!
 		if (!empty($attachments) && isset($curAction))
 		{
-			$this->_session->check('request');
+			$this->session->check('request');
 
 			// This will be handy.
 
@@ -495,9 +495,9 @@ class PostModerationController extends AbstractController
 	{
 		global $user_info, $topic, $board;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
-		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
+		$current_msg = $this->http_req->getQuery('msg', 'intval', 0);
 
 
 

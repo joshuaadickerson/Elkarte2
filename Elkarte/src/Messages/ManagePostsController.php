@@ -112,40 +112,40 @@ class ManagePostsController extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		if (!empty($this->_req->post->save_censor))
+		if (!empty($this->http_req->post->save_censor))
 		{
 			// Make sure censoring is something they can do.
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-censor');
 
 			$censored_vulgar = array();
 			$censored_proper = array();
 
 			// Rip it apart, then split it into two arrays.
-			if (isset($this->_req->post->censortext))
+			if (isset($this->http_req->post->censortext))
 			{
-				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, array("\r" => '')));
+				$this->http_req->post->censortext = explode("\n", strtr($this->http_req->post->censortext, array("\r" => '')));
 
-				foreach ($this->_req->post->censortext as $c)
+				foreach ($this->http_req->post->censortext as $c)
 					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
 			}
-			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
+			elseif (isset($this->http_req->post->censor_vulgar, $this->http_req->post->censor_proper))
 			{
-				if (is_array($this->_req->post->censor_vulgar))
+				if (is_array($this->http_req->post->censor_vulgar))
 				{
-					foreach ($this->_req->post->censor_vulgar as $i => $value)
+					foreach ($this->http_req->post->censor_vulgar as $i => $value)
 					{
 						if (trim(strtr($value, '*', ' ')) == '')
-							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
+							unset($this->http_req->post->censor_vulgar[$i], $this->http_req->post->censor_proper[$i]);
 					}
 
-					$censored_vulgar = $this->_req->post->censor_vulgar;
-					$censored_proper = $this->_req->post->censor_proper;
+					$censored_vulgar = $this->http_req->post->censor_vulgar;
+					$censored_proper = $this->http_req->post->censor_proper;
 				}
 				else
 				{
-					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, array("\r" => '')));
-					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, array("\r" => '')));
+					$censored_vulgar = explode("\n", strtr($this->http_req->post->censor_vulgar, array("\r" => '')));
+					$censored_proper = explode("\n", strtr($this->http_req->post->censor_proper, array("\r" => '')));
 				}
 			}
 
@@ -153,9 +153,9 @@ class ManagePostsController extends AbstractController
 			$updates = array(
 				'censor_vulgar' => implode("\n", $censored_vulgar),
 				'censor_proper' => implode("\n", $censored_proper),
-				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
-				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
-				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
+				'censorWholeWord' => empty($this->http_req->post->censorWholeWord) ? '0' : '1',
+				'censorIgnoreCase' => empty($this->http_req->post->censorIgnoreCase) ? '0' : '1',
+				'allow_no_censored' => empty($this->http_req->post->allow_no_censored) ? '0' : '1',
 			);
 
 			$GLOBALS['elk']['hooks']->hook('save_censors', array(&$updates));
@@ -164,10 +164,10 @@ class ManagePostsController extends AbstractController
 		}
 
 		// Testing a word to see how it will be censored?
-		if (isset($this->_req->post->censortest))
+		if (isset($this->http_req->post->censortest))
 		{
 
-			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
+			$censorText = htmlspecialchars($this->http_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
 			$context['censor_test'] = strtr(censor($censorText), array('"' => '&quot;'));
@@ -194,7 +194,7 @@ class ManagePostsController extends AbstractController
 		createToken('Admin-censor');
 
 		// Using ajax?
-		if (isset($this->_req->query->xml, $this->_req->post->censortest))
+		if (isset($this->http_req->query->xml, $this->http_req->post->censortest))
 		{
 			// Clear the templates
 			$this->_layers->removeAll();
@@ -238,12 +238,12 @@ class ManagePostsController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
+			if (isset($this->http_req->post->max_messageLength) && $this->http_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
@@ -253,18 +253,18 @@ class ManagePostsController extends AbstractController
 						$body_type = $column['type'];
 				}
 
-				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type == 'text')
+				if (isset($body_type) && ($this->http_req->post->max_messageLength > 65535 || $this->http_req->post->max_messageLength == 0) && $body_type == 'text')
 					$GLOBALS['elk']['errors']->fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=Admin;area=maintain;sa=database'));
 
 			}
 
 			// If we're changing the post preview length let's check its valid
-			if (!empty($this->_req->post->preview_characters))
-				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
+			if (!empty($this->http_req->post->preview_characters))
+				$this->http_req->post->preview_characters = (int) min(max(0, $this->http_req->post->preview_characters), 512);
 
 			$GLOBALS['elk']['hooks']->hook('save_post_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=postsettings;sa=posts');
 		}
 

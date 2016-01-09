@@ -58,7 +58,7 @@ class KarmaController extends AbstractController
 	{
 		global $user_info;
 
-		$id_target = $this->_req->getQuery('uid', 'intval', 0);
+		$id_target = $this->http_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
@@ -80,13 +80,13 @@ class KarmaController extends AbstractController
 			$this->_redirect_karma();
 
 		// The user ID _must_ be a number, no matter what.
-		$id_target = $this->_req->getQuery('uid', 'intval', 0);
+		$id_target = $this->http_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
 
 		// Give em a wack and run away
-		$this->_give_karma($user_info['id'], $this->_req->query->uid, $action, -1);
+		$this->_give_karma($user_info['id'], $this->http_req->query->uid, $action, -1);
 		$this->_redirect_karma();
 	}
 
@@ -133,7 +133,7 @@ class KarmaController extends AbstractController
 		is_not_guest();
 		isAllowedTo('karma_edit');
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// We hold karma here.
 		require_once(SUBSDIR . '/Karma.subs.php');

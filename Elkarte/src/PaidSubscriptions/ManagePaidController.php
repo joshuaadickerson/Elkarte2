@@ -95,7 +95,7 @@ class ManagePaidController extends AbstractController
 		);
 
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
+		$subAction = isset($this->http_req->query->sa) && isset($subActions[$this->http_req->query->sa]) ? $this->http_req->query->sa : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
 		// Load in the subActions, call integrate_sa_manage_subscriptions
 		$action->initialize($subActions, 'settings');
@@ -154,14 +154,14 @@ class ManagePaidController extends AbstractController
 		toggleCurrencyOther();', true);
 
 		// Saving the settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_subscription_settings');
 
 			// Check that the entered email addresses are valid
-			if (!empty($this->_req->post->paid_email_to))
+			if (!empty($this->http_req->post->paid_email_to))
 			{
 				$validator = new DataValidator();
 
@@ -171,12 +171,12 @@ class ManagePaidController extends AbstractController
 				$validator->input_processing(array('paid_email_to' => 'csv'));
 				$validator->text_replacements(array('paid_email_to' => $txt['paid_email_to']));
 
-				if ($validator->validate($this->_req->post))
-					$this->_req->post->paid_email_to = $validator->validation_data('paid_email_to');
+				if ($validator->validate($this->http_req->post))
+					$this->http_req->post->paid_email_to = $validator->validation_data('paid_email_to');
 				else
 				{
 					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
-					$config_vars[1]['value'] = $this->_req->post->paid_email_to;
+					$config_vars[1]['value'] = $this->http_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();
 					foreach ($validator->validation_errors() as $id => $error)
@@ -188,15 +188,15 @@ class ManagePaidController extends AbstractController
 			if (empty($context['error_type']))
 			{
 				// Sort out the currency stuff.
-				if ($this->_req->post->paid_currency != 'other')
+				if ($this->http_req->post->paid_currency != 'other')
 				{
-					$this->_req->post->paid_currency_code = $this->_req->post->paid_currency;
-					$this->_req->post->paid_currency_symbol = $txt[$this->_req->post->paid_currency . '_symbol'];
+					$this->http_req->post->paid_currency_code = $this->http_req->post->paid_currency;
+					$this->http_req->post->paid_currency_symbol = $txt[$this->http_req->post->paid_currency . '_symbol'];
 				}
-				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
+				$this->http_req->post->paid_currency_code = trim($this->http_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				SettingsForm::save_db($config_vars, $this->_req->post);
+				SettingsForm::save_db($config_vars, $this->http_req->post);
 				redirectexit('action=Admin;area=paidsubscribe;sa=settings');
 			}
 		}
@@ -423,17 +423,17 @@ class ManagePaidController extends AbstractController
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
-		$context['sub_id'] = isset($this->_req->query->sid) ? (int) $this->_req->query->sid : 0;
-		$context['action_type'] = $context['sub_id'] ? (isset($this->_req->query->delete) ? 'delete' : 'edit') : 'add';
+		$context['sub_id'] = isset($this->http_req->query->sid) ? (int) $this->http_req->query->sid : 0;
+		$context['action_type'] = $context['sub_id'] ? (isset($this->http_req->query->delete) ? 'delete' : 'edit') : 'add';
 
 		// Setup the template.
 		$context['sub_template'] = $context['action_type'] == 'delete' ? 'delete_subscription' : 'modify_subscription';
 		$context['page_title'] = $txt['paid_' . $context['action_type'] . '_subscription'];
 
 		// Delete it?
-		if (isset($this->_req->post->delete_confirm) && isset($this->_req->query->delete))
+		if (isset($this->http_req->post->delete_confirm) && isset($this->http_req->query->delete))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-pmsd');
 
 			deleteSubscription($context['sub_id']);
@@ -444,29 +444,29 @@ class ManagePaidController extends AbstractController
 		}
 
 		// Saving?
-		if (isset($this->_req->post->save))
+		if (isset($this->http_req->post->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-pms');
 
 			// Some cleaning...
-			$isActive = max($this->_req->getPost('active', 'intval', 0), 1);
-			$isRepeatable = max($this->_req->getPost('repeatable', 'intval', 0), 1);
-			$allowPartial = max($this->_req->getPost('allow_partial', 'intval', 0), 1);
-			$reminder = max($this->_req->getPost('reminder', 'intval', 0), 1);
-			$emailComplete = strlen($this->_req->post->emailcomplete) > 10 ? trim($this->_req->post->emailcomplete) : '';
+			$isActive = max($this->http_req->getPost('active', 'intval', 0), 1);
+			$isRepeatable = max($this->http_req->getPost('repeatable', 'intval', 0), 1);
+			$allowPartial = max($this->http_req->getPost('allow_partial', 'intval', 0), 1);
+			$reminder = max($this->http_req->getPost('reminder', 'intval', 0), 1);
+			$emailComplete = strlen($this->http_req->post->emailcomplete) > 10 ? trim($this->http_req->post->emailcomplete) : '';
 
 			// Is this a fixed one?
-			if ($this->_req->post->duration_type == 'fixed')
+			if ($this->http_req->post->duration_type == 'fixed')
 			{
 				// Clean the span.
-				$span = $this->_req->post->span_value . $this->_req->post->span_unit;
+				$span = $this->http_req->post->span_value . $this->http_req->post->span_unit;
 
 				// Sort out the cost.
-				$cost = array('fixed' => sprintf('%01.2f', strtr($this->_req->post->cost, ',', '.')));
+				$cost = array('fixed' => sprintf('%01.2f', strtr($this->http_req->post->cost, ',', '.')));
 
 				// There needs to be something.
-				if (empty($this->_req->post->span_value) || empty($this->_req->post->cost))
+				if (empty($this->http_req->post->span_value) || empty($this->http_req->post->cost))
 					$GLOBALS['elk']['errors']->fatal_lang_error('paid_no_cost_value');
 			}
 			// Flexible is harder but more fun ;)
@@ -475,13 +475,13 @@ class ManagePaidController extends AbstractController
 				$span = 'F';
 
 				$cost = array(
-					'day' => sprintf('%01.2f', strtr($this->_req->post->cost_day, ',', '.')),
-					'week' => sprintf('%01.2f', strtr($this->_req->post->cost_week, ',', '.')),
-					'month' => sprintf('%01.2f', strtr($this->_req->post->cost_month, ',', '.')),
-					'year' => sprintf('%01.2f', strtr($this->_req->post->cost_year, ',', '.')),
+					'day' => sprintf('%01.2f', strtr($this->http_req->post->cost_day, ',', '.')),
+					'week' => sprintf('%01.2f', strtr($this->http_req->post->cost_week, ',', '.')),
+					'month' => sprintf('%01.2f', strtr($this->http_req->post->cost_month, ',', '.')),
+					'year' => sprintf('%01.2f', strtr($this->http_req->post->cost_year, ',', '.')),
 				);
 
-				if (empty($this->_req->post->cost_day) && empty($this->_req->post->cost_week) && empty($this->_req->post->cost_month) && empty($this->_req->post->cost_year))
+				if (empty($this->http_req->post->cost_day) && empty($this->http_req->post->cost_week) && empty($this->http_req->post->cost_month) && empty($this->http_req->post->cost_year))
 					$GLOBALS['elk']['errors']->fatal_lang_error('paid_all_freq_blank');
 			}
 
@@ -489,9 +489,9 @@ class ManagePaidController extends AbstractController
 
 			// Yep, time to do additional groups.
 			$addGroups = array();
-			if (!empty($this->_req->post->addgroup))
+			if (!empty($this->http_req->post->addgroup))
 			{
-				foreach ($this->_req->post->addgroup as $id => $dummy)
+				foreach ($this->http_req->post->addgroup as $id => $dummy)
 					$addGroups[] = (int) $id;
 			}
 			$addGroups = implode(',', $addGroups);
@@ -500,12 +500,12 @@ class ManagePaidController extends AbstractController
 			if ($context['action_type'] == 'add')
 			{
 				$insert = array(
-					'name' => $this->_req->post->name,
-					'desc' => $this->_req->post->desc,
+					'name' => $this->http_req->post->name,
+					'desc' => $this->http_req->post->desc,
 					'isActive' => $isActive,
 					'span' => $span,
 					'cost' => $cost,
-					'prim_group' => $this->_req->post->prim_group,
+					'prim_group' => $this->http_req->post->prim_group,
 					'addgroups' => $addGroups,
 					'isRepeatable' => $isRepeatable,
 					'allowpartial' => $allowPartial,
@@ -522,13 +522,13 @@ class ManagePaidController extends AbstractController
 
 				$update = array(
 					'is_active' => $isActive,
-					'id_group' => !empty($this->_req->post->prim_group) ? $this->_req->post->prim_group : 0,
+					'id_group' => !empty($this->http_req->post->prim_group) ? $this->http_req->post->prim_group : 0,
 					'repeatable' => $isRepeatable,
 					'allow_partial' => $allowPartial,
 					'reminder' => $reminder,
 					'current_subscription' => $context['sub_id'],
-					'name' => $this->_req->post->name,
-					'desc' => $this->_req->post->desc,
+					'name' => $this->http_req->post->name,
+					'desc' => $this->http_req->post->desc,
 					'length' => $span,
 					'cost' => $cost,
 					'additional_groups' => !empty($addGroups) ? $addGroups : '',
@@ -538,7 +538,7 @@ class ManagePaidController extends AbstractController
 				updateSubscription($update, $ignore_active);
 			}
 
-			$GLOBALS['elk']['hooks']->hook('save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
+			$GLOBALS['elk']['hooks']->hook('save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $this->http_req->post->name, $this->http_req->post->desc, $isActive, $span, $cost, $this->http_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
 
 			redirectexit('action=Admin;area=paidsubscribe;view');
 		}
@@ -600,14 +600,14 @@ class ManagePaidController extends AbstractController
 		$context['page_title'] = $txt['viewing_users_subscribed'];
 
 		// ID of the subscription.
-		$context['sub_id'] = (int) $this->_req->query->sid;
+		$context['sub_id'] = (int) $this->http_req->query->sid;
 
 		// Load the subscription information.
 		$context['subscription'] = getSubscriptionDetails($context['sub_id']);
 
 		// Are we searching for people?
-		$search_string = isset($this->_req->post->ssearch) && !empty($this->_req->post->sub_search) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
-		$search_vars = empty($this->_req->post->sub_search) ? array() : array('search' => '%' . $this->_req->post->sub_search . '%', 'guest' => $txt['guest']);
+		$search_string = isset($this->http_req->post->ssearch) && !empty($this->http_req->post->sub_search) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
+		$search_vars = empty($this->http_req->post->sub_search) ? array() : array('search' => '%' . $this->http_req->post->sub_search . '%', 'guest' => $txt['guest']);
 
 		$listOptions = array(
 			'id' => 'subscribed_users_list',
@@ -805,8 +805,8 @@ class ManagePaidController extends AbstractController
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 
-		$context['log_id'] = $this->_req->getQuery('lid', 'intval', 0);
-		$context['sub_id'] = $this->_req->getQuery('sid', 'intval', 0);
+		$context['log_id'] = $this->http_req->getQuery('lid', 'intval', 0);
+		$context['sub_id'] = $this->http_req->getQuery('sid', 'intval', 0);
 		$context['action_type'] = $context['log_id'] ? 'edit' : 'add';
 
 		// Setup the template.
@@ -824,25 +824,25 @@ class ManagePaidController extends AbstractController
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?
-		if (isset($this->_req->post->ssearch))
+		if (isset($this->http_req->post->ssearch))
 			return $this->action_viewsub();
 		// Saving?
-		elseif (isset($this->_req->post->save_sub))
+		elseif (isset($this->http_req->post->save_sub))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Work out the dates...
-			$starttime = mktime($this->_req->post->hour, $this->_req->post->minute, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year);
-			$endtime = mktime($this->_req->post->hourend, $this->_req->post->minuteend, 0, $this->_req->post->monthend, $this->_req->post->dayend, $this->_req->post->yearend);
+			$starttime = mktime($this->http_req->post->hour, $this->http_req->post->minute, 0, $this->http_req->post->month, $this->http_req->post->day, $this->http_req->post->year);
+			$endtime = mktime($this->http_req->post->hourend, $this->http_req->post->minuteend, 0, $this->http_req->post->monthend, $this->http_req->post->dayend, $this->http_req->post->yearend);
 
 			// Status.
-			$status = $this->_req->post->status;
+			$status = $this->http_req->post->status;
 
 			// New one?
 			if (empty($context['log_id']))
 			{
 				// Find the user...
-						$member = getMemberByName($this->_req->post->name);
+						$member = getMemberByName($this->http_req->post->name);
 
 				if (empty($member))
 					$GLOBALS['elk']['errors']->fatal_lang_error('error_member_not_found');
@@ -895,21 +895,21 @@ class ManagePaidController extends AbstractController
 			redirectexit('action=Admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
 		}
 		// Deleting?
-		elseif (isset($this->_req->post->delete) || isset($this->_req->post->finished))
+		elseif (isset($this->http_req->post->delete) || isset($this->http_req->post->finished))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Do the actual deletes!
-			if (!empty($this->_req->post->delsub))
+			if (!empty($this->http_req->post->delsub))
 			{
 				$toDelete = array();
-				foreach ($this->_req->post->delsub as $id => $dummy)
+				foreach ($this->http_req->post->delsub as $id => $dummy)
 					$toDelete[] = (int) $id;
 
 				$deletes = prepareDeleteSubscriptions($toDelete);
 
 				foreach ($deletes as $id_subscribe => $id_member)
-					removeSubscription($id_subscribe, $id_member, isset($this->_req->post->delete));
+					removeSubscription($id_subscribe, $id_member, isset($this->http_req->post->delete));
 			}
 			redirectexit('action=Admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
 		}
@@ -940,11 +940,11 @@ class ManagePaidController extends AbstractController
 			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
 			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 
-			if (isset($this->_req->query->uid))
+			if (isset($this->http_req->query->uid))
 			{
 
 				// Get the latest activated member's display name.
-				$result = getBasicMemberData((int) $this->_req->query->uid);
+				$result = getBasicMemberData((int) $this->http_req->query->uid);
 				$context['sub']['username'] = $result['real_name'];
 			}
 			else
@@ -990,15 +990,15 @@ class ManagePaidController extends AbstractController
 				}
 
 				// Check if we are adding/removing any.
-				if (isset($this->_req->query->pending))
+				if (isset($this->http_req->query->pending))
 				{
 					foreach ($pending_details as $id => $pending)
 					{
 						// Found the one to action?
-						if ($this->_req->query->pending == $id && $pending[3] == 'payback' && isset($context['pending_payments'][$id]))
+						if ($this->http_req->query->pending == $id && $pending[3] == 'payback' && isset($context['pending_payments'][$id]))
 						{
 							// Flexible?
-							if (isset($this->_req->query->accept))
+							if (isset($this->http_req->query->accept))
 								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] == 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
 							unset($pending_details[$id]);
 

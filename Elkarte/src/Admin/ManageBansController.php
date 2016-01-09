@@ -53,7 +53,7 @@ class ManageBansController extends AbstractController
 		$action = new Action();
 
 		// Default the sub-action to 'view ban list'.
-		$subAction = $this->_req->getQuery('sa', 'strval', 'list');
+		$subAction = $this->http_req->getQuery('sa', 'strval', 'list');
 
 		// Tabs for browsing the different ban functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -113,12 +113,12 @@ class ManageBansController extends AbstractController
 		global $txt, $context, $scripturl, $user_info;
 
 		// User pressed the 'remove selection button'.
-		if (!empty($this->_req->post->removeBans) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
+		if (!empty($this->http_req->post->removeBans) && !empty($this->http_req->post->remove) && is_array($this->http_req->post->remove))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Make sure every entry is a proper integer.
-			$to_remove = array_map('intval', $this->_req->post->remove);
+			$to_remove = array_map('intval', $this->http_req->post->remove);
 
 			// Unban them all!
 			removeBanGroups($to_remove);
@@ -307,10 +307,10 @@ class ManageBansController extends AbstractController
 		$ban_errors = ErrorContext::context('ban', 1);
 
 		// Saving a new or edited ban?
-		if ((isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban) || isset($this->_req->post->remove_selection)) && !$ban_errors->hasErrors())
+		if ((isset($this->http_req->post->add_ban) || isset($this->http_req->post->modify_ban) || isset($this->http_req->post->remove_selection)) && !$ban_errors->hasErrors())
 			$this->action_edit2();
 
-		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
+		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->http_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
 		loadLanguage('Errors');
@@ -455,9 +455,9 @@ class ManageBansController extends AbstractController
 				);
 
 				// Overwrite some of the default form values if a user ID was given.
-				if (!empty($this->_req->query->u))
+				if (!empty($this->http_req->query->u))
 				{
-					$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
+					$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->http_req->query->u));
 
 					if (!empty($context['ban_suggestions']['member']['id']))
 					{
@@ -515,18 +515,18 @@ class ManageBansController extends AbstractController
 
 
 		// Delete one or more entries.
-		if (!empty($this->_req->post->removeAll) || (!empty($this->_req->post->removeSelected) && !empty($this->_req->post->remove)))
+		if (!empty($this->http_req->post->removeAll) || (!empty($this->http_req->post->removeSelected) && !empty($this->http_req->post->remove)))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-bl');
 
 			// 'Delete all entries' button was pressed.
-			if (!empty($this->_req->post->removeAll))
+			if (!empty($this->http_req->post->removeAll))
 				removeBanLogs();
 			// 'Delete selection' button was pressed.
 			else
 			{
-				$to_remove = array_map('intval', $this->_req->post->remove);
+				$to_remove = array_map('intval', $this->http_req->post->remove);
 				removeBanLogs($to_remove);
 			}
 		}
@@ -658,34 +658,34 @@ class ManageBansController extends AbstractController
 
 
 		// Check with security first
-		$this->_session->check();
+		$this->session->check();
 		validateToken('Admin-bet');
 
 		$ban_errors = ErrorContext::context('ban', 1);
 
 		// Adding or editing a ban group
-		if (isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban))
+		if (isset($this->http_req->post->add_ban) || isset($this->http_req->post->modify_ban))
 		{
 			$ban_info = array();
 
 			// Let's collect all the information we need
-			$ban_info['id'] = $this->_req->getQuery('bg', 'intval', 0);
+			$ban_info['id'] = $this->http_req->getQuery('bg', 'intval', 0);
 			$ban_info['is_new'] = empty($ban_info['id']);
-			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
+			$ban_info['expire_date'] = $this->http_req->getPost('expire_date', 'intval', 0);
 			$ban_info['expiration'] = array(
-				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->_req->post->expiration : 'never',
+				'status' => isset($this->http_req->post->expiration) && in_array($this->http_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->http_req->post->expiration : 'never',
 				'days' => $ban_info['expire_date'],
 			);
 			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
-			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
-			$ban_info['reason'] = $this->_req->getPost('reason', 'htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['name'] = $this->_req->getPost('ban_name', 'htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = $this->_req->getPost('notes', 'htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['full_ban'] = empty($this->http_req->post->full_ban) ? 0 : 1;
+			$ban_info['reason'] = $this->http_req->getPost('reason', 'htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['name'] = $this->http_req->getPost('ban_name', 'htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['notes'] = $this->http_req->getPost('notes', 'htmlspecialchars[ENT_QUOTES]', '');
 			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
 			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
-			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;
-			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_register) ? 0 : 1;
-			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_login) ? 0 : 1;
+			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->http_req->post->cannot_post) ? 0 : 1;
+			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->http_req->post->cannot_register) ? 0 : 1;
+			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($this->http_req->post->cannot_login) ? 0 : 1;
 
 			// Adding a new ban group
 			if (empty($ban_info['id']))
@@ -704,9 +704,9 @@ class ManageBansController extends AbstractController
 		}
 
 		// Update the triggers associated with this ban
-		if (isset($this->_req->post->ban_suggestions, $ban_info['id']))
+		if (isset($this->http_req->post->ban_suggestions, $ban_info['id']))
 		{
-			$saved_triggers = saveTriggers((array) $this->_req->post, $ban_info['id'], $this->_req->getQuery('u', 'intval', 0), $this->_req->getQuery('bi', 'intval', 0));
+			$saved_triggers = saveTriggers((array) $this->http_req->post, $ban_info['id'], $this->http_req->getQuery('u', 'intval', 0), $this->http_req->getQuery('bi', 'intval', 0));
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
 
@@ -717,13 +717,13 @@ class ManageBansController extends AbstractController
 			$context['ban']['from_user'] = true;
 
 			// They may have entered a name not using the member select box
-			if (isset($this->_req->query->u))
-				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
-			elseif (isset($this->_req->query->user))
+			if (isset($this->http_req->query->u))
+				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->http_req->query->u));
+			elseif (isset($this->http_req->query->user))
 			{
 				$context['ban']['from_user'] = false;
 				$context['use_autosuggest'] = true;
-				$context['ban_suggestions']['member']['name'] = $this->_req->query->user;
+				$context['ban_suggestions']['member']['name'] = $this->http_req->query->user;
 			}
 
 			// Not strictly necessary, but it's nice
@@ -733,10 +733,10 @@ class ManageBansController extends AbstractController
 			return $this->action_edit();
 		}
 
-		if (isset($this->_req->post->ban_items))
+		if (isset($this->http_req->post->ban_items))
 		{
-			$ban_group_id = $this->_req->getQuery('bg', 'intval', 0);
-			$ban_items = array_map('intval', $this->_req->post->ban_items);
+			$ban_group_id = $this->http_req->getQuery('bg', 'intval', 0);
+			$ban_items = array_map('intval', $this->http_req->post->ban_items);
 
 			removeBanTriggers($ban_items, $ban_group_id);
 		}
@@ -748,7 +748,7 @@ class ManageBansController extends AbstractController
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=Admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . isset($ban_group_id) ? $ban_group_id : 0));
+		redirectexit('action=Admin;area=ban;sa=' . (isset($this->http_req->post->add_ban) ? 'list' : 'edit;bg=' . isset($ban_group_id) ? $ban_group_id : 0));
 	}
 
 	/**
@@ -771,33 +771,33 @@ class ManageBansController extends AbstractController
 
 
 
-		$ban_group = $this->_req->getQuery('bg', 'intval', 0);
-		$ban_id = $this->_req->getQuery('bi', 'intval', 0);
+		$ban_group = $this->http_req->getQuery('bg', 'intval', 0);
+		$ban_id = $this->http_req->getQuery('bi', 'intval', 0);
 
 		if (empty($ban_group))
 			$GLOBALS['elk']['errors']->fatal_lang_error('ban_not_found', false);
 
 		// Adding a new trigger
-		if (isset($this->_req->post->add_new_trigger) && !empty($this->_req->post->ban_suggestions))
+		if (isset($this->http_req->post->add_new_trigger) && !empty($this->http_req->post->ban_suggestions))
 		{
-			saveTriggers((array) $this->_req->post, $ban_group, 0, $ban_id);
+			saveTriggers((array) $this->http_req->post, $ban_group, 0, $ban_id);
 			redirectexit('action=Admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 		// Edit an existing trigger with new / updated details
-		elseif (isset($this->_req->post->edit_trigger) && !empty($this->_req->post->ban_suggestions))
+		elseif (isset($this->http_req->post->edit_trigger) && !empty($this->http_req->post->ban_suggestions))
 		{
 			// The first replaces the old one, the others are added new
 			// (simplification, otherwise it would require another query and some work...)
-			$dummy = (array) $this->_req->post;
-			$dummy['ban_suggestions'] = array_shift($this->_req->post->ban_suggestions);
+			$dummy = (array) $this->http_req->post;
+			$dummy['ban_suggestions'] = array_shift($this->http_req->post->ban_suggestions);
 			saveTriggers($dummy, $ban_group, 0, $ban_id);
-			if (!empty($this->_req->post->ban_suggestions))
-				saveTriggers((array) $this->_req->post, $ban_group);
+			if (!empty($this->http_req->post->ban_suggestions))
+				saveTriggers((array) $this->http_req->post, $ban_group);
 
 			redirectexit('action=Admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 		// Removing a ban trigger by clearing the checkbox
-		elseif (isset($this->_req->post->edit_trigger))
+		elseif (isset($this->http_req->post->edit_trigger))
 		{
 			removeBanTriggers($ban_id);
 			redirectexit('action=Admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
@@ -885,24 +885,24 @@ class ManageBansController extends AbstractController
 
 
 
-		if (!empty($this->_req->post->remove_triggers) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
+		if (!empty($this->http_req->post->remove_triggers) && !empty($this->http_req->post->remove) && is_array($this->http_req->post->remove))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Make sure every entry is a proper integer.
-			$to_remove = array_map('intval', $this->_req->post->remove);
+			$to_remove = array_map('intval', $this->http_req->post->remove);
 
 			removeBanTriggers($to_remove);
 
 			// Rehabilitate some members.
-			if ($this->_req->query->entity == 'member')
+			if ($this->http_req->query->entity == 'member')
 				updateBanMembers();
 
 			// Make sure the ban cache is refreshed.
 			updateSettings(array('banLastUpdated' => time()));
 		}
 
-		$context['selected_entity'] = isset($this->_req->query->entity) && in_array($this->_req->query->entity, array('ip', 'hostname', 'email', 'member')) ? $this->_req->query->entity : 'ip';
+		$context['selected_entity'] = isset($this->http_req->query->entity) && in_array($this->http_req->query->entity, array('ip', 'hostname', 'email', 'member')) ? $this->http_req->query->entity : 'ip';
 
 		$listOptions = array(
 			'id' => 'ban_trigger_list',

@@ -59,11 +59,11 @@ class MembersController extends AbstractController
 	{
 		global $user_info, $modSettings;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 		is_not_guest();
 
 		// Who's going to be your buddy
-		$user = $this->_req->getQuery('u', 'intval', '');
+		$user = $this->http_req->getQuery('u', 'intval', '');
 
 		// You have to give a user
 		if (empty($user))
@@ -106,13 +106,13 @@ class MembersController extends AbstractController
 	{
 		global $user_info;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 		is_not_guest();
 
 		$GLOBALS['elk']['hooks']->hook('remove_buddy', array($user_info['id']));
 
 		// Yeah, they are no longer cool
-		$user = $this->_req->getQuery('u', 'intval', '');
+		$user = $this->http_req->getQuery('u', 'intval', '');
 
 		// You have to give a user
 		if (empty($user))

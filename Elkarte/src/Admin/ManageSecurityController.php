@@ -121,11 +121,11 @@ class ManageSecurityController extends AbstractController
 		$config_vars = $this->_securitySettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 
 			$GLOBALS['elk']['hooks']->hook('save_general_security_settings');
 
@@ -173,32 +173,32 @@ class ManageSecurityController extends AbstractController
 			unset($config_vars['moderate']);
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
 			{
-				$this->_req->post->warning_watch = 0;
-				$this->_req->post->warning_moderate = 0;
-				$this->_req->post->warning_mute = 0;
+				$this->http_req->post->warning_watch = 0;
+				$this->http_req->post->warning_moderate = 0;
+				$this->http_req->post->warning_mute = 0;
 			}
 			else
 			{
-				$this->_req->post->warning_watch = min($this->_req->post->warning_watch, 100);
-				$this->_req->post->warning_moderate = $modSettings['postmod_active'] ? min($this->_req->post->warning_moderate, 100) : 0;
-				$this->_req->post->warning_mute = min($this->_req->post->warning_mute, 100);
+				$this->http_req->post->warning_watch = min($this->http_req->post->warning_watch, 100);
+				$this->http_req->post->warning_moderate = $modSettings['postmod_active'] ? min($this->http_req->post->warning_moderate, 100) : 0;
+				$this->http_req->post->warning_mute = min($this->http_req->post->warning_mute, 100);
 			}
 
 			// Fix the warning setting array!
-			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
+			$this->http_req->post->warning_settings = '1,' . min(100, (int) $this->http_req->post->user_limit) . ',' . min(100, (int) $this->http_req->post->warning_decrement);
 			$config_vars[] = array('text', 'warning_settings');
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
 			$GLOBALS['elk']['hooks']->hook('save_moderation_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=securitysettings;sa=moderation');
 		}
 
@@ -244,16 +244,16 @@ class ManageSecurityController extends AbstractController
 		$config_vars = $this->_spamSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Fix PM settings.
-			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
+			$this->http_req->post->pm_spam_settings = (int) $this->http_req->post->max_pm_recipients . ',' . (int) $this->http_req->post->pm_posts_verification . ',' . (int) $this->http_req->post->pm_posts_per_hour;
 
 			// Guest requiring verification!
-			if (empty($this->_req->post->posts_require_captcha) && !empty($this->_req->post->guests_require_captcha))
-				$this->_req->post->posts_require_captcha = -1;
+			if (empty($this->http_req->post->posts_require_captcha) && !empty($this->http_req->post->guests_require_captcha))
+				$this->http_req->post->posts_require_captcha = -1;
 
 			unset($config_vars['pm1'], $config_vars['pm2'], $config_vars['pm3'], $config_vars['guest_verify']);
 
@@ -262,7 +262,7 @@ class ManageSecurityController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('save_spam_settings');
 
 			// Now save.
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			$GLOBALS['elk']['cache']->remove('verificationQuestionIds');
 			redirectexit('action=Admin;area=securitysettings;sa=spam');
 		}
@@ -338,14 +338,14 @@ class ManageSecurityController extends AbstractController
 		$config_vars = $this->_bbSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			// Make sure Bad Behavior defaults are set if nothing was specified
-			$this->_req->post->badbehavior_httpbl_threat = empty($this->_req->post->badbehavior_httpbl_threat) ? 25 : $this->_req->post->badbehavior_httpbl_threat;
-			$this->_req->post->badbehavior_httpbl_maxage = empty($this->_req->post->badbehavior_httpbl_maxage) ? 30 : $this->_req->post->badbehavior_httpbl_maxage;
-			$this->_req->post->badbehavior_reverse_proxy_header = empty($this->_req->post->badbehavior_reverse_proxy_header) ? 'X-Forwarded-For' : $this->_req->post->badbehavior_reverse_proxy_header;
+			$this->http_req->post->badbehavior_httpbl_threat = empty($this->http_req->post->badbehavior_httpbl_threat) ? 25 : $this->http_req->post->badbehavior_httpbl_threat;
+			$this->http_req->post->badbehavior_httpbl_maxage = empty($this->http_req->post->badbehavior_httpbl_maxage) ? 30 : $this->http_req->post->badbehavior_httpbl_maxage;
+			$this->http_req->post->badbehavior_reverse_proxy_header = empty($this->http_req->post->badbehavior_reverse_proxy_header) ? 'X-Forwarded-For' : $this->http_req->post->badbehavior_reverse_proxy_header;
 
 			// Build up the whitelist options
 			foreach ($whitelist as $list)
@@ -353,17 +353,17 @@ class ManageSecurityController extends AbstractController
 				$this_list = array();
 				$this_desc = array();
 
-				if (isset($this->_req->post->$list))
+				if (isset($this->http_req->post->$list))
 				{
 					// Clear blanks from the data field, only grab the comments that don't have blank data value
-					$this_list = array_map('trim', array_filter($this->_req->post->$list));
-					$this_desc = array_intersect_key($this->_req->post->{$list . '_desc'}, $this_list);
+					$this_list = array_map('trim', array_filter($this->http_req->post->$list));
+					$this_desc = array_intersect_key($this->http_req->post->{$list . '_desc'}, $this_list);
 				}
 
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=securitysettings;sa=badbehavior');
 		}
 

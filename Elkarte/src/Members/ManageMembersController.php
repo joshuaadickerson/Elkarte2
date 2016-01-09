@@ -155,16 +155,16 @@ class ManageMembersController extends AbstractController
 		$GLOBALS['elk']['hooks']->hook('manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
+		if (!$context['show_activate'] && ($subAction != 'browse' || $this->http_req->query->type != 'activate'))
 		{
 			$context['tabs']['approve']['is_last'] = true;
 			unset($context['tabs']['activate']);
 		}
 
 		// Unset approval tab if it shouldn't be there.
-		if (!$context['show_approve'] && ($subAction != 'browse' || $this->_req->query->type != 'approve'))
+		if (!$context['show_approve'] && ($subAction != 'browse' || $this->http_req->query->type != 'approve'))
 		{
-			if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
+			if (!$context['show_activate'] && ($subAction != 'browse' || $this->http_req->query->type != 'activate'))
 				$context['tabs']['search']['is_last'] = true;
 			unset($context['tabs']['approve']);
 		}
@@ -192,10 +192,10 @@ class ManageMembersController extends AbstractController
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Set the current sub action.
-		$context['sub_action'] = $this->_req->getPost('sa', 'strval', 'all');
+		$context['sub_action'] = $this->http_req->getPost('sa', 'strval', 'all');
 
 		// Are we performing a mass action?
-		if (isset($this->_req->post->maction_on_members, $this->_req->post->maction) && !empty($this->_req->post->members))
+		if (isset($this->http_req->post->maction_on_members, $this->http_req->post->maction) && !empty($this->http_req->post->members))
 			$this->_multiMembersAction();
 
 		// Check input after a member search has been submitted.
@@ -278,15 +278,15 @@ class ManageMembersController extends AbstractController
 			$GLOBALS['elk']['hooks']->hook('view_members_params', array(&$params));
 
 			$search_params = array();
-			if ($context['sub_action'] == 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
-				$search_params = @unserialize(base64_decode($this->_req->query->params));
-			elseif (!empty($this->_req->post))
+			if ($context['sub_action'] == 'query' && !empty($this->http_req->query->params) && empty($this->http_req->post->types))
+				$search_params = @unserialize(base64_decode($this->http_req->query->params));
+			elseif (!empty($this->http_req->post))
 			{
-				$search_params['types'] = $this->_req->post->types;
+				$search_params['types'] = $this->http_req->post->types;
 				foreach ($params as $param_name => $param_info)
 				{
-					if (isset($this->_req->post->$param_name))
-						$search_params[$param_name] = $this->_req->post->$param_name;
+					if (isset($this->http_req->post->$param_name))
+						$search_params[$param_name] = $this->http_req->post->$param_name;
 				}
 			}
 
@@ -615,14 +615,14 @@ class ManageMembersController extends AbstractController
 		global $txt, $user_info;
 
 		// @todo add a token too?
-		$this->_session->check();
+		$this->session->check();
 
 		// Clean the input.
 		$members = array();
-		foreach ($this->_req->post->members as $value)
+		foreach ($this->http_req->post->members as $value)
 		{
 			// Don't delete yourself, idiot.
-			if ($this->_req->post->maction === 'delete' && $value == $user_info['id'])
+			if ($this->http_req->post->maction === 'delete' && $value == $user_info['id'])
 				continue;
 
 			$members[] = (int) $value;
@@ -634,21 +634,21 @@ class ManageMembersController extends AbstractController
 			return;
 
 		// Are we performing a delete?
-		if ($this->_req->post->maction == 'delete' && allowedTo('profile_remove_any'))
+		if ($this->http_req->post->maction == 'delete' && allowedTo('profile_remove_any'))
 		{
 			// Delete all the selected members.
 				deleteMembers($members, true);
 		}
 
 		// Are we changing groups?
-		if (in_array($this->_req->post->maction, array('pgroup', 'agroup')) && allowedTo('manage_membergroups'))
+		if (in_array($this->http_req->post->maction, array('pgroup', 'agroup')) && allowedTo('manage_membergroups'))
 		{
 
 
 			$groups = array('p', 'a');
 			foreach ($groups as $group)
 			{
-				if ($this->_req->post->maction == $group . 'group' && !empty($this->_req->post->new_membergroup))
+				if ($this->http_req->post->maction == $group . 'group' && !empty($this->http_req->post->new_membergroup))
 				{
 					if ($group == 'p')
 						$type = 'force_primary';
@@ -656,8 +656,8 @@ class ManageMembersController extends AbstractController
 						$type = 'only_additional';
 
 					// Change all the selected members' group.
-					if ($this->_req->post->new_membergroup != -1)
-						addMembersToGroup($members, $this->_req->post->new_membergroup, $type, true);
+					if ($this->http_req->post->new_membergroup != -1)
+						addMembersToGroup($members, $this->http_req->post->new_membergroup, $type, true);
 					else
 						removeMembersFromGroups($members, null, true);
 				}
@@ -665,7 +665,7 @@ class ManageMembersController extends AbstractController
 		}
 
 		// Are we banning?
-		if (in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
+		if (in_array($this->http_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
 		{
 
 
@@ -682,9 +682,9 @@ class ManageMembersController extends AbstractController
 				'notes' => '',
 			));
 
-			$ban_name = in_array($this->_req->post->maction, array('ban_names', 'ban_names_mails'));
-			$ban_email = in_array($this->_req->post->maction, array('ban_mails', 'ban_names_mails'));
-			$ban_ips = $this->_req->post->maction === 'ban_ips';
+			$ban_name = in_array($this->http_req->post->maction, array('ban_names', 'ban_names_mails'));
+			$ban_email = in_array($this->http_req->post->maction, array('ban_mails', 'ban_names_mails'));
+			$ban_ips = $this->http_req->post->maction === 'ban_ips';
 			$suggestions = array();
 
 			if ($ban_email)
@@ -753,14 +753,14 @@ class ManageMembersController extends AbstractController
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
-		$context['browse_type'] = isset($this->_req->query->type) ? $this->_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+		$context['browse_type'] = isset($this->http_req->query->type) ? $this->http_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 
 		if (isset($context['tabs'][$context['browse_type']]))
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
 
 		// Allowed filters are those we can have, in theory.
 		$context['allowed_filters'] = $context['browse_type'] == 'approve' ? array(3, 4, 5) : array(0, 2);
-		$context['current_filter'] = isset($this->_req->query->filter) && in_array($this->_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->_req->query->filter]) ? (int) $this->_req->query->filter : -1;
+		$context['current_filter'] = isset($this->http_req->query->filter) && in_array($this->http_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->http_req->query->filter]) ? (int) $this->http_req->query->filter : -1;
 
 		// Sort out the different sub areas that we can actually filter by.
 		$context['available_filters'] = array();
@@ -796,8 +796,8 @@ class ManageMembersController extends AbstractController
 		);
 
 		// Are we showing duplicate information?
-		if (isset($this->_req->query->showdupes))
-			$_SESSION['showdupes'] = (int) $this->_req->query->showdupes;
+		if (isset($this->http_req->query->showdupes))
+			$_SESSION['showdupes'] = (int) $this->http_req->query->showdupes;
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
@@ -1093,7 +1093,7 @@ class ManageMembersController extends AbstractController
 		global $modSettings;
 
 		// First, check our session.
-		$this->_session->check();
+		$this->session->check();
 
 
 
@@ -1104,36 +1104,36 @@ class ManageMembersController extends AbstractController
 		$this->conditions = array();
 
 		// Sort out where we are going...
-		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->query->orig_filter;
+		$current_filter = $this->conditions['activated_status'] = (int) $this->http_req->query->orig_filter;
 
 		// If we are applying a filter do just that - then redirect.
-		if (isset($this->_req->query->filter) && $this->_req->query->filter != $this->_req->query->orig_filter)
-			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $this->_req->query->filter . ';start=' . $this->_req->query->start);
+		if (isset($this->http_req->query->filter) && $this->http_req->query->filter != $this->http_req->query->orig_filter)
+			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->http_req->query->type . ';sort=' . $this->http_req->query->sort . ';filter=' . $this->http_req->query->filter . ';start=' . $this->http_req->query->start);
 
 		// Nothing to do?
-		if (!isset($this->_req->post->todoAction) && !isset($this->_req->post->time_passed))
-			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+		if (!isset($this->http_req->post->todoAction) && !isset($this->http_req->post->time_passed))
+			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->http_req->query->type . ';sort=' . $this->http_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->http_req->query->start);
 
 		// Are we dealing with members who have been waiting for > set amount of time?
-		if (isset($this->_req->post->time_passed))
-			$this->conditions['time_before'] = time() - 86400 * (int) $this->_req->post->time_passed;
+		if (isset($this->http_req->post->time_passed))
+			$this->conditions['time_before'] = time() - 86400 * (int) $this->http_req->post->time_passed;
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
 			$this->conditions['members'] = array();
-			foreach ($this->_req->post->todoAction as $id)
+			foreach ($this->http_req->post->todoAction as $id)
 				$this->conditions['members'][] = (int) $id;
 		}
 
 		$data = retrieveMemberData($this->conditions);
 		if ($data['member_count'] == 0)
-			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+			redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->http_req->query->type . ';sort=' . $this->http_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->http_req->query->start);
 
 		$this->member_info = $data['member_info'];
 		$this->conditions['members'] = $data['members'];
 
 		// What do we want to do with this application?
-		switch ($this->_req->post->todo)
+		switch ($this->http_req->post->todo)
 		{
 			// Are we activating or approving the members?
 			case 'ok':
@@ -1161,9 +1161,9 @@ class ManageMembersController extends AbstractController
 		}
 
 		// Log what we did?
-		if (!empty($modSettings['modlog_enabled']) && in_array($this->_req->post->todo, array('ok', 'okemail', 'require_activation', 'remind')))
+		if (!empty($modSettings['modlog_enabled']) && in_array($this->http_req->post->todo, array('ok', 'okemail', 'require_activation', 'remind')))
 		{
-			$log_action = $this->_req->post->todo == 'remind' ? 'remind_member' : 'approve_member';
+			$log_action = $this->http_req->post->todo == 'remind' ? 'remind_member' : 'approve_member';
 
 			foreach ($this->member_info as $member)
 				logAction($log_action, array('member' => $member['id']), 'Admin');
@@ -1177,13 +1177,13 @@ class ManageMembersController extends AbstractController
 		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
-		if (!in_array($this->_req->post->todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
+		if (!in_array($this->http_req->post->todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
 		{
 
 			updatePostGroupStats($this->conditions['members']);
 		}
 
-		redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+		redirectexit('action=Admin;area=viewmembers;sa=browse;type=' . $this->http_req->query->type . ';sort=' . $this->http_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->http_req->query->start);
 	}
 
 	/**
@@ -1215,7 +1215,7 @@ class ManageMembersController extends AbstractController
 		deleteMembers($this->conditions['members']);
 
 		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo == 'deleteemail')
+		if ($this->http_req->post->todo == 'deleteemail')
 		{
 			foreach ($this->member_info as $member)
 			{
@@ -1237,7 +1237,7 @@ class ManageMembersController extends AbstractController
 		deleteMembers($this->conditions['members']);
 
 		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo == 'rejectemail')
+		if ($this->http_req->post->todo == 'rejectemail')
 		{
 			foreach ($this->member_info as $member)
 			{
@@ -1262,7 +1262,7 @@ class ManageMembersController extends AbstractController
 		approveMembers($this->conditions);
 
 		// Check for email.
-		if ($this->_req->post->todo == 'okemail')
+		if ($this->http_req->post->todo == 'okemail')
 		{
 			foreach ($this->member_info as $member)
 			{

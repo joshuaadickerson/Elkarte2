@@ -87,13 +87,13 @@ class ManageLanguagesController extends AbstractController
 		global $context, $txt;
 
 		// Are we searching for new languages on the site?
-		if (!empty($this->_req->post->lang_add_sub))
+		if (!empty($this->http_req->post->lang_add_sub))
 		{
 			// Need fetch_web_data.
 			require_once(ROOTDIR . '/Packages/Package.subs.php');
 			require_once(SUBSDIR . '/Language.subs.php');
 
-			$context['elk_search_term'] = $this->_req->getPost('lang_add', 'trim|htmlspecialchars[ENT_COMPAT]');
+			$context['elk_search_term'] = $this->http_req->getPost('lang_add', 'trim|htmlspecialchars[ENT_COMPAT]');
 
 			$listOptions = array(
 				'id' => 'languages',
@@ -162,26 +162,26 @@ class ManageLanguagesController extends AbstractController
 		require_once(SUBSDIR . '/Language.subs.php');
 
 		// Setting a new default?
-		if (!empty($this->_req->post->set_default) && !empty($this->_req->post->def_language))
+		if (!empty($this->http_req->post->set_default) && !empty($this->http_req->post->def_language))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-lang');
 
 			$lang_exists = false;
 			$available_langs = getLanguages();
 			foreach ($available_langs as $lang)
 			{
-				if ($this->_req->post->def_language == $lang['filename'])
+				if ($this->http_req->post->def_language == $lang['filename'])
 				{
 					$lang_exists = true;
 					break;
 				}
 			}
 
-			if ($this->_req->post->def_language != $language && $lang_exists)
+			if ($this->http_req->post->def_language != $language && $lang_exists)
 			{
-				SettingsForm::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
-				$language = $this->_req->post->def_language;
+				SettingsForm::save_file(array('language' => '\'' . $this->http_req->post->def_language . '\''));
+				$language = $this->http_req->post->def_language;
 			}
 		}
 
@@ -306,25 +306,25 @@ class ManageLanguagesController extends AbstractController
 		require_once(ROOTDIR . '/Packages/Package.subs.php');
 
 		// Clearly we need to know what to request.
-		if (!isset($this->_req->query->did))
+		if (!isset($this->http_req->query->did))
 			$GLOBALS['elk']['errors']->fatal_lang_error('no_access', false);
 
 		// Some lovely context.
-		$context['download_id'] = $this->_req->query->did;
+		$context['download_id'] = $this->http_req->query->did;
 		$context['sub_template'] = 'download_language';
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'add';
 
 		// Can we actually do the installation - and do they want to?
-		if (!empty($this->_req->post->do_install) && !empty($this->_req->post->copy_file))
+		if (!empty($this->http_req->post->do_install) && !empty($this->http_req->post->copy_file))
 		{
-			$this->_session->check('get');
+			$this->session->check('get');
 			validateToken('Admin-dlang');
 
 			$chmod_files = array();
 			$install_files = array();
 
 			// Check writable status.
-			foreach ($this->_req->post->copy_file as $file)
+			foreach ($this->http_req->post->copy_file as $file)
 			{
 				// Check it's not very bad.
 				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
@@ -345,7 +345,7 @@ class ManageLanguagesController extends AbstractController
 			elseif (!empty($install_files))
 			{
 				// @todo retrieve the language pack per naming pattern from our sites
-				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), BOARDDIR, false, true, $install_files);
+				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->http_req->query->did), BOARDDIR, false, true, $install_files);
 
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();
@@ -357,7 +357,7 @@ class ManageLanguagesController extends AbstractController
 
 		// @todo Open up the old china.
 		if (!isset($archive_content))
-			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
+			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->http_req->query->did), null);
 
 		if (empty($archive_content))
 			$GLOBALS['elk']['errors']->fatal_error($txt['add_language_error_no_response']);
@@ -634,8 +634,8 @@ class ManageLanguagesController extends AbstractController
 		$context['page_title'] = $txt['edit_languages'];
 		$context['sub_template'] = 'modify_language_entries';
 
-		$context['lang_id'] = $this->_req->query->lid;
-		list ($theme_id, $file_id) = empty($this->_req->post->tfid) || strpos($this->_req->post->tfid, '+') === false ? array(1, '') : explode('+', $this->_req->post->tfid);
+		$context['lang_id'] = $this->http_req->query->lid;
+		list ($theme_id, $file_id) = empty($this->http_req->post->tfid) || strpos($this->http_req->post->tfid, '+') === false ? array(1, '') : explode('+', $this->http_req->post->tfid);
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
@@ -706,9 +706,9 @@ class ManageLanguagesController extends AbstractController
 
 		// Saving primary settings?
 		$madeSave = false;
-		if (!empty($this->_req->post->save_main) && !$current_file)
+		if (!empty($this->http_req->post->save_main) && !$current_file)
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mlang');
 
 			// Read in the current file.
@@ -716,10 +716,10 @@ class ManageLanguagesController extends AbstractController
 
 			// These are the replacements. old => new
 			$replace_array = array(
-				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($this->_req->post->locale) . '\';',
-				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($this->_req->post->dictionary) . '\';',
-				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($this->_req->post->spelling) . '\';',
-				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($this->_req->post->rtl) ? 'true' : 'false') . ';',
+				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($this->http_req->post->locale) . '\';',
+				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($this->http_req->post->dictionary) . '\';',
+				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($this->http_req->post->spelling) . '\';',
+				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($this->http_req->post->rtl) ? 'true' : 'false') . ';',
 			);
 			$current_data = preg_replace(array_keys($replace_array), array_values($replace_array), $current_data);
 			$fp = fopen($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php', 'w+');
@@ -751,16 +751,16 @@ class ManageLanguagesController extends AbstractController
 
 		// Are we saving?
 		$save_strings = array();
-		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
+		if (isset($this->http_req->post->save_entries) && !empty($this->http_req->post->entry))
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('Admin-mlang');
 
 			// Clean each entry!
-			foreach ($this->_req->post->entry as $k => $v)
+			foreach ($this->http_req->post->entry as $k => $v)
 			{
 				// Only try to save if it's changed!
-				if ($this->_req->post->entry[$k] != $this->_req->post->comp[$k])
+				if ($this->http_req->post->entry[$k] != $this->http_req->post->comp[$k])
 					$save_strings[$k] = cleanLangString($v, false);
 			}
 		}
@@ -922,7 +922,7 @@ class ManageLanguagesController extends AbstractController
 			// Any saves to make?
 			if (!empty($final_saves))
 			{
-				$this->_session->check();
+				$this->session->check();
 
 				$file_contents = implode('', file($current_file));
 				foreach ($final_saves as $save)
@@ -969,9 +969,9 @@ class ManageLanguagesController extends AbstractController
 		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$GLOBALS['elk']['hooks']->hook('save_language_settings');
 

@@ -66,7 +66,7 @@ class RemoveTopicController extends AbstractController
 		global $user_info, $topic, $board, $modSettings;
 
 		// Make sure they aren't being lead around by someone. (:@)
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// Trying to fool us around, are we?
 		if (empty($topic))
@@ -128,18 +128,18 @@ class RemoveTopicController extends AbstractController
 	{
 		global $topic, $modSettings;
 
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// This has some handy functions for topics
 
 
 		// Need a message to remove
-		$_msg = $this->_req->getQuery('msg', 'intval', null);
+		$_msg = $this->http_req->getQuery('msg', 'intval', null);
 
 		// Is $topic set?
-		if (empty($topic) && isset($this->_req->query->topic))
+		if (empty($topic) && isset($this->http_req->query->topic))
 		{
-			$topic = (int) $this->_req->query->topic;
+			$topic = (int) $this->http_req->query->topic;
 		}
 
 		// Trying to mess around are we?
@@ -183,7 +183,7 @@ class RemoveTopicController extends AbstractController
 		global $modSettings;
 
 		// Check session.
-		$this->_session->check('get');
+		$this->session->check('get');
 
 		// Is recycled board enabled?
 		if (empty($modSettings['recycle_enable']))
@@ -197,15 +197,15 @@ class RemoveTopicController extends AbstractController
 		$restorer = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Restoring messages?
-		if (!empty($this->_req->query->msgs))
+		if (!empty($this->http_req->query->msgs))
 		{
-			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $this->_req->query->msgs)));
+			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $this->http_req->query->msgs)));
 		}
 
 		// Now any topics?
-		if (!empty($this->_req->query->topics))
+		if (!empty($this->http_req->query->topics))
 		{
-			$topics_to_restore = array_map('intval', explode(',', $this->_req->query->topics));
+			$topics_to_restore = array_map('intval', explode(',', $this->http_req->query->topics));
 			$restorer->restoreTopics($topics_to_restore);
 		}
 
@@ -284,14 +284,14 @@ class RemoveTopicController extends AbstractController
 		global $topic, $board;
 
 		// We want to redirect back to recent action.
-		if (isset($this->_req->query->recent))
+		if (isset($this->http_req->query->recent))
 		{
 			redirectexit('action=recent');
 		}
 		// Back to profile
-		elseif (isset($this->_req->query->profile, $this->_req->query->start, $this->_req->query->u))
+		elseif (isset($this->http_req->query->profile, $this->http_req->query->start, $this->http_req->query->u))
 		{
-			redirectexit('action=profile;u=' . $this->_req->query->u . ';area=showposts;start=' . $this->_req->query->start);
+			redirectexit('action=profile;u=' . $this->http_req->query->u . ';area=showposts;start=' . $this->http_req->query->start);
 		}
 		// Back to the board if the topic was removed
 		elseif ($full_topic)
@@ -301,7 +301,7 @@ class RemoveTopicController extends AbstractController
 		// Back to the topic where the message was removed
 		else
 		{
-			redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+			redirectexit('topic=' . $topic . '.' . $this->http_req->query->start);
 		}
 	}
 

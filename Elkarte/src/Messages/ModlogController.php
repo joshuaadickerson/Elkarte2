@@ -52,14 +52,14 @@ class ModlogController extends AbstractController
 		global $txt, $context, $scripturl;
 
 		// Are we looking at the moderation log or the administration log.
-		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa == 'adminlog' ? 3 : 1;
+		$context['log_type'] = isset($this->http_req->query->sa) && $this->http_req->query->sa == 'adminlog' ? 3 : 1;
 
 		// Trying to view the Admin log, lets check you can.
 		if ($context['log_type'] == 3)
 			isAllowedTo('admin_forum');
 
 		// These change dependant on whether we are viewing the moderation or Admin log.
-		if ($context['log_type'] == 3 || $this->_req->query->action == 'Admin')
+		if ($context['log_type'] == 3 || $this->http_req->query->action == 'Admin')
 			$context['url_start'] = '?action=Admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
 		else
 			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
@@ -77,23 +77,23 @@ class ModlogController extends AbstractController
 		$context['hoursdisable'] = 24;
 
 		// Handle deletion...
-		if (isset($this->_req->post->removeall) && $context['can_delete'])
+		if (isset($this->http_req->post->removeall) && $context['can_delete'])
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('mod-ml');
 			deleteLogAction($context['log_type'], $context['hoursdisable']);
 		}
-		elseif (!empty($this->_req->post->remove) && isset($this->_req->post->delete) && $context['can_delete'])
+		elseif (!empty($this->http_req->post->remove) && isset($this->http_req->post->delete) && $context['can_delete'])
 		{
-			$this->_session->check();
+			$this->session->check();
 			validateToken('mod-ml');
-			deleteLogAction($context['log_type'], $context['hoursdisable'], $this->_req->post->delete);
+			deleteLogAction($context['log_type'], $context['hoursdisable'], $this->http_req->post->delete);
 		}
 
 		// If we're coming from a search, get the variables.
-		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
+		if (!empty($this->http_req->post->params) && empty($this->http_req->post->is_search))
 		{
-			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
+			$search_params = base64_decode(strtr($this->http_req->post->params, array(' ' => '+')));
 			$search_params = @unserialize($search_params);
 		}
 
@@ -106,15 +106,15 @@ class ModlogController extends AbstractController
 		);
 
 		// Setup the allowed search
-		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$context['order'] = isset($this->http_req->query->sort) && isset($searchTypes[$this->http_req->query->sort]) ? $this->http_req->query->sort : 'member';
 
-		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
-			$search_params_string = $this->_req->getPost('search', 'trim', '');
+		if (!isset($search_params['string']) || (!empty($this->http_req->post->search) && $search_params['string'] != $this->http_req->post->search))
+			$search_params_string = $this->http_req->getPost('search', 'trim', '');
 		else
 			$search_params_string = $search_params['string'];
 
-		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
+		if (isset($this->http_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($this->http_req->post->search_type) && isset($searchTypes[$this->http_req->post->search_type]) ? $this->http_req->query->search_type : $context['order'];
 		else
 			$search_params_type = $search_params['type'];
 

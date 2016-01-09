@@ -13,7 +13,8 @@
 
 namespace Elkarte\Admin;
 
-use Elkarte\Controllers\AbstractController;
+use Elkarte\Elkarte\Controller\AbstractController;
+use Elkarte\Elkarte\Controller\Action;
 
 /**
  * AddonSettings controller handles administration settings added
@@ -93,9 +94,9 @@ class AddonSettingsController extends AbstractController
 		$config_vars = $this->_addonSettings->settings();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
-			$this->_session->check();
+			$this->session->check();
 
 			$this->_hook->hook('save_general_mod_settings');
 
@@ -173,8 +174,8 @@ class AddonSettingsController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
-			$sa = $this->_req->query->sa;
+		if (isset($this->http_req->query->sa, $subActions[$this->http_req->query->sa]))
+			$sa = $this->http_req->query->sa;
 		elseif (!empty($defaultAction))
 			$sa = $defaultAction;
 		else

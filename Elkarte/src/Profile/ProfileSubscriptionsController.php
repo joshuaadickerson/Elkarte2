@@ -55,6 +55,7 @@ class ProfileSubscriptionsController extends AbstractController
 	public function action_index()
 	{
 		// $this->action_subscriptions();
+		$this->bootstrap();
 	}
 
 	/**
@@ -65,14 +66,12 @@ class ProfileSubscriptionsController extends AbstractController
 		global $context, $txt;
 
 		// Load the paid template anyway.
-		$this->_templates->load('ManagePaid');
 		loadLanguage('ManagePaid');
 
-		$memID = currentMemberID();
+		$memID = $this->elk['profile']->currentMemberID();
 		$context['member']['id'] = $memID;
 
 		// Load all of the subscriptions in the system (loads in to $context)
-		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 
 		// Remove any invalid ones, ones not properly set up
@@ -103,14 +102,16 @@ class ProfileSubscriptionsController extends AbstractController
 		}
 
 		// Simple "done"?
-		if (isset($this->_req->query->done))
+		if (isset($this->http_req->query->done))
 			$this->_orderDone($memID);
 		// They have selected a subscription to order.
-		elseif (isset($this->_req->query->confirm) && isset($this->_req->post->sub_id) && is_array($this->_req->post->sub_id))
+		elseif (isset($this->http_req->query->confirm) && isset($this->http_req->post->sub_id) && is_array($this->http_req->post->sub_id))
 			$this->_confirmOrder($memID);
 		// Show the users whats available and what they have
 		else
 			$context['sub_template'] = 'user_subscription';
+
+		$this->templates->load('ManagePaid');
 	}
 
 	/**
@@ -172,7 +173,7 @@ class ProfileSubscriptionsController extends AbstractController
 	{
 		global $context;
 
-		$sub_id = (int) $this->_req->query->sub_id;
+		$sub_id = (int) $this->http_req->query->sub_id;
 
 		// Must exist but let's be sure...
 		if (isset($context['current'][$sub_id]))
@@ -216,7 +217,7 @@ class ProfileSubscriptionsController extends AbstractController
 		global $context, $modSettings, $txt;
 
 		// Hopefully just one, if not we use the last one.
-		foreach ($this->_req->post->sub_id as $k => $v)
+		foreach ($this->http_req->post->sub_id as $k => $v)
 			$this->_id_sub = (int) $k;
 
 		// Selecting a subscription that does not exist or is not active?
@@ -232,7 +233,7 @@ class ProfileSubscriptionsController extends AbstractController
 		$period = 'xx';
 		if ($this->_order['flexible'])
 		{
-			$period = isset($this->_req->post->cur[$this->_id_sub]) && isset($this->_order['costs'][$this->_req->post->cur[$this->_id_sub]]) ? $this->_req->post->cur[$this->_id_sub] : 'xx';
+			$period = isset($this->http_req->post->cur[$this->_id_sub]) && isset($this->_order['costs'][$this->http_req->post->cur[$this->_id_sub]]) ? $this->http_req->post->cur[$this->_id_sub] : 'xx';
 		}
 
 		// Check we have a valid cost.
@@ -308,11 +309,11 @@ class ProfileSubscriptionsController extends AbstractController
 		if ($this->_order['flexible'])
 		{
 			// Real cost...
-			$context['value'] = $this->_order['costs'][$this->_req->post->cur[$this->_id_sub]];
-			$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$this->_req->post->cur[$this->_id_sub]];
+			$context['value'] = $this->_order['costs'][$this->http_req->post->cur[$this->_id_sub]];
+			$context['cost'] = sprintf($modSettings['paid_currency_symbol'], $context['value']) . '/' . $txt[$this->http_req->post->cur[$this->_id_sub]];
 
 			// The period value for paypal.
-			$context['paypal_period'] = strtoupper(substr($this->_req->post->cur[$this->_id_sub], 0, 1));
+			$context['paypal_period'] = strtoupper(substr($this->http_req->post->cur[$this->_id_sub], 0, 1));
 		}
 		else
 		{

@@ -89,16 +89,16 @@ class SpellcheckController extends AbstractController
 		@ob_end_clean();
 
 		// Nothing to check or nothing to check with
-		if (!isset($this->_req->post->spellstring) || !$this->pspell_link)
+		if (!isset($this->http_req->post->spellstring) || !$this->pspell_link)
 			die;
 
 		// Get all the words (Javascript already separated them).
-		$this->_alphas = explode("\n", strtr($this->_req->post->spellstring, array("\r" => '')));
+		$this->_alphas = explode("\n", strtr($this->http_req->post->spellstring, array("\r" => '')));
 
 		// Construct a bit of Javascript code.
 		$context['spell_js'] = '
 			var txt = {"done": "' . $txt['spellcheck_done'] . '"},
-				mispstr = ' . ($this->_req->post->fulleditor === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
+				mispstr = ' . ($this->http_req->post->fulleditor === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
 				misps = ' . $this->_build_misps_array() . '
 			);';
 

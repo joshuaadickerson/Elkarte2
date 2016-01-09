@@ -99,10 +99,10 @@ class WhoController extends AbstractController
 			unset($_SESSION['who_online_filter']);
 
 		// Does the user prefer a different sort direction?
-		if (isset($this->_req->query->sort) && isset($sort_methods[$this->_req->query->sort]))
+		if (isset($this->http_req->query->sort) && isset($sort_methods[$this->http_req->query->sort]))
 		{
-			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $this->_req->query->sort;
-			$sort_method = $sort_methods[$this->_req->query->sort];
+			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $this->http_req->query->sort;
+			$sort_method = $sort_methods[$this->http_req->query->sort];
 		}
 		// Did we set a preferred sort order earlier in the session?
 		elseif (isset($_SESSION['who_online_sort_by']))
@@ -117,21 +117,21 @@ class WhoController extends AbstractController
 			$sort_method = 'lo.log_time';
 		}
 
-		$context['sort_direction'] = isset($this->_req->query->asc) || ($this->_req->getQuery('sort_dir', 'trim', '') === 'asc') ? 'up' : 'down';
+		$context['sort_direction'] = isset($this->http_req->query->asc) || ($this->http_req->getQuery('sort_dir', 'trim', '') === 'asc') ? 'up' : 'down';
 
 		$conditions = array();
 		if (!allowedTo('moderate_forum'))
 			$conditions[] = '(IFNULL(mem.show_online, 1) = 1)';
 
 		// Fallback to top filter?
-		if (isset($this->_req->post->submit_top, $this->_req->post->show_top))
-			$this->_req->post->show = $this->_req->post->show_top;
+		if (isset($this->http_req->post->submit_top, $this->http_req->post->show_top))
+			$this->http_req->post->show = $this->http_req->post->show_top;
 
 		// Does the user wish to apply a filter?
-		if (isset($this->_req->post->show) && isset($show_methods[$this->_req->post->show]))
+		if (isset($this->http_req->post->show) && isset($show_methods[$this->http_req->post->show]))
 		{
-			$context['show_by'] = $_SESSION['who_online_filter'] = $this->_req->post->show;
-			$conditions[] = $show_methods[$this->_req->post->show];
+			$context['show_by'] = $_SESSION['who_online_filter'] = $this->http_req->post->show;
+			$conditions[] = $show_methods[$this->http_req->post->show];
 		}
 		// Perhaps we saved a filter earlier in the session?
 		elseif (isset($_SESSION['who_online_filter']))
@@ -145,8 +145,8 @@ class WhoController extends AbstractController
 		$totalMembers = countMembersOnline($conditions);
 
 		// Prepare some page index variables.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $this->_req->post->start, $totalMembers, $modSettings['defaultMaxMembers']);
-		$context['start'] = $this->_req->post->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $this->http_req->post->start, $totalMembers, $modSettings['defaultMaxMembers']);
+		$context['start'] = $this->http_req->post->start;
 		$context['sub_template'] = 'whos_online';
 		$this->_layers->add('whos_selection');
 

@@ -468,4 +468,9 @@ abstract class AbstractDatabase implements DatabaseInterface
 	{
 		return is_object($this->connection());
 	}
+
+	public function title()
+	{
+		return self::TITLE;
+	}
 }

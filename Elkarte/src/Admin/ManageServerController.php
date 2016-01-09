@@ -80,7 +80,7 @@ class ManageServerController extends AbstractController
 
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
-		$this->_session->check('request');
+		$this->session->check('request');
 
 		$subActions = array(
 			'general' => array($this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
@@ -109,7 +109,7 @@ class ManageServerController extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($this->_req->query->msg) && isset($txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
+		$context['settings_message'] = (isset($this->http_req->query->msg) && isset($txt[$this->http_req->query->msg])) ? $txt[$this->http_req->query->msg] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
 		if ($subAction != 'cache')
@@ -161,7 +161,7 @@ class ManageServerController extends AbstractController
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			$GLOBALS['elk']['hooks']->hook('save_general_settings');
 
@@ -214,7 +214,7 @@ class ManageServerController extends AbstractController
 		$context['save_disabled'] = $context['settings_not_writable'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			$GLOBALS['elk']['hooks']->hook('save_database_settings');
 
@@ -256,22 +256,22 @@ class ManageServerController extends AbstractController
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			$GLOBALS['elk']['hooks']->hook('save_cookie_settings');
 
 			// Its either local or global cookies
-			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
-				unset($this->_req->post->globalCookies);
+			if (!empty($this->http_req->post->localCookies) && empty($this->http_req->post->globalCookies))
+				unset($this->http_req->post->globalCookies);
 
-			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
+			if (!empty($this->http_req->post->globalCookiesDomain) && strpos($boardurl, $this->http_req->post->globalCookiesDomain) === false)
 				$GLOBALS['elk']['errors']->fatal_lang_error('invalid_cookie_domain', false);
 
 			//SettingsForm::save_db($config_vars);
 			$this->_cookieSettingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
-			if ($cookiename != $this->_req->post->cookiename)
+			if ($cookiename != $this->http_req->post->cookiename)
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -281,7 +281,7 @@ class ManageServerController extends AbstractController
 				setLoginCookie(-3600, 0);
 
 				// Set the new one.
-				$cookiename = $this->_req->post->cookiename;
+				$cookiename = $this->http_req->post->cookiename;
 				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
 
 				redirectexit('action=Admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, serverIs('needs_login_fix'));
@@ -344,14 +344,14 @@ class ManageServerController extends AbstractController
 		}
 
 		// Saving again?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			$GLOBALS['elk']['hooks']->hook('save_cache_settings');
 
 			$this->_cacheSettingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
-			updatesettings(array('cache_enable' => (int) $this->_req->post->cache_enable));
+			updatesettings(array('cache_enable' => (int) $this->http_req->post->cache_enable));
 
 			// exit so we reload our new settings on the page
 			redirectexit('action=Admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
@@ -408,24 +408,24 @@ class ManageServerController extends AbstractController
 		$context['settings_title'] = $txt['load_balancing_settings'];
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->http_req->query->save))
 		{
 			// Stupidity is not allowed.
-			foreach ($this->_req->post as $key => $value)
+			foreach ($this->http_req->post as $key => $value)
 			{
 				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
 					continue;
 				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
-					$this->_req->post->loadavg_auto_opt = '1.0';
+					$this->http_req->post->loadavg_auto_opt = '1.0';
 				elseif ($key == 'loadavg_forum' && $value < 10)
-					$this->_req->post->loadavg_forum = '10.0';
+					$this->http_req->post->loadavg_forum = '10.0';
 				elseif ($value < 2)
-					$this->_req->$key = '2.0';
+					$this->http_req->$key = '2.0';
 			}
 
 			$GLOBALS['elk']['hooks']->hook('save_loadavg_settings');
 
-			SettingsForm::save_db($config_vars, $this->_req->post);
+			SettingsForm::save_db($config_vars, $this->http_req->post);
 			redirectexit('action=Admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -592,7 +592,7 @@ class ManageServerController extends AbstractController
 				array('localCookies', $txt['localCookies'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) == 'on' || strtolower($this->_req->server->HTTPS) == '1')),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->http_req->server->HTTPS) || !(strtolower($this->http_req->server->HTTPS) == 'on' || strtolower($this->http_req->server->HTTPS) == '1')),
 				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 				// Sessions

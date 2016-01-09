@@ -135,10 +135,10 @@ class MoveTopicController extends AbstractController
 
 		$this->_check_access_2();
 
-		$this->_session->check();
+		$this->session->check();
 
 		// The destination board must be numeric.
-		$this->_toboard = (int) $this->_req->post->toboard;
+		$this->_toboard = (int) $this->http_req->post->toboard;
 
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
@@ -171,7 +171,7 @@ class MoveTopicController extends AbstractController
 		sendNotifications($this->_topic, 'move');
 
 		// Why not go back to the original board in case they want to keep moving?
-		if (!isset($this->_req->post->goback))
+		if (!isset($this->http_req->post->goback))
 			redirectexit('board=' . $board . '.0');
 		else
 			redirectexit('topic=' . $this->_topic . '.0');
@@ -201,7 +201,7 @@ class MoveTopicController extends AbstractController
 			'name' => $txt['move_topic'],
 		);
 
-		$context['back_to_topic'] = isset($this->_req->post->goback);
+		$context['back_to_topic'] = isset($this->http_req->post->goback);
 
 		// Ugly !
 		if ($user_info['language'] != $language)
@@ -213,8 +213,8 @@ class MoveTopicController extends AbstractController
 		}
 
 		// We will need this
-		if (isset($this->_req->query->current_board))
-			moveTopicConcurrence((int) $this->_req->query->current_board);
+		if (isset($this->http_req->query->current_board))
+			moveTopicConcurrence((int) $this->http_req->query->current_board);
 
 		// Register this form and get a sequence number in $context.
 		$this->checkSubmitOnce('register');
@@ -271,17 +271,17 @@ class MoveTopicController extends AbstractController
 			$this->_errors->fatal_lang_error('no_access', false);
 
 		// You can't choose to have a redirection topic and not provide a reason.
-		if (isset($this->_req->post->postRedirect) && $this->_req->getPost('reason', 'trim', '') === '')
+		if (isset($this->http_req->post->postRedirect) && $this->http_req->getPost('reason', 'trim', '') === '')
 			$this->_errors->fatal_lang_error('movetopic_no_reason', false);
 
 		// You have to tell us were you are moving to
-		if (!isset($this->_req->post->toboard))
+		if (!isset($this->http_req->post->toboard))
 			$this->_errors->fatal_lang_error('movetopic_no_board', false);
 
 		// We will need this
 
-		if (isset($this->_req->query->current_board))
-			moveTopicConcurrence((int) $this->_req->query->current_board);
+		if (isset($this->http_req->query->current_board))
+			moveTopicConcurrence((int) $this->http_req->query->current_board);
 
 		// Make sure this form hasn't been submitted before.
 		$this->checkSubmitOnce('check');
@@ -321,9 +321,9 @@ class MoveTopicController extends AbstractController
 		global $context;
 
 		// Rename the topic...
-		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
+		if (isset($this->http_req->post->reset_subject, $this->http_req->post->custom_subject) && $this->http_req->post->custom_subject != '')
 		{
-			$custom_subject = strtr($GLOBALS['elk']['text']->htmltrim($GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr($GLOBALS['elk']['text']->htmltrim($GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
 			if ($GLOBALS['elk']['text']->strlen($custom_subject) > 100)
@@ -332,7 +332,7 @@ class MoveTopicController extends AbstractController
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
 			{
-				$all_messages = isset($this->_req->post->enforce_subject);
+				$all_messages = isset($this->http_req->post->enforce_subject);
 				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.
@@ -362,13 +362,13 @@ class MoveTopicController extends AbstractController
 		global $txt, $board, $scripturl, $language, $user_info;
 
 		// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
-		if (isset($this->_req->post->postRedirect))
+		if (isset($this->http_req->post->postRedirect))
 		{
 			// Should be in the boardwide language.
 			if ($user_info['language'] != $language)
 				loadLanguage('index', $language);
 
-			$reason = $GLOBALS['elk']['text']->htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
+			$reason = $GLOBALS['elk']['text']->htmlspecialchars($this->http_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.
@@ -378,10 +378,10 @@ class MoveTopicController extends AbstractController
 			));
 
 			// Auto remove this MOVED redirection topic in the future?
-			$redirect_expires = !empty($this->_req->post->redirect_expires) ? (int) $this->_req->post->redirect_expires : 0;
+			$redirect_expires = !empty($this->http_req->post->redirect_expires) ? (int) $this->http_req->post->redirect_expires : 0;
 
 			// Redirect to the MOVED topic from topic list?
-			$redirect_topic = isset($this->_req->post->redirect_topic) ? $this->_topic : 0;
+			$redirect_topic = isset($this->http_req->post->redirect_topic) ? $this->_topic : 0;
 
 			// And remember the last expiry period too.
 			$_SESSION['move_to_topic']['redirect_topic'] = $redirect_topic;
